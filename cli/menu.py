@@ -39,15 +39,15 @@ def menu_1():
         elif option == '2':
             pass
         elif option == '3':
-            pass
+            return menu_1_3()
         elif option == '4':
-            pass
+            return menu_1_4()
         elif option == '5':
             pass
         elif option == '6':
-            pass
+            return menu_1_6()
         elif option == '7':
-            pass
+            return menu_1_7()
         elif option == '8':
             pass
         elif option == '9':
@@ -75,5 +75,103 @@ def menu_1_1():
         option = input('Wybierz opcję: ')
         if option == '0':
             return menu_1()
+
+
+def menu_1_3():
+    while True:
+        print("┌─────────── WSKAŹNIKI ───────────┐\n"
+              "| 1 - Wyświetl                    |\n"
+              "| 2 - Wczytaj z pliku (zastąp)    |\n"
+              "| 3 - Wczytaj z pliku (dodaj)     |\n"
+              "| 4 - Dodaj                       |\n"
+              "| 5 - Edytuj                      |\n"
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '3':
+            pass
+        elif option == '4':
+            pass
+        elif option == '5':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
+
+def menu_1_4():
+    while True:
+        print("┌───────── PRZELICZNIKI ──────────┐\n"
+              "| 1 - Wyświetl                    |\n"
+              "| 2 - Wczytaj z pliku (zastąp)    |\n"
+              "| 3 - Wczytaj z pliku (dodaj)     |\n"
+              "| 4 - Dodaj                       |\n"
+              "| 5 - Edytuj                      |\n"
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '3':
+            pass
+        elif option == '4':
+            pass
+        elif option == '5':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
+
+def menu_1_6():
+    while True:
+        print("┌──────────── RAPORTY ────────────┐\n"
+              "| 1 - Generuj Raport 1            |\n"
+              "| 2 - Generuj Raport 2            |\n"
+              "| 3 - Generuj Raport 3            |\n"              
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '3':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
+
+def menu_1_7():
+    while True:
+        print("┌─────────── USTAWIENIA ──────────┐\n"
+              "| 1 - Język                       |\n"
+              "| 2 - Jednostki                   |\n"
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
 
 menu_0()
