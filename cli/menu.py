@@ -37,13 +37,13 @@ def menu_1():
         if option == '1':
             return menu_1_1()
         elif option == '2':
-            pass
+            return menu_1_2()
         elif option == '3':
             return menu_1_3()
         elif option == '4':
             return menu_1_4()
         elif option == '5':
-            pass
+            return menu_1_5()
         elif option == '6':
             return menu_1_6()
         elif option == '7':
@@ -65,7 +65,7 @@ def menu_1_1():
               "| NIP: 645065656                        |\n"
               "| Adres: ul. Kwiatowa, 00-000 Warszawa  |\n"
               "|                                       |\n"
-              "|                                       |\n"
+              "|            DO UZUPEŁNIENIA            |\n"
               "|                                       |\n"
               "|                                       |\n"
               "|                                       |\n"
@@ -75,6 +75,25 @@ def menu_1_1():
         option = input('Wybierz opcję: ')
         if option == '0':
             return menu_1()
+
+
+def menu_1_2():
+    while True:
+        print("┌──────── PRZEDSIĘBIORSTWO ───────┐\n"
+              "| 1 - Wyświetl                    |\n"
+              "| 2 - Edytuj                      |\n"
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
 
 
 def menu_1_3():
@@ -113,6 +132,34 @@ def menu_1_4():
               "| 3 - Wczytaj z pliku (dodaj)     |\n"
               "| 4 - Dodaj                       |\n"
               "| 5 - Edytuj                      |\n"
+              "|                                 |\n"
+              "| 0 - Powrót                      |\n"
+              "└─────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            pass
+        elif option == '2':
+            pass
+        elif option == '3':
+            pass
+        elif option == '4':
+            pass
+        elif option == '5':
+            pass
+        elif option == '0':
+            return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
+
+def menu_1_5():
+    while True:
+        print("┌───────── DANE EMISYJNE ─────────┐\n"
+              "| 1 - Spalanie stacjonarne        |\n"
+              "| 2 - Spalanie mobilne            |\n"
+              "| 3 - Emisje procesowe            |\n"
+              "| 4 - Emisje niezorganizowane     |\n"
+              "| 5 - Energia                     |\n"
               "|                                 |\n"
               "| 0 - Powrót                      |\n"
               "└─────────────────────────────────┘")
