@@ -15,6 +15,8 @@ def menu_0():
         elif option == '2':
             return menu_1()                             # Tymczasowo pominięta opcja wczytywania/zapisu projektu
         elif option == '0':
+            for k in logo:
+                print(k)
             sys.exit()
         else:
             print('Wprowadzono zły parametr!')
