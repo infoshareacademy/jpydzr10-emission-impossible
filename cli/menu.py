@@ -1,4 +1,5 @@
 import sys
+from app.defaults import *
 
 
 def menu_0():
@@ -21,7 +22,7 @@ def menu_0():
 
 def menu_1():
     while True:
-        print(f"┌────────── PROJEKT XYZ ──────────┐\n"   # Nazwa projektu do zastąpienia przez f string (nazwa pliku)
+        print(f"┌──────── {project_name:^15.15} ────────┐\n"
               "| 1 - Podsumowanie                |\n"
               "| 2 - Przedsiębiorstwo            |\n"
               "| 3 - Wskaźniki                   |\n"
@@ -60,18 +61,20 @@ def menu_1():
 
 def menu_1_1():
     while True:
-        print(f"┌──────────── PODSUMOWANIE ─────────────┐\n"        # Do uzupełnienia
-              "| NAZWA FIRMY: EMISSION IMPOSSIBLE      |\n"
-              "| NIP: 645065656                        |\n"
-              "| Adres: ul. Kwiatowa, 00-000 Warszawa  |\n"
-              "|                                       |\n"
-              "|            DO UZUPEŁNIENIA            |\n"
-              "|                                       |\n"
-              "|                                       |\n"
-              "|                                       |\n"
-              "|                                       |\n"
-              "| 0 - Powrót                            |\n"
-              "└───────────────────────────────────────┘")
+        print(f"┌──────────────────────── PODSUMOWANIE ─────────────────────────┐\n"        # Do uzupełnienia
+              f"| NAZWA FIRMY:{company:<50.50}|\n"
+              f"| ADRES:      {company_address:<50.50}|\n"
+              f"| TELEFON:    {company_tel:<15.15}  E-MAIL: {company_mail:<25.25}|\n"
+              f"|---------------------------------------------------------------|\n"
+              f"| Okres sprawozdawczy: 2026 r.                                  |\n"        # Dane przykładowe
+              f"| Ślad węglowy (CO2e): 123 566 789                              |\n"
+              f"|                        DO UZUPEŁNIENIA                        |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"| 0 - Powrót                                                    |\n"
+              f"└───────────────────────────────────────────────────────────────┘")
         option = input('Wybierz opcję: ')
         if option == '0':
             return menu_1()
@@ -219,6 +222,3 @@ def menu_1_7():
             return menu_1()
         else:
             print('Wprowadzono zły parametr!')
-
-
-menu_0()

@@ -1,3 +1,4 @@
-import cli.menu
+import cli.menu as cli
+from app.defaults import *
 
-menu_0()
+cli.menu_0()

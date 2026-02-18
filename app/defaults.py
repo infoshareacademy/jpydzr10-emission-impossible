@@ -1,0 +1,7 @@
+# Plik zawierający domyślne wartości zmiennych
+# Aktualnie zmienne do testów
+company = 'ABCD Sp. z o.o.'
+company_address = 'ul. Kwiatowa 1, 00-000 Warszawa'
+company_tel = '+48 123 456 789'
+company_mail = 'kontakt@abcd.com.pl'
+project_name = 'PROJEKT ABCD'
