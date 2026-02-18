@@ -126,9 +126,9 @@ def menu_1_2_1():
 def menu_1_2_2():
     while True:
         print(f"┌────────────────────── PRZEDSIĘBIORSTWO ───────────────────────┐\n"        # Do uzupełnienia
-              f"| [1]NAZWA FIRMY:{company:<47.47}|\n"
-              f"| [2]ADRES:      {company_address:<47.47}|\n"
-              f"| [3]TELEFON:    {company_tel:<12.12}  [4]E-MAIL: {company_mail:<22.22}|\n"
+              f"| [\033[91m1\033[0m]NAZWA FIRMY:{company:<47.47}|\n"
+              f"| [\033[91m2\033[0m]ADRES:      {company_address:<47.47}|\n"
+              f"| [\033[91m3\033[0m]TELEFON:    {company_tel:<12.12}  [\033[91m4\033[0m]E-MAIL: {company_mail:<22.22}|\n"
               f"|---------------------------------------------------------------|\n"
               f"|                                                               |\n"        # Dane przykładowe
               f"|                        POZOSTAŁE  DANE                        |\n"
