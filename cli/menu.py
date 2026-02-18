@@ -15,7 +15,7 @@ def menu_0():
         elif option == '2':
             return menu_1()                             # Tymczasowo pominięta opcja wczytywania/zapisu projektu
         elif option == '0':
-            for k in logo:
+            for k in LOGO:
                 print(k)
             sys.exit()
         else:
@@ -92,11 +92,56 @@ def menu_1_2():
               "└─────────────────────────────────┘")
         option = input('Wybierz opcję: ')
         if option == '1':
-            pass
+            return menu_1_2_1()
         elif option == '2':
-            pass
+            return menu_1_2_2()
         elif option == '0':
             return menu_1()
+        else:
+            print('Wprowadzono zły parametr!')
+
+def menu_1_2_1():
+    while True:
+        print(f"┌────────────────────── PRZEDSIĘBIORSTWO ───────────────────────┐\n"        # Do uzupełnienia
+              f"| NAZWA FIRMY:{company:<50.50}|\n"
+              f"| ADRES:      {company_address:<50.50}|\n"
+              f"| TELEFON:    {company_tel:<15.15}  E-MAIL: {company_mail:<25.25}|\n"
+              f"|---------------------------------------------------------------|\n"
+              f"|                                                               |\n"        # Dane przykładowe
+              f"|                        POZOSTAŁE  DANE                        |\n"
+              f"|                        DO UZUPEŁNIENIA                        |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"| 0 - Powrót                                                    |\n"
+              f"└───────────────────────────────────────────────────────────────┘")
+        option = input('Wybierz opcję: ')
+        if option == '0':
+            return menu_1_2()
+        else:
+            print('Wprowadzono zły parametr!')
+
+
+def menu_1_2_2():
+    while True:
+        print(f"┌────────────────────── PRZEDSIĘBIORSTWO ───────────────────────┐\n"        # Do uzupełnienia
+              f"| [1]NAZWA FIRMY:{company:<47.47}|\n"
+              f"| [2]ADRES:      {company_address:<47.47}|\n"
+              f"| [3]TELEFON:    {company_tel:<12.12}  [4]E-MAIL: {company_mail:<22.22}|\n"
+              f"|---------------------------------------------------------------|\n"
+              f"|                                                               |\n"        # Dane przykładowe
+              f"|                        POZOSTAŁE  DANE                        |\n"
+              f"|                        DO UZUPEŁNIENIA                        |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"|                                                               |\n"
+              f"| 0 - Powrót                                                    |\n"
+              f"└───────────────────────────────────────────────────────────────┘")
+        option = input('Wybierz numer pola do edycji: ')
+        if option == '0':
+            return menu_1_2()
         else:
             print('Wprowadzono zły parametr!')
 
