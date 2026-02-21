@@ -32,7 +32,7 @@ def menu_1():
               "| 5 - Dane emisyjne               |\n"
               "| 6 - Raporty                     |\n"
               "| 7 - Ustawienia                  |\n"
-              "| 8 - ----------                  |\n"
+              "| 8 - Użytkownicy                  |\n"
               "| 9 - Zapisz                      |\n"
               "| 0 - Zakończ                     |\n"
               "└─────────────────────────────────┘")
