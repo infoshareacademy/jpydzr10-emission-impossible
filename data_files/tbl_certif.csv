@@ -1,0 +1,2 @@
+"id,company,id_certif,energy_type,amount,unit,date_purchase,date_production,country,factor,trader,source"
+"1,TESTOWA,PL-GO-2024-00012345,Energia elektryczna z OZE,100,MWh,15.01.2025,2024,Polska,0,Energa S.A.,faktura"
