@@ -1,2 +1,2 @@
-"id,company,vehicle,fuel,amount,unit,source"
-"1,TESTOWA,samochód,benzyna,200,l,faktura"
+"id,year,company,vehicle,fuel,amount,unit,source"
+"1,2026,TESTOWA,samochód,benzyna,200,l,faktura"

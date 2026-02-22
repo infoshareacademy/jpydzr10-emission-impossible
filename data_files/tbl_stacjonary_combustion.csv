@@ -1,2 +1,2 @@
-"id,company,fuel,amount,unit,installation,emission,source,raport"
-"1,TESTOWA,gaz ziemny,50,m3,kotłownia,,faktura,FALSE"
+"id,year,company,fuel,amount,unit,installation,emission,source,raport"
+"1,2025,TESTOWA,gaz ziemny,50,m3,kotłownia,,faktura,FALSE"
