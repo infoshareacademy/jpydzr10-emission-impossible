@@ -1,5 +1,6 @@
 import sys
-from app.infrastructure.defaults import *
+import app.infrastructure.defaults as defaults
+import app.core.entities.company as company
 
 
 def menu_0():
@@ -15,7 +16,7 @@ def menu_0():
         elif option == '2':
             return menu_1()                             # Tymczasowo pominięta opcja wczytywania/zapisu projektu
         elif option == '0':
-            for k in LOGO:
+            for k in defaults.LOGO:
                 print(k)
             sys.exit()
         else:
@@ -24,7 +25,7 @@ def menu_0():
 
 def menu_1():
     while True:
-        print(f"┌──────── {project_name:^15.15} ────────┐\n"
+        print(f"┌──────── {defaults.project_name:^15.15} ────────┐\n"
               "| 1 - Podsumowanie                |\n"
               "| 2 - Przedsiębiorstwo            |\n"
               "| 3 - Wskaźniki                   |\n"
@@ -64,9 +65,9 @@ def menu_1():
 def menu_1_1():
     while True:
         print(f"┌──────────────────────── PODSUMOWANIE ─────────────────────────┐\n"        # Do uzupełnienia
-              f"| NAZWA FIRMY:{company:<50.50}|\n"
-              f"| ADRES:      {company_address:<50.50}|\n"
-              f"| TELEFON:    {company_tel:<15.15}  E-MAIL: {company_mail:<25.25}|\n"
+              f"| NAZWA FIRMY:{defaults.company:<50.50}|\n"
+              f"| ADRES:      {defaults.company_address:<50.50}|\n"
+              f"| TELEFON:    {defaults.company_tel:<15.15}  E-MAIL: {defaults.company_mail:<25.25}|\n"
               f"|---------------------------------------------------------------|\n"
               f"| Okres sprawozdawczy: 2026 r.                                  |\n"        # Dane przykładowe
               f"| Ślad węglowy (CO2e): 123 566 789                              |\n"
@@ -84,66 +85,73 @@ def menu_1_1():
 
 def menu_1_2():
     while True:
-        print("┌──────── PRZEDSIĘBIORSTWO ───────┐\n"
-              "| 1 - Wyświetl                    |\n"
-              "| 2 - Edytuj                      |\n"
-              "|                                 |\n"
-              "| 0 - Powrót                      |\n"
-              "└─────────────────────────────────┘")
+        print("╔════════ PRZEDSIĘBIORSTWO ═══════╗\n"
+              "║ 1 - Wyświetl                    ║\n"
+              "║ 2 - Edytuj                      ║\n"
+              "║ 3 - Utwórz                      ║\n"
+              "║ 0 - Powrót                      ║\n"
+              "╚═════════════════════════════════╝")
         option = input('Wybierz opcję: ')
         if option == '1':
-            return menu_1_2_1()
+            return company_list()
         elif option == '2':
             return menu_1_2_2()
+        elif option == '3':
+            return menu_1_2_3()
         elif option == '0':
             return menu_1()
-        else:
-            print('Wprowadzono zły parametr!')
-
-def menu_1_2_1():
-    while True:
-        print(f"┌────────────────────── PRZEDSIĘBIORSTWO ───────────────────────┐\n"        # Do uzupełnienia
-              f"| NAZWA FIRMY:{company:<50.50}|\n"
-              f"| ADRES:      {company_address:<50.50}|\n"
-              f"| TELEFON:    {company_tel:<15.15}  E-MAIL: {company_mail:<25.25}|\n"
-              f"|---------------------------------------------------------------|\n"
-              f"|                                                               |\n"        # Dane przykładowe
-              f"|                        POZOSTAŁE  DANE                        |\n"
-              f"|                        DO UZUPEŁNIENIA                        |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"| 0 - Powrót                                                    |\n"
-              f"└───────────────────────────────────────────────────────────────┘")
-        option = input('Wybierz opcję: ')
-        if option == '0':
-            return menu_1_2()
         else:
             print('Wprowadzono zły parametr!')
 
 
 def menu_1_2_2():
     while True:
-        print(f"┌────────────────────── PRZEDSIĘBIORSTWO ───────────────────────┐\n"        # Do uzupełnienia
-              f"| [\033[91m1\033[0m]NAZWA FIRMY:{company:<47.47}|\n"
-              f"| [\033[91m2\033[0m]ADRES:      {company_address:<47.47}|\n"
-              f"| [\033[91m3\033[0m]TELEFON:    {company_tel:<12.12}  [\033[91m4\033[0m]E-MAIL: {company_mail:<22.22}|\n"
-              f"|---------------------------------------------------------------|\n"
-              f"|                                                               |\n"        # Dane przykładowe
-              f"|                        POZOSTAŁE  DANE                        |\n"
-              f"|                        DO UZUPEŁNIENIA                        |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"|                                                               |\n"
-              f"| 0 - Powrót                                                    |\n"
-              f"└───────────────────────────────────────────────────────────────┘")
-        option = input('Wybierz numer pola do edycji: ')
+        company_list(False)
+        option = input('Wybierz numer ID wiersza do edycji: ')              # Edycja danych firmy - do uzupełnienia
         if option == '0':
             return menu_1_2()
         else:
             print('Wprowadzono zły parametr!')
+
+def menu_1_2_3():
+    while True:
+        print("╔════════════ UTWÓRZ ═════════════╗\n"
+              "║ 1 - Grupa kapitałowa            ║\n"
+              "║ 2 - Przedsiębiorstwo            ║\n"
+              "║ 3 - Importuj (DEMO)             ║\n"                   # Tymczasowe DEMO, do zastąpienia importem z *.csv
+              "║ 4 - Zapisz do pliku             ║\n"                   # Funkcja do uzupełnienia
+              "║ 0 - Powrót                      ║\n"
+              "╚═════════════════════════════════╝")
+        option = input('Wybierz opcję: ')
+        if option == '1':
+            company.cg.update_cg(True)
+            return company_list()
+        elif option == '2':
+            company.cg.update_cg(False)
+            return company_list()
+        elif option == '3':
+            company.import_companies()
+            return company_list()
+        elif option == '4':
+            pass
+        elif option == '0':
+            return menu_1_2()
+        else:
+            print('Wprowadzono zły parametr!')
+
+def company_list(return_loop=True):
+    print(company.cg)
+    print('╔' + 2*'═' + '╤' + 22*'═' + '╤' + 17*'═' + '╤' + 17*'═' + '╤' + 17*'═' + '╤' + 8*'═' + '╤' + 17*'═' + '╤' + 17*'═' + '╤' + 12*'═' + '╤' + 11*'═' + '╤' + 12*'═' + '╤' + 22*'═' + '╗')
+    print(f'║{'ID':^2.2}│ {'NAZWA':^20.20} │ {'PAŃSTWO':^15.15} │ {'MIASTO':^15.15} │ {'ULICA':^15.15} │ {'KOD P.':^6.6} │ {'TELEFON':^15.15} │ {'E-MAIL':^15.15} │ {'KRS':^10.10} │ {'REGON':^9.9} │ {'NIP':^10.10} │ {'GRUPA KAPITAŁOWA':^20.20} ║')
+    print('╠' + 2*'═' + '╪' + 22*'═' + '╪' + 17*'═' + '╪' + 17*'═' + '╪' + 17*'═' + '╪' + 8*'═' + '╪' + 17*'═' + '╪' + 17*'═' + '╪' + 12*'═' + '╪' + 11*'═' + '╪' + 12*'═' + '╪' + 22*'═' + '╣')
+
+    for x in range(len(company.companies)):
+        print(company.companies[x])
+    print('╚' + 2*'═' + '╧' + 22*'═' + '╧' + 17*'═' + '╧' + 17*'═' + '╧' + 17*'═' + '╧' + 8*'═' + '╧' + 17*'═' + '╧' + 17*'═' + '╧' + 12*'═' + '╧' + 11*'═' + '╧' + 12*'═' + '╧' + 22*'═' + '╝')
+    if return_loop:
+        while True:
+            if input('Wpisz 0, aby powrócić:') == '0':
+                return menu_1_2()
 
 
 def menu_1_3():
