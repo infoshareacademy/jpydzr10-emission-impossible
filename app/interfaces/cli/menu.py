@@ -204,7 +204,8 @@ def menu_1_4():
               "╚═══════════════════════════════════════════════════════════════════════════╝")
 
         option = input('Wybierz opcję:')
-        value = input('Podaj wartość:')
+        if option != '0':
+            value = input('Podaj wartość:')
         if option == '1':
             u1, u2 = 'MWh', 'kWh'
         elif option == '2':
