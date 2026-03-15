@@ -1,0 +1,6 @@
+co_id,co_name,co_country,co_city,co_street,co_zip,co_tel,co_mail,co_krs,co_regon,co_nip,cg_name
+0,ABC Solutions,Polska,Darłowo,Morska 10,76-150,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
+1,XYZ Company,USA,New York,11 Wall Street,10005,+44 (0)207 797 1000,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
+2,ABC Limited,Wielka Brytania,Londyn,10 Paternoster Sq',EC4M 7LS,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
+3,Firma AAA,Polska,Gdańsk,Podwale Grodzkie 2,80-886,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
+4,Firma BBB,Polska,Warszawa,Książęca 4,00-498,+48 22 537 75 82,info@abc.pl,1023456789,987654321,1234567890,ABC Enterprise

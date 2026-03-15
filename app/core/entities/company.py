@@ -1,3 +1,5 @@
+import app.infrastructure.repositories.file.company_repository as csv_reader
+
 class CapitalGroup:
     cg_companies = []
     def __init__(self, is_cg, cg_name=None, cg_num=0):
@@ -70,14 +72,18 @@ def clear_companies():
     cg.cg_num = 0
     companies.clear()
 
-# Funkcja testowa, do zastąpienia importem z *.csv
+# Import from 'tbl_companies.csv'
 def import_companies():
     clear_companies()
-    cg.cg_name = 'ABC Enterprise'
-    cg.is_cg = True
-    cg.cg_num = 5
-    companies.append(Company(co_id=0, co_name='ABC Solutions', co_country='Polska', co_city='Darłowo', co_street='Morska 10', co_zip='76-150', co_tel='+48 789 456 123', co_mail='kontak@abc.pl', co_krs='1023456789', co_regon='987654321', co_nip='1234567890', cg_name=cg.cg_name))
-    companies.append(Company(co_id=1, co_name='XYZ Company', co_country='USA', co_city='New York', co_street='11 Wall Street', co_zip='10005', co_tel='+48 789 456 123', co_mail='kontak@abc.pl', co_krs='1023456789', co_regon='987654321', co_nip='1234567890', cg_name=cg.cg_name))
-    companies.append(Company(co_id=2, co_name='ABC Limited', co_country='Wielka Brytania', co_city='Londyn', co_street='10 Paternoster Sq', co_zip='EC4M 7LS', co_tel='+44 (0)207 797 1000', co_mail='kontak@abc.pl', co_krs='1023456789', co_regon='987654321', co_nip='1234567890', cg_name=cg.cg_name))
-    companies.append(Company(co_id=3, co_name='Firma AAA', co_country='Polska', co_city='Gdańsk', co_street='Podwale Grodzkie 2', co_zip='80-886', co_tel='+48 789 456 123', co_mail='kontak@abc.pl', co_krs='1023456789', co_regon='987654321', co_nip='1234567890', cg_name=cg.cg_name))
-    companies.append(Company(co_id=4, co_name='Firma BBB', co_country='Polska', co_city='Warszawa', co_street='Książęca 4', co_zip='00-498', co_tel='+48 22 537 75 82', co_mail='info@abc.pl', co_krs='1023456789', co_regon='987654321', co_nip='1234567890', cg_name=cg.cg_name))
+    rows = csv_reader.read_csv('tbl_companies.csv')
+    first_row = rows[0]
+    if first_row['cg_name'] != '':                                      # Name of Capital Group is taken from first record only
+        cg.cg_name = first_row['cg_name']
+        cg.is_cg = True
+        cg.cg_num = len(rows)
+    else:
+        cg.cg_name = '------'
+        cg.is_cg = False
+        cg.cg_num = 0
+    for row in rows:
+        companies.append(Company(co_id=row['co_id'], co_name=row['co_name'], co_country=row['co_country'], co_city=row['co_city'], co_street=row['co_street'], co_zip=row['co_zip'], co_tel=row['co_tel'], co_mail=row['co_mail'], co_krs=row['co_krs'], co_regon=row['co_regon'], co_nip=row['co_nip'], cg_name=cg.cg_name))

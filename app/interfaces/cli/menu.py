@@ -119,7 +119,7 @@ def menu_1_2_3():
         print("╔════════════ UTWÓRZ ═════════════╗\n"
               "║ 1 - Grupa kapitałowa            ║\n"
               "║ 2 - Przedsiębiorstwo            ║\n"
-              "║ 3 - Importuj (DEMO)             ║\n"                   # Tymczasowe DEMO, do zastąpienia importem z *.csv
+              "║ 3 - Importuj z pliku            ║\n"                   # tbl_companies.csv
               "║ 4 - Zapisz do pliku             ║\n"                   # Funkcja do uzupełnienia
               "║ 0 - Powrót                      ║\n"
               "╚═════════════════════════════════╝")
