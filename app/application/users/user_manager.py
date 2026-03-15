@@ -5,11 +5,11 @@ from getpass import getpass
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
-env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "data_files", ".env")
-load_dotenv(env_path)
+# Load variables from .env in project root
+load_dotenv()
 
 FOLDER_PATH = "data_files"
-USERS_FILE = "tbl_users.csv"
+USERS_FILE = os.getenv("USERS_FILE", "tbl_users.csv")
 DEFAULT_PASSWORD = os.getenv("DEFAULT_PASSWORD", "1234")
 
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
@@ -57,7 +57,7 @@ class UserManager:
         new_user = User(name, surname, email, phone_number, login, password)
         self.users.append(new_user)
         self._save_users()
-        print(f"✅ User '{login}' added successfully.")
+        print(f" User '{login}' added successfully.")
         return new_user
 
     def authenticate_user(self, login, password):
