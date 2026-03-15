@@ -1,7 +1,6 @@
 import sys
 import app.infrastructure.defaults as defaults
 import app.core.entities.company as company
-from app.application.users import menu_users
 import app.core.calculations.conversions as unit
 
 
@@ -54,8 +53,8 @@ def menu_1():
             return menu_1_6()
         elif option == '7':
             return menu_1_7()
-        elif option == "8":
-            menu_users()
+        elif option == '8':
+            pass
         elif option == '9':
             pass
         elif option == '0':
