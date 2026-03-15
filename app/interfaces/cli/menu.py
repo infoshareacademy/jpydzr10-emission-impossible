@@ -2,6 +2,7 @@ import sys
 import app.infrastructure.defaults as defaults
 import app.core.entities.company as company
 from app.application.users import menu_users
+import app.core.calculations.conversions as unit
 
 
 def menu_0():
@@ -119,7 +120,7 @@ def menu_1_2_3():
         print("╔════════════ UTWÓRZ ═════════════╗\n"
               "║ 1 - Grupa kapitałowa            ║\n"
               "║ 2 - Przedsiębiorstwo            ║\n"
-              "║ 3 - Importuj (DEMO)             ║\n"                   # Tymczasowe DEMO, do zastąpienia importem z *.csv
+              "║ 3 - Importuj z pliku            ║\n"                   # tbl_companies.csv
               "║ 4 - Zapisz do pliku             ║\n"                   # Funkcja do uzupełnienia
               "║ 0 - Powrót                      ║\n"
               "╚═════════════════════════════════╝")
@@ -185,30 +186,65 @@ def menu_1_3():
 
 def menu_1_4():
     while True:
-        print("┌───────── PRZELICZNIKI ──────────┐\n"
-              "| 1 - Wyświetl                    |\n"
-              "| 2 - Wczytaj z pliku (zastąp)    |\n"
-              "| 3 - Wczytaj z pliku (dodaj)     |\n"
-              "| 4 - Dodaj                       |\n"
-              "| 5 - Edytuj                      |\n"
-              "|                                 |\n"
-              "| 0 - Powrót                      |\n"
-              "└─────────────────────────────────┘")
-        option = input('Wybierz opcję: ')
+        print("╔══════════════════════════════ PRZELICZNIKI ═══════════════════════════════╗\n"
+              "║                                  ENERGIA                                  ║\n"
+              "╟──────────────────┬──────────────────┬──────────────────┬──────────────────╢\n"
+              "║ 1 - MWh -> kWh   │ 4 - kWh -> MWh   │ 7 - GJ -> kWh    │ 10 - MJ -> kWh   ║\n"
+              "║ 2 - MWh -> GJ    │ 5 - kWh -> GJ    │ 8 - GJ -> MWh    │ 11 - MJ -> MWh   ║\n"
+              "║ 3 - MWh -> MJ    │ 6 - kWh -> MJ    │ 9 - GJ -> MJ     │ 12 - MJ -> GJ    ║\n"
+              "╠══════════════════╧══════════════════╧══════════════════╧══════════════════╣\n"
+              "║                                   MASA                                    ║\n"
+              "╟──────────────────┬──────────────────┬──────────────────┬──────────────────╢\n"
+              "║ 13 - kg -> t     │ 14 - t -> kg     │                  │                  ║\n"
+              "╠══════════════════╧══════════════════╧══════════════════╧══════════════════╣\n"
+              "║                                 OBJĘTOŚĆ                                  ║\n"
+              "╟──────────────────┬──────────────────┬──────────────────┬──────────────────╢\n"
+              "║ 15 - l -> m3     │ 16 - m3 -> l     │                  │                  ║\n"
+              "╠══════════════════╧══════════════════╧══════════════════╧══════════════════╣\n"
+              "║ 0 - Powrót                                                                ║\n"
+              "╚═══════════════════════════════════════════════════════════════════════════╝")
+
+        option = input('Wybierz opcję:')
+        if option != '0':
+            value = input('Podaj wartość:')
         if option == '1':
-            pass
+            u1, u2 = 'MWh', 'kWh'
         elif option == '2':
-            pass
+            u1, u2 = 'MWh', 'GJ'
         elif option == '3':
-            pass
+            u1, u2 = 'MWh', 'MJ'
         elif option == '4':
-            pass
+            u1, u2 = 'kWh', 'MWh'
         elif option == '5':
-            pass
+            u1, u2 = 'kWh', 'GJ'
+        elif option == '6':
+            u1, u2 = 'kWh', 'MJ'
+        elif option == '7':
+            u1, u2 = 'GJ', 'kWh'
+        elif option == '8':
+            u1, u2 = 'GJ', 'MWh'
+        elif option == '9':
+            u1, u2 = 'GJ', 'MJ'
+        elif option == '10':
+            u1, u2 = 'MJ', 'kWh'
+        elif option == '11':
+            u1, u2 = 'MJ', 'MWh'
+        elif option == '12':
+            u1, u2 = 'MJ', 'GJ'
+        elif option == '13':
+            u1, u2 = 'kg', 't'
+        elif option == '14':
+            u1, u2 = 't',
+        elif option == '15':
+            u1, u2 = 'l', 'm3'
+        elif option == '16':
+            u1, u2 = 'm3', 'l'
         elif option == '0':
             return menu_1()
         else:
             print('Wprowadzono zły parametr!')
+        result = unit.convert(float(value), u1, u2)
+        print(f'{value} {u1} = \033[34m{result} {u2}\033[0m')
 
 
 def menu_1_5():
