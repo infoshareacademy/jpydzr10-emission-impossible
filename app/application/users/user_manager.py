@@ -3,9 +3,14 @@ import os
 import re
 from getpass import getpass
 from dataclasses import dataclass
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "data_files", ".env")
+load_dotenv(env_path)
 
 FOLDER_PATH = "data_files"
 USERS_FILE = "tbl_users.csv"
+DEFAULT_PASSWORD = os.getenv("DEFAULT_PASSWORD", "1234")
 
 EMAIL_REGEX = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
