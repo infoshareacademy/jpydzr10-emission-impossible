@@ -1,2 +1,3 @@
-"name,surname,email,phone_number,login,password"
-"Adrian,Sidorek,adriansidorek@gmail.com,666555222,sidoreka,123123!"
+name,surname,email,phone_number,login,password
+Adrian,Sidorek,adriansidorek@gmail.com,666555222,sidoreka,123123!
+

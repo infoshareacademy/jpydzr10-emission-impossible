@@ -1,9 +1,37 @@
 import sys
 import app.infrastructure.defaults as defaults
 import app.core.entities.company as company
-from app.application.users import menu_users
 import app.core.calculations.conversions as unit
+import app.application.users.user_manager as user_manager
 
+def menu_users():
+    """
+    Menu for handling user operations:
+    1 - Login
+    2 - Create new user
+    3 - Edit my data
+    0 - Back to main menu
+    """
+    while True:
+        print(
+            "┌────────── USERS ──────────┐\n"
+            "| 1 - Login                 |\n"
+            "| 2 - Create new user       |\n"
+            "| 3 - Edit my data          |\n"
+            "| 0 - Back                  |\n"
+            "└───────────────────────────┘"
+        )
+        option = input("Choose an option: ")
+        if option == "1":
+            user_manager.user_prompt()
+        elif option == "2":
+            user_manager.create_user()
+        elif option == "3":
+            user_manager.edit_user()
+        elif option == "0":
+            return  # back to main menu
+        else:
+            print("Invalid option!")
 
 def menu_0():
     while True:

@@ -1,2 +1,2 @@
-"id,year,company,energy_type,amount,unit,trader,factor,source"
-"1,2026,TESTOWA,Energia elektryczna,20,MWh,Energa S.A.,faktura"
+id,year,company,energy_type,amount,unit,trader,factor,source
+1,2026,TESTOWA,Energia elektryczna,20,MWh,Energa S.A.,faktura

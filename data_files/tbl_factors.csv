@@ -1,2 +1,2 @@
-"id,factor_name,country,factor,unit_factor,source"
-"1,Energia elektryczna,Polska,0.55,tCO2e/GJ,KOBiZE"
+id,factor_name,country,factor,unit_factor,source
+1,Energia elektryczna,Polska,0.55,tCO2e/GJ,KOBiZE

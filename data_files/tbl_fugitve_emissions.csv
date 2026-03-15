@@ -1,2 +1,2 @@
-"id,year,company,installation,product,amount,unit,emission,source"
-"1,2026,TESTOWA,Klimatyzator,R509a,0.4,kg,2,rejestr CRO"
+id,year,company,installation,product,amount,unit,emission,source
+1,2026,TESTOWA,Klimatyzator,R509a,0.4,kg,2,rejestr CRO
