@@ -1,8 +1,6 @@
 # Obsługa użytkowników aplikacji
 
 import getpass
-
-
 from user_manager import UserManager
 from getpass import getpass
 
