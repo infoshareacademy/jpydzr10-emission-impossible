@@ -1,2 +1,5 @@
 id,company,id_certif,energy_type,amount,unit,date_purchase,date_production,country,factor,trader,source
-1,TESTOWA,PL-GO-2024-00012345,Energia elektryczna z OZE,100,MWh,15.01.2025,2024,Polska,0,Energa S.A.,faktura
+1,GreenTech Polska,PL-GO-2025-00011111,Energia elektryczna z OZE,200,MWh,10.01.2025,2024,Polska,0,GreenTech Energia,umowa PPA
+2,GreenTech Produkcja,PL-GO-2025-00022222,Energia elektryczna z OZE,500,MWh,15.02.2025,2024,Polska,0,Energa OZE,faktura
+3,EcoPartner Sp. z o.o.,PL-GO-2025-00033333,Energia elektryczna z OZE,150,MWh,20.01.2025,2024,Polska,0,GreenTech Energia,umowa PPA
+4,GreenTech Nieruchomości,PL-GO-2025-00044444,Energia elektryczna z OZE,100,MWh,05.03.2025,2024,Polska,0,PGE OZE,faktura

@@ -1,1 +1,4 @@
 id,year,company,process,product,amount,unit,emission,source
+1,2025,NovaChem Industries,kalcynacja,wapno palone,500,t,390,raport produkcji
+2,2025,NovaChem Industries,reakcja chemiczna,kwas siarkowy,1200,t,48,raport produkcji
+3,2025,NovaChem Recycling,topienie metali,aluminium wtórne,80,t,12,raport produkcji

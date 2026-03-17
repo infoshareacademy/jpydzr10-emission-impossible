@@ -1,2 +1,4 @@
 id,year,company,installation,energy_type,amount,unit,factor,source
-
+1,2025,GreenTech Energia,Farma PV Wrocław,Energia elektryczna z OZE,950,MWh,0,odczyt licznika
+2,2025,GreenTech Polska,PV dach centrala,Energia elektryczna z OZE,45,MWh,0,odczyt licznika
+3,2025,EcoPartner Sp. z o.o.,PV dach biuro,Energia elektryczna z OZE,32,MWh,0,odczyt licznika

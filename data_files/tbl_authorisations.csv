@@ -1,2 +1,14 @@
 login,company,save,read
-sidoreka,TESTOWA,TRUE,TRUE
+sidoreka,GreenTech Polska,TRUE,TRUE
+sidoreka,GreenTech Logistyka,TRUE,TRUE
+sidoreka,GreenTech Produkcja,TRUE,TRUE
+sidoreka,GreenTech Energia,TRUE,TRUE
+sidoreka,GreenTech Nieruchomości,TRUE,TRUE
+kowalskij,EcoPartner Sp. z o.o.,TRUE,TRUE
+kowalskij,EcoPartner Transport,TRUE,TRUE
+kowalskij,EcoPartner Handel,TRUE,TRUE
+nowakm,NovaChem Industries,TRUE,TRUE
+nowakm,NovaChem Recycling,TRUE,TRUE
+audytor1,GreenTech Polska,FALSE,TRUE
+audytor1,EcoPartner Sp. z o.o.,FALSE,TRUE
+audytor1,NovaChem Industries,FALSE,TRUE

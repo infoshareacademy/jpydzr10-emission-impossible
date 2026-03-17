@@ -1,6 +1,11 @@
 co_id,co_name,co_country,co_city,co_street,co_zip,co_tel,co_mail,co_krs,co_regon,co_nip,cg_name
-0,ABC Solutions,Polska,Darłowo,Morska 10,76-150,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
-1,XYZ Company,USA,New York,11 Wall Street,10005,+44 (0)207 797 1000,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
-2,ABC Limited,Wielka Brytania,Londyn,10 Paternoster Sq',EC4M 7LS,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
-3,Firma AAA,Polska,Gdańsk,Podwale Grodzkie 2,80-886,+48 789 456 123,kontak@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
-4,Firma BBB,Polska,Warszawa,Książęca 4,00-498,+48 22 537 75 82,info@abc.pl,1023456789,987654321,1234567890,ABC Enterprise
+0,GreenTech Polska,Polska,Warszawa,Marszałkowska 100,00-001,+48 22 100 2000,biuro@greentech.pl,0000112233,123456789,5261234567,GreenTech Group
+1,GreenTech Logistyka,Polska,Gdańsk,Portowa 15,80-001,+48 58 300 4000,logistyka@greentech.pl,0000223344,234567890,5862345678,GreenTech Group
+2,GreenTech Produkcja,Polska,Katowice,Przemysłowa 8,40-001,+48 32 200 5000,produkcja@greentech.pl,0000334455,345678901,6343456789,GreenTech Group
+3,GreenTech Energia,Polska,Wrocław,Energetyczna 22,50-001,+48 71 400 6000,energia@greentech.pl,0000445566,456789012,8984567890,GreenTech Group
+4,GreenTech Nieruchomości,Polska,Kraków,Floriańska 3,31-001,+48 12 500 7000,nieruch@greentech.pl,0000556677,567890123,6795678901,GreenTech Group
+5,EcoPartner Sp. z o.o.,Polska,Poznań,Polna 44,60-001,+48 61 600 8000,kontakt@ecopartner.pl,0000667788,678901234,7776789012,EcoPartner SA
+6,EcoPartner Transport,Polska,Łódź,Fabryczna 12,90-001,+48 42 700 9000,transport@ecopartner.pl,0000778899,789012345,7287890123,EcoPartner SA
+7,EcoPartner Handel,Polska,Szczecin,Handlowa 7,70-001,+48 91 800 1000,handel@ecopartner.pl,0000889900,890123456,8518901234,EcoPartner SA
+8,NovaChem Industries,Polska,Płock,Chemiczna 1,09-400,+48 24 900 2000,info@novachem.pl,0000990011,901234567,7749012345,NovaChem SA
+9,NovaChem Recycling,Polska,Bydgoszcz,Ekologiczna 30,85-001,+48 52 100 3000,recycling@novachem.pl,0000001122,012345678,5540123456,NovaChem SA

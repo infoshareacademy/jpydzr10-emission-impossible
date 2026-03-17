@@ -1,2 +1,13 @@
 id,year,company,installation,product,amount,unit,emission,source
-1,2026,TESTOWA,Klimatyzator,R509a,0.4,kg,2,rejestr CRO
+1,2025,GreenTech Polska,klimatyzacja centrala,R410A,1.2,kg,2506,rejestr CRO
+2,2025,GreenTech Polska,klimatyzacja serwerownia,R32,0.8,kg,541,rejestr CRO
+3,2025,GreenTech Produkcja,chłodnia magazynowa,R404A,2.5,kg,9810,rejestr CRO
+4,2025,GreenTech Produkcja,klimatyzacja hala,R410A,0.6,kg,1253,rejestr CRO
+5,2025,GreenTech Nieruchomości,klimatyzacja biurowiec A,R32,1.5,kg,1015,rejestr CRO
+6,2025,GreenTech Nieruchomości,klimatyzacja biurowiec B,R410A,0.9,kg,1879,rejestr CRO
+7,2025,EcoPartner Sp. z o.o.,klimatyzacja biuro,R32,0.4,kg,271,rejestr CRO
+8,2025,EcoPartner Handel,chłodnia sklepowa,R404A,3.2,kg,12557,rejestr CRO
+9,2025,EcoPartner Handel,klimatyzacja hala,R410A,0.7,kg,1462,rejestr CRO
+10,2025,NovaChem Industries,klimatyzacja laboratorium,R410A,0.5,kg,1044,rejestr CRO
+11,2025,NovaChem Industries,chłodzenie procesowe,R404A,4.8,kg,18835,rejestr CRO
+12,2025,NovaChem Recycling,klimatyzacja biuro,R32,0.3,kg,203,rejestr CRO

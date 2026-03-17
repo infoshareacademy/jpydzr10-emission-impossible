@@ -7,7 +7,7 @@ id,year,company,amount,unit,source,fuel,installation,emission,raport
 6,2025,GreenTech Nieruchomości,9800,m3,faktura,gaz ziemny,kotłownia biurowiec A,20.0,TRUE
 7,2025,GreenTech Nieruchomości,7200,m3,faktura,gaz ziemny,kotłownia biurowiec B,14.7,TRUE
 8,2025,EcoPartner Sp. z o.o.,18000,m3,faktura,gaz ziemny,kotłownia główna,36.7,TRUE
-10,2025,EcoPartner Handel,6500,m3,faktura,gaz ziemny,kotłownia hala,13.13000,TRUE
+10,2025,EcoPartner Handel,6500,m3,faktura,gaz ziemny,kotłownia hala,13.3,TRUE
 11,2025,NovaChem Industries,120000,m3,faktura,gaz ziemny,piec procesowy 1,242.40000,TRUE
 12,2025,NovaChem Industries,85000,m3,faktura,gaz ziemny,piec procesowy 2,171.70000,TRUE
 13,2025,NovaChem Industries,80,t,faktura,olej opałowy ciężki,kocioł parowy,253.60,TRUE

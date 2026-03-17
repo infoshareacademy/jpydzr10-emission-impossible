@@ -1,1 +1,3 @@
 id,year,company,energy_type,amount,unit,customer,source
+1,2025,GreenTech Energia,Energia elektryczna z OZE,200,MWh,GreenTech Polska,umowa PPA
+2,2025,GreenTech Energia,Energia elektryczna z OZE,150,MWh,EcoPartner Sp. z o.o.,umowa PPA

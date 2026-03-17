@@ -1,2 +1,11 @@
 id,year,company,energy_type,amount,unit,trader,factor,source
-1,2026,TESTOWA,Energia elektryczna,20,MWh,Energa S.A.,faktura
+1,2025,GreenTech Polska,Energia elektryczna,450,MWh,PGE Obrót S.A.,faktura,faktura
+2,2025,GreenTech Logistyka,Energia elektryczna,180,MWh,Energa S.A.,faktura,faktura
+3,2025,GreenTech Produkcja,Energia elektryczna,2200,MWh,Tauron Sprzedaż,faktura,faktura
+4,2025,GreenTech Energia,Energia elektryczna,120,MWh,PGE Obrót S.A.,faktura,faktura
+5,2025,GreenTech Nieruchomości,Energia elektryczna,350,MWh,Enea S.A.,faktura,faktura
+6,2025,EcoPartner Sp. z o.o.,Energia elektryczna,280,MWh,PGE Obrót S.A.,faktura,faktura
+7,2025,EcoPartner Transport,Energia elektryczna,95,MWh,Energa S.A.,faktura,faktura
+8,2025,EcoPartner Handel,Energia elektryczna,520,MWh,Tauron Sprzedaż,faktura,faktura
+9,2025,NovaChem Industries,Energia elektryczna,4800,MWh,PGE Obrót S.A.,faktura,faktura
+10,2025,NovaChem Recycling,Energia elektryczna,680,MWh,Enea S.A.,faktura,faktura

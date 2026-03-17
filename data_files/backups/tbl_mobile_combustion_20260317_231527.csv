@@ -16,6 +16,6 @@ id,year,company,amount,unit,source,vehicle,fuel,emission
 15,2025,EcoPartner Transport,15000,l,karty paliwowe,samochód dostawczy,diesel,0
 16,2025,NovaChem Industries,4500,l,karty paliwowe,samochód osobowy,diesel,12.06000
 17,2025,NovaChem Industries,5800,l,faktura,wózek widłowy,LPG,9.45400
-18,2025,NovaChem Industries,7200,l,karty paliwowe,samochód dostawczy,diesel,19.29600
+18,2025,NovaChem Industries,7200,l,karty paliwowe,samochód dostawczy,diesel,0
 19,2025,NovaChem Recycling,28000,l,faktura,ciężarówka 12t,diesel,0
 20,2025,NovaChem Recycling,1900,l,karty paliwowe,samochód osobowy,diesel,0
