@@ -8,11 +8,13 @@ PRZEPŁYW:
 from decimal import Decimal
 from typing import Optional
 from decimal import ROUND_HALF_UP
+from dotenv import load_dotenv
 
 from app.infrastructure.repositories.file.repositories import RepositoryFactory
 from app.application.class_models import StationaryCombustion, MobileCombustion, FugitiveEmission, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS, MAX_YEAR, MIN_YEAR
 from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm
 
+load_dotenv()
 class EmissionUseCases:
     def __init__(self, data_folder: str = "data_files"):
         self.repos = RepositoryFactory(data_folder)
@@ -317,3 +319,26 @@ class EmissionUseCases:
                 print(f"\n{name}:")
                 for e in errs:
                     print(f" {e}")
+
+    def get_company_context(self, year: int, company: str) -> str:
+        summary = self.generate_summary(year, company)
+
+        _, errors = self.repos.validate_all()
+        company_errors = [e for e in errors.get("stationary", []) + errors.get("mobile", []) if company in e]
+
+        context = f"""
+        RAPORT EMISYJNY DLA: {company}
+        ROK: {year}
+
+        WYNIKI (w tonach CO2e):
+        - Spalanie stacjonarne: {summary['scope1_stationary']}
+        - Spalanie mobilne: {summary['scope1_mobile']}
+        - Emisje niezorganizowane: {summary['scope1_fugitive']}
+        - ŁĄCZNIE SCOPE 1: {summary['total']}
+
+        PROBLEMY Z DANYMI:
+        {", ".join(company_errors) if company_errors else "Brak błędów w danych."}
+
+        WSKAZÓWKA: Jeśli wyniki są równe 0.000, może to oznaczać brak wskaźników emisji w tabeli factors.
+        """
+        return context

@@ -1,6 +1,13 @@
+import sys
 from decimal import Decimal
+from os import getenv
+from dotenv import load_dotenv
+from app.core.services.agent_esg_ai import EmissionAgent
 from app.infrastructure.repositories.file.repositories import RepositoryFactory
 from app.application.use_cases import EmissionUseCases
+
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 def demo_01_companies():
     print("\n" + "═" * 65)
@@ -118,6 +125,27 @@ def demo_07_display_tables():
     print("\n─── Spalanie stacjonarne (NovaChem Industries) ───")
     uc.display_table("stationary", company="NovaChem Industries")
 
+def demo_ai_assistant():
+    load_dotenv()
+
+    agent = EmissionAgent(api_key=getenv("GEMINI_API_KEY"))
+
+    # Scenariusz 1: Interpretacja wyników
+    print("Pytam agenta o analizę NovaChem...")
+    agent.chat(
+        company="NovaChem Industries",
+        year=2025,
+        user_query="Dlaczego moje emisje są tak wysokie i który obszar wymaga natychmiastowej redukcji?"
+    )
+
+    # Scenariusz 2: Pomoc w błędach danych
+    print("Pytam agenta o błędy w GreenTech...")
+    agent.chat(
+        company="GreenTech Polska",
+        year=2025,
+        user_query="Dlaczego w raporcie mam zera przy spalaniu mobilnym, skoro wpisałem zużycie diesla? Daj odpowiedź w 2 zdaniach"
+    )
+
 if __name__ == "__main__":
     demo_01_companies()
     demo_02_factors_and_converters()
@@ -125,6 +153,7 @@ if __name__ == "__main__":
     demo_05_summaries()
     demo_06_validation()
     demo_07_display_tables()
+    demo_ai_assistant()
 
     print("\n" + "═" * 65)
     print(" Wszystkie demo zakończone pomyślnie!")
