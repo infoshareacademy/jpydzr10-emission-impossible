@@ -271,8 +271,8 @@ def menu_emission_crud(repo_name: str, label: str):
               f"└─────────────────────────────────┘")
         option = input('Wybierz opcję: ')
         if option == '1':
-            year = safe_int("Rok (Enter = wszystkie): ", MIN_YEAR, MAX_YEAR, allow_empty=True)
-            print("Firma (Enter = wszystkie):")
+            raw_year = safe_input("Rok (Enter = wszystkie): ", allow_empty=True)
+            year = int(raw_year) if raw_year else None
             company = choose_company(allow_all=True)
             uc.display_table(repo_name, year=year, company=company)
         elif option == '2':

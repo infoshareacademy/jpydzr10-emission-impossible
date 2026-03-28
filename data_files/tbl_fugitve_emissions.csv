@@ -11,3 +11,31 @@ id,year,company,installation,product,amount,unit,emission,source
 10,2025,NovaChem Industries,klimatyzacja laboratorium,R410A,0.5,kg,1044,rejestr CRO
 11,2025,NovaChem Industries,chłodzenie procesowe,R404A,4.8,kg,18835,rejestr CRO
 12,2025,NovaChem Recycling,klimatyzacja biuro,R32,0.3,kg,203,rejestr CRO
+13,2023,GreenTech Polska,klimatyzacja centrala,R410A,1.5,kg,0,rejestr CRO
+14,2023,GreenTech Polska,klimatyzacja serwerownia,R32,1.0,kg,0,rejestr CRO
+15,2023,GreenTech Produkcja,chłodnia magazynowa,R404A,3.1,kg,0,rejestr CRO
+16,2023,GreenTech Produkcja,klimatyzacja hala,R410A,0.8,kg,0,rejestr CRO
+17,2023,GreenTech Nieruchomości,klimatyzacja biurowiec A,R32,1.8,kg,0,rejestr CRO
+18,2023,EcoPartner Sp. z o.o.,klimatyzacja biuro,R32,0.6,kg,0,rejestr CRO
+19,2023,EcoPartner Handel,chłodnia sklepowa,R404A,4.0,kg,0,rejestr CRO
+20,2023,NovaChem Industries,klimatyzacja laboratorium,R410A,0.7,kg,0,rejestr CRO
+21,2023,NovaChem Industries,chłodzenie procesowe,R404A,5.5,kg,0,rejestr CRO
+22,2023,NovaChem Recycling,klimatyzacja biuro,R32,0.4,kg,0,rejestr CRO
+23,2024,GreenTech Polska,klimatyzacja centrala,R410A,1.3,kg,0,rejestr CRO
+24,2024,GreenTech Polska,klimatyzacja serwerownia,R32,0.9,kg,0,rejestr CRO
+25,2024,GreenTech Produkcja,chłodnia magazynowa,R404A,2.8,kg,0,rejestr CRO
+26,2024,GreenTech Produkcja,klimatyzacja hala,R410A,0.7,kg,0,rejestr CRO
+27,2024,GreenTech Nieruchomości,klimatyzacja biurowiec A,R32,1.6,kg,0,rejestr CRO
+28,2024,GreenTech Nieruchomości,klimatyzacja biurowiec B,R410A,1.0,kg,0,rejestr CRO
+29,2024,EcoPartner Sp. z o.o.,klimatyzacja biuro,R32,0.5,kg,0,rejestr CRO
+30,2024,EcoPartner Handel,chłodnia sklepowa,R404A,3.5,kg,0,rejestr CRO
+31,2024,EcoPartner Handel,klimatyzacja hala,R410A,0.8,kg,0,rejestr CRO
+32,2024,NovaChem Industries,klimatyzacja laboratorium,R410A,0.6,kg,0,rejestr CRO
+33,2024,NovaChem Industries,chłodzenie procesowe,R404A,5.2,kg,0,rejestr CRO
+34,2024,NovaChem Recycling,klimatyzacja biuro,R32,0.35,kg,0,rejestr CRO
+35,2026,GreenTech Polska,klimatyzacja centrala,R410A,1.1,kg,0,rejestr CRO
+36,2026,GreenTech Produkcja,chłodnia magazynowa,R404A,2.2,kg,0,rejestr CRO
+37,2026,GreenTech Nieruchomości,klimatyzacja biurowiec A,R32,1.4,kg,0,rejestr CRO
+38,2026,EcoPartner Handel,chłodnia sklepowa,R404A,2.9,kg,0,rejestr CRO
+39,2026,NovaChem Industries,chłodzenie procesowe,R404A,4.5,kg,0,rejestr CRO
+40,2026,NovaChem Recycling,klimatyzacja biuro,R32,0.25,kg,0,rejestr CRO

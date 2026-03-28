@@ -2,3 +2,20 @@ id,year,company,installation,energy_type,amount,unit,factor,source
 1,2025,GreenTech Energia,Farma PV Wrocław,Energia elektryczna z OZE,950,MWh,0,odczyt licznika
 2,2025,GreenTech Polska,PV dach centrala,Energia elektryczna z OZE,45,MWh,0,odczyt licznika
 3,2025,EcoPartner Sp. z o.o.,PV dach biuro,Energia elektryczna z OZE,32,MWh,0,odczyt licznika
+4,2023,GreenTech Energia,Farma PV Wrocław,Energia elektryczna z OZE,780,MWh,0,odczyt licznika
+5,2023,GreenTech Polska,PV dach centrala,Energia elektryczna z OZE,42,MWh,0,odczyt licznika
+6,2023,EcoPartner Sp. z o.o.,PV dach biuro,Energia elektryczna z OZE,28,MWh,0,odczyt licznika
+7,2024,GreenTech Energia,Farma PV Wrocław,Energia elektryczna z OZE,870,MWh,0,odczyt licznika
+8,2024,GreenTech Polska,PV dach centrala,Energia elektryczna z OZE,44,MWh,0,odczyt licznika
+9,2024,EcoPartner Sp. z o.o.,PV dach biuro,Energia elektryczna z OZE,30,MWh,0,odczyt licznika
+10,2024,GreenTech Nieruchomości,PV dach biurowiec A,Energia elektryczna z OZE,18,MWh,0,odczyt licznika
+11,2025,GreenTech Nieruchomości,PV dach biurowiec A,Energia elektryczna z OZE,22,MWh,0,odczyt licznika
+12,2026,GreenTech Energia,Farma PV Wrocław,Energia elektryczna z OZE,1050,MWh,0,odczyt licznika
+13,2026,GreenTech Polska,PV dach centrala,Energia elektryczna z OZE,48,MWh,0,odczyt licznika
+14,2026,EcoPartner Sp. z o.o.,PV dach biuro,Energia elektryczna z OZE,35,MWh,0,odczyt licznika
+15,2026,GreenTech Nieruchomości,PV dach biurowiec A,Energia elektryczna z OZE,25,MWh,0,odczyt licznika
+16,2025,GreenTech Energia,Farma wiatrowa Szczecin,Energia elektryczna z OZE,320,MWh,0,odczyt licznika
+17,2026,GreenTech Energia,Farma wiatrowa Szczecin,Energia elektryczna z OZE,380,MWh,0,odczyt licznika
+18,2024,NovaChem Industries,PV dach hala produkcyjna,Energia elektryczna z OZE,55,MWh,0,odczyt licznika
+19,2025,NovaChem Industries,PV dach hala produkcyjna,Energia elektryczna z OZE,60,MWh,0,odczyt licznika
+20,2026,NovaChem Industries,PV dach hala produkcyjna,Energia elektryczna z OZE,62,MWh,0,odczyt licznika
