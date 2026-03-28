@@ -51,6 +51,7 @@ coverage.xml
 .pytest_cache/
 cover/
 
+.claude/
 CLAUDE.md
 
 # Translations
@@ -135,6 +136,8 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
+
+./data_files/backups/
 
 # Environments
 .env

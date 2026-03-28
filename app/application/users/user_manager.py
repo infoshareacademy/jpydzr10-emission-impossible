@@ -99,7 +99,7 @@ def user_prompt():
     password = getpass("Password: ")
     user = user_manager.authenticate_user(login, password)
     if user:
-        print(f"Welcome {user.name} {user.surname}!")
+        print(f"Witaj {user.name} {user.surname}!")
         return user
     else:
         return None

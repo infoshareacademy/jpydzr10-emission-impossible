@@ -7,5 +7,5 @@ co_id,co_name,co_country,co_city,co_street,co_zip,co_tel,co_mail,co_krs,co_regon
 5,EcoPartner Sp. z o.o.,Polska,Poznań,Polna 44,60-001,+48 61 600 8000,kontakt@ecopartner.pl,0000667788,678901234,7776789012,EcoPartner SA
 6,EcoPartner Transport,Polska,Łódź,Fabryczna 12,90-001,+48 42 700 9000,transport@ecopartner.pl,0000778899,789012345,7287890123,EcoPartner SA
 7,EcoPartner Handel,Polska,Szczecin,Handlowa 7,70-001,+48 91 800 1000,handel@ecopartner.pl,0000889900,890123456,8518901234,EcoPartner SA
-8,NovaChem Industries,Polska,Płock,Chemiczna 1,09-400,+48 24 900 2000,info@novachem.pl,0000990011,901234567,7749012345,NovaChem SA
+8,NovaChem Industries,Polska,Warszawa,Chemiczna 1,09-400,+48 24 900 2000,info@novachem.pl,0000990011,901234567,7749012345,NovaChem SA
 9,NovaChem Recycling,Polska,Bydgoszcz,Ekologiczna 30,85-001,+48 52 100 3000,recycling@novachem.pl,0000001122,012345678,5540123456,NovaChem SA
