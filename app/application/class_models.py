@@ -235,3 +235,51 @@ class UserAuthorization(BaseModel):
         if isinstance(v, str):
             return v.strip().upper() in ("TRUE", "1", "TAK", "YES", "T")
         return bool(v)
+
+# Dozwolone źródła energii — używane przy walidacji danych wejściowych
+ENERGY_SOURCE_TYPES = {
+    "Zakupiona",
+    "Wyprodukowana",
+    "Sprzedana",
+    "Zużyta",
+}
+
+# Dozwolone typy energii — muszą odpowiadać nazwom w tbl_factors.csv
+ENERGY_TYPES = {
+    "Energia elektryczna",
+    "Energia elektryczna z OZE",
+    "Energia elektryczna nie OZE",
+    "Ciepło",
+    "Chłód",
+}
+
+# Model dla tbl_e_cons.csv — zużycie energii (Scope 2)
+# Dziedziczy z ActivityRecord, więc ma już pola: id, year, company, amount, unit, source
+class EnergyConsumption(ActivityRecord):
+    """Model dla tbl_e_cons.csv — zużycie energii (Scope 2)"""
+    energy_source: str = Field(min_length=1, max_length=100, description="Źródło energii")
+    energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
+    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja CO2e")
+
+    @field_validator("emission", mode="before")
+    @classmethod
+    def parse_emission(cls, v) -> Decimal:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return Decimal("0")
+        return v
+
+# Model dla tbl_e_purc.csv — zakupiona energia (Scope 2)
+# Rozszerza ActivityRecord o dane dostawcy i wskaźnik emisji
+class EnergyPurchased(ActivityRecord):
+    """Model dla tbl_e_purc.csv — zakupiona energia (Scope 2)"""
+    energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
+    trader: str = Field(default="", max_length=200, description="Dostawca energii")
+    factor: Decimal = Field(default=Decimal("0"), ge=0, description="Wskaźnik emisji")
+    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja CO2e")
+
+    @field_validator("emission", "factor", mode="before")
+    @classmethod
+    def parse_decimal(cls, v) -> Decimal:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return Decimal("0")
+        return v

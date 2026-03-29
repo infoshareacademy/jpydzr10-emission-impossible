@@ -261,6 +261,67 @@ class EmissionUseCases:
         print("─── Zakończono obliczenia ───\n")
         return success
 
+    def calculate_scope_2(self, year: int, company: str, country: str = "Polska") -> bool:
+        """Oblicza emisje Scope 2 dla zużycia energii."""
+        print(f"\n─── Rozpoczynam obliczenia Scope 2 dla: {company} ({year}) ───")
+        success = True
+
+        # Pobieramy rekordy zużycia energii dla danej firmy i roku
+        records = self.repos.energy_consumption.get_filtered(year=year, company=company)
+        if not records:
+            print("Brak danych o zużyciu energii.")
+            return False
+
+        print(f"Obliczanie: energy_consumption ({len(records)} rekordów)...")
+
+        for record in records:
+            # Szukamy wskaźnika emisji po typie energii
+            factor_obj = self.repos.factors.get_factor(record.energy_type, country)
+
+            if not factor_obj:
+                print(f"  [!] Brak wskaźnika dla: '{record.energy_type}'. Pomijam ID: {record.id}")
+                success = False
+                continue
+
+            try:
+                # Ustalamy jednostkę mianownika ze wskaźnika
+                if "/" in factor_obj.unit_factor:
+                    num_unit, den_unit = factor_obj.unit_factor.split("/")
+                    num_unit = num_unit.strip()
+                    den_unit = den_unit.strip()
+                else:
+                    num_unit = factor_obj.unit_factor.strip()
+                    den_unit = record.unit
+
+                if "CO2" in num_unit.upper():
+                    num_unit = "t" if "t" in num_unit.lower() else "kg"
+
+                # Przeliczamy jednostki jeśli trzeba
+                converted_amount = self.repos.converters.convert(
+                    record.amount, record.unit, den_unit
+                )
+
+                # Obliczamy emisję
+                raw_emission = converted_amount * factor_obj.factor
+
+                # Przeliczamy wynik na tony
+                final_emission = self.repos.converters.convert(raw_emission, num_unit, "t")
+
+                # Zapisujemy wynik
+                ok, msg = self.repos.energy_consumption.update(
+                    record.id, {"emission": final_emission}
+                )
+                if not ok:
+                    print(f"  [!] Błąd zapisu dla rekordu {record.id}: {msg}")
+                    success = False
+
+            except ValueError as e:
+                print(f"  [!] Błąd konwersji dla rekordu {record.id}: {e}")
+                success = False
+
+        print("─── Zakończono obliczenia Scope 2 ───\n")
+        return success
+
     def generate_summary(self, year: int, company: str) -> dict:
         R = lambda d: d.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
         s = {
@@ -269,6 +330,7 @@ class EmissionUseCases:
             "scope1_mobile": Decimal("0"),
             "scope1_fugitive": Decimal("0"),
             "scope1_process": Decimal("0"),
+            "scope2_energy": Decimal("0"),   # scope 2
             "total": Decimal("0"),
         }
 
@@ -287,6 +349,10 @@ class EmissionUseCases:
         # Scope 1: spalanie mobilne
         for r in self.repos.mobile.get_filtered(year=year, company=company):
             s["scope1_mobile"] += r.emission
+
+        # Scope 2: sumujemy emisje Scope 2 dla danej firmy i roku
+        for r in self.repos.energy_consumption.get_filtered(year=year, company=company):
+            s["scope2_energy"] += r.emission
 
         # Zaokrąglenie
         for k in s:
@@ -308,6 +374,8 @@ class EmissionUseCases:
         print(f"{'─' * 55}")
         print(f" ŁĄCZNIE:                   {s['total']:>12} tCO2e")
         print(f"{'═' * 55}")
+        print(f" SCOPE 2 — energia:")
+        print(f"   Zużycie energii:         {s['scope2_energy']:>12} tCO2e")
 
     def validate_all_files(self):
         print("\n─── Walidacja plików ───\n")
