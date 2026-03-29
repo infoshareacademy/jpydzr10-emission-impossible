@@ -1,10 +1,14 @@
+import sys
 from decimal import Decimal, InvalidOperation
 from typing import Optional
 
 def safe_input(prompt: str, allow_empty: bool = False, max_length: int = 200) -> Optional[str]:
     while True:
         try:
-            value = input(prompt).strip()
+            sys.stdout.write(prompt)
+            sys.stdout.flush()
+            raw_bytes = sys.stdin.buffer.readline()
+            value = raw_bytes.decode("utf-8", errors="replace").rstrip("\n").strip()
         except (EOFError, KeyboardInterrupt):
             print()
             return None

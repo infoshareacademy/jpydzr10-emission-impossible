@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from app.application.use_cases import EmissionUseCases
 from app.core.validators.input_validators import safe_input, safe_int, safe_choice, confirm
 from app.application.class_models import MIN_YEAR, MAX_YEAR
+from app.core.entities.charts import plot_companies_comparison
 import app.application.users.user_manager as user_manager
 
 load_dotenv()
@@ -304,6 +305,18 @@ def menu_summary():
             year = safe_int("Rok: ", MIN_YEAR, MAX_YEAR)
             if year is None: continue
             uc.display_summary_for_user(current_user, year)
+            companies = uc.get_user_companies(current_user)
+            summaries = [uc.generate_summary(year, c) for c in companies]
+            has_data = any(
+                s["scope1_stationary"] or s["scope1_mobile"]
+                or s["scope1_fugitive"] or s["scope1_process"]
+                for s in summaries
+            )
+            if has_data and confirm("Wyświetlić wykres porównawczy? (tak/nie): "):
+                try:
+                    plot_companies_comparison(summaries, year)
+                except Exception as e:
+                    error_msg(f"Nie można wyświetlić wykresu: {e}")
             wait()
         elif option == '2':
             company = choose_company()
