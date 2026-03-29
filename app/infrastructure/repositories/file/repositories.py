@@ -4,7 +4,7 @@ from typing import Optional
 
 from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
-    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
+    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization, EnergyConsumption, EnergyPurchased,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -110,6 +110,20 @@ class ConverterRepository(CsvRepository[UnitConverter]):
             f"Dodaj wpis do tbl_converters.csv."
         )
 
+# Nowe klasy repozytoriów
+class EnergyConsumptionRepository(CsvRepository[EnergyConsumption]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergyConsumption,
+            file_path=os.path.join(folder, "tbl_e_cons.csv"),
+        )
+
+class EnergyPurchasedRepository(CsvRepository[EnergyPurchased]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergyPurchased,
+            file_path=os.path.join(folder, "tbl_e_purc.csv"),
+        )
 
 class RepositoryFactory:
     def __init__(self, folder: str = FOLDER_PATH):
@@ -121,6 +135,9 @@ class RepositoryFactory:
         self.fugitive = FugitiveEmissionRepository(folder)
         self.factors = FactorRepository(folder)
         self.converters = ConverterRepository(folder)
+        # Nowe repozytoria dla energii
+        self.energy_consumption = EnergyConsumptionRepository(folder)
+        self.energy_purchased = EnergyPurchasedRepository(folder)
 
     def reload_all(self):
         for name in vars(self):
