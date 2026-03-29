@@ -14,3 +14,12 @@ id,factor_name,country,factor,unit_factor,source
 13,pellet,Polska,0.084,tCO2e/t,KOBiZE WE
 14,biomasa,Polska,0.0,tCO2e/t,neutralna CO2
 15,drewno,Polska,0.0,tCO2e/t,neutralna CO2
+16,R410A,Polska,2088,kgCO2e/kg,IPCC AR5 GWP-100
+17,R32,Polska,675,kgCO2e/kg,IPCC AR5 GWP-100
+18,R404A,Polska,3922,kgCO2e/kg,IPCC AR5 GWP-100
+19,kalcynacja,Polska,0.780,tCO2e/t,IPCC 2006 Vol.3 Ch.2
+20,reakcja chemiczna,Polska,0.040,tCO2e/t,KOBiZE WE
+21,topienie metali,Polska,0.150,tCO2e/t,KOBiZE WE
+22,synteza,Polska,1.694,tCO2e/t,IPCC 2006 Vol.3 Ch.3
+23,redukcja,Polska,0.490,tCO2e/t,KOBiZE WE
+24,spawanie,Polska,0.098,tCO2e/t,KOBiZE WE

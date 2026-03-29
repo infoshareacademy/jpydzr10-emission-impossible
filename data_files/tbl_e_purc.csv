@@ -9,3 +9,31 @@ id,year,company,energy_type,amount,unit,trader,factor,source
 8,2025,EcoPartner Handel,Energia elektryczna,520,MWh,Tauron Sprzedaż,faktura,faktura
 9,2025,NovaChem Industries,Energia elektryczna,4800,MWh,PGE Obrót S.A.,faktura,faktura
 10,2025,NovaChem Recycling,Energia elektryczna,680,MWh,Enea S.A.,faktura,faktura
+11,2023,GreenTech Polska,Energia elektryczna,520,MWh,PGE Obrót S.A.,faktura,faktura
+12,2023,GreenTech Logistyka,Energia elektryczna,200,MWh,Energa S.A.,faktura,faktura
+13,2023,GreenTech Produkcja,Energia elektryczna,2500,MWh,Tauron Sprzedaż,faktura,faktura
+14,2023,GreenTech Energia,Energia elektryczna,140,MWh,PGE Obrót S.A.,faktura,faktura
+15,2023,GreenTech Nieruchomości,Energia elektryczna,380,MWh,Enea S.A.,faktura,faktura
+16,2023,EcoPartner Sp. z o.o.,Energia elektryczna,310,MWh,PGE Obrót S.A.,faktura,faktura
+17,2023,EcoPartner Transport,Energia elektryczna,105,MWh,Energa S.A.,faktura,faktura
+18,2023,EcoPartner Handel,Energia elektryczna,580,MWh,Tauron Sprzedaż,faktura,faktura
+19,2023,NovaChem Industries,Energia elektryczna,5200,MWh,PGE Obrót S.A.,faktura,faktura
+20,2023,NovaChem Recycling,Energia elektryczna,750,MWh,Enea S.A.,faktura,faktura
+21,2024,GreenTech Polska,Energia elektryczna,480,MWh,PGE Obrót S.A.,faktura,faktura
+22,2024,GreenTech Logistyka,Energia elektryczna,190,MWh,Energa S.A.,faktura,faktura
+23,2024,GreenTech Produkcja,Energia elektryczna,2350,MWh,Tauron Sprzedaż,faktura,faktura
+24,2024,GreenTech Energia,Energia elektryczna,130,MWh,PGE Obrót S.A.,faktura,faktura
+25,2024,GreenTech Nieruchomości,Energia elektryczna,365,MWh,Enea S.A.,faktura,faktura
+26,2024,EcoPartner Sp. z o.o.,Energia elektryczna,295,MWh,PGE Obrót S.A.,faktura,faktura
+27,2024,EcoPartner Transport,Energia elektryczna,100,MWh,Energa S.A.,faktura,faktura
+28,2024,EcoPartner Handel,Energia elektryczna,550,MWh,Tauron Sprzedaż,faktura,faktura
+29,2024,NovaChem Industries,Energia elektryczna,5000,MWh,PGE Obrót S.A.,faktura,faktura
+30,2024,NovaChem Recycling,Energia elektryczna,720,MWh,Enea S.A.,faktura,faktura
+31,2026,GreenTech Polska,Energia elektryczna,420,MWh,PGE Obrót S.A.,faktura,faktura
+32,2026,GreenTech Produkcja,Energia elektryczna,2100,MWh,Tauron Sprzedaż,faktura,faktura
+33,2026,EcoPartner Sp. z o.o.,Energia elektryczna,265,MWh,PGE Obrót S.A.,faktura,faktura
+34,2026,NovaChem Industries,Energia elektryczna,4600,MWh,PGE Obrót S.A.,faktura,faktura
+35,2026,NovaChem Recycling,Energia elektryczna,650,MWh,Enea S.A.,faktura,faktura
+36,2026,GreenTech Logistyka,Energia elektryczna,170,MWh,Energa S.A.,faktura,faktura
+37,2026,GreenTech Nieruchomości,Energia elektryczna,330,MWh,Enea S.A.,faktura,faktura
+38,2026,EcoPartner Handel,Energia elektryczna,490,MWh,Tauron Sprzedaż,faktura,faktura

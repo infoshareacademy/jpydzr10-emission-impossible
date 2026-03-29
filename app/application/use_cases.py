@@ -388,6 +388,37 @@ class EmissionUseCases:
                 for e in errs:
                     print(f" {e}")
 
+    def get_user_companies(self, login: str, read_only: bool = True) -> list[str]:
+        return self.repos.authorisations.get_companies_for_user(login, read_only)
+
+    def display_summary_for_user(self, login: str, year: int):
+        companies = self.get_user_companies(login)
+        if not companies:
+            print(f"Brak przypisanych spółek dla użytkownika '{login}'.")
+            return
+
+        print(f"\n{'═' * 60}")
+        print(f" PODSUMOWANIE DLA: {login} | Rok: {year}")
+        print(f" Dostęp do {len(companies)} spółek")
+        print(f"{'═' * 60}")
+
+        grand_total = Decimal("0")
+        for company in companies:
+            s = self.generate_summary(year, company)
+            total = s["total"]
+            grand_total += total
+            print(f"\n  {company}")
+            print(f"    Spalanie stacjonarne:    {s['scope1_stationary']:>12} tCO2e")
+            print(f"    Spalanie mobilne:        {s['scope1_mobile']:>12} tCO2e")
+            print(f"    Emisje niezorganizowane: {s['scope1_fugitive']:>12} tCO2e")
+            print(f"    Emisje procesowe:        {s['scope1_process']:>12} tCO2e")
+            print(f"    {'─' * 45}")
+            print(f"    RAZEM:                   {total:>12} tCO2e")
+
+        print(f"\n{'═' * 60}")
+        print(f" ŁĄCZNIE WSZYSTKIE SPÓŁKI:  {grand_total:>12} tCO2e")
+        print(f"{'═' * 60}")
+
     def get_company_context(self, year: int, company: str) -> str:
         summary = self.generate_summary(year, company)
 

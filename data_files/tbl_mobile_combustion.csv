@@ -2,12 +2,12 @@ id,year,company,amount,unit,source,vehicle,fuel,emission
 1,2025,GreenTech Polska,2400,l,karty paliwowe,samochód osobowy,benzyna,5.56800
 2,2025,GreenTech Polska,3100,l,karty paliwowe,samochód osobowy,diesel,8.30800
 3,2025,GreenTech Polska,1800,l,karty paliwowe,samochód osobowy,benzyna,4.17600
-4,2025,GreenTech Logistyka,45000,l,faktura,ciężarówka 12t,diesel,0
-5,2025,GreenTech Logistyka,38000,l,faktura,ciężarówka 12t,diesel,0
-6,2025,GreenTech Logistyka,12000,l,karty paliwowe,ciężarówka 3.5t,diesel,0
-7,2025,GreenTech Logistyka,8500,l,karty paliwowe,samochód dostawczy,diesel,0
-8,2025,GreenTech Produkcja,3200,l,faktura,wózek widłowy,LPG,0
-9,2025,GreenTech Produkcja,2200,l,karty paliwowe,samochód osobowy,diesel,0
+4,2025,GreenTech Logistyka,45000,l,faktura,ciężarówka 12t,diesel,120.60000
+5,2025,GreenTech Logistyka,38000,l,faktura,ciężarówka 12t,diesel,101.84000
+6,2025,GreenTech Logistyka,12000,l,karty paliwowe,ciężarówka 3.5t,diesel,32.16000
+7,2025,GreenTech Logistyka,8500,l,karty paliwowe,samochód dostawczy,diesel,22.78000
+8,2025,GreenTech Produkcja,3200,l,faktura,wózek widłowy,LPG,5.21600
+9,2025,GreenTech Produkcja,2200,l,karty paliwowe,samochód osobowy,diesel,5.89600
 10,2025,EcoPartner Sp. z o.o.,1500,l,karty paliwowe,samochód osobowy,benzyna,0
 11,2025,EcoPartner Sp. z o.o.,2800,l,karty paliwowe,samochód osobowy,diesel,0
 12,2025,EcoPartner Transport,92000,l,faktura,ciężarówka 18t,diesel,0
@@ -19,3 +19,45 @@ id,year,company,amount,unit,source,vehicle,fuel,emission
 18,2025,NovaChem Industries,7200,l,karty paliwowe,samochód dostawczy,diesel,19.29600
 19,2025,NovaChem Recycling,28000,l,faktura,ciężarówka 12t,diesel,0
 20,2025,NovaChem Recycling,1900,l,karty paliwowe,samochód osobowy,diesel,0
+21,2023,GreenTech Polska,2800,l,karty paliwowe,samochód osobowy,benzyna,6.49600
+22,2023,GreenTech Polska,3500,l,karty paliwowe,samochód osobowy,diesel,9.38000
+23,2023,GreenTech Logistyka,50000,l,faktura,ciężarówka 12t,diesel,0
+24,2023,GreenTech Logistyka,42000,l,faktura,ciężarówka 12t,diesel,0
+25,2023,GreenTech Logistyka,14000,l,karty paliwowe,ciężarówka 3.5t,diesel,0
+26,2023,GreenTech Produkcja,3800,l,faktura,wózek widłowy,LPG,0
+27,2023,GreenTech Produkcja,2500,l,karty paliwowe,samochód osobowy,diesel,0
+28,2023,EcoPartner Sp. z o.o.,1800,l,karty paliwowe,samochód osobowy,benzyna,0
+29,2023,EcoPartner Sp. z o.o.,3200,l,karty paliwowe,samochód osobowy,diesel,0
+30,2023,EcoPartner Transport,98000,l,faktura,ciężarówka 18t,diesel,0
+31,2023,EcoPartner Transport,85000,l,faktura,ciężarówka 18t,diesel,0
+32,2023,EcoPartner Transport,60000,l,faktura,ciężarówka 12t,diesel,0
+33,2023,NovaChem Industries,5200,l,karty paliwowe,samochód osobowy,diesel,13.93600
+34,2023,NovaChem Industries,6500,l,faktura,wózek widłowy,LPG,10.59500
+35,2023,NovaChem Recycling,32000,l,faktura,ciężarówka 12t,diesel,0
+36,2024,GreenTech Polska,2600,l,karty paliwowe,samochód osobowy,benzyna,6.03200
+37,2024,GreenTech Polska,3300,l,karty paliwowe,samochód osobowy,diesel,8.84400
+38,2024,GreenTech Polska,1900,l,karty paliwowe,samochód osobowy,benzyna,4.40800
+39,2024,GreenTech Logistyka,47000,l,faktura,ciężarówka 12t,diesel,0
+40,2024,GreenTech Logistyka,40000,l,faktura,ciężarówka 12t,diesel,0
+41,2024,GreenTech Logistyka,13000,l,karty paliwowe,ciężarówka 3.5t,diesel,0
+42,2024,GreenTech Logistyka,9000,l,karty paliwowe,samochód dostawczy,diesel,0
+43,2024,GreenTech Produkcja,3500,l,faktura,wózek widłowy,LPG,5.70500
+44,2024,GreenTech Produkcja,2400,l,karty paliwowe,samochód osobowy,diesel,6.43200
+45,2024,EcoPartner Sp. z o.o.,1600,l,karty paliwowe,samochód osobowy,benzyna,0
+46,2024,EcoPartner Transport,95000,l,faktura,ciężarówka 18t,diesel,0
+47,2024,EcoPartner Transport,80000,l,faktura,ciężarówka 18t,diesel,0
+48,2024,EcoPartner Transport,58000,l,faktura,ciężarówka 12t,diesel,0
+49,2024,NovaChem Industries,4800,l,karty paliwowe,samochód osobowy,diesel,12.86400
+50,2024,NovaChem Industries,6100,l,faktura,wózek widłowy,LPG,9.94300
+51,2024,NovaChem Industries,7500,l,karty paliwowe,samochód dostawczy,diesel,20.10000
+52,2024,NovaChem Recycling,30000,l,faktura,ciężarówka 12t,diesel,0
+53,2024,NovaChem Recycling,2100,l,karty paliwowe,samochód osobowy,diesel,0
+54,2026,GreenTech Polska,2200,l,karty paliwowe,samochód osobowy,benzyna,5.10400
+55,2026,GreenTech Polska,2900,l,karty paliwowe,samochód osobowy,diesel,7.77200
+56,2026,GreenTech Logistyka,43000,l,faktura,ciężarówka 12t,diesel,0
+57,2026,GreenTech Logistyka,36000,l,faktura,ciężarówka 12t,diesel,0
+58,2026,EcoPartner Transport,88000,l,faktura,ciężarówka 18t,diesel,0
+59,2026,EcoPartner Transport,52000,l,faktura,ciężarówka 12t,diesel,0
+60,2026,NovaChem Industries,4200,l,karty paliwowe,samochód osobowy,diesel,11.25600
+61,2026,NovaChem Industries,5500,l,faktura,wózek widłowy,LPG,8.96500
+62,2026,NovaChem Recycling,26000,l,faktura,ciężarówka 12t,diesel,0

@@ -4,6 +4,10 @@ import re
 from getpass import getpass
 from dataclasses import dataclass
 from dotenv import load_dotenv
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+
+ph = PasswordHasher()
 
 # Load variables from .env in project root
 load_dotenv()
@@ -54,7 +58,8 @@ class UserManager:
             print(f"Login '{login}' already exists.")
             return None
 
-        new_user = User(name, surname, email, phone_number, login, password)
+        hashed = ph.hash(password)
+        new_user = User(name, surname, email, phone_number, login, hashed)
         self.users.append(new_user)
         self._save_users()
         print(f" User '{login}' added successfully.")
@@ -62,8 +67,15 @@ class UserManager:
 
     def authenticate_user(self, login, password):
         for user in self.users:
-            if user.login == login and user.password == password:
-                return user
+            if user.login == login:
+                try:
+                    if ph.verify(user.password, password):
+                        if ph.check_needs_rehash(user.password):
+                            user.password = ph.hash(password)
+                            self._save_users()
+                        return user
+                except VerifyMismatchError:
+                    return None
         return None
 
     def edit_user(self, login, field, new_value):
@@ -76,6 +88,8 @@ class UserManager:
                     print("Invalid email format.")
                     return False
                 if hasattr(user, field):
+                    if field == "password":
+                        new_value = ph.hash(new_value)
                     setattr(user, field, new_value)
                     self._save_users()
                     print(f"Updated {field} for {login}.")
@@ -99,7 +113,7 @@ def user_prompt():
     password = getpass("Password: ")
     user = user_manager.authenticate_user(login, password)
     if user:
-        print(f"Welcome {user.name} {user.surname}!")
+        print(f"Witaj {user.name} {user.surname}!")
         return user
     else:
         return None

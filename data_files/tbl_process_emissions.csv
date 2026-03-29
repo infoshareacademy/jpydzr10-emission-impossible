@@ -1,4 +1,26 @@
-id,year,company,process,product,amount,unit,emission,source
-1,2025,NovaChem Industries,kalcynacja,wapno palone,500,t,390,raport produkcji
-2,2025,NovaChem Industries,reakcja chemiczna,kwas siarkowy,1200,t,48,raport produkcji
-3,2025,NovaChem Recycling,topienie metali,aluminium wtórne,80,t,12,raport produkcji
+id,year,company,amount,unit,source,process,product,emission
+1,2025,NovaChem Industries,500,t,raport produkcji,kalcynacja,wapno palone,390.000
+2,2025,NovaChem Industries,1200,t,raport produkcji,reakcja chemiczna,kwas siarkowy,48.000
+3,2025,NovaChem Recycling,80,t,raport produkcji,topienie metali,aluminium wtórne,12
+4,2023,NovaChem Industries,580,t,raport produkcji,kalcynacja,wapno palone,452.400
+5,2023,NovaChem Industries,1400,t,raport produkcji,reakcja chemiczna,kwas siarkowy,56.000
+6,2023,NovaChem Recycling,95,t,raport produkcji,topienie metali,aluminium wtórne,0
+7,2023,NovaChem Industries,300,t,raport produkcji,synteza,amoniak,508.200
+8,2023,NovaChem Industries,150,t,raport produkcji,redukcja,tlenek cynku,73.500
+9,2024,NovaChem Industries,540,t,raport produkcji,kalcynacja,wapno palone,421.200
+10,2024,NovaChem Industries,1300,t,raport produkcji,reakcja chemiczna,kwas siarkowy,52.000
+11,2024,NovaChem Recycling,88,t,raport produkcji,topienie metali,aluminium wtórne,0
+12,2024,NovaChem Industries,320,t,raport produkcji,synteza,amoniak,542.080
+13,2024,NovaChem Industries,160,t,raport produkcji,redukcja,tlenek cynku,78.400
+14,2024,NovaChem Recycling,45,t,raport produkcji,topienie metali,miedź wtórna,0
+15,2025,NovaChem Industries,280,t,raport produkcji,synteza,amoniak,474.320
+16,2025,NovaChem Industries,140,t,raport produkcji,redukcja,tlenek cynku,68.600
+17,2025,NovaChem Recycling,50,t,raport produkcji,topienie metali,miedź wtórna,0
+18,2026,NovaChem Industries,470,t,raport produkcji,kalcynacja,wapno palone,366.600
+19,2026,NovaChem Industries,1100,t,raport produkcji,reakcja chemiczna,kwas siarkowy,44.000
+20,2026,NovaChem Recycling,75,t,raport produkcji,topienie metali,aluminium wtórne,0
+21,2026,NovaChem Industries,260,t,raport produkcji,synteza,amoniak,440.440
+22,2023,GreenTech Produkcja,120,t,raport produkcji,spawanie,konstrukcje stalowe,0
+23,2024,GreenTech Produkcja,115,t,raport produkcji,spawanie,konstrukcje stalowe,0
+24,2025,GreenTech Produkcja,110,t,raport produkcji,spawanie,konstrukcje stalowe,0
+25,2026,GreenTech Produkcja,105,t,raport produkcji,spawanie,konstrukcje stalowe,0

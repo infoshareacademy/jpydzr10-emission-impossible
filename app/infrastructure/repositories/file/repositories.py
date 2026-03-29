@@ -84,6 +84,21 @@ class FactorRepository(CsvRepository[EmissionFactor]):
                     return obj
         return None
 
+class AuthorisationRepository(CsvRepository[UserAuthorization]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=UserAuthorization,
+            file_path=os.path.join(folder, "tbl_authorisations.csv"),
+            id_field="login",
+        )
+
+    def get_companies_for_user(self, login: str, read_only: bool = True) -> list[str]:
+        records = self.get_filtered(login=login)
+        if read_only:
+            return [r.company for r in records if r.read]
+        return [r.company for r in records if r.save]
+
+
 class ConverterRepository(CsvRepository[UnitConverter]):
     def __init__(self, folder: str = FOLDER_PATH):
         super().__init__(
@@ -138,6 +153,7 @@ class RepositoryFactory:
         # Nowe repozytoria dla energii
         self.energy_consumption = EnergyConsumptionRepository(folder)
         self.energy_purchased = EnergyPurchasedRepository(folder)
+        self.authorisations = AuthorisationRepository(folder)
 
     def reload_all(self):
         for name in vars(self):
