@@ -20,7 +20,8 @@ id,year,company,amount,unit,source,process,product,emission
 19,2026,NovaChem Industries,1100,t,raport produkcji,reakcja chemiczna,kwas siarkowy,44.000
 20,2026,NovaChem Recycling,75,t,raport produkcji,topienie metali,aluminium wtórne,0
 21,2026,NovaChem Industries,260,t,raport produkcji,synteza,amoniak,440.440
-22,2023,GreenTech Produkcja,120,t,raport produkcji,spawanie,konstrukcje stalowe,0
-23,2024,GreenTech Produkcja,115,t,raport produkcji,spawanie,konstrukcje stalowe,0
-24,2025,GreenTech Produkcja,110,t,raport produkcji,spawanie,konstrukcje stalowe,0
-25,2026,GreenTech Produkcja,105,t,raport produkcji,spawanie,konstrukcje stalowe,0
+22,2023,GreenTech Produkcja,120,t,raport produkcji,spawanie,konstrukcje stalowe,11.760
+23,2024,GreenTech Produkcja,115,t,raport produkcji,spawanie,konstrukcje stalowe,11.270
+24,2025,GreenTech Produkcja,110,t,raport produkcji,spawanie,konstrukcje stalowe,10.780
+25,2026,GreenTech Produkcja,105,t,raport produkcji,spawanie,konstrukcje stalowe,10.290
+26,2025,GreenTech Polska,381,kg,KOBIZE,Wypalanie koksu na katalizatorze,Koks,0

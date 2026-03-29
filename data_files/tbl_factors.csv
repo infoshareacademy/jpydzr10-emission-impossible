@@ -23,3 +23,5 @@ id,factor_name,country,factor,unit_factor,source
 22,synteza,Polska,1.694,tCO2e/t,IPCC 2006 Vol.3 Ch.3
 23,redukcja,Polska,0.490,tCO2e/t,KOBiZE WE
 24,spawanie,Polska,0.098,tCO2e/t,KOBiZE WE
+25,Energia elektryczna nie OZE,Polska,0.709,tCO2e/MWh,KOBiZE 2024
+26,Energia elektryczna z OZE,Polska,0.0,tCO2e/MWh,certyfikat GO — emisja zerowa

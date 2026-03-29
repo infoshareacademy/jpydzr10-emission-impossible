@@ -224,6 +224,7 @@ class Company(BaseModel):
 class UserAuthorization(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
+    id: int = Field(ge=0, description="Unikalny ID")
     login: str = Field(min_length=1, max_length=100)
     company: str = Field(min_length=1, max_length=200)
     save: bool = Field(default=False)
@@ -235,6 +236,27 @@ class UserAuthorization(BaseModel):
         if isinstance(v, str):
             return v.strip().upper() in ("TRUE", "1", "TAK", "YES", "T")
         return bool(v)
+
+
+# Dozwolone role użytkowników
+USER_ROLES = {"admin", "użytkownik"}
+
+
+class UserPermission(BaseModel):
+    """Model dla tbl_permissions.csv — rola użytkownika w systemie."""
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    id: int = Field(ge=0, description="Unikalny ID")
+    login: str = Field(min_length=1, max_length=100)
+    role: str = Field(min_length=1, max_length=50, description="Rola: admin lub użytkownik")
+
+    @field_validator("role")
+    @classmethod
+    def validate_role(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in USER_ROLES:
+            raise ValueError(f"Nieznana rola '{v}'. Dozwolone: {sorted(USER_ROLES)}")
+        return v
 
 # Dozwolone źródła energii — używane przy walidacji danych wejściowych
 ENERGY_SOURCE_TYPES = {

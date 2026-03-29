@@ -90,6 +90,41 @@ def safe_bool(prompt: str) -> Optional[bool]:
         print("Wpisz 'tak' lub 'nie'.")
 
 
+def safe_year_range(prompt: str, min_val: int = 1990, max_val: int = 2100,
+                    allow_all: bool = True) -> Optional[tuple[int, int]]:
+    """Pobiera rok lub zakres lat (np. '2025' lub '2019-2025').
+    Enter = wszystkie lata (min_val–max_val) jeśli allow_all=True.
+    Zwraca (rok_od, rok_do) lub None (anulowanie)."""
+    while True:
+        raw = safe_input(prompt, allow_empty=allow_all)
+        if raw is None:
+            return None
+        raw = raw.strip()
+        if raw == "" and allow_all:
+            return (min_val, max_val)
+        if "-" in raw:
+            parts = raw.split("-", 1)
+            try:
+                year_from = int(parts[0].strip())
+                year_to = int(parts[1].strip())
+            except ValueError:
+                print(f"Nieprawidłowy format. Wpisz rok (np. 2025) lub zakres (np. 2019-2025).")
+                continue
+            if year_from > year_to:
+                print(f"Rok początkowy ({year_from}) nie może być większy niż końcowy ({year_to}).")
+                continue
+        else:
+            try:
+                year_from = year_to = int(raw)
+            except ValueError:
+                print(f"'{raw}' nie jest liczbą. Wpisz rok (np. 2025) lub zakres (np. 2019-2025).")
+                continue
+        if year_from < min_val or year_to > max_val:
+            print(f"Zakres lat musi mieścić się w {min_val}–{max_val}.")
+            continue
+        return (year_from, year_to)
+
+
 def confirm(prompt: str = "Czy na pewno? (tak/nie): ") -> bool:
     result = safe_bool(prompt)
     return result is True

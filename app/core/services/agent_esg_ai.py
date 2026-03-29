@@ -8,7 +8,7 @@ class EmissionAgent:
         self.model_id = "gemini-2.5-flash"
 
     def _prepare_context(self, company: str, year: int) -> str:
-        summary = self.use_cases.generate_summary(year, company)
+        summary = self.use_cases.generate_summary(year, year, company)
         errors_report = self.use_cases.repos.validate_all()
 
         if errors_report:

@@ -4,7 +4,8 @@ from typing import Optional
 
 from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
-    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization, EnergyConsumption, EnergyPurchased,
+    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
+    EnergyConsumption, EnergyPurchased, UserPermission,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -89,7 +90,6 @@ class AuthorisationRepository(CsvRepository[UserAuthorization]):
         super().__init__(
             model_class=UserAuthorization,
             file_path=os.path.join(folder, "tbl_authorisations.csv"),
-            id_field="login",
         )
 
     def get_companies_for_user(self, login: str, read_only: bool = True) -> list[str]:
@@ -140,6 +140,25 @@ class EnergyPurchasedRepository(CsvRepository[EnergyPurchased]):
             file_path=os.path.join(folder, "tbl_e_purc.csv"),
         )
 
+class PermissionRepository(CsvRepository[UserPermission]):
+    """Repozytorium ról użytkowników (admin / użytkownik)."""
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=UserPermission,
+            file_path=os.path.join(folder, "tbl_permissions.csv"),
+        )
+
+    def get_role(self, login: str) -> str:
+        """Zwraca rolę użytkownika. Domyślnie 'użytkownik' jeśli brak wpisu."""
+        records = self.get_filtered(login=login)
+        if records:
+            return records[0].role
+        return "użytkownik"
+
+    def is_admin(self, login: str) -> bool:
+        return self.get_role(login) == "admin"
+
+
 class RepositoryFactory:
     def __init__(self, folder: str = FOLDER_PATH):
         self.folder = folder
@@ -154,6 +173,7 @@ class RepositoryFactory:
         self.energy_consumption = EnergyConsumptionRepository(folder)
         self.energy_purchased = EnergyPurchasedRepository(folder)
         self.authorisations = AuthorisationRepository(folder)
+        self.permissions = PermissionRepository(folder)
 
     def reload_all(self):
         for name in vars(self):

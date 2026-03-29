@@ -1,14 +1,14 @@
-login,company,save,read
-sidoreka,GreenTech Polska,TRUE,TRUE
-sidoreka,GreenTech Logistyka,TRUE,TRUE
-sidoreka,GreenTech Produkcja,TRUE,TRUE
-sidoreka,GreenTech Energia,TRUE,TRUE
-sidoreka,GreenTech Nieruchomości,TRUE,TRUE
-kowalskij,EcoPartner Sp. z o.o.,TRUE,TRUE
-kowalskij,EcoPartner Transport,TRUE,TRUE
-kowalskij,EcoPartner Handel,TRUE,TRUE
-nowakm,NovaChem Industries,TRUE,TRUE
-nowakm,NovaChem Recycling,TRUE,TRUE
-audytor1,GreenTech Polska,FALSE,TRUE
-audytor1,EcoPartner Sp. z o.o.,FALSE,TRUE
-audytor1,NovaChem Industries,FALSE,TRUE
+id,login,company,save,read
+1,sidoreka,GreenTech Polska,TRUE,TRUE
+2,sidoreka,GreenTech Logistyka,TRUE,TRUE
+3,sidoreka,GreenTech Produkcja,TRUE,TRUE
+4,sidoreka,GreenTech Energia,TRUE,TRUE
+5,sidoreka,GreenTech Nieruchomości,TRUE,TRUE
+6,kowalskij,EcoPartner Sp. z o.o.,TRUE,TRUE
+7,kowalskij,EcoPartner Transport,TRUE,TRUE
+8,kowalskij,EcoPartner Handel,TRUE,TRUE
+9,nowakm,NovaChem Industries,TRUE,TRUE
+10,nowakm,NovaChem Recycling,TRUE,TRUE
+11,audytor1,GreenTech Polska,FALSE,TRUE
+12,audytor1,EcoPartner Sp. z o.o.,FALSE,TRUE
+13,audytor1,NovaChem Industries,FALSE,TRUE
