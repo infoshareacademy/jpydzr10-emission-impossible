@@ -1,2 +1,21 @@
 id,company,id_certif,energy_type,amount,unit,date_purchase,date_production,country,factor,trader,source
-1,TESTOWA,PL-GO-2024-00012345,Energia elektryczna z OZE,100,MWh,15.01.2025,2024,Polska,0,Energa S.A.,faktura
+1,GreenTech Polska,PL-GO-2025-00011111,Energia elektryczna z OZE,200,MWh,10.01.2025,2024,Polska,0,GreenTech Energia,umowa PPA
+2,GreenTech Produkcja,PL-GO-2025-00022222,Energia elektryczna z OZE,500,MWh,15.02.2025,2024,Polska,0,Energa OZE,faktura
+3,EcoPartner Sp. z o.o.,PL-GO-2025-00033333,Energia elektryczna z OZE,150,MWh,20.01.2025,2024,Polska,0,GreenTech Energia,umowa PPA
+4,GreenTech Nieruchomości,PL-GO-2025-00044444,Energia elektryczna z OZE,100,MWh,05.03.2025,2024,Polska,0,PGE OZE,faktura
+5,GreenTech Polska,PL-GO-2024-00011100,Energia elektryczna z OZE,180,MWh,12.01.2024,2023,Polska,0,GreenTech Energia,umowa PPA
+6,GreenTech Produkcja,PL-GO-2024-00022200,Energia elektryczna z OZE,450,MWh,18.02.2024,2023,Polska,0,Energa OZE,faktura
+7,EcoPartner Sp. z o.o.,PL-GO-2024-00033300,Energia elektryczna z OZE,130,MWh,22.01.2024,2023,Polska,0,GreenTech Energia,umowa PPA
+8,GreenTech Nieruchomości,PL-GO-2024-00044400,Energia elektryczna z OZE,80,MWh,10.03.2024,2023,Polska,0,PGE OZE,faktura
+9,NovaChem Industries,PL-GO-2024-00055500,Energia elektryczna z OZE,300,MWh,25.02.2024,2023,Polska,0,Tauron OZE,faktura
+10,GreenTech Polska,PL-GO-2023-00011000,Energia elektryczna z OZE,150,MWh,15.01.2023,2022,Polska,0,GreenTech Energia,umowa PPA
+11,GreenTech Produkcja,PL-GO-2023-00022000,Energia elektryczna z OZE,400,MWh,20.02.2023,2022,Polska,0,Energa OZE,faktura
+12,EcoPartner Sp. z o.o.,PL-GO-2023-00033000,Energia elektryczna z OZE,100,MWh,18.01.2023,2022,Polska,0,PGE OZE,faktura
+13,NovaChem Industries,PL-GO-2025-00055555,Energia elektryczna z OZE,350,MWh,28.02.2025,2024,Polska,0,Tauron OZE,faktura
+14,GreenTech Energia,PL-GO-2025-00066666,Energia elektryczna z OZE,200,MWh,01.03.2025,2024,Polska,0,Energa OZE,faktura
+15,NovaChem Recycling,PL-GO-2025-00077777,Energia elektryczna z OZE,80,MWh,15.03.2025,2024,Polska,0,Enea OZE,faktura
+16,EcoPartner Handel,PL-GO-2025-00088888,Energia elektryczna z OZE,120,MWh,20.03.2025,2024,Polska,0,Tauron OZE,faktura
+17,GreenTech Polska,PL-GO-2026-00011112,Energia elektryczna z OZE,220,MWh,08.01.2026,2025,Polska,0,GreenTech Energia,umowa PPA
+18,GreenTech Produkcja,PL-GO-2026-00022223,Energia elektryczna z OZE,550,MWh,12.02.2026,2025,Polska,0,Energa OZE,faktura
+19,NovaChem Industries,PL-GO-2026-00055556,Energia elektryczna z OZE,400,MWh,25.02.2026,2025,Polska,0,Tauron OZE,faktura
+20,EcoPartner Sp. z o.o.,PL-GO-2026-00033334,Energia elektryczna z OZE,170,MWh,18.01.2026,2025,Polska,0,GreenTech Energia,umowa PPA

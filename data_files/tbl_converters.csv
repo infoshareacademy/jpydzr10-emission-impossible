@@ -1,2 +1,16 @@
 id,unit_from,unit_to,factor
 1,MWh,kWh,1000
+2,MWh,GJ,3.6
+3,MWh,MJ,3600
+4,GJ,MJ,1000
+5,t,kg,1000
+6,Mg,t,1
+7,m3,l,1000
+8,kWh,MJ,3.6
+9,GJ,kWh,277.778
+10,TJ,GJ,1000
+11,TJ,MWh,277.778
+12,MWh,TJ,0.0036
+13,Mg,kg,1000
+14,t,g,1000000
+15,kg,g,1000

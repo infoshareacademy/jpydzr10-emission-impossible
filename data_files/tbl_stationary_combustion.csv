@@ -1,2 +1,62 @@
-id,year,company,fuel,amount,unit,installation,emission,source,raport
-1,2025,TESTOWA,gaz ziemny,50,m3,kotłownia,,faktura,FALSE
+id,year,company,amount,unit,source,fuel,installation,emission,raport
+1,2025,GreenTech Polska,12000,m3,faktura,gaz ziemny,kotłownia centrala,24.24000,TRUE
+2,2025,GreenTech Polska,9500,m3,faktura,gaz ziemny,kotłownia magazyn,19.19000,TRUE
+3,2025,GreenTech Produkcja,45000,m3,faktura,gaz ziemny,piec przemysłowy 1,90.90000,TRUE
+4,2025,GreenTech Produkcja,32000,m3,faktura,gaz ziemny,piec przemysłowy 2,64.64000,TRUE
+5,2025,GreenTech Produkcja,15,t,faktura,olej opałowy lekki,kocioł awaryjny,47.55,TRUE
+6,2025,GreenTech Nieruchomości,9800,m3,faktura,gaz ziemny,kotłownia biurowiec A,19.79600,TRUE
+7,2025,GreenTech Nieruchomości,7200,m3,faktura,gaz ziemny,kotłownia biurowiec B,14.54400,TRUE
+8,2025,EcoPartner Sp. z o.o.,18000,m3,faktura,gaz ziemny,kotłownia główna,36.7,TRUE
+10,2025,EcoPartner Handel,6500,m3,faktura,gaz ziemny,kotłownia hala,13.13000,TRUE
+11,2025,NovaChem Industries,120000,m3,faktura,gaz ziemny,piec procesowy 1,242.40000,TRUE
+12,2025,NovaChem Industries,85000,m3,faktura,gaz ziemny,piec procesowy 2,171.70000,TRUE
+13,2025,NovaChem Industries,80,t,faktura,olej opałowy ciężki,kocioł parowy,253.60,TRUE
+14,2025,NovaChem Industries,200,t,faktura,węgiel kamienny,kotłownia ciepłownicza,489.200,TRUE
+15,2025,NovaChem Recycling,22000,m3,faktura,gaz ziemny,piec do topienia,44.8,TRUE
+16,2025,GreenTech Energia,55000,m3,faktura,gaz ziemny,turbina gazowa,111.10000,TRUE
+17,2025,GreenTech Energia,35000,m3,faktura,gaz ziemny,kocioł szczytowy,70.70000,TRUE
+18,2025,GreenTech Logistyka,4200,m3,faktura,gaz ziemny,ogrzewanie bazy,8.48400,TRUE
+19,2025,EcoPartner Transport,3800,m3,faktura,gaz ziemny,ogrzewanie zajezdni,7.7,TRUE
+20,2023,GreenTech Polska,13500,m3,faktura,gaz ziemny,kotłownia centrala,27.27000,TRUE
+21,2023,GreenTech Polska,10200,m3,faktura,gaz ziemny,kotłownia magazyn,20.60400,TRUE
+22,2023,GreenTech Produkcja,48000,m3,faktura,gaz ziemny,piec przemysłowy 1,0,TRUE
+23,2023,GreenTech Produkcja,34500,m3,faktura,gaz ziemny,piec przemysłowy 2,0,TRUE
+24,2023,GreenTech Produkcja,18,t,faktura,olej opałowy lekki,kocioł awaryjny,0,TRUE
+25,2023,GreenTech Nieruchomości,10500,m3,faktura,gaz ziemny,kotłownia biurowiec A,0,TRUE
+26,2023,GreenTech Nieruchomości,7800,m3,faktura,gaz ziemny,kotłownia biurowiec B,0,TRUE
+27,2023,EcoPartner Sp. z o.o.,19500,m3,faktura,gaz ziemny,kotłownia główna,0,TRUE
+28,2023,EcoPartner Handel,7200,m3,faktura,gaz ziemny,kotłownia hala,14.54400,TRUE
+29,2023,NovaChem Industries,130000,m3,faktura,gaz ziemny,piec procesowy 1,262.60000,TRUE
+30,2023,NovaChem Industries,90000,m3,faktura,gaz ziemny,piec procesowy 2,181.80000,TRUE
+31,2023,NovaChem Industries,95,t,faktura,olej opałowy ciężki,kocioł parowy,301.15,TRUE
+32,2023,NovaChem Industries,250,t,faktura,węgiel kamienny,kotłownia ciepłownicza,611.500,TRUE
+33,2023,NovaChem Recycling,20000,m3,faktura,gaz ziemny,piec do topienia,0,TRUE
+34,2023,GreenTech Energia,50000,m3,faktura,gaz ziemny,turbina gazowa,0,TRUE
+35,2023,GreenTech Logistyka,4500,m3,faktura,gaz ziemny,ogrzewanie bazy,0,TRUE
+36,2023,EcoPartner Transport,4100,m3,faktura,gaz ziemny,ogrzewanie zajezdni,0,TRUE
+37,2024,GreenTech Polska,12800,m3,faktura,gaz ziemny,kotłownia centrala,25.85600,TRUE
+38,2024,GreenTech Polska,9800,m3,faktura,gaz ziemny,kotłownia magazyn,19.79600,TRUE
+39,2024,GreenTech Produkcja,46000,m3,faktura,gaz ziemny,piec przemysłowy 1,92.92000,TRUE
+40,2024,GreenTech Produkcja,33000,m3,faktura,gaz ziemny,piec przemysłowy 2,66.66000,TRUE
+41,2024,GreenTech Produkcja,16,t,faktura,olej opałowy lekki,kocioł awaryjny,50.72,TRUE
+42,2024,GreenTech Nieruchomości,10100,m3,faktura,gaz ziemny,kotłownia biurowiec A,0,TRUE
+43,2024,GreenTech Nieruchomości,7500,m3,faktura,gaz ziemny,kotłownia biurowiec B,0,TRUE
+44,2024,EcoPartner Sp. z o.o.,18500,m3,faktura,gaz ziemny,kotłownia główna,0,TRUE
+45,2024,EcoPartner Handel,6800,m3,faktura,gaz ziemny,kotłownia hala,13.73600,TRUE
+46,2024,NovaChem Industries,125000,m3,faktura,gaz ziemny,piec procesowy 1,252.50000,TRUE
+47,2024,NovaChem Industries,88000,m3,faktura,gaz ziemny,piec procesowy 2,177.76000,TRUE
+48,2024,NovaChem Industries,85,t,faktura,olej opałowy ciężki,kocioł parowy,269.45,TRUE
+49,2024,NovaChem Industries,220,t,faktura,węgiel kamienny,kotłownia ciepłownicza,538.120,TRUE
+50,2024,NovaChem Recycling,21000,m3,faktura,gaz ziemny,piec do topienia,0,TRUE
+51,2024,GreenTech Energia,52000,m3,faktura,gaz ziemny,turbina gazowa,0,TRUE
+52,2024,GreenTech Energia,33000,m3,faktura,gaz ziemny,kocioł szczytowy,0,TRUE
+53,2024,GreenTech Logistyka,4400,m3,faktura,gaz ziemny,ogrzewanie bazy,0,TRUE
+54,2024,EcoPartner Transport,3900,m3,faktura,gaz ziemny,ogrzewanie zajezdni,0,TRUE
+55,2026,GreenTech Polska,11500,m3,faktura,gaz ziemny,kotłownia centrala,23.23000,TRUE
+56,2026,GreenTech Produkcja,43000,m3,faktura,gaz ziemny,piec przemysłowy 1,0,TRUE
+57,2026,GreenTech Produkcja,30000,m3,faktura,gaz ziemny,piec przemysłowy 2,0,TRUE
+58,2026,EcoPartner Sp. z o.o.,17000,m3,faktura,gaz ziemny,kotłownia główna,0,TRUE
+59,2026,NovaChem Industries,115000,m3,faktura,gaz ziemny,piec procesowy 1,232.30000,TRUE
+60,2026,NovaChem Industries,82000,m3,faktura,gaz ziemny,piec procesowy 2,165.64000,TRUE
+61,2026,NovaChem Industries,70,t,faktura,olej opałowy ciężki,kocioł parowy,221.90,TRUE
+62,2026,NovaChem Recycling,23000,m3,faktura,gaz ziemny,piec do topienia,0,TRUE

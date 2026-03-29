@@ -1,3 +1,5 @@
 name,surname,email,phone_number,login,password
-Adrian,Sidorek,adriansidorek@gmail.com,666555222,sidoreka,123123!
-
+Adrian,Sidorek,adriansidorek@gmail.com,666555222,sidoreka,"$argon2id$v=19$m=65536,t=3,p=4$8KHgkKzZJbJqcSNWqgsbKg$CI5aUutJqV31iscGo1rb+xERaLrNpUkrglJkx97zlfE"
+Jan,Kowalski,j.kowalski@ecopartner.pl,500100200,kowalskij,"$argon2id$v=19$m=65536,t=3,p=4$B6AzaUTf6s/dZ/z4rU+Miw$J99PHo2ZAvjvTktxZZcdFpwVAhYnmZ+orT5lgbv/INI"
+Maria,Nowak,m.nowak@novachem.pl,600300400,nowakm,"$argon2id$v=19$m=65536,t=3,p=4$Yn1Fi4T2BmAGiUsRMwcm8w$+cJthZPv2HO2l5q/Cj0TtHB8BceqycjJ9xv3cVAY/ec"
+Anna,Wiśniewska,a.wisniewska@audyt.pl,700400500,audytor1,"$argon2id$v=19$m=65536,t=3,p=4$pnXykh/cdnlM8AEOK4QykQ$VMKCH2/JeffIXpzo81l9Jl8aVqz4adjLiILhpe24LF4"

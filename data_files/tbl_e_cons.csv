@@ -1,2 +1,69 @@
 id,year,company,energy_source,energy_type,amount,unit,source
-1,2026,TESTOWA,Zakupiona,Energia elektryczna nie OZE,20,MWh,faktura
+1,2025,GreenTech Polska,Zakupiona,Energia elektryczna nie OZE,450,MWh,faktura
+2,2025,GreenTech Polska,Zakupiona,Energia cieplna,280,GJ,faktura
+3,2025,GreenTech Logistyka,Zakupiona,Energia elektryczna nie OZE,180,MWh,faktura
+4,2025,GreenTech Produkcja,Zakupiona,Energia elektryczna nie OZE,2200,MWh,faktura
+5,2025,GreenTech Produkcja,Zakupiona,Energia cieplna,1500,GJ,faktura
+6,2025,GreenTech Produkcja,Zakupiona,Para technologiczna,800,GJ,faktura
+7,2025,GreenTech Energia,Zakupiona,Energia elektryczna nie OZE,120,MWh,faktura
+8,2025,GreenTech Nieruchomości,Zakupiona,Energia elektryczna nie OZE,350,MWh,faktura
+9,2025,GreenTech Nieruchomości,Zakupiona,Energia cieplna,620,GJ,faktura
+10,2025,EcoPartner Sp. z o.o.,Zakupiona,Energia elektryczna nie OZE,280,MWh,faktura
+11,2025,EcoPartner Sp. z o.o.,Zakupiona,Energia cieplna,190,GJ,faktura
+12,2025,EcoPartner Transport,Zakupiona,Energia elektryczna nie OZE,95,MWh,faktura
+13,2025,EcoPartner Handel,Zakupiona,Energia elektryczna nie OZE,520,MWh,faktura
+14,2025,EcoPartner Handel,Zakupiona,Chłód,340,GJ,faktura
+15,2025,NovaChem Industries,Zakupiona,Energia elektryczna nie OZE,4800,MWh,faktura
+16,2025,NovaChem Industries,Zakupiona,Energia cieplna,3200,GJ,faktura
+17,2025,NovaChem Industries,Zakupiona,Para technologiczna,2100,GJ,faktura
+18,2025,NovaChem Recycling,Zakupiona,Energia elektryczna nie OZE,680,MWh,faktura
+19,2025,NovaChem Recycling,Zakupiona,Energia cieplna,450,GJ,faktura
+20,2025,GreenTech Energia,Wyprodukowana,Energia elektryczna z OZE,950,MWh,fotowoltaika
+21,2023,GreenTech Polska,Zakupiona,Energia elektryczna nie OZE,520,MWh,faktura
+22,2023,GreenTech Polska,Zakupiona,Energia cieplna,320,GJ,faktura
+23,2023,GreenTech Logistyka,Zakupiona,Energia elektryczna nie OZE,200,MWh,faktura
+24,2023,GreenTech Produkcja,Zakupiona,Energia elektryczna nie OZE,2500,MWh,faktura
+25,2023,GreenTech Produkcja,Zakupiona,Energia cieplna,1700,GJ,faktura
+26,2023,GreenTech Produkcja,Zakupiona,Para technologiczna,900,GJ,faktura
+27,2023,GreenTech Energia,Zakupiona,Energia elektryczna nie OZE,140,MWh,faktura
+28,2023,GreenTech Nieruchomości,Zakupiona,Energia elektryczna nie OZE,380,MWh,faktura
+29,2023,GreenTech Nieruchomości,Zakupiona,Energia cieplna,700,GJ,faktura
+30,2023,EcoPartner Sp. z o.o.,Zakupiona,Energia elektryczna nie OZE,310,MWh,faktura
+31,2023,EcoPartner Sp. z o.o.,Zakupiona,Energia cieplna,220,GJ,faktura
+32,2023,EcoPartner Transport,Zakupiona,Energia elektryczna nie OZE,105,MWh,faktura
+33,2023,EcoPartner Handel,Zakupiona,Energia elektryczna nie OZE,580,MWh,faktura
+34,2023,EcoPartner Handel,Zakupiona,Chłód,380,GJ,faktura
+35,2023,NovaChem Industries,Zakupiona,Energia elektryczna nie OZE,5200,MWh,faktura
+36,2023,NovaChem Industries,Zakupiona,Energia cieplna,3600,GJ,faktura
+37,2023,NovaChem Industries,Zakupiona,Para technologiczna,2400,GJ,faktura
+38,2023,NovaChem Recycling,Zakupiona,Energia elektryczna nie OZE,750,MWh,faktura
+39,2023,NovaChem Recycling,Zakupiona,Energia cieplna,520,GJ,faktura
+40,2023,GreenTech Energia,Wyprodukowana,Energia elektryczna z OZE,780,MWh,fotowoltaika
+41,2024,GreenTech Polska,Zakupiona,Energia elektryczna nie OZE,480,MWh,faktura
+42,2024,GreenTech Polska,Zakupiona,Energia cieplna,300,GJ,faktura
+43,2024,GreenTech Logistyka,Zakupiona,Energia elektryczna nie OZE,190,MWh,faktura
+44,2024,GreenTech Produkcja,Zakupiona,Energia elektryczna nie OZE,2350,MWh,faktura
+45,2024,GreenTech Produkcja,Zakupiona,Energia cieplna,1600,GJ,faktura
+46,2024,GreenTech Produkcja,Zakupiona,Para technologiczna,850,GJ,faktura
+47,2024,GreenTech Energia,Zakupiona,Energia elektryczna nie OZE,130,MWh,faktura
+48,2024,GreenTech Nieruchomości,Zakupiona,Energia elektryczna nie OZE,365,MWh,faktura
+49,2024,GreenTech Nieruchomości,Zakupiona,Energia cieplna,660,GJ,faktura
+50,2024,EcoPartner Sp. z o.o.,Zakupiona,Energia elektryczna nie OZE,295,MWh,faktura
+51,2024,EcoPartner Sp. z o.o.,Zakupiona,Energia cieplna,205,GJ,faktura
+52,2024,EcoPartner Transport,Zakupiona,Energia elektryczna nie OZE,100,MWh,faktura
+53,2024,EcoPartner Handel,Zakupiona,Energia elektryczna nie OZE,550,MWh,faktura
+54,2024,EcoPartner Handel,Zakupiona,Chłód,360,GJ,faktura
+55,2024,NovaChem Industries,Zakupiona,Energia elektryczna nie OZE,5000,MWh,faktura
+56,2024,NovaChem Industries,Zakupiona,Energia cieplna,3400,GJ,faktura
+57,2024,NovaChem Industries,Zakupiona,Para technologiczna,2250,GJ,faktura
+58,2024,NovaChem Recycling,Zakupiona,Energia elektryczna nie OZE,720,MWh,faktura
+59,2024,NovaChem Recycling,Zakupiona,Energia cieplna,480,GJ,faktura
+60,2024,GreenTech Energia,Wyprodukowana,Energia elektryczna z OZE,870,MWh,fotowoltaika
+61,2026,GreenTech Polska,Zakupiona,Energia elektryczna nie OZE,420,MWh,faktura
+62,2026,GreenTech Produkcja,Zakupiona,Energia elektryczna nie OZE,2100,MWh,faktura
+63,2026,GreenTech Produkcja,Zakupiona,Energia cieplna,1400,GJ,faktura
+64,2026,EcoPartner Sp. z o.o.,Zakupiona,Energia elektryczna nie OZE,265,MWh,faktura
+65,2026,NovaChem Industries,Zakupiona,Energia elektryczna nie OZE,4600,MWh,faktura
+66,2026,NovaChem Industries,Zakupiona,Energia cieplna,3000,GJ,faktura
+67,2026,NovaChem Recycling,Zakupiona,Energia elektryczna nie OZE,650,MWh,faktura
+68,2026,GreenTech Energia,Wyprodukowana,Energia elektryczna z OZE,1050,MWh,fotowoltaika

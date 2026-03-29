@@ -1,1 +1,14 @@
 id,year,company,energy_type,amount,unit,customer,source
+1,2025,GreenTech Energia,Energia elektryczna z OZE,200,MWh,GreenTech Polska,umowa PPA
+2,2025,GreenTech Energia,Energia elektryczna z OZE,150,MWh,EcoPartner Sp. z o.o.,umowa PPA
+3,2023,GreenTech Energia,Energia elektryczna z OZE,160,MWh,GreenTech Polska,umowa PPA
+4,2023,GreenTech Energia,Energia elektryczna z OZE,120,MWh,EcoPartner Sp. z o.o.,umowa PPA
+5,2024,GreenTech Energia,Energia elektryczna z OZE,180,MWh,GreenTech Polska,umowa PPA
+6,2024,GreenTech Energia,Energia elektryczna z OZE,140,MWh,EcoPartner Sp. z o.o.,umowa PPA
+7,2024,GreenTech Energia,Energia elektryczna z OZE,50,MWh,GreenTech Nieruchomości,umowa PPA
+8,2025,GreenTech Energia,Energia elektryczna z OZE,80,MWh,GreenTech Nieruchomości,umowa PPA
+9,2025,GreenTech Energia,Energia elektryczna z OZE,100,MWh,GreenTech Produkcja,umowa PPA
+10,2026,GreenTech Energia,Energia elektryczna z OZE,220,MWh,GreenTech Polska,umowa PPA
+11,2026,GreenTech Energia,Energia elektryczna z OZE,170,MWh,EcoPartner Sp. z o.o.,umowa PPA
+12,2026,GreenTech Energia,Energia elektryczna z OZE,100,MWh,GreenTech Nieruchomości,umowa PPA
+13,2026,GreenTech Energia,Energia elektryczna z OZE,120,MWh,GreenTech Produkcja,umowa PPA
