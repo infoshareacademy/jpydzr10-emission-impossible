@@ -15,6 +15,7 @@ CATEGORY_LABELS = [
     "Mobilne",
     "Niezorganizowane",
     "Procesowe",
+    "Energia (S2)",
 ]
 
 CATEGORY_COLORS = [
@@ -22,6 +23,7 @@ CATEGORY_COLORS = [
     "#4A90D9",  # niebieski     — spalanie mobilne
     "#7BC67E",  # zielony       — emisje niezorganizowane
     "#C05780",  # różowy        — emisje procesowe
+    "#F5C542",  # żółty         — zużycie energii (Scope 2)
 ]
 
 def plot_companies_comparison(summaries: list[dict], year: int) -> None:
@@ -38,11 +40,12 @@ def plot_companies_comparison(summaries: list[dict], year: int) -> None:
         "Mobilne":          [float(s["scope1_mobile"])      for s in summaries],
         "Niezorganizowane": [float(s["scope1_fugitive"])    for s in summaries],
         "Procesowe":        [float(s["scope1_process"])     for s in summaries],
+        "Energia (S2)":     [float(s["scope2_energy"])      for s in summaries],
     }
 
     x = np.arange(n)
-    bar_width = 0.18
-    offsets = np.array([-1.5, -0.5, 0.5, 1.5]) * bar_width
+    bar_width = 0.15
+    offsets = np.array([-2, -1, 0, 1, 2]) * bar_width
 
     fig, ax = plt.subplots(figsize=(max(10, n * 2.2), 7))
     fig.patch.set_facecolor("#1E1E2E")
@@ -90,7 +93,7 @@ def plot_companies_comparison(summaries: list[dict], year: int) -> None:
 
     ax.set_ylabel("tCO₂e", color="#CCCCCC", fontsize=11)
     ax.set_title(
-        f"Porównanie emisji Scope 1 — {year}",
+        f"Porównanie emisji Scope 1 + Scope 2 — {year}",
         color="#FFFFFF",
         fontsize=14,
         fontweight="bold",
