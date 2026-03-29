@@ -131,6 +131,136 @@ def plot_companies_comparison(summaries: list[dict], year: int) -> None:
     _open_file(tmp.name)
 
 
+def plot_pie_chart(summary: dict, year: int) -> None:
+    """Wykres kołowy — udział kategorii emisji dla jednej spółki."""
+    labels = []
+    sizes = []
+    colors = []
+
+    categories = [
+        ("Stacjonarne", float(summary["scope1_stationary"]), "#E07B39"),
+        ("Mobilne", float(summary["scope1_mobile"]), "#4A90D9"),
+        ("Niezorganizowane", float(summary["scope1_fugitive"]), "#7BC67E"),
+        ("Procesowe", float(summary["scope1_process"]), "#C05780"),
+        ("Energia (S2)", float(summary["scope2_energy"]), "#F5C542"),
+    ]
+
+    for label, val, color in categories:
+        if val > 0:
+            labels.append(label)
+            sizes.append(val)
+            colors.append(color)
+
+    if not sizes:
+        print("[!] Brak danych do wykresu kołowego.")
+        return
+
+    fig, ax = plt.subplots(figsize=(9, 7))
+    fig.patch.set_facecolor("#1E1E2E")
+    ax.set_facecolor("#1E1E2E")
+
+    total = sum(sizes)
+
+    def fmt_pct(pct):
+        val = pct * total / 100
+        return f"{pct:.1f}%\n({val:.2f} t)"
+
+    wedges, texts, autotexts = ax.pie(
+        sizes,
+        labels=labels,
+        colors=colors,
+        autopct=fmt_pct,
+        startangle=140,
+        pctdistance=0.75,
+        wedgeprops={"edgecolor": "#1E1E2E", "linewidth": 1.5},
+    )
+
+    for t in texts:
+        t.set_color("#EEEEEE")
+        t.set_fontsize(10)
+    for t in autotexts:
+        t.set_color("#FFFFFF")
+        t.set_fontsize(8)
+        t.set_fontweight("bold")
+
+    company = summary.get("company", "")
+    ax.set_title(
+        f"Struktura emisji — {company} ({year})\nŁącznie: {total:.2f} tCO₂e",
+        color="#FFFFFF",
+        fontsize=13,
+        fontweight="bold",
+        pad=20,
+    )
+
+    plt.tight_layout()
+
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".png", prefix="emission_pie_", delete=False
+    )
+    tmp.close()
+    plt.savefig(tmp.name, dpi=130, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
+
+    print(f"  Wykres zapisany: {tmp.name}")
+    _open_file(tmp.name)
+
+
+def plot_trend_chart(trends: list[dict], company: str) -> None:
+    """Wykres liniowy — trendy emisji rok do roku."""
+    if not trends:
+        print("[!] Brak danych do wykresu trendów.")
+        return
+
+    years = [t["year"] for t in trends]
+    scope1 = [float(t["scope1_total"]) for t in trends]
+    scope2 = [float(t["scope2_energy"]) for t in trends]
+    totals = [float(t["total"]) for t in trends]
+
+    fig, ax = plt.subplots(figsize=(max(8, len(years) * 1.5), 6))
+    fig.patch.set_facecolor("#1E1E2E")
+    ax.set_facecolor("#2A2A3E")
+
+    ax.plot(years, scope1, "o-", color="#E07B39", label="Scope 1", linewidth=2, markersize=6)
+    ax.plot(years, scope2, "s-", color="#F5C542", label="Scope 2", linewidth=2, markersize=6)
+    ax.plot(years, totals, "D-", color="#FFFFFF", label="Łącznie", linewidth=2.5, markersize=7)
+
+    # Etykiety wartości
+    for x, y in zip(years, totals):
+        ax.annotate(f"{y:.1f}", (x, y), textcoords="offset points",
+                    xytext=(0, 10), ha="center", fontsize=7, color="#CCCCCC")
+
+    ax.set_xticks(years)
+    ax.set_xticklabels([str(y) for y in years], color="#EEEEEE", fontsize=9)
+    ax.tick_params(axis="y", colors="#AAAAAA", labelsize=9)
+
+    ax.set_ylabel("tCO₂e", color="#CCCCCC", fontsize=11)
+    ax.set_title(
+        f"Trendy emisji — {_shorten(company, 30)}",
+        color="#FFFFFF", fontsize=13, fontweight="bold", pad=15,
+    )
+
+    ax.yaxis.grid(True, color="#444466", linewidth=0.5, linestyle="--", zorder=0)
+    for spine in ax.spines.values():
+        spine.set_edgecolor("#444466")
+
+    ax.legend(
+        loc="upper right", framealpha=0.25, facecolor="#2A2A3E",
+        edgecolor="#666688", labelcolor="#EEEEEE", fontsize=9,
+    )
+
+    plt.tight_layout()
+
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=".png", prefix="emission_trend_", delete=False
+    )
+    tmp.close()
+    plt.savefig(tmp.name, dpi=130, bbox_inches="tight")
+    plt.close(fig)
+
+    print(f"  Wykres zapisany: {tmp.name}")
+    _open_file(tmp.name)
+
+
 def _open_file(path: str) -> None:
     """Otwiera plik domyślną aplikacją systemu."""
     try:

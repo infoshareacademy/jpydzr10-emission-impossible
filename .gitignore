@@ -138,6 +138,7 @@ celerybeat.pid
 *.sage.py
 
 data_files/backups/
+data_files/export/
 
 # Environments
 .env

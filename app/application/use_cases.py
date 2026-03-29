@@ -5,9 +5,9 @@ PRZEPŁYW:
             input_validators.py
 """
 
-from decimal import Decimal
+import os
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Optional
-from decimal import ROUND_HALF_UP
 from dotenv import load_dotenv
 
 from app.infrastructure.repositories.file.repositories import RepositoryFactory
@@ -19,9 +19,38 @@ from app.application.class_models import (
 from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm
 
 load_dotenv()
+
+# Ścieżka do folderu exportu
+EXPORT_FOLDER = os.path.join("data_files", "export")
+
 class EmissionUseCases:
     def __init__(self, data_folder: str = "data_files"):
         self.repos = RepositoryFactory(data_folder)
+
+    def _calculate_emission_for_record(self, amount: Decimal, unit: str,
+                                          factor_key: str, country: str = "Polska") -> Decimal:
+        """Oblicza emisję dla pojedynczego rekordu na podstawie wskaźnika emisji.
+        Zwraca emisję w tonach CO2e lub Decimal('0') jeśli brak wskaźnika."""
+        factor_obj = self.repos.factors.get_factor(factor_key, country)
+        if not factor_obj:
+            return Decimal("0")
+        try:
+            if "/" in factor_obj.unit_factor:
+                num_unit, den_unit = factor_obj.unit_factor.split("/")
+                num_unit = num_unit.strip()
+                den_unit = den_unit.strip()
+            else:
+                num_unit = factor_obj.unit_factor.strip()
+                den_unit = unit
+
+            if "CO2" in num_unit.upper():
+                num_unit = "t" if "t" in num_unit.lower() else "kg"
+
+            converted_amount = self.repos.converters.convert(amount, unit, den_unit)
+            raw_emission = converted_amount * factor_obj.factor
+            return self.repos.converters.convert(raw_emission, num_unit, "t")
+        except (ValueError, Exception):
+            return Decimal("0")
 
     def display_table(self, repo_name: str, year: Optional[int] = None,
                       company: Optional[str] = None,
@@ -131,8 +160,14 @@ class EmissionUseCases:
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
         raport = safe_bool("Uwzględnić w raporcie? ") or False
 
+        emission = self._calculate_emission_for_record(amount, unit, fuel)
+
         print(f"\n  Rok: {year} | Firma: {company} | {fuel}: {amount} {unit}")
         print(f"  Instalacja: {installation} | Źródło: {source} | Raport: {'TAK' if raport else 'NIE'}")
+        if emission > 0:
+            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        else:
+            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -141,7 +176,7 @@ class EmissionUseCases:
         record = StationaryCombustion(
             id=self.repos.stationary.next_id(), year=year, company=company,
             fuel=fuel, amount=amount, unit=unit, installation=installation,
-            emission=Decimal("0"), source=source, raport=raport,
+            emission=emission, source=source, raport=raport,
         )
         ok, msg = self.repos.stationary.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -167,12 +202,21 @@ class EmissionUseCases:
         if unit is None: return False
         source = safe_input("Źródło: ", allow_empty=True) or ""
 
+        emission = self._calculate_emission_for_record(amount, unit, fuel)
+
+        print(f"\n  Rok: {year} | Firma: {company} | {vehicle} | {fuel}: {amount} {unit}")
+        if emission > 0:
+            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        else:
+            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+
         if not confirm("\nZapisać? "):
             return False
 
         record = MobileCombustion(
             id=self.repos.mobile.next_id(), year=year, company=company,
             vehicle=vehicle, fuel=fuel, amount=amount, unit=unit, source=source,
+            emission=emission,
         )
         ok, msg = self.repos.mobile.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -206,8 +250,14 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
+        emission = self._calculate_emission_for_record(amount, unit, process)
+
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Proces: {process} | Produkt: {product} | {amount} {unit}")
+        if emission > 0:
+            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        else:
+            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -216,7 +266,7 @@ class EmissionUseCases:
         record = ProcessEmission(
             id=self.repos.process.next_id(), year=year, company=company,
             process=process, product=product, amount=amount, unit=unit,
-            emission=Decimal("0"), source=source,
+            emission=emission, source=source,
         )
         ok, msg = self.repos.process.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -250,8 +300,14 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
+        emission = self._calculate_emission_for_record(amount, unit, product)
+
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Instalacja: {installation} | Czynnik: {product} | {amount} {unit}")
+        if emission > 0:
+            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        else:
+            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -260,7 +316,7 @@ class EmissionUseCases:
         record = FugitiveEmission(
             id=self.repos.fugitive.next_id(), year=year, company=company,
             installation=installation, product=product, amount=amount, unit=unit,
-            emission=Decimal("0"), source=source,
+            emission=emission, source=source,
         )
         ok, msg = self.repos.fugitive.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -294,8 +350,14 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych (np. faktura): ", allow_empty=True) or ""
 
+        emission = self._calculate_emission_for_record(amount, unit, energy_type)
+
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Źródło: {energy_source} | Typ: {energy_type} | {amount} {unit}")
+        if emission > 0:
+            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        else:
+            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -304,7 +366,7 @@ class EmissionUseCases:
         record = EnergyConsumption(
             id=self.repos.energy_consumption.next_id(), year=year, company=company,
             energy_source=energy_source, energy_type=energy_type,
-            amount=amount, unit=unit, emission=Decimal("0"), source=source,
+            amount=amount, unit=unit, emission=emission, source=source,
         )
         ok, msg = self.repos.energy_consumption.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -600,6 +662,214 @@ class EmissionUseCases:
         print(f"{'═' * 55}")
         print(f" ŁĄCZNIE (Scope 1 + 2):     {s['total']:>12} tCO2e")
         print(f"{'═' * 55}")
+
+    def generate_trend_report(self, company: str, year_from: int, year_to: int) -> list[dict]:
+        """Generuje raport trendów rok do roku dla spółki.
+        Zwraca listę słowników z danymi emisji i % zmianą dla każdego roku."""
+        trends = []
+        prev = None
+        for year in range(year_from, year_to + 1):
+            s = self.generate_summary(year, year, company)
+            scope1 = s["scope1_stationary"] + s["scope1_mobile"] + s["scope1_fugitive"] + s["scope1_process"]
+            scope2 = s["scope2_energy"]
+            total = s["total"]
+
+            row = {
+                "year": year, "company": company,
+                "scope1_stationary": s["scope1_stationary"],
+                "scope1_mobile": s["scope1_mobile"],
+                "scope1_fugitive": s["scope1_fugitive"],
+                "scope1_process": s["scope1_process"],
+                "scope1_total": scope1,
+                "scope2_energy": scope2,
+                "total": total,
+                "change_pct": None,
+            }
+            if prev is not None and prev > 0:
+                change = ((total - prev) / prev * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+                row["change_pct"] = change
+            prev = total
+            trends.append(row)
+        return trends
+
+    def display_trend_report(self, company: str, year_from: int, year_to: int):
+        """Wyświetla raport trendów rok do roku w terminalu."""
+        trends = self.generate_trend_report(company, year_from, year_to)
+        if not trends:
+            print("Brak danych do analizy trendów.")
+            return
+
+        print(f"\n{'═' * 80}")
+        print(f" TRENDY ROK DO ROKU: {company}")
+        print(f" Zakres: {year_from}–{year_to}")
+        print(f"{'═' * 80}")
+        print(f" {'Rok':<6} {'Scope 1':>12} {'Scope 2':>12} {'ŁĄCZNIE':>12} {'Zmiana %':>10}")
+        print(f" {'─' * 6} {'─' * 12} {'─' * 12} {'─' * 12} {'─' * 10}")
+
+        for t in trends:
+            scope1 = t["scope1_total"]
+            scope2 = t["scope2_energy"]
+            total = t["total"]
+            if t["change_pct"] is not None:
+                pct = t["change_pct"]
+                arrow = "↑" if pct > 0 else ("↓" if pct < 0 else "→")
+                change_str = f"{arrow} {pct:+.1f}%"
+            else:
+                change_str = "—"
+            print(f" {t['year']:<6} {scope1:>12.3f} {scope2:>12.3f} {total:>12.3f} {change_str:>10}")
+
+        # Podsumowanie: zmiana pierwsza→ostatnia
+        first_total = trends[0]["total"]
+        last_total = trends[-1]["total"]
+        if first_total > 0:
+            overall = ((last_total - first_total) / first_total * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+            print(f"{'─' * 80}")
+            arrow = "↑" if overall > 0 else ("↓" if overall < 0 else "→")
+            print(f" Zmiana {year_from}→{year_to}: {arrow} {overall:+.1f}%  ({first_total:.3f} → {last_total:.3f} tCO2e)")
+        print(f"{'═' * 80}")
+        return trends
+
+    def display_trend_report_organization(self, login: str, year_from: int, year_to: int):
+        """Wyświetla zbiorczy raport trendów dla całej organizacji."""
+        companies = self.get_user_companies(login)
+        if not companies:
+            print("Brak przypisanych spółek.")
+            return
+
+        print(f"\n{'═' * 80}")
+        print(f" TRENDY ROK DO ROKU — CAŁA ORGANIZACJA ({login})")
+        print(f" Zakres: {year_from}–{year_to}")
+        print(f"{'═' * 80}")
+
+        # Sumujemy po latach
+        yearly_totals = {}
+        for year in range(year_from, year_to + 1):
+            yearly_totals[year] = {"scope1": Decimal("0"), "scope2": Decimal("0"), "total": Decimal("0")}
+
+        for company in companies:
+            trends = self.generate_trend_report(company, year_from, year_to)
+            for t in trends:
+                yearly_totals[t["year"]]["scope1"] += t["scope1_total"]
+                yearly_totals[t["year"]]["scope2"] += t["scope2_energy"]
+                yearly_totals[t["year"]]["total"] += t["total"]
+
+        print(f" {'Rok':<6} {'Scope 1':>12} {'Scope 2':>12} {'ŁĄCZNIE':>12} {'Zmiana %':>10}")
+        print(f" {'─' * 6} {'─' * 12} {'─' * 12} {'─' * 12} {'─' * 10}")
+
+        prev = None
+        rows = []
+        for year in range(year_from, year_to + 1):
+            d = yearly_totals[year]
+            total = d["total"]
+            if prev is not None and prev > 0:
+                pct = ((total - prev) / prev * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+                arrow = "↑" if pct > 0 else ("↓" if pct < 0 else "→")
+                change_str = f"{arrow} {pct:+.1f}%"
+            else:
+                change_str = "—"
+            print(f" {year:<6} {d['scope1']:>12.3f} {d['scope2']:>12.3f} {total:>12.3f} {change_str:>10}")
+            rows.append({"year": year, **d})
+            prev = total
+
+        first = yearly_totals[year_from]["total"]
+        last = yearly_totals[year_to]["total"]
+        if first > 0:
+            overall = ((last - first) / first * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+            print(f"{'─' * 80}")
+            arrow = "↑" if overall > 0 else ("↓" if overall < 0 else "→")
+            print(f" Zmiana {year_from}→{year_to}: {arrow} {overall:+.1f}%  ({first:.3f} → {last:.3f} tCO2e)")
+        print(f"{'═' * 80}")
+        return rows
+
+    def export_summary_csv(self, summaries: list[dict], filename: str = "raport_emisji.csv") -> str:
+        """Eksportuje podsumowanie emisji do pliku CSV w folderze export/."""
+        import csv
+
+        os.makedirs(EXPORT_FOLDER, exist_ok=True)
+        filepath = os.path.join(EXPORT_FOLDER, filename)
+
+        fieldnames = [
+            "company", "years_label",
+            "scope1_stationary", "scope1_mobile", "scope1_fugitive", "scope1_process",
+            "scope2_energy", "total",
+        ]
+
+        with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=";")
+            writer.writeheader()
+            for s in summaries:
+                writer.writerow({k: s.get(k, "") for k in fieldnames})
+
+        print(f"  Wyeksportowano: {filepath}")
+        return filepath
+
+    def export_trend_csv(self, trends: list[dict], filename: str = "raport_trendy.csv") -> str:
+        """Eksportuje raport trendów do pliku CSV w folderze export/."""
+        import csv
+
+        os.makedirs(EXPORT_FOLDER, exist_ok=True)
+        filepath = os.path.join(EXPORT_FOLDER, filename)
+
+        fieldnames = [
+            "year", "company",
+            "scope1_stationary", "scope1_mobile", "scope1_fugitive", "scope1_process",
+            "scope1_total", "scope2_energy", "total", "change_pct",
+        ]
+
+        with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=";")
+            writer.writeheader()
+            for t in trends:
+                row = {k: t.get(k, "") for k in fieldnames}
+                if row["change_pct"] is None:
+                    row["change_pct"] = ""
+                writer.writerow(row)
+
+        print(f"  Wyeksportowano: {filepath}")
+        return filepath
+
+    def validate_data_consistency(self) -> list[str]:
+        """Sprawdza spójność danych — czy firmy w tabelach emisyjnych istnieją w tbl_companies."""
+        issues = []
+        companies, _ = self.repos.companies.get_all()
+        valid_names = {c.co_name for c in companies}
+
+        emission_repos = [
+            ("spalanie stacjonarne", self.repos.stationary),
+            ("spalanie mobilne", self.repos.mobile),
+            ("emisje procesowe", self.repos.process),
+            ("emisje niezorganizowane", self.repos.fugitive),
+            ("zużycie energii", self.repos.energy_consumption),
+        ]
+
+        for table_name, repo in emission_repos:
+            records, _ = repo.get_all()
+            for r in records:
+                if r.company not in valid_names:
+                    issues.append(
+                        f"[{table_name}] ID {r.id}: firma '{r.company}' nie istnieje w tbl_companies.csv"
+                    )
+
+        # Sprawdź autoryzacje
+        auth_records, _ = self.repos.authorisations.get_all()
+        for r in auth_records:
+            if r.company not in valid_names:
+                issues.append(
+                    f"[autoryzacje] ID {r.id}: firma '{r.company}' nie istnieje w tbl_companies.csv"
+                )
+
+        return issues
+
+    def display_data_consistency_report(self):
+        """Wyświetla raport spójności danych w terminalu."""
+        print(f"\n─── Walidacja spójności danych ───\n")
+        issues = self.validate_data_consistency()
+        if not issues:
+            print("  Wszystkie dane spójne — firmy w tabelach emisyjnych istnieją w rejestrze firm. ✓")
+            return
+        for issue in issues:
+            print(f"  ✗ {issue}")
+        print(f"\n  Łącznie problemów: {len(issues)}")
 
     def validate_all_files(self):
         print("\n─── Walidacja plików ───\n")

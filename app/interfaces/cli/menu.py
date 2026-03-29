@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from app.application.use_cases import EmissionUseCases
 from app.core.validators.input_validators import safe_input, safe_int, safe_choice, safe_year_range, confirm
 from app.application.class_models import MIN_YEAR, MAX_YEAR
-from app.core.entities.charts import plot_companies_comparison
+from app.core.entities.charts import plot_companies_comparison, plot_pie_chart, plot_trend_chart
 import app.application.users.user_manager as user_manager
 
 load_dotenv()
@@ -397,16 +397,19 @@ def _reports_whole_organization():
         uc.calculate_scope_2(year_from, year_to, comp, country)
     uc.display_summary_for_user(current_user, year_from, year_to)
     summaries = [uc.generate_summary(year_from, year_to, c) for c in companies]
-    has_data = any(
-        s["scope1_stationary"] or s["scope1_mobile"]
-        or s["scope1_fugitive"] or s["scope1_process"]
-        for s in summaries
-    )
-    if has_data and confirm("Wyświetlić wykres porównawczy? (tak/nie): "):
-        try:
-            plot_companies_comparison(summaries, year_from)
-        except Exception as e:
-            error_msg(f"Nie można wyświetlić wykresu: {e}")
+    has_data = any(s["total"] > 0 for s in summaries)
+    if has_data:
+        if confirm("Wyświetlić wykres porównawczy? (tak/nie): "):
+            try:
+                plot_companies_comparison(summaries, year_from)
+            except Exception as e:
+                error_msg(f"Nie można wyświetlić wykresu: {e}")
+        if confirm("Wyexportować raport do CSV? (tak/nie): "):
+            try:
+                uc.export_summary_csv(summaries, f"raport_organizacja_{year_from}-{year_to}.csv")
+                success_msg("Raport CSV wyeksportowany do data_files/export/")
+            except Exception as e:
+                error_msg(f"Błąd eksportu: {e}")
     wait()
 
 
@@ -425,7 +428,93 @@ def _reports_single_company():
     uc.calculate_scope_1(year_from, year_to, company, country)
     uc.calculate_scope_2(year_from, year_to, company, country)
     uc.display_summary(year_from, year_to, company)
+    summary = uc.generate_summary(year_from, year_to, company)
+    if summary["total"] > 0:
+        if confirm("Wyświetlić wykres kołowy? (tak/nie): "):
+            try:
+                plot_pie_chart(summary, year_from)
+            except Exception as e:
+                error_msg(f"Nie można wyświetlić wykresu: {e}")
+        if confirm("Wyexportować raport do CSV? (tak/nie): "):
+            try:
+                safe_name = company.replace(" ", "_").replace(".", "")
+                uc.export_summary_csv([summary], f"raport_{safe_name}_{year_from}-{year_to}.csv")
+                success_msg("Raport CSV wyeksportowany do data_files/export/")
+            except Exception as e:
+                error_msg(f"Błąd eksportu: {e}")
     wait()
+
+def _reports_trends():
+    """Raport trendów rok do roku — spółka lub cała organizacja."""
+    if not require_login(): return
+    print_menu("TRENDY ROK DO ROKU", [
+        ("1", "Cała organizacja"),
+        ("2", "Pojedyncza spółka"),
+        ("-", ""),
+        ("0", "Powrót"),
+    ], icon="📊")
+    option = prompt()
+    if option == '1':
+        year_range = safe_year_range("Zakres lat (np. 2023-2025): ", MIN_YEAR, MAX_YEAR, allow_all=False)
+        if year_range is None: return
+        year_from, year_to = year_range
+        if year_from == year_to:
+            error_msg("Trendy wymagają zakresu co najmniej 2 lat (np. 2023-2025).")
+            wait()
+            return
+        country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
+        # Oblicz emisje dla wszystkich spółek i lat
+        companies = uc.get_user_companies(current_user)
+        for comp in companies:
+            uc.calculate_scope_1(year_from, year_to, comp, country)
+            uc.calculate_scope_2(year_from, year_to, comp, country)
+        rows = uc.display_trend_report_organization(current_user, year_from, year_to)
+        if rows and confirm("Wyexportować trendy do CSV? (tak/nie): "):
+            try:
+                # Konwertuj do formatu trend
+                trend_rows = []
+                for r in rows:
+                    trend_rows.append({
+                        "year": r["year"], "company": "ORGANIZACJA",
+                        "scope1_stationary": "", "scope1_mobile": "",
+                        "scope1_fugitive": "", "scope1_process": "",
+                        "scope1_total": r["scope1"], "scope2_energy": r["scope2"],
+                        "total": r["total"], "change_pct": None,
+                    })
+                uc.export_trend_csv(trend_rows, f"trendy_organizacja_{year_from}-{year_to}.csv")
+                success_msg("Trendy CSV wyeksportowane do data_files/export/")
+            except Exception as e:
+                error_msg(f"Błąd eksportu: {e}")
+        wait()
+    elif option == '2':
+        company = choose_company()
+        if company is None: return
+        year_range = safe_year_range("Zakres lat (np. 2023-2025): ", MIN_YEAR, MAX_YEAR, allow_all=False)
+        if year_range is None: return
+        year_from, year_to = year_range
+        if year_from == year_to:
+            error_msg("Trendy wymagają zakresu co najmniej 2 lat (np. 2023-2025).")
+            wait()
+            return
+        country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
+        uc.calculate_scope_1(year_from, year_to, company, country)
+        uc.calculate_scope_2(year_from, year_to, company, country)
+        trends = uc.display_trend_report(company, year_from, year_to)
+        if trends:
+            if confirm("Wyświetlić wykres trendów? (tak/nie): "):
+                try:
+                    plot_trend_chart(trends, company)
+                except Exception as e:
+                    error_msg(f"Nie można wyświetlić wykresu: {e}")
+            if confirm("Wyexportować trendy do CSV? (tak/nie): "):
+                try:
+                    safe_name = company.replace(" ", "_").replace(".", "")
+                    uc.export_trend_csv(trends, f"trendy_{safe_name}_{year_from}-{year_to}.csv")
+                    success_msg("Trendy CSV wyeksportowane do data_files/export/")
+                except Exception as e:
+                    error_msg(f"Błąd eksportu: {e}")
+        wait()
+
 
 def menu_companies():
     while True:
@@ -663,6 +752,7 @@ def menu_reports():
         print_menu("RAPORTY", [
             ("1", "Cała organizacja"),
             ("2", "Pojedyncza spółka"),
+            ("3", "Trendy rok do roku"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="📋")
@@ -671,6 +761,8 @@ def menu_reports():
             _reports_whole_organization()
         elif option == '2':
             _reports_single_company()
+        elif option == '3':
+            _reports_trends()
         elif option == '0':
             return
         else:
@@ -684,6 +776,7 @@ def menu_tools():
             ("1", "Walidacja plików CSV"),
             ("2", "Przeładuj dane"),
             ("3", "Weryfikacja wskaźników i przeliczeń"),
+            ("4", "Walidacja spójności danych"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🔧")
@@ -698,6 +791,9 @@ def menu_tools():
         elif option == '3':
             country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
             uc.display_verification_report(country)
+            wait()
+        elif option == '4':
+            uc.display_data_consistency_report()
             wait()
         elif option == '0':
             return

@@ -61,3 +61,4 @@ id,year,company,amount,unit,source,vehicle,fuel,emission
 60,2026,NovaChem Industries,4200,l,karty paliwowe,samochód osobowy,diesel,11.25600
 61,2026,NovaChem Industries,5500,l,faktura,wózek widłowy,LPG,8.96500
 62,2026,NovaChem Recycling,26000,l,faktura,ciężarówka 12t,diesel,69.68000
+63,2025,GreenTech Polska,5000,l,karty paliwowe,samochód osobowy,diesel,0
