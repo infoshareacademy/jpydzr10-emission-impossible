@@ -236,8 +236,7 @@ class UserAuthorization(BaseModel):
             return v.strip().upper() in ("TRUE", "1", "TAK", "YES", "T")
         return bool(v)
 
-# Dodaj na końcu pliku, przed lub po UserAuthorization
-
+# Dozwolone źródła energii — używane przy walidacji danych wejściowych
 ENERGY_SOURCE_TYPES = {
     "Zakupiona",
     "Wyprodukowana",
@@ -245,6 +244,7 @@ ENERGY_SOURCE_TYPES = {
     "Zużyta",
 }
 
+# Dozwolone typy energii — muszą odpowiadać nazwom w tbl_factors.csv
 ENERGY_TYPES = {
     "Energia elektryczna",
     "Energia elektryczna z OZE",
@@ -253,6 +253,8 @@ ENERGY_TYPES = {
     "Chłód",
 }
 
+# Model dla tbl_e_cons.csv — zużycie energii (Scope 2)
+# Dziedziczy z ActivityRecord, więc ma już pola: id, year, company, amount, unit, source
 class EnergyConsumption(ActivityRecord):
     """Model dla tbl_e_cons.csv — zużycie energii (Scope 2)"""
     energy_source: str = Field(min_length=1, max_length=100, description="Źródło energii")
@@ -266,7 +268,8 @@ class EnergyConsumption(ActivityRecord):
             return Decimal("0")
         return v
 
-
+# Model dla tbl_e_purc.csv — zakupiona energia (Scope 2)
+# Rozszerza ActivityRecord o dane dostawcy i wskaźnik emisji
 class EnergyPurchased(ActivityRecord):
     """Model dla tbl_e_purc.csv — zakupiona energia (Scope 2)"""
     energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
