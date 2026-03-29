@@ -1,6 +1,6 @@
 id,year,company,amount,unit,source,fuel,installation,emission,raport
 1,2025,GreenTech Polska,12000,m3,faktura,gaz ziemny,kotłownia centrala,24.24000,TRUE
-2,2025,GreenTech Polska,9500,m3,faktura,gaz ziemny,kotłownia magazyn,17.17000,TRUE
+2,2025,GreenTech Polska,9500,m3,faktura,gaz ziemny,kotłownia magazyn,19.19000,TRUE
 3,2025,GreenTech Produkcja,45000,m3,faktura,gaz ziemny,piec przemysłowy 1,90.90000,TRUE
 4,2025,GreenTech Produkcja,32000,m3,faktura,gaz ziemny,piec przemysłowy 2,64.64000,TRUE
 5,2025,GreenTech Produkcja,15,t,faktura,olej opałowy lekki,kocioł awaryjny,47.55,TRUE
@@ -36,9 +36,9 @@ id,year,company,amount,unit,source,fuel,installation,emission,raport
 36,2023,EcoPartner Transport,4100,m3,faktura,gaz ziemny,ogrzewanie zajezdni,0,TRUE
 37,2024,GreenTech Polska,12800,m3,faktura,gaz ziemny,kotłownia centrala,0,TRUE
 38,2024,GreenTech Polska,9800,m3,faktura,gaz ziemny,kotłownia magazyn,0,TRUE
-39,2024,GreenTech Produkcja,46000,m3,faktura,gaz ziemny,piec przemysłowy 1,0,TRUE
-40,2024,GreenTech Produkcja,33000,m3,faktura,gaz ziemny,piec przemysłowy 2,0,TRUE
-41,2024,GreenTech Produkcja,16,t,faktura,olej opałowy lekki,kocioł awaryjny,0,TRUE
+39,2024,GreenTech Produkcja,46000,m3,faktura,gaz ziemny,piec przemysłowy 1,92.92000,TRUE
+40,2024,GreenTech Produkcja,33000,m3,faktura,gaz ziemny,piec przemysłowy 2,66.66000,TRUE
+41,2024,GreenTech Produkcja,16,t,faktura,olej opałowy lekki,kocioł awaryjny,50.72,TRUE
 42,2024,GreenTech Nieruchomości,10100,m3,faktura,gaz ziemny,kotłownia biurowiec A,0,TRUE
 43,2024,GreenTech Nieruchomości,7500,m3,faktura,gaz ziemny,kotłownia biurowiec B,0,TRUE
 44,2024,EcoPartner Sp. z o.o.,18500,m3,faktura,gaz ziemny,kotłownia główna,0,TRUE

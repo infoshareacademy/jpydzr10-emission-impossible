@@ -41,8 +41,8 @@ id,year,company,amount,unit,source,vehicle,fuel,emission
 40,2024,GreenTech Logistyka,40000,l,faktura,ciężarówka 12t,diesel,0
 41,2024,GreenTech Logistyka,13000,l,karty paliwowe,ciężarówka 3.5t,diesel,0
 42,2024,GreenTech Logistyka,9000,l,karty paliwowe,samochód dostawczy,diesel,0
-43,2024,GreenTech Produkcja,3500,l,faktura,wózek widłowy,LPG,0
-44,2024,GreenTech Produkcja,2400,l,karty paliwowe,samochód osobowy,diesel,0
+43,2024,GreenTech Produkcja,3500,l,faktura,wózek widłowy,LPG,5.70500
+44,2024,GreenTech Produkcja,2400,l,karty paliwowe,samochód osobowy,diesel,6.43200
 45,2024,EcoPartner Sp. z o.o.,1600,l,karty paliwowe,samochód osobowy,benzyna,0
 46,2024,EcoPartner Transport,95000,l,faktura,ciężarówka 18t,diesel,0
 47,2024,EcoPartner Transport,80000,l,faktura,ciężarówka 18t,diesel,0
