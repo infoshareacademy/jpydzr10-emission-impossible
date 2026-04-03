@@ -465,6 +465,64 @@ Według Stern Review (2006) — jednego z najważniejszych raportów ekonomiczny
 
 Zakresy 1 i 2 to zwykle zaledwie **20-30% całkowitego śladu węglowego firmy**. Pozostałe 70-80% to Zakres 3 — emisje w łańcuchu wartości: transport dostawców, podróże służbowe, dojazdy pracowników, zużycie produktów przez klientów, utylizacja. To temat na przyszłość, ale warto o nim wspomnieć — pełen obraz wymaga wszystkich trzech zakresów.
 
+### CodeCarbon — jaki ślad węglowy ma samo liczenie śladu węglowego?
+
+**CodeCarbon** to biblioteka Pythona (https://codecarbon.io), która mierzy zużycie energii przez kod i przelicza je na emisje CO₂. Pozwala odpowiedzieć na pytanie: ile kosztuje środowisko uruchomienie naszego kalkulatora?
+
+**Szacunkowa emisja Emission Impossible:**
+
+Typowa sesja z narzędziem (wczytanie danych, obliczenia, generowanie raportów z wykresami) trwa ok. 30-60 sekund aktywnego czasu CPU. Na zwykłym laptopie biurowym (TDP ~15-25 W) wygląda to tak:
+
+| Parametr | Wartość |
+|----------|---------|
+| Czas CPU sesji | ~30-60 s |
+| Moc laptopa (idle + CPU) | ~15-25 W |
+| Zużycie energii na sesję | ~0,0002-0,0004 kWh |
+| Emisja CO₂ (Polska, 0,709 kg/kWh) | **~0,00015-0,0003 kg CO₂** |
+| Emisja CO₂ na sesję | **~0,15-0,3 g CO₂** |
+
+Czyli jedno uruchomienie kalkulatora emituje **mniej niż 1 gram CO₂** — tyle co oddech przez 1 sekundę.
+
+**Porównanie z tradycyjnym podejściem (Excel + e-maile):**
+
+W tradycyjnym procesie raportowania emisji specjalista ESG:
+- Zbiera dane z e-maili i faktur — **2-4 godziny** pracy na komputerze
+- Ręcznie wpisuje dane do arkusza Excel — **1-2 godziny**
+- Sprawdza wskaźniki w dokumentach KOBiZE/DEFRA — **30-60 minut**
+- Liczy formuły, weryfikuje, poprawia błędy — **1-2 godziny**
+- Wysyła arkusze e-mailem do współpracowników — kolejne wiadomości z załącznikami
+- Tworzy wykresy i formatuje raport — **1-2 godziny**
+
+**Łącznie: 6-10 godzin pracy komputerowej na jedno raportowanie.**
+
+| Metoda | Czas pracy | Zużycie energii | Emisja CO₂ (Polska) |
+|--------|-----------|-----------------|---------------------|
+| **Emission Impossible** | ~1 min | ~0,0003 kWh | **~0,2 g CO₂** |
+| **Excel + e-maile** | ~8 h | ~0,12-0,20 kWh | **~85-140 g CO₂** |
+| **Stosunek** | **480× szybciej** | **400-600× mniej energii** | **~500× mniej emisji** |
+
+Do tego dochodzą ukryte koszty tradycyjnego podejścia:
+- **Serwery pocztowe** — każdy e-mail z załącznikiem Excel to ~4-50 g CO₂ (dane: The Carbon Literacy Project)
+- **Przechowywanie w chmurze** — arkusze na OneDrive/Google Drive zużywają energię centrów danych 24/7
+- **Powtórzona praca** — błędy w formułach Excel wykrywane po tygodniach wymagają ponownego przeliczenia
+- **Wersjonowanie** — „raport_v3_final_FINAL(2).xlsx" to nie tylko żart, ale też zmarnowana energia
+
+**Wniosek:** Automatyzacja obliczeń to nie tylko oszczędność czasu i eliminacja błędów — to realnie niższy ślad węglowy samego procesu raportowania. Narzędzie, które liczy emisje, emituje **500 razy mniej** niż tradycyjna metoda. To jak jazda rowerem do pracy zamiast SUV-em — efekt ten sam, ślad nieporównywalnie mniejszy.
+
+**Jak zmierzyć samodzielnie?** Wystarczy dodać CodeCarbon do projektu:
+
+```python
+from codecarbon import EmissionsTracker
+
+tracker = EmissionsTracker(country_iso_code="POL")
+tracker.start()
+# ... tutaj obliczenia Emission Impossible ...
+tracker.stop()
+print(f"Emisja sesji: {tracker.final_emissions:.6f} kg CO₂")
+```
+
+CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulator emisji generuje własny raport emisyjny.
+
 ---
 
 ## 12. Instrukcja — Przewodnik po danych emisyjnych

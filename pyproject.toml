@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "argon2-cffi>=25.1.0",
+    "codecarbon>=3.2.6",
     "matplotlib>=3.9.0",
     "pandas>=3.0.1",
     "pydantic>=2.12.5",
