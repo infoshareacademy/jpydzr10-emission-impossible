@@ -390,11 +390,7 @@ def _reports_whole_organization():
     year_range = safe_year_range("Rok lub zakres (np. 2025 lub 2019-2025, Enter = wszystkie): ", MIN_YEAR, MAX_YEAR)
     if year_range is None: return
     year_from, year_to = year_range
-    country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
     companies = uc.get_user_companies(current_user)
-    for comp in companies:
-        uc.calculate_scope_1(year_from, year_to, comp, country)
-        uc.calculate_scope_2(year_from, year_to, comp, country)
     uc.display_summary_for_user(current_user, year_from, year_to)
     summaries = [uc.generate_summary(year_from, year_to, c) for c in companies]
     has_data = any(s["total"] > 0 for s in summaries)
@@ -424,9 +420,6 @@ def _reports_single_company():
     year_range = safe_year_range("Rok lub zakres (np. 2025 lub 2019-2025, Enter = wszystkie): ", MIN_YEAR, MAX_YEAR)
     if year_range is None: return
     year_from, year_to = year_range
-    country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
-    uc.calculate_scope_1(year_from, year_to, company, country)
-    uc.calculate_scope_2(year_from, year_to, company, country)
     uc.display_summary(year_from, year_to, company)
     summary = uc.generate_summary(year_from, year_to, company)
     if summary["total"] > 0:
@@ -462,12 +455,6 @@ def _reports_trends():
             error_msg("Trendy wymagają zakresu co najmniej 2 lat (np. 2023-2025).")
             wait()
             return
-        country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
-        # Oblicz emisje dla wszystkich spółek i lat
-        companies = uc.get_user_companies(current_user)
-        for comp in companies:
-            uc.calculate_scope_1(year_from, year_to, comp, country)
-            uc.calculate_scope_2(year_from, year_to, comp, country)
         rows = uc.display_trend_report_organization(current_user, year_from, year_to)
         if rows and confirm("Wyexportować trendy do CSV? (tak/nie): "):
             try:
@@ -496,9 +483,6 @@ def _reports_trends():
             error_msg("Trendy wymagają zakresu co najmniej 2 lat (np. 2023-2025).")
             wait()
             return
-        country = safe_input("Kraj (domyślnie Polska): ", allow_empty=True) or "Polska"
-        uc.calculate_scope_1(year_from, year_to, company, country)
-        uc.calculate_scope_2(year_from, year_to, company, country)
         trends = uc.display_trend_report(company, year_from, year_to)
         if trends:
             if confirm("Wyświetlić wykres trendów? (tak/nie): "):

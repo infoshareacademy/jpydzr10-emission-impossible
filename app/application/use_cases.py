@@ -158,16 +158,23 @@ class EmissionUseCases:
         if installation is None: return False
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
-        raport = safe_bool("Uwzględnić w raporcie? ") or False
+        raport = safe_bool("Masz gotową wartość emisji? (tak=wpiszę emisję / nie=oblicz z wskaźnika): ") or False
 
-        emission = self._calculate_emission_for_record(amount, unit, fuel)
+        calc_emission = self._calculate_emission_for_record(amount, unit, fuel)
+
+        if raport:
+            print(f"  Szacowana emisja wg wskaźnika: {calc_emission:.3f} tCO2e") if calc_emission > 0 else None
+            emission = safe_decimal("Wartość emisji [tCO2e]: ", min_val=Decimal("0"))
+            if emission is None: return False
+        else:
+            emission = Decimal("0")
 
         print(f"\n  Rok: {year} | Firma: {company} | {fuel}: {amount} {unit}")
-        print(f"  Instalacja: {installation} | Źródło: {source} | Raport: {'TAK' if raport else 'NIE'}")
-        if emission > 0:
-            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
+        print(f"  Instalacja: {installation} | Źródło: {source}")
+        if raport:
+            print(f"  Emisja (podana ręcznie): {emission:.3f} tCO2e")
         else:
-            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+            print(f"  Emisja (zostanie obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -202,13 +209,10 @@ class EmissionUseCases:
         if unit is None: return False
         source = safe_input("Źródło: ", allow_empty=True) or ""
 
-        emission = self._calculate_emission_for_record(amount, unit, fuel)
+        calc_emission = self._calculate_emission_for_record(amount, unit, fuel)
 
         print(f"\n  Rok: {year} | Firma: {company} | {vehicle} | {fuel}: {amount} {unit}")
-        if emission > 0:
-            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
-        else:
-            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+        print(f"  Emisja (obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
 
         if not confirm("\nZapisać? "):
             return False
@@ -216,7 +220,7 @@ class EmissionUseCases:
         record = MobileCombustion(
             id=self.repos.mobile.next_id(), year=year, company=company,
             vehicle=vehicle, fuel=fuel, amount=amount, unit=unit, source=source,
-            emission=emission,
+            emission=Decimal("0"),
         )
         ok, msg = self.repos.mobile.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -250,14 +254,11 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
-        emission = self._calculate_emission_for_record(amount, unit, process)
+        calc_emission = self._calculate_emission_for_record(amount, unit, process)
 
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Proces: {process} | Produkt: {product} | {amount} {unit}")
-        if emission > 0:
-            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
-        else:
-            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+        print(f"  Emisja (obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -266,7 +267,7 @@ class EmissionUseCases:
         record = ProcessEmission(
             id=self.repos.process.next_id(), year=year, company=company,
             process=process, product=product, amount=amount, unit=unit,
-            emission=emission, source=source,
+            emission=Decimal("0"), source=source,
         )
         ok, msg = self.repos.process.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -300,14 +301,11 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
-        emission = self._calculate_emission_for_record(amount, unit, product)
+        calc_emission = self._calculate_emission_for_record(amount, unit, product)
 
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Instalacja: {installation} | Czynnik: {product} | {amount} {unit}")
-        if emission > 0:
-            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
-        else:
-            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+        print(f"  Emisja (obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -316,7 +314,7 @@ class EmissionUseCases:
         record = FugitiveEmission(
             id=self.repos.fugitive.next_id(), year=year, company=company,
             installation=installation, product=product, amount=amount, unit=unit,
-            emission=emission, source=source,
+            emission=Decimal("0"), source=source,
         )
         ok, msg = self.repos.fugitive.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -350,14 +348,11 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych (np. faktura): ", allow_empty=True) or ""
 
-        emission = self._calculate_emission_for_record(amount, unit, energy_type)
+        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type)
 
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Źródło: {energy_source} | Typ: {energy_type} | {amount} {unit}")
-        if emission > 0:
-            print(f"  Obliczona emisja: {emission:.3f} tCO2e")
-        else:
-            print(f"  [!] Brak wskaźnika — emisja zostanie obliczona przy generowaniu raportu")
+        print(f"  Emisja (obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
 
         if not confirm("\nZapisać? "):
             print("Anulowano.")
@@ -366,7 +361,7 @@ class EmissionUseCases:
         record = EnergyConsumption(
             id=self.repos.energy_consumption.next_id(), year=year, company=company,
             energy_source=energy_source, energy_type=energy_type,
-            amount=amount, unit=unit, emission=emission, source=source,
+            amount=amount, unit=unit, emission=Decimal("0"), source=source,
         )
         ok, msg = self.repos.energy_consumption.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
@@ -584,7 +579,11 @@ class EmissionUseCases:
         print("─── Zakończono obliczenia Scope 2 ───\n")
         return success
 
-    def generate_summary(self, year_from: int, year_to: int, company: str) -> dict:
+    def generate_summary(self, year_from: int, year_to: int, company: str,
+                         country: str = "Polska") -> dict:
+        """Generuje podsumowanie emisji — obliczenia wyłącznie w pamięci.
+        Spalanie stacjonarne: raport=True → wartość z CSV, raport=False → oblicz z wskaźnika.
+        Pozostałe tabele: zawsze oblicz z ilości × wskaźnik."""
         R = lambda d: d.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
         years_label = str(year_from) if year_from == year_to else f"{year_from}–{year_to}"
         s = {
@@ -598,25 +597,33 @@ class EmissionUseCases:
             "total": Decimal("0"),
         }
 
-        # Scope 1: spalanie stacjonarne
+        # Scope 1: spalanie stacjonarne — raport=True → emisja z CSV, raport=False → oblicz
         for r in self._get_records_in_range(self.repos.stationary, year_from, year_to, company):
-            s["scope1_stationary"] += r.emission
+            if r.raport and r.emission > 0:
+                s["scope1_stationary"] += r.emission
+            else:
+                s["scope1_stationary"] += self._calculate_emission_for_record(
+                    r.amount, r.unit, r.fuel, country)
 
-        # Scope 1: emisje niezorganizowane
-        for r in self._get_records_in_range(self.repos.fugitive, year_from, year_to, company):
-            s["scope1_fugitive"] += r.emission
-
-        # Scope 1: emisje procesowe
-        for r in self._get_records_in_range(self.repos.process, year_from, year_to, company):
-            s["scope1_process"] += r.emission
-
-        # Scope 1: spalanie mobilne
+        # Scope 1: spalanie mobilne — zawsze oblicz
         for r in self._get_records_in_range(self.repos.mobile, year_from, year_to, company):
-            s["scope1_mobile"] += r.emission
+            s["scope1_mobile"] += self._calculate_emission_for_record(
+                r.amount, r.unit, r.fuel, country)
 
-        # Scope 2: zużycie energii
+        # Scope 1: emisje niezorganizowane — zawsze oblicz
+        for r in self._get_records_in_range(self.repos.fugitive, year_from, year_to, company):
+            s["scope1_fugitive"] += self._calculate_emission_for_record(
+                r.amount, r.unit, r.product, country)
+
+        # Scope 1: emisje procesowe — zawsze oblicz
+        for r in self._get_records_in_range(self.repos.process, year_from, year_to, company):
+            s["scope1_process"] += self._calculate_emission_for_record(
+                r.amount, r.unit, r.process, country)
+
+        # Scope 2: zużycie energii — zawsze oblicz
         for r in self._get_records_in_range(self.repos.energy_consumption, year_from, year_to, company):
-            s["scope2_energy"] += r.emission
+            s["scope2_energy"] += self._calculate_emission_for_record(
+                r.amount, r.unit, r.energy_type, country)
 
         # Zaokrąglenie
         for k in s:
@@ -829,7 +836,9 @@ class EmissionUseCases:
         return filepath
 
     def validate_data_consistency(self) -> list[str]:
-        """Sprawdza spójność danych — czy firmy w tabelach emisyjnych istnieją w tbl_companies."""
+        """Sprawdza spójność danych:
+        1. Czy firmy w tabelach emisyjnych istnieją w tbl_companies
+        2. Czy w spalaniu stacjonarnym raport=TRUE ale emission=0 (brak podanej emisji)"""
         issues = []
         companies, _ = self.repos.companies.get_all()
         valid_names = {c.co_name for c in companies}
@@ -849,6 +858,15 @@ class EmissionUseCases:
                     issues.append(
                         f"[{table_name}] ID {r.id}: firma '{r.company}' nie istnieje w tbl_companies.csv"
                     )
+
+        # Sprawdź raport=TRUE z emission=0 w spalaniu stacjonarnym
+        stationary_records, _ = self.repos.stationary.get_all()
+        for r in stationary_records:
+            if r.raport and (r.emission is None or r.emission == 0):
+                issues.append(
+                    f"[spalanie stacjonarne] ID {r.id}: raport=TRUE ale emisja=0 "
+                    f"({r.company}, {r.fuel}, {r.amount} {r.unit})"
+                )
 
         # Sprawdź autoryzacje
         auth_records, _ = self.repos.authorisations.get_all()
