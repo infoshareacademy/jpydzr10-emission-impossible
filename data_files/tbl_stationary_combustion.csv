@@ -60,3 +60,4 @@ id,year,company,amount,unit,source,fuel,installation,emission,raport
 60,2026,NovaChem Industries,82000,m3,faktura,gaz ziemny,piec procesowy 2,165.64000,TRUE
 61,2026,NovaChem Industries,70,t,faktura,olej opałowy ciężki,kocioł parowy,221.90,TRUE
 62,2026,NovaChem Recycling,23000,m3,faktura,gaz ziemny,piec do topienia,46.46000,TRUE
+63,2025,GreenTech Polska,203,t,faktura,biomasa,Kocioł na biomase,0,FALSE

@@ -320,6 +320,8 @@ def menu_0():
                 user = user_manager.user_prompt()
                 if user:
                     current_user = user.login
+                    # Włącz audit log (trigger) — od teraz zmiany będą rejestrowane
+                    uc.repos.set_audit_context(current_user)
                     companies = uc.get_user_companies(current_user)
                     success_msg(f"Zalogowano jako: {current_user}")
                     info_msg(f"Dostęp do spółek: {', '.join(companies) if companies else 'brak'}")

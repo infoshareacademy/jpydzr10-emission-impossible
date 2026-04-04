@@ -69,3 +69,4 @@ id,year,company,amount,unit,source,energy_source,energy_type,emission
 68,2026,GreenTech Energia,1050,MWh,fotowoltaika,Wyprodukowana,Energia elektryczna z OZE,0.0
 69,2025,GreenTech Energia,48852,kWh,faktura,Zużyta,Chłód,31.65607067514345988523209181
 70,2025,NovaChem Recycling,221,GJ,faktura,Sprzedana,Chłód,39.780
+71,2026,GreenTech Polska,203,kWh,pomiar ilości,Zużyta,Energia elektryczna nie OZE,0

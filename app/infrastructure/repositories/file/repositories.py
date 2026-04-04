@@ -5,7 +5,7 @@ from typing import Optional
 from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
     FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
-    EnergyConsumption, EnergyPurchased, UserPermission,
+    EnergyConsumption, EnergyPurchased, UserPermission, ChangeLog,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -159,9 +159,46 @@ class PermissionRepository(CsvRepository[UserPermission]):
         return self.get_role(login) == "admin"
 
 
+class ChangeLogRepository(CsvRepository[ChangeLog]):
+    """Repozytorium rejestru zmian (audit log).
+
+    Działa jak tabela audit — tylko zapis (add) i odczyt.
+    Nie pozwala na update ani delete — zapewnia integralność logu.
+    Backup wyłączony — sam log jest kopią historii zmian.
+    """
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=ChangeLog,
+            file_path=os.path.join(folder, "tbl_change_log.csv"),
+            id_field="id_rejestr_zmian",
+            backup=False,
+        )
+
+    def update(self, record_id, updates: dict) -> tuple[bool, str]:
+        """Zablokowane — rejestr zmian jest niezmienny (immutable)."""
+        return False, "Rejestr zmian nie pozwala na edycję rekordów"
+
+    def delete(self, record_id) -> tuple[bool, str]:
+        """Zablokowane — rejestr zmian jest niezmienny (immutable)."""
+        return False, "Rejestr zmian nie pozwala na usuwanie rekordów"
+
+    def get_by_table(self, table_name: str) -> list[ChangeLog]:
+        """Zwraca historię zmian dla danej tabeli."""
+        return self.get_filtered(table_name=table_name)
+
+    def get_by_record(self, table_name: str, record_id: str) -> list[ChangeLog]:
+        """Zwraca historię zmian konkretnego rekordu."""
+        return self.get_filtered(table_name=table_name, record_id=record_id)
+
+    def get_by_user(self, login: str) -> list[ChangeLog]:
+        """Zwraca wszystkie zmiany wykonane przez danego użytkownika."""
+        return self.get_filtered(login=login)
+
+
 class RepositoryFactory:
     def __init__(self, folder: str = FOLDER_PATH):
         self.folder = folder
+        self.change_log = ChangeLogRepository(folder)
         self.companies = CompanyRepository(folder)
         self.stationary = StationaryCombustionRepository(folder)
         self.mobile = MobileCombustionRepository(folder)
@@ -174,6 +211,18 @@ class RepositoryFactory:
         self.energy_purchased = EnergyPurchasedRepository(folder)
         self.authorisations = AuthorisationRepository(folder)
         self.permissions = PermissionRepository(folder)
+
+    def set_audit_context(self, login: str):
+        """Włącza audit log (trigger) dla wszystkich repozytoriów.
+
+        Wywołaj po zalogowaniu użytkownika — od tego momentu każda zmiana
+        (add/update/delete) w dowolnym repo będzie rejestrowana w tbl_change_log.csv.
+        """
+        for name in vars(self):
+            attr = getattr(self, name)
+            # Podpinamy audit do wszystkich repo OPRÓCZ samego change_log
+            if isinstance(attr, CsvRepository) and not isinstance(attr, ChangeLogRepository):
+                attr.set_audit_context(self.change_log, login)
 
     def reload_all(self):
         for name in vars(self):

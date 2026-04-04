@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -304,4 +305,48 @@ class EnergyPurchased(ActivityRecord):
     def parse_decimal(cls, v) -> Decimal:
         if v is None or (isinstance(v, str) and v.strip() == ""):
             return Decimal("0")
+        return v
+
+CHANGE_TYPES = {"INSERT", "UPDATE", "DELETE"}
+
+class ChangeLog(BaseModel):
+    """Model dla tbl_change_log.csv — rejestr zmian (audit log).
+
+    Działa jak trigger SQL — rejestruje każdą zmianę w dowolnej tabeli.
+    Pola previous_data i actual_data przechowują JSON (docelowo JSONB w SQL).
+    Rekord jest niezmienny — tylko INSERT, nigdy UPDATE ani DELETE na tym logu.
+    """
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    id_rejestr_zmian: int = Field(ge=1, description="Klucz serial — auto-generowany")
+    login: str = Field(min_length=1, max_length=100, description="Login użytkownika który wykonał zmianę")
+    date_change: datetime = Field(description="Data i godzina zmiany (YYYY-MM-DD HH:MM:SS)")
+    table_name: str = Field(min_length=1, max_length=200, description="Nazwa tabeli (pliku CSV) w której nastąpiła zmiana")
+    record_id: str = Field(max_length=50, description="ID zmienionego rekordu")
+    change_type: str = Field(min_length=1, max_length=10, description="Typ zmiany: INSERT, UPDATE lub DELETE")
+    previous_data: Optional[str] = Field(default=None, description="JSON z danymi przed zmianą (null przy INSERT)")
+    actual_data: Optional[str] = Field(default=None, description="JSON z danymi po zmianie (null przy DELETE)")
+
+    @field_validator("change_type")
+    @classmethod
+    def validate_change_type(cls, v: str) -> str:
+        v = v.strip().upper()
+        if v not in CHANGE_TYPES:
+            raise ValueError(f"Nieznany typ zmiany '{v}'. Dozwolone: {sorted(CHANGE_TYPES)}")
+        return v
+
+    @field_validator("date_change", mode="before")
+    @classmethod
+    def parse_datetime(cls, v) -> datetime:
+        """Parsuje datetime z różnych formatów — CSV przechowuje string."""
+        if isinstance(v, datetime):
+            return v
+        if isinstance(v, str):
+            v = v.strip()
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(v, fmt)
+                except ValueError:
+                    continue
+            raise ValueError(f"Nie można sparsować daty: '{v}'")
         return v

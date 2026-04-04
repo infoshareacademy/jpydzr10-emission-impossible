@@ -199,6 +199,13 @@ def test_data_folder(tmp_path):
         ],
     )
 
+    # --- tbl_change_log.csv (pusty — audit log) ---
+    _write_csv(os.path.join(folder, "tbl_change_log.csv"),
+        ["id_rejestr_zmian", "login", "date_change", "table_name", "record_id",
+         "change_type", "previous_data", "actual_data"],
+        [],
+    )
+
     return folder
 
 

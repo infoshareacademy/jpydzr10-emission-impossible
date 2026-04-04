@@ -335,6 +335,37 @@ Taka architektura oznacza, że:
 - Migracja z CSV na bazę SQL wymaga jedynie podmianki warstwy danych.
 - Obliczenia są testowalne jednostkowo — 128 automatycznych testów weryfikuje poprawność obliczeń.
 
+### Rejestr zmian (Audit Log)
+
+Narzędzie posiada wbudowany **mechanizm śledzenia zmian** działający analogicznie do triggerów w bazach danych SQL. Każda operacja modyfikująca dane (dodanie, edycja, usunięcie rekordu) w dowolnej tabeli jest automatycznie rejestrowana w dedykowanym logu zmian (`tbl_change_log.csv`).
+
+**Struktura rejestru zmian:**
+
+| Pole | Typ | Opis |
+| ---- | --- | ---- |
+| `id_rejestr_zmian` | serial | Automatycznie generowany klucz główny |
+| `login` | tekst | Login użytkownika, który wykonał zmianę |
+| `date_change` | datetime | Data i godzina zmiany (YYYY-MM-DD HH:MM:SS) |
+| `table_name` | tekst | Nazwa tabeli, w której nastąpiła zmiana |
+| `record_id` | tekst | ID zmienionego rekordu |
+| `change_type` | tekst | Typ operacji: INSERT, UPDATE lub DELETE |
+| `previous_data` | JSON | Kopia wiersza przed zmianą (null przy INSERT) |
+| `actual_data` | JSON | Kopia wiersza po zmianie (null przy DELETE) |
+
+**Zasady działania:**
+
+- **INSERT** — zapisywane jest tylko `actual_data` (nowy rekord, nie było poprzedniego stanu).
+- **UPDATE** — zapisywane są oba pola: `previous_data` (stan przed zmianą) i `actual_data` (stan po zmianie).
+- **DELETE** — zapisywane jest tylko `previous_data` (usunięty rekord, brak nowego stanu).
+- Rejestr zmian jest **niezmienny (immutable)** — nie można edytować ani usuwać wpisów z logu, co zapewnia integralność historii.
+- Pola `previous_data` i `actual_data` przechowują dane w formacie **JSON** — przygotowane pod przyszłą migrację na typ JSONB w PostgreSQL.
+- Audit log **nie wymaga backupu** — sam jest historią zmian i stanowi dodatkową warstwę zabezpieczenia danych.
+- Mechanizm aktywuje się automatycznie po zalogowaniu użytkownika — od tego momentu każda modyfikacja danych jest śledzona.
+
+**Dlaczego to ważne?**
+
+W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danych jest kluczowa. Audytor może sprawdzić, kto i kiedy modyfikował dane emisyjne, jakie wartości zostały zmienione i czy zmiany były uzasadnione. To element **zasady przejrzystości (Transparency)** z GHG Protocol — łańcuch zmian danych jest udokumentowany i weryfikowalny.
+
 ---
 
 ## 8. Funkcjonalności i zalety narzędzia
@@ -365,6 +396,7 @@ Taka architektura oznacza, że:
 - Walidacja spójności danych (czy firmy w danych emisyjnych istnieją w rejestrze firm)
 - Weryfikacja kompletności wskaźników i przeliczników
 - Automatyczne kopie zapasowe przy każdej modyfikacji danych
+- **Rejestr zmian (audit log)** — automatyczne śledzenie każdej operacji INSERT/UPDATE/DELETE we wszystkich tabelach, z zapisem danych przed i po zmianie w formacie JSON, loginem użytkownika i datą zmiany
 
 ### Zalety narzędzia
 
@@ -376,6 +408,7 @@ Taka architektura oznacza, że:
 | **Wielospółkowość** | Jedna instalacja obsługuje całą grupę kapitałową |
 | **Polskie wskaźniki emisji** | KOBiZE 2024, DEFRA 2024, IPCC AR5 — aktualne i wiarygodne źródła |
 | **Kontrola dostępu** | Każdy użytkownik widzi tylko swoje spółki |
+| **Audit log (rejestr zmian)** | Pełna historia zmian danych — kto, kiedy i co zmienił. Niezmienny log gotowy na audyt ESG |
 | **Eksport CSV** | Łatwy import do Excela, Power BI, innych narzędzi analitycznych |
 | **Open source** | Pełna transparentność metodologii — audytor może zweryfikować każdy wzór |
 
@@ -602,6 +635,7 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | **Scope 1** | Emisje bezpośrednie (spalanie paliw, wycieki czynników, procesy) |
 | **Scope 2** | Emisje pośrednie z zakupionej energii |
 | **Scope 3** | Emisje pośrednie z łańcucha wartości |
+| **Audit log** | Rejestr zmian — automatyczny zapis każdej modyfikacji danych (jak trigger SQL) |
 
 ---
 

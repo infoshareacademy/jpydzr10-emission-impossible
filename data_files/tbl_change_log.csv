@@ -1,0 +1,4 @@
+id_rejestr_zmian,login,date_change,table_name,record_id,change_type,previous_data,actual_data
+1,sidoreka,2026-04-04 21:29:10,tbl_mobile_combustion,64,INSERT,,"{""id"": 64, ""year"": 2026, ""company"": ""GreenTech Polska"", ""amount"": ""2893"", ""unit"": ""l"", ""source"": ""faktra"", ""vehicle"": ""Samochód osobowy"", ""fuel"": ""benzyna"", ""emission"": ""0""}"
+2,sidoreka,2026-04-04 21:32:06,tbl_stationary_combustion,63,INSERT,,"{""id"": 63, ""year"": 2025, ""company"": ""GreenTech Polska"", ""amount"": ""203"", ""unit"": ""t"", ""source"": ""faktura"", ""fuel"": ""biomasa"", ""installation"": ""Kocioł na biomase"", ""emission"": ""0"", ""raport"": false}"
+3,sidoreka,2026-04-04 21:36:00,tbl_e_cons,71,INSERT,,"{""id"": 71, ""year"": 2026, ""company"": ""GreenTech Polska"", ""amount"": ""203"", ""unit"": ""kWh"", ""source"": ""pomiar ilości"", ""energy_source"": ""Zużyta"", ""energy_type"": ""Energia elektryczna nie OZE"", ""emission"": ""0""}"
