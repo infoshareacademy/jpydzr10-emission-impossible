@@ -165,7 +165,7 @@ class TestAuditTriggerInsert:
             id=repos.energy_consumption.next_id(),
             year=2025, company="TestFirma A", amount=Decimal("100"),
             unit="MWh", source="test", energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         ok, _ = repos.energy_consumption.add(record)
         assert ok is True
@@ -190,7 +190,7 @@ class TestAuditTriggerInsert:
             id=repos.energy_consumption.next_id(),
             year=2025, company="TestFirma A", amount=Decimal("777"),
             unit="MWh", source="test_json", energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
 
@@ -279,7 +279,7 @@ class TestAuditWithoutContext:
             id=repos.energy_consumption.next_id(),
             year=2025, company="TestFirma A", amount=Decimal("100"),
             unit="MWh", source="test", energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
 
@@ -302,7 +302,7 @@ class TestChangeLogFiltering:
             id=repos.energy_consumption.next_id(),
             year=2025, company="TestFirma A", amount=Decimal("100"),
             unit="MWh", source="test", energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
 
@@ -353,7 +353,7 @@ class TestAuditFullCycle:
             id=new_id, year=2025, company="TestFirma A",
             amount=Decimal("100"), unit="MWh", source="lifecycle",
             energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
 
@@ -393,7 +393,7 @@ class TestAuditFullCycle:
             id=new_id, year=2025, company="TestFirma A",
             amount=Decimal("50"), unit="MWh", source="seq",
             energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
         repos.energy_consumption.update(new_id, {"amount": Decimal("60")})
@@ -412,7 +412,7 @@ class TestAuditFullCycle:
             id=repos.energy_consumption.next_id(),
             year=2025, company="TestFirma A", amount=Decimal("50"),
             unit="MWh", source="dt", energy_source="Zakupiona",
-            energy_type="Energia elektryczna nie OZE", emission=Decimal("0"),
+            energy_type="Energia elektryczna nie OZE",
         )
         repos.energy_consumption.add(record)
 

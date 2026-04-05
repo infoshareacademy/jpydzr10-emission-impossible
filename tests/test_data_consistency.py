@@ -1,7 +1,7 @@
 """
 Testy walidacji spójności danych między tabelami.
 Sprawdza czy firmy w tabelach emisyjnych istnieją w tbl_companies
-oraz czy raport=TRUE z emission=0 jest wykrywane.
+oraz czy niespójność emission_tco2eq/raport jest wykrywana.
 """
 
 import pytest
@@ -23,18 +23,18 @@ class TestDataConsistency:
         false_positives = [i for i in issues if "TestFirma A" in i and "nie istnieje" in i]
         assert len(false_positives) == 0
 
-    def test_detects_raport_true_emission_zero(self, uc):
-        """Wykrywa raport=TRUE z emission=0 w spalaniu stacjonarnym."""
+    def test_detects_raport_without_emission(self, uc):
+        """Wykrywa raport podany ale emission_tco2eq puste."""
         issues = uc.validate_data_consistency()
-        raport_issues = [i for i in issues if "raport=TRUE ale emisja=0" in i]
-        # ID 3: raport=TRUE, emission=0
+        raport_issues = [i for i in issues if "raport=" in i and "emission_tco2eq puste" in i]
+        # ID 3: raport='KOBiZE', emission_tco2eq puste
         assert len(raport_issues) >= 1
 
-    def test_raport_true_with_emission_not_flagged(self, uc):
-        """raport=TRUE z emission > 0 → nie powinien być zgłoszony."""
+    def test_consistent_record_not_flagged(self, uc):
+        """emission_tco2eq + raport oba podane → nie powinien być zgłoszony."""
         issues = uc.validate_data_consistency()
-        # ID 1: raport=TRUE, emission=99.999 — poprawny rekord
-        flagged = [i for i in issues if "ID 1" in i and "raport=TRUE" in i]
+        # ID 1: emission_tco2eq=99.999 + raport='KOBiZE' — poprawny rekord
+        flagged = [i for i in issues if "ID 1" in i and "spalanie stacjonarne" in i]
         assert len(flagged) == 0
 
 

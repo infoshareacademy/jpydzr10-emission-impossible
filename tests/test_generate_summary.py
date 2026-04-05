@@ -1,8 +1,8 @@
 """
 Testy generate_summary — podsumowanie emisji w pamięci.
 Sprawdza poprawność logiki:
-- raport=TRUE → bierze emission z CSV
-- raport=FALSE → oblicza z ilości × wskaźnik
+- emission_tco2eq podana → używa deklarowanej wartości (priorytet)
+- emission_tco2eq puste → oblicza z ilości × wskaźnik
 - Scope 2 → zawsze oblicza z wskaźnika
 - Trendy rok do roku
 """
@@ -18,33 +18,30 @@ def R(d: Decimal) -> Decimal:
 class TestGenerateSummary:
     """Testy generate_summary — główna metoda raportowania."""
 
-    def test_stationary_raport_true_uses_csv_value(self, uc):
-        """raport=TRUE z podaną emisją → używa wartości z CSV (99.999)."""
+    def test_stationary_declared_emission_has_priority(self, uc):
+        """emission_tco2eq podana → używa deklarowanej wartości (99.999)."""
         s = uc.generate_summary(2025, 2025, "TestFirma A")
-        # ID 1: raport=TRUE, emission=99.999
-        # ID 2: raport=FALSE, 5000 m3 × 0.00202 = 10.100
+        # ID 1: emission_tco2eq=99.999 (deklarowana, priorytet)
+        # ID 2: emission_tco2eq puste → oblicz: 5000 m3 × 0.00202 = 10.100
         expected_stationary = Decimal("99.999") + Decimal("10.100")
         assert s["scope1_stationary"] == R(expected_stationary)
 
-    def test_stationary_raport_false_calculates(self, uc):
-        """raport=FALSE → oblicza emisję z amount × wskaźnik."""
+    def test_stationary_empty_emission_calculates(self, uc):
+        """emission_tco2eq puste → oblicza emisję z amount × wskaźnik."""
         s = uc.generate_summary(2025, 2025, "TestFirma A")
-        # Sprawdź że stationary nie jest 0 (bo raport=FALSE oblicza)
         assert s["scope1_stationary"] > 0
 
-    def test_stationary_raport_true_emission_zero_calculates(self, uc):
-        """raport=TRUE ale emission=0 → oblicza z wskaźnika (bo emission nie >0)."""
+    def test_stationary_raport_without_emission_calculates(self, uc):
+        """raport podany ale emission_tco2eq puste → oblicza z wskaźnika."""
         s = uc.generate_summary(2025, 2025, "TestFirma B")
-        # ID 3: raport=TRUE, emission=0, 200 t × 2.446 = 489.200
-        # generate_summary: if r.raport and r.emission > 0 → bierze z CSV
-        # tu emission=0 więc warunek nie spełniony → oblicza
+        # ID 3: raport='KOBiZE', emission_tco2eq puste → 200 t × 2.446 = 489.200
         assert s["scope1_stationary"] == Decimal("489.200")
 
-    def test_mobile_always_calculates(self, uc):
-        """Spalanie mobilne — zawsze oblicza z wskaźnika, ignoruje CSV emission."""
+    def test_mobile_calculates_when_empty(self, uc):
+        """Spalanie mobilne bez deklarowanej emisji → oblicza z wskaźnika."""
         s = uc.generate_summary(2025, 2025, "TestFirma A")
-        # ID 1: 2400 l benzyna × 0.00232 = 5.568
-        # ID 2: 5000 l diesel × 0.00268 = 13.400
+        # ID 1: 2400 l benzyna × 0.00232 = 5.568 (emission_tco2eq puste)
+        # ID 2: 5000 l diesel × 0.00268 = 13.400 (emission_tco2eq puste)
         expected = Decimal("5.568") + Decimal("13.400")
         assert s["scope1_mobile"] == R(expected)
 
@@ -109,10 +106,11 @@ class TestGenerateSummary:
         assert s_all["total"] > s_2025["total"]
         assert s_all["total"] > s_2024["total"]
 
-    def test_csv_emission_not_used_for_mobile(self, uc):
-        """Spalanie mobilne: CSV emission=0, ale summary oblicza > 0."""
-        s = uc.generate_summary(2025, 2025, "TestFirma A")
-        assert s["scope1_mobile"] > 0
+    def test_mobile_declared_emission_has_priority(self, uc):
+        """Spalanie mobilne: emission_tco2eq podana → użyj deklarowanej (rok 2024)."""
+        s = uc.generate_summary(2024, 2024, "TestFirma A")
+        # ID 4: emission_tco2eq=9.000 (deklarowana) — priorytet nad obliczoną
+        assert s["scope1_mobile"] == Decimal("9.000")
 
 
 class TestTrendReport:

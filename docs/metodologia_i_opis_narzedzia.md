@@ -116,6 +116,9 @@ Zakres 1 (Scope 1) obejmuje **emisje gazów cieplarnianych ze źródeł będący
 | Jednostka | Jednostka miary | m³ |
 | Instalacja | Nazwa źródła | piec przemysłowy 1 |
 | Źródło danych | Skąd pochodzi informacja | faktura |
+| Emisja [tCO2eq] | Deklarowana emisja (opcjonalnie) | 24.240 |
+| Raport | Źródło raportu emisji (wymagane jeśli emisja podana) | KOBiZE |
+| Uwagi | Notatki do rekordu (opcjonalnie) | pomiar kontrolny |
 
 **Dozwolone paliwa:** gaz ziemny, benzyna, diesel, LPG, węgiel kamienny, koks, olej opałowy lekki, olej opałowy ciężki, pellet, biomasa, drewno.
 
@@ -139,6 +142,9 @@ Zakres 1 (Scope 1) obejmuje **emisje gazów cieplarnianych ze źródeł będący
 | Ilość | Zużyta ilość | 45 000 |
 | Jednostka | Jednostka miary | l (litry) |
 | Źródło | Skąd pochodzi informacja | karty paliwowe |
+| Emisja [tCO2eq] | Deklarowana emisja (opcjonalnie) | 5.568 |
+| Raport | Źródło raportu (wymagane jeśli emisja podana) | DEFRA 2024 |
+| Uwagi | Notatki (opcjonalnie) | flota północ |
 
 **Wskazówka praktyczna:** Jeśli firma nie mierzy zużycia paliwa bezpośrednio, można je oszacować na podstawie przejechanych kilometrów i średniego spalania pojazdów. Jednak dokładniejsze są dane z kart paliwowych lub faktur.
 
@@ -377,6 +383,9 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - Obsługa wszystkich kategorii Zakresu 1 (spalanie stacjonarne, mobilne, emisje procesowe, fugitive) i Zakresu 2 (energia elektryczna, ciepło, para, chłód)
 - Automatyczna walidacja typów paliw, jednostek, zakresów dat
 - Podgląd szacunkowej emisji już przy wprowadzaniu danych
+- **Emisja deklarowana** — użytkownik może podać własną wartość emisji [tCO2eq] z zewnętrznego raportu (np. KOBiZE, DEFRA, pomiar). Jeśli podana — ma priorytet nad obliczeniem automatycznym. Jeśli odchylenie od wskaźnika > ±50% — narzędzie wyświetla ostrzeżenie i prosi o potwierdzenie poprawności danych
+- **Pole raport** — źródło raportu emisji (wymagane gdy użytkownik podaje emisję deklarowaną)
+- **Pole uwagi (notes)** — dowolne notatki do każdego rekordu emisyjnego
 
 **Obliczenia:**
 - Automatyczne przeliczanie emisji na podstawie wskaźników emisji (KOBiZE, DEFRA, IPCC)
@@ -402,6 +411,7 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 
 | Cecha | Korzyść |
 |-------|---------|
+| **Emisja deklarowana z priorytetem** | Własna wartość emisji z raportu ma pierwszeństwo nad obliczeniem automatycznym. Ostrzeżenie przy odchyleniu > ±50% |
 | **Obliczenia w pamięci** | Dane źródłowe nie są nadpisywane — zawsze możesz wrócić do oryginału |
 | **Automatyczne przeliczanie jednostek** | Nie musisz ręcznie konwertować kWh na MWh czy kg na tony |
 | **128 testów automatycznych** | Pewność, że obliczenia są poprawne — każda zmiana kodu jest weryfikowana |
@@ -576,7 +586,9 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Jaki rodzaj paliwa? | Sprawdź na fakturze — gaz ziemny, olej opałowy, węgiel itp. |
 | Ile zużyto? | Ilość z faktury — m³ gazu, tony węgla, litry oleju |
 | Jaka instalacja? | Nazwa kotła, pieca, turbiny — pomaga zidentyfikować źródło |
-| Mam gotową emisję? | Jeśli masz wynik z pomiaru na kominie (np. z raportu KOBIZE) — wybierz TAK i wpisz wartość. Jeśli nie — narzędzie obliczy automatycznie. |
+| Emisja [tCO2eq] | Jeśli masz gotową wartość emisji (np. z pomiaru na kominie, raportu KOBiZE) — wpisz ją. Ma priorytet nad obliczeniem automatycznym. Jeśli nie masz — zostaw puste, narzędzie obliczy. |
+| Raport | Źródło deklarowanej emisji — np. „KOBiZE", „DEFRA 2024", „pomiar akredytowany". Wymagane gdy podajesz emisję. |
+| Uwagi | Opcjonalne notatki — np. „kotłownia budynek B", „szacunek na podstawie Q3". |
 
 ### Spalanie mobilne — co wpisać?
 
@@ -585,6 +597,9 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Jaki pojazd? | Typ pojazdu — samochód osobowy, ciężarówka 12t, wózek widłowy |
 | Jakie paliwo? | Benzyna, diesel, LPG — z karty paliwowej lub faktury |
 | Ile paliwa? | Litry — z karty paliwowej lub faktury za paliwo |
+| Emisja [tCO2eq] | Gotowa wartość emisji z raportu — jeśli masz. Priorytet nad obliczeniem. |
+| Raport | Źródło deklarowanej emisji — np. „DEFRA 2024", „karta paliwowa z kalkulacją". Wymagane gdy podajesz emisję. |
+| Uwagi | Opcjonalne notatki — np. „flota osobowa", „pojazdy budowlane". |
 
 **Wskazówka:** Jeśli nie masz danych o zużyciu paliwa, ale masz przejechane kilometry, skontaktuj się z działem floty — przebiegi można przeliczyć na litry paliwa.
 
@@ -595,6 +610,9 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Jaki proces? | Nazwa procesu technologicznego — kalcynacja, synteza, topienie |
 | Jaki produkt? | Co jest wytwarzane — wapno, kwas, metal |
 | Ile przetworzone? | Tony surowca/produktu — z raportów produkcyjnych |
+| Emisja [tCO2eq] | Gotowa wartość emisji z raportu zakładowego. Priorytet nad obliczeniem. |
+| Raport | Źródło deklarowanej emisji — np. „raport środowiskowy 2024", „KOBiZE". Wymagane gdy podajesz emisję. |
+| Uwagi | Opcjonalne notatki — np. „linia produkcyjna nr 2", „piec obrotowy". |
 
 ### Emisje niezorganizowane — co wpisać?
 
@@ -603,6 +621,9 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Jaka instalacja? | Nazwa systemu — klimatyzacja biuro, chłodnia magazyn |
 | Jaki czynnik? | Typ czynnika chłodniczego — R410A, R32, R404A — z karty serwisowej |
 | Ile wyciekło? | Ilość uzupełnionego czynnika (kg) = ilość wycieku — z protokołu serwisu |
+| Emisja [tCO2eq] | Gotowa wartość emisji — jeśli serwisant podał w protokole. Priorytet nad obliczeniem z GWP. |
+| Raport | Źródło deklarowanej emisji — np. „protokół serwisu klima", „F-gaz raport". Wymagane gdy podajesz emisję. |
+| Uwagi | Opcjonalne notatki — np. „klimatyzacja piętro 3", „wymiana sprężarki". |
 
 **Ważne:** Jeśli nie było serwisu i uzupełnienia czynnika w danym roku — emisja fugitive = 0 dla tej instalacji.
 
@@ -614,6 +635,8 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Typ energii | Energia elektryczna (OZE/nie OZE), ciepło, para, chłód |
 | Ile? | MWh lub GJ — z faktury od dostawcy energii |
 | OZE czy nie? | Sprawdź umowę z dostawcą — czy masz certyfikat Gwarancji Pochodzenia (GO)? Jeśli tak → OZE (emisja = 0). Jeśli nie → nie OZE. |
+| Emisja [tCO2eq] | Scope 2 jest zawsze obliczane automatycznie ze wskaźnika — to pole jest informacyjne. |
+| Uwagi | Opcjonalne notatki — np. „umowa PPA z farmą wiatrową", „certyfikat GO nr 12345". |
 
 **Ważna uwaga o OZE:** Sam fakt, że dostawca „oferuje zieloną energię" nie wystarczy. Liczy się certyfikat Gwarancji Pochodzenia (GO) — formalny dokument potwierdzający, że konkretna ilość energii pochodzi ze źródła odnawialnego. Bez GO, nawet jeśli dostawca reklamuje się jako „zielony", energia powinna być raportowana jako nie-OZE.
 

@@ -90,91 +90,98 @@ def test_data_folder(tmp_path):
 
     # --- tbl_stationary_combustion.csv ---
     _write_csv(os.path.join(folder, "tbl_stationary_combustion.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "fuel", "installation", "emission", "raport"],
+        ["id", "year", "company", "amount", "unit", "source", "fuel", "installation", "emission_tco2eq", "raport", "notes"],
         [
-            # raport=TRUE z podaną emisją → powinien użyć wartości z CSV
+            # emission_tco2eq podana + raport → użyj deklarowanej wartości
             {"id": 1, "year": 2025, "company": "TestFirma A", "amount": "10000", "unit": "m3",
              "source": "faktura", "fuel": "gaz ziemny", "installation": "kotłownia",
-             "emission": "99.999", "raport": "TRUE"},
-            # raport=FALSE → powinien obliczyć: 5000 m3 × 0.00202 = 10.100 tCO2e
+             "emission_tco2eq": "99.999", "raport": "KOBiZE", "notes": ""},
+            # emission_tco2eq puste → oblicz: 5000 m3 × 0.00202 = 10.100 tCO2e
             {"id": 2, "year": 2025, "company": "TestFirma A", "amount": "5000", "unit": "m3",
              "source": "faktura", "fuel": "gaz ziemny", "installation": "piec",
-             "emission": "0", "raport": "FALSE"},
-            # raport=TRUE ale emission=0 → walidacja powinna to wyłapać
+             "emission_tco2eq": "", "raport": "", "notes": ""},
+            # raport podany ale emission_tco2eq puste → walidacja powinna wyłapać
             {"id": 3, "year": 2025, "company": "TestFirma B", "amount": "200", "unit": "t",
              "source": "faktura", "fuel": "węgiel kamienny", "installation": "kotłownia",
-             "emission": "0", "raport": "TRUE"},
-            # Inny rok do testów trendów
+             "emission_tco2eq": "", "raport": "KOBiZE", "notes": ""},
+            # Inny rok do testów trendów — deklarowana emisja
             {"id": 4, "year": 2024, "company": "TestFirma A", "amount": "12000", "unit": "m3",
              "source": "faktura", "fuel": "gaz ziemny", "installation": "kotłownia",
-             "emission": "24.240", "raport": "TRUE"},
+             "emission_tco2eq": "24.240", "raport": "KOBiZE", "notes": "pomiar kontrolny"},
         ],
     )
 
     # --- tbl_mobile_combustion.csv ---
     _write_csv(os.path.join(folder, "tbl_mobile_combustion.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "vehicle", "fuel", "emission"],
+        ["id", "year", "company", "amount", "unit", "source", "vehicle", "fuel", "emission_tco2eq", "raport", "notes"],
         [
-            # 2400 l benzyna × 0.00232 = 5.568 tCO2e
+            # 2400 l benzyna × 0.00232 = 5.568 tCO2e (brak deklarowanej emisji)
             {"id": 1, "year": 2025, "company": "TestFirma A", "amount": "2400", "unit": "l",
-             "source": "karty", "vehicle": "samochód osobowy", "fuel": "benzyna", "emission": "0"},
-            # 5000 l diesel × 0.00268 = 13.400 tCO2e
+             "source": "karty", "vehicle": "samochód osobowy", "fuel": "benzyna",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
+            # 5000 l diesel × 0.00268 = 13.400 tCO2e (brak deklarowanej emisji)
             {"id": 2, "year": 2025, "company": "TestFirma A", "amount": "5000", "unit": "l",
-             "source": "karty", "vehicle": "samochód osobowy", "fuel": "diesel", "emission": "0"},
-            # 1000 l LPG × 0.00163 = 1.630 tCO2e
+             "source": "karty", "vehicle": "samochód osobowy", "fuel": "diesel",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
+            # 1000 l LPG × 0.00163 = 1.630 tCO2e (brak deklarowanej emisji)
             {"id": 3, "year": 2025, "company": "TestFirma B", "amount": "1000", "unit": "l",
-             "source": "faktura", "vehicle": "wózek widłowy", "fuel": "LPG", "emission": "0"},
-            # Rok 2024
+             "source": "faktura", "vehicle": "wózek widłowy", "fuel": "LPG",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
+            # Rok 2024 — deklarowana emisja
             {"id": 4, "year": 2024, "company": "TestFirma A", "amount": "3000", "unit": "l",
-             "source": "karty", "vehicle": "samochód osobowy", "fuel": "diesel", "emission": "0"},
+             "source": "karty", "vehicle": "samochód osobowy", "fuel": "diesel",
+             "emission_tco2eq": "9.000", "raport": "DEFRA 2024", "notes": "pomiar flota"},
         ],
     )
 
     # --- tbl_fugitve_emissions.csv ---
     _write_csv(os.path.join(folder, "tbl_fugitve_emissions.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "installation", "product", "emission"],
+        ["id", "year", "company", "amount", "unit", "source", "installation", "product", "emission_tco2eq", "raport", "notes"],
         [
-            # 5 kg R410A × 2088 kgCO2e/kg = 10440 kgCO2e = 10.440 tCO2e
+            # 5 kg R410A × 2088 kgCO2e/kg = 10440 kgCO2e = 10.440 tCO2e (brak deklarowanej)
             {"id": 1, "year": 2025, "company": "TestFirma A", "amount": "5", "unit": "kg",
-             "source": "serwis", "installation": "klimatyzacja biuro", "product": "R410A", "emission": "0"},
-            # 2 kg R32 × 675 kgCO2e/kg = 1350 kgCO2e = 1.350 tCO2e
+             "source": "serwis", "installation": "klimatyzacja biuro", "product": "R410A",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
+            # 2 kg R32 × 675 kgCO2e/kg = 1350 kgCO2e = 1.350 tCO2e (brak deklarowanej)
             {"id": 2, "year": 2025, "company": "TestFirma B", "amount": "2", "unit": "kg",
-             "source": "serwis", "installation": "klimatyzacja hala", "product": "R32", "emission": "0"},
+             "source": "serwis", "installation": "klimatyzacja hala", "product": "R32",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
         ],
     )
 
     # --- tbl_process_emissions.csv ---
     _write_csv(os.path.join(folder, "tbl_process_emissions.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "process", "product", "emission"],
+        ["id", "year", "company", "amount", "unit", "source", "process", "product", "emission_tco2eq", "raport", "notes"],
         [
-            # 100 t kalcynacja × 0.780 = 78.000 tCO2e
+            # 100 t kalcynacja × 0.780 = 78.000 tCO2e (brak deklarowanej)
             {"id": 1, "year": 2025, "company": "TestFirma B", "amount": "100", "unit": "t",
-             "source": "pomiar", "process": "kalcynacja", "product": "wapno", "emission": "0"},
+             "source": "pomiar", "process": "kalcynacja", "product": "wapno",
+             "emission_tco2eq": "", "raport": "", "notes": ""},
         ],
     )
 
     # --- tbl_e_cons.csv ---
     _write_csv(os.path.join(folder, "tbl_e_cons.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "energy_source", "energy_type", "emission"],
+        ["id", "year", "company", "amount", "unit", "source", "energy_source", "energy_type", "emission_tco2eq"],
         [
             # 450 MWh × 0.709 = 319.050 tCO2e
             {"id": 1, "year": 2025, "company": "TestFirma A", "amount": "450", "unit": "MWh",
-             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia elektryczna nie OZE", "emission": "0"},
+             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia elektryczna nie OZE", "emission_tco2eq": ""},
             # 280 GJ ciepło × 0.292 = 81.760 tCO2e
             {"id": 2, "year": 2025, "company": "TestFirma A", "amount": "280", "unit": "GJ",
-             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia cieplna", "emission": "0"},
+             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia cieplna", "emission_tco2eq": ""},
             # OZE → 0
             {"id": 3, "year": 2025, "company": "TestFirma A", "amount": "100", "unit": "MWh",
-             "source": "PV", "energy_source": "Wyprodukowana", "energy_type": "Energia elektryczna z OZE", "emission": "0"},
+             "source": "PV", "energy_source": "Wyprodukowana", "energy_type": "Energia elektryczna z OZE", "emission_tco2eq": ""},
             # 2024 — do trendów
             {"id": 4, "year": 2024, "company": "TestFirma A", "amount": "500", "unit": "MWh",
-             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia elektryczna nie OZE", "emission": "0"},
+             "source": "faktura", "energy_source": "Zakupiona", "energy_type": "Energia elektryczna nie OZE", "emission_tco2eq": ""},
         ],
     )
 
     # --- tbl_e_purc.csv (pusty, ale potrzebny) ---
     _write_csv(os.path.join(folder, "tbl_e_purc.csv"),
-        ["id", "year", "company", "amount", "unit", "source", "energy_type", "trader", "factor", "emission"],
+        ["id", "year", "company", "amount", "unit", "source", "energy_type", "trader", "factor", "emission_tco2eq"],
         [],
     )
 

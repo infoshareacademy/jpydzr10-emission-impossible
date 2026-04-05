@@ -21,10 +21,9 @@ class TestStationaryCombustionModel:
         r = StationaryCombustion(
             id=1, year=2025, company="Test", amount=Decimal("100"),
             unit="m3", fuel="gaz ziemny", installation="piec",
-            emission=Decimal("0"), raport=False,
         )
         assert r.fuel == "gaz ziemny"
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
 
     def test_invalid_fuel(self):
         with pytest.raises(ValidationError, match="Nieznany typ paliwa"):
@@ -68,37 +67,53 @@ class TestStationaryCombustionModel:
                 unit="m3", fuel="gaz ziemny", installation="piec",
             )
 
-    def test_raport_bool_parsing_true(self):
+    def test_raport_string(self):
         r = StationaryCombustion(
             id=1, year=2025, company="Test", amount=Decimal("100"),
             unit="m3", fuel="gaz ziemny", installation="piec",
-            raport="TRUE",
+            emission_tco2eq=Decimal("10"), raport="KOBiZE",
         )
-        assert r.raport is True
+        assert r.raport == "KOBiZE"
 
-    def test_raport_bool_parsing_false(self):
+    def test_raport_empty_is_none(self):
         r = StationaryCombustion(
             id=1, year=2025, company="Test", amount=Decimal("100"),
             unit="m3", fuel="gaz ziemny", installation="piec",
-            raport="FALSE",
+            raport="",
         )
-        assert r.raport is False
+        assert r.raport is None
 
-    def test_emission_none_defaults_to_zero(self):
+    def test_emission_none_stays_none(self):
         r = StationaryCombustion(
             id=1, year=2025, company="Test", amount=Decimal("100"),
             unit="m3", fuel="gaz ziemny", installation="piec",
-            emission=None,
+            emission_tco2eq=None,
         )
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
 
-    def test_emission_empty_string_defaults_to_zero(self):
+    def test_emission_empty_string_is_none(self):
         r = StationaryCombustion(
             id=1, year=2025, company="Test", amount=Decimal("100"),
             unit="m3", fuel="gaz ziemny", installation="piec",
-            emission="",
+            emission_tco2eq="",
         )
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
+
+    def test_emission_with_value(self):
+        r = StationaryCombustion(
+            id=1, year=2025, company="Test", amount=Decimal("100"),
+            unit="m3", fuel="gaz ziemny", installation="piec",
+            emission_tco2eq=Decimal("25.5"),
+        )
+        assert r.emission_tco2eq == Decimal("25.5")
+
+    def test_notes_optional(self):
+        r = StationaryCombustion(
+            id=1, year=2025, company="Test", amount=Decimal("100"),
+            unit="m3", fuel="gaz ziemny", installation="piec",
+            notes="test uwagi",
+        )
+        assert r.notes == "test uwagi"
 
 
 class TestMobileCombustionModel:
@@ -110,7 +125,16 @@ class TestMobileCombustionModel:
             unit="l", vehicle="samochód osobowy", fuel="benzyna",
         )
         assert r.vehicle == "samochód osobowy"
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
+
+    def test_emission_and_raport(self):
+        r = MobileCombustion(
+            id=1, year=2025, company="Test", amount=Decimal("2400"),
+            unit="l", vehicle="auto", fuel="benzyna",
+            emission_tco2eq=Decimal("5.5"), raport="DEFRA 2024",
+        )
+        assert r.emission_tco2eq == Decimal("5.5")
+        assert r.raport == "DEFRA 2024"
 
     def test_invalid_fuel(self):
         with pytest.raises(ValidationError, match="Nieznany typ paliwa"):
@@ -128,12 +152,12 @@ class TestFugitiveEmissionModel:
         )
         assert r.product == "R410A"
 
-    def test_emission_default_zero(self):
+    def test_emission_default_none(self):
         r = FugitiveEmission(
             id=1, year=2025, company="Test", amount=Decimal("5"),
             unit="kg", installation="klima", product="R410A",
         )
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
 
 
 class TestProcessEmissionModel:
@@ -153,7 +177,7 @@ class TestEnergyConsumptionModel:
             energy_type="Energia elektryczna nie OZE",
         )
         assert r.energy_type == "Energia elektryczna nie OZE"
-        assert r.emission == Decimal("0")
+        assert r.emission_tco2eq is None
 
 
 class TestEmissionFactorModel:

@@ -68,14 +68,15 @@ class ActivityRecord(BaseRecord):
 class StationaryCombustion(ActivityRecord):
     fuel: str = Field(min_length=1, max_length=100, description="Rodzaj paliwa")
     installation: str = Field(min_length=1, max_length=200, description="Nazwa instalacji")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja")
-    raport: bool = Field(default=False, description="Czy dane z raportu")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja deklarowana [tCO2eq]")
+    raport: Optional[str] = Field(default=None, max_length=300, description="Źródło raportu emisji")
+    notes: Optional[str] = Field(default=None, max_length=500, description="Uwagi do rekordu")
 
-    @field_validator("emission", mode="before")
+    @field_validator("emission_tco2eq", mode="before")
     @classmethod
-    def parse_emission(cls, v) -> Decimal:
+    def parse_emission(cls, v) -> Optional[Decimal]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
 
     @field_validator("fuel")
@@ -90,22 +91,27 @@ class StationaryCombustion(ActivityRecord):
 
     @field_validator("raport", mode="before")
     @classmethod
-    def parse_bool(cls, v) -> bool:
-        if isinstance(v, str):
-            return v.strip().upper() in ("TRUE", "1", "TAK", "YES", "T")
-        return bool(v)
+    def parse_raport(cls, v) -> Optional[str]:
+        """Parsuje pole raport — obsługuje stare wartości TRUE/FALSE i nowe stringi."""
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        if isinstance(v, bool):
+            return None  # Stary format — ignoruj
+        return v.strip()
 
 
 class MobileCombustion(ActivityRecord):
     vehicle: str = Field(min_length=1, max_length=200, description="Typ pojazdu")
     fuel: str = Field(min_length=1, max_length=100, description="Rodzaj paliwa")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja deklarowana [tCO2eq]")
+    raport: Optional[str] = Field(default=None, max_length=300, description="Źródło raportu emisji")
+    notes: Optional[str] = Field(default=None, max_length=500, description="Uwagi do rekordu")
 
-    @field_validator("emission", mode="before")
+    @field_validator("emission_tco2eq", mode="before")
     @classmethod
-    def parse_emission(cls, v) -> Decimal:
+    def parse_emission(cls, v) -> Optional[Decimal]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
 
     @field_validator("fuel")
@@ -118,31 +124,56 @@ class MobileCombustion(ActivityRecord):
             )
         return v
 
+    @field_validator("raport", mode="before")
+    @classmethod
+    def parse_raport(cls, v) -> Optional[str]:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        return v.strip() if isinstance(v, str) else None
+
 
 class ProcessEmission(ActivityRecord):
     process: str = Field(min_length=1, max_length=200, description="Nazwa procesu")
     product: str = Field(min_length=1, max_length=200, description="Produkt")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja deklarowana [tCO2eq]")
+    raport: Optional[str] = Field(default=None, max_length=300, description="Źródło raportu emisji")
+    notes: Optional[str] = Field(default=None, max_length=500, description="Uwagi do rekordu")
 
-    @field_validator("emission", mode="before")
+    @field_validator("emission_tco2eq", mode="before")
     @classmethod
-    def parse_emission(cls, v) -> Decimal:
+    def parse_emission(cls, v) -> Optional[Decimal]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
+
+    @field_validator("raport", mode="before")
+    @classmethod
+    def parse_raport(cls, v) -> Optional[str]:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        return v.strip() if isinstance(v, str) else None
 
 
 class FugitiveEmission(ActivityRecord):
     installation: str = Field(min_length=1, max_length=200, description="Nazwa instalacji")
     product: str = Field(min_length=1, max_length=200, description="Czynnik chłodniczy")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja deklarowana [tCO2eq]")
+    raport: Optional[str] = Field(default=None, max_length=300, description="Źródło raportu emisji")
+    notes: Optional[str] = Field(default=None, max_length=500, description="Uwagi do rekordu")
 
-    @field_validator("emission", mode="before")
+    @field_validator("emission_tco2eq", mode="before")
     @classmethod
-    def parse_emission(cls, v) -> Decimal:
+    def parse_emission(cls, v) -> Optional[Decimal]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
+
+    @field_validator("raport", mode="before")
+    @classmethod
+    def parse_raport(cls, v) -> Optional[str]:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        return v.strip() if isinstance(v, str) else None
 
 
 class EmissionFactor(BaseModel):
@@ -269,11 +300,14 @@ ENERGY_SOURCE_TYPES = {
 
 # Dozwolone typy energii — muszą odpowiadać nazwom w tbl_factors.csv
 ENERGY_TYPES = {
-    "Energia elektryczna",
     "Energia elektryczna z OZE",
     "Energia elektryczna nie OZE",
-    "Ciepło",
-    "Chłód",
+    "Ciepło z OZE",
+    "Ciepło nie OZE",
+    "Chłód z OZE",
+    "Chłód nie OZE",
+    "Para Techniczna z OZE",
+    "Para Techniczna nie OZE",
 }
 
 # Model dla tbl_e_cons.csv — zużycie energii (Scope 2)
@@ -282,13 +316,13 @@ class EnergyConsumption(ActivityRecord):
     """Model dla tbl_e_cons.csv — zużycie energii (Scope 2)"""
     energy_source: str = Field(min_length=1, max_length=100, description="Źródło energii")
     energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja CO2e")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja CO2e [tCO2eq]")
 
-    @field_validator("emission", mode="before")
+    @field_validator("emission_tco2eq", mode="before")
     @classmethod
-    def parse_emission(cls, v) -> Decimal:
+    def parse_emission(cls, v) -> Optional[Decimal]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
 
 # Model dla tbl_e_purc.csv — zakupiona energia (Scope 2)
@@ -298,13 +332,13 @@ class EnergyPurchased(ActivityRecord):
     energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
     trader: str = Field(default="", max_length=200, description="Dostawca energii")
     factor: Decimal = Field(default=Decimal("0"), ge=0, description="Wskaźnik emisji")
-    emission: Decimal = Field(default=Decimal("0"), ge=0, description="Emisja CO2e")
+    emission_tco2eq: Optional[Decimal] = Field(default=None, ge=0, description="Emisja CO2e [tCO2eq]")
 
-    @field_validator("emission", "factor", mode="before")
+    @field_validator("emission_tco2eq", "factor", mode="before")
     @classmethod
-    def parse_decimal(cls, v) -> Decimal:
+    def parse_decimal(cls, v):
         if v is None or (isinstance(v, str) and v.strip() == ""):
-            return Decimal("0")
+            return None
         return v
 
 CHANGE_TYPES = {"INSERT", "UPDATE", "DELETE"}

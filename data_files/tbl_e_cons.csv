@@ -1,4 +1,4 @@
-id,year,company,amount,unit,source,energy_source,energy_type,emission
+id,year,company,amount,unit,source,energy_source,energy_type,emission_tco2eq
 1,2025,GreenTech Polska,450,MWh,faktura,Zakupiona,Energia elektryczna nie OZE,319.050
 2,2025,GreenTech Polska,280,GJ,faktura,Zakupiona,Energia cieplna,81.760
 3,2025,GreenTech Logistyka,180,MWh,faktura,Zakupiona,Energia elektryczna nie OZE,127.620
