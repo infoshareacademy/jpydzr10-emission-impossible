@@ -54,9 +54,12 @@ class TestStationaryCombustionModel:
             )
 
     def test_year_too_high(self):
+        """Rok n+1 (przyszły) nie jest dozwolony."""
+        from datetime import datetime
+        next_year = datetime.now().year + 1
         with pytest.raises(ValidationError):
             StationaryCombustion(
-                id=1, year=2099, company="Test", amount=Decimal("100"),
+                id=1, year=next_year, company="Test", amount=Decimal("100"),
                 unit="m3", fuel="gaz ziemny", installation="piec",
             )
 

@@ -7,7 +7,9 @@ requires-python = ">=3.12"
 dependencies = [
     "argon2-cffi>=25.1.0",
     "codecarbon>=3.2.6",
+    "fpdf2>=2.8.7",
     "matplotlib>=3.9.0",
+    "openpyxl>=3.1.5",
     "pandas>=3.0.1",
     "pydantic>=2.12.5",
     "pytest>=9.0.2",

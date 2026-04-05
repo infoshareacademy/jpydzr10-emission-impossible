@@ -399,6 +399,7 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - Wykresy porównawcze (słupkowy) i strukturalne (kołowy)
 - Wykres trendów (liniowy)
 - Eksport raportów do CSV
+- **Eksport do PDF** — profesjonalny raport emisji w formacie PDF z podsumowaniem, tabelami i metodyką. Dostępny z menu raportów
 
 **Zarządzanie danymi:**
 - System ról (admin / użytkownik) z kontrolą dostępu na poziomie spółki
@@ -406,6 +407,8 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - Weryfikacja kompletności wskaźników i przeliczników
 - Automatyczne kopie zapasowe przy każdej modyfikacji danych
 - **Rejestr zmian (audit log)** — automatyczne śledzenie każdej operacji INSERT/UPDATE/DELETE we wszystkich tabelach, z zapisem danych przed i po zmianie w formacie JSON, loginem użytkownika i datą zmiany
+- **Hurtowy import danych** — import rekordów emisyjnych z plików CSV lub Excel (.xlsx). Automatyczna walidacja Pydantic, nadawanie ID, raport błędów. Dostępny z menu Narzędzia
+- **Poziomy pewności danych (data_quality)** — każdy rekord może mieć oznaczenie jakości danych: *measured* (pomiar), *calculated* (obliczenie), *estimated* (szacunek) — zgodnie z wymogami GHG Protocol
 
 ### Zalety narzędzia
 
@@ -414,12 +417,14 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 | **Emisja deklarowana z priorytetem** | Własna wartość emisji z raportu ma pierwszeństwo nad obliczeniem automatycznym. Ostrzeżenie przy odchyleniu > ±50% |
 | **Obliczenia w pamięci** | Dane źródłowe nie są nadpisywane — zawsze możesz wrócić do oryginału |
 | **Automatyczne przeliczanie jednostek** | Nie musisz ręcznie konwertować kWh na MWh czy kg na tony |
-| **128 testów automatycznych** | Pewność, że obliczenia są poprawne — każda zmiana kodu jest weryfikowana |
+| **177 testów automatycznych** | Pewność, że obliczenia są poprawne — każda zmiana kodu jest weryfikowana |
 | **Wielospółkowość** | Jedna instalacja obsługuje całą grupę kapitałową |
 | **Polskie wskaźniki emisji** | KOBiZE 2024, DEFRA 2024, IPCC AR5 — aktualne i wiarygodne źródła |
 | **Kontrola dostępu** | Każdy użytkownik widzi tylko swoje spółki |
 | **Audit log (rejestr zmian)** | Pełna historia zmian danych — kto, kiedy i co zmienił. Niezmienny log gotowy na audyt ESG |
-| **Eksport CSV** | Łatwy import do Excela, Power BI, innych narzędzi analitycznych |
+| **Eksport CSV i PDF** | Łatwy import do Excela, Power BI + profesjonalny raport PDF gotowy do prezentacji |
+| **Hurtowy import CSV/Excel** | Szybkie ładowanie danych z zewnętrznych źródeł (faktur, kart paliwowych) zamiast ręcznego wpisywania |
+| **Poziomy pewności danych** | Oznaczenie measured/calculated/estimated — audytor widzi jakość każdego rekordu |
 | **Open source** | Pełna transparentność metodologii — audytor może zweryfikować każdy wzór |
 
 ---
@@ -574,10 +579,11 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 
 ### Ogólne zasady wprowadzania danych
 
-1. **Rok sprawozdawczy** — rok, w którym nastąpiło zużycie paliwa/energii (nie rok faktury). Jeśli faktura za grudzień 2024 przyszła w styczniu 2025, dane dotyczą roku 2024.
+1. **Rok sprawozdawczy** — rok, w którym nastąpiło zużycie paliwa/energii (nie rok faktury). Jeśli faktura za grudzień 2024 przyszła w styczniu 2025, dane dotyczą roku 2024. **Uwaga:** aplikacja nie pozwala wpisać roku w przyszłości (max = bieżący rok). Dane można raportować najwcześniej od 2010 roku.
 2. **Firma** — nazwa spółki prawnej, do której przypisany jest dany koszt/zużycie. W grupie kapitałowej każda spółka raportuje oddzielnie.
 3. **Ilość i jednostka** — zawsze podawaj w jednostce z dokumentu źródłowego (faktury). Narzędzie automatycznie przeliczy jeśli potrzeba.
 4. **Źródło danych** — podaj skąd pochodzi informacja (faktura, karta paliwowa, odczyt licznika, szacunek). Pomaga to audytorowi zweryfikować dane.
+5. **Pewność danych (data_quality)** — oznacz poziom pewności: *measured* (pomiar z faktury/licznika), *calculated* (obliczone z aktywności), *estimated* (szacunek). Pole opcjonalne, ale ważne dla audytu i zgodności z GHG Protocol.
 
 ### Spalanie stacjonarne — co wpisać?
 

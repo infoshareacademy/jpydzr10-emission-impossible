@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 import re
 
 MIN_YEAR = 2010
-MAX_YEAR = 2030
+MAX_YEAR = datetime.now().year  # nie pozwalamy wpisać roku w przyszłości
 
 EMAIL_REGEX = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 PHONE_REGEX = re.compile(r"^\+?[\d\s\-\(\)]{7,20}$")
@@ -28,6 +28,10 @@ FUEL_TYPES = {
     "biomasa",
 }
 
+# Poziomy pewności danych — wymagane przez GHG Protocol
+DATA_QUALITY_LEVELS = {"measured", "calculated", "estimated"}
+
+
 class BaseRecord(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -36,6 +40,23 @@ class BaseRecord(BaseModel):
     id: int = Field(ge=0, description="Unikalny ID wiersza")
     year: int = Field(ge=MIN_YEAR, le=MAX_YEAR, description="Rok sprawozdawczy")
     company: str = Field(min_length=1, max_length=200, description="Nazwa firmy")
+    data_quality: Optional[str] = Field(
+        default=None, max_length=20,
+        description="Poziom pewności danych: measured / calculated / estimated"
+    )
+
+    @field_validator("data_quality", mode="before")
+    @classmethod
+    def parse_data_quality(cls, v) -> Optional[str]:
+        """Parsuje i normalizuje poziom pewności danych."""
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        v = v.strip().lower()
+        if v not in DATA_QUALITY_LEVELS:
+            raise ValueError(
+                f"Nieznany poziom pewności '{v}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}"
+            )
+        return v
 
     @field_validator("company")
     @classmethod

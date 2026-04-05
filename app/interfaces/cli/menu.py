@@ -8,6 +8,8 @@ from app.application.use_cases import EmissionUseCases
 from app.core.validators.input_validators import safe_input, safe_int, safe_choice, safe_year_range, confirm
 from app.application.class_models import MIN_YEAR, MAX_YEAR
 from app.core.entities.charts import plot_companies_comparison, plot_pie_chart, plot_trend_chart
+from app.application.pdf_export import export_summary_pdf, export_trend_pdf
+from app.application.bulk_import import bulk_import, TABLE_MODELS
 import app.application.users.user_manager as user_manager
 
 load_dotenv()
@@ -437,6 +439,12 @@ def _reports_single_company():
                 success_msg("Raport CSV wyeksportowany do data_files/export/")
             except Exception as e:
                 error_msg(f"Błąd eksportu: {e}")
+        if confirm("Wyexportować raport do PDF? (tak/nie): "):
+            try:
+                path = export_summary_pdf(summary, company)
+                success_msg(f"Raport PDF wyeksportowany: {path}")
+            except Exception as e:
+                error_msg(f"Błąd eksportu PDF: {e}")
     wait()
 
 def _reports_trends():
@@ -499,6 +507,12 @@ def _reports_trends():
                     success_msg("Trendy CSV wyeksportowane do data_files/export/")
                 except Exception as e:
                     error_msg(f"Błąd eksportu: {e}")
+            if confirm("Wyexportować trendy do PDF? (tak/nie): "):
+                try:
+                    path = export_trend_pdf(trends, company, year_from, year_to)
+                    success_msg(f"Trendy PDF wyeksportowane: {path}")
+                except Exception as e:
+                    error_msg(f"Błąd eksportu PDF: {e}")
         wait()
 
 
@@ -763,6 +777,7 @@ def menu_tools():
             ("2", "Przeładuj dane"),
             ("3", "Weryfikacja wskaźników i przeliczeń"),
             ("4", "Walidacja spójności danych"),
+            ("5", "Import danych z pliku (CSV/Excel)"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🔧")
@@ -781,10 +796,62 @@ def menu_tools():
         elif option == '4':
             uc.display_data_consistency_report()
             wait()
+        elif option == '5':
+            if not require_login(): continue
+            _bulk_import_interactive()
+            wait()
         elif option == '0':
             return
         else:
             error_msg()
+
+
+def _bulk_import_interactive():
+    """Import hurtowy danych z pliku CSV lub Excel."""
+    print(f"\n  {C.CYAN}Dostępne tabele docelowe:{C.RESET}")
+    table_options = list(TABLE_MODELS.keys())
+    for i, name in enumerate(table_options, 1):
+        print(f"    {C.YELLOW}{i}{C.RESET} {C.DIM}│{C.RESET} {name}")
+
+    raw = safe_input("Numer tabeli docelowej: ")
+    if raw is None: return
+    try:
+        idx = int(raw)
+        if not (1 <= idx <= len(table_options)):
+            error_msg("Nieprawidłowy numer.")
+            return
+    except ValueError:
+        error_msg("Podaj numer.")
+        return
+
+    repo_name = table_options[idx - 1]
+    repo = getattr(uc.repos, repo_name, None)
+    if repo is None:
+        error_msg(f"Nie znaleziono repozytorium: {repo_name}")
+        return
+
+    file_path = safe_input("Ścieżka do pliku (CSV lub Excel): ")
+    if file_path is None: return
+    file_path = file_path.strip('"').strip("'")
+
+    if not os.path.isfile(file_path):
+        error_msg(f"Plik nie istnieje: {file_path}")
+        return
+
+    info_msg(f"Importuję z '{file_path}' do tabeli '{repo_name}'...")
+    result = bulk_import(file_path, repo_name, repo)
+
+    if result["imported"] > 0:
+        success_msg(f"Zaimportowano: {result['imported']} rekordów")
+    if result["skipped"] > 0:
+        error_msg(f"Pominięto: {result['skipped']} wierszy z błędami")
+    if result["errors"]:
+        print(f"\n  {C.RED}Szczegóły błędów:{C.RESET}")
+        for row_num, msg in result["errors"][:20]:
+            print(f"    Wiersz {row_num}: {msg}")
+        if len(result["errors"]) > 20:
+            print(f"    ... i {len(result['errors']) - 20} więcej")
+
 
 def menu_ai_agent():
     try:

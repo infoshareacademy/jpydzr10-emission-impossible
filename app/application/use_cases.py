@@ -15,6 +15,7 @@ from app.application.class_models import (
     StationaryCombustion, MobileCombustion, FugitiveEmission, ProcessEmission,
     EnergyConsumption, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS, ENERGY_UNITS,
     ENERGY_SOURCE_TYPES, ENERGY_TYPES, MAX_YEAR, MIN_YEAR,
+    DATA_QUALITY_LEVELS,
 )
 from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm
 
@@ -109,10 +110,20 @@ class EmissionUseCases:
 
         notes = safe_input("Uwagi (opcjonalne): ", allow_empty=True) or None
 
+        dq_raw = safe_input(
+            "Pewność danych (measured/calculated/estimated, Enter = pomiń): ",
+            allow_empty=True,
+        )
+        data_quality = dq_raw.strip().lower() if dq_raw else None
+        if data_quality and data_quality not in DATA_QUALITY_LEVELS:
+            print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
+            data_quality = None
+
         return {
             "emission_tco2eq": emission_tco2eq,
             "raport": raport,
             "notes": notes,
+            "data_quality": data_quality,
         }
 
     def display_table(self, repo_name: str, year: Optional[int] = None,
@@ -429,6 +440,15 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych (np. faktura): ", allow_empty=True) or ""
 
+        dq_raw = safe_input(
+            "Pewność danych (measured/calculated/estimated, Enter = pomiń): ",
+            allow_empty=True,
+        )
+        data_quality = dq_raw.strip().lower() if dq_raw else None
+        if data_quality and data_quality not in DATA_QUALITY_LEVELS:
+            print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
+            data_quality = None
+
         calc_emission = self._calculate_emission_for_record(amount, unit, energy_type)
 
         print(f"\n  Rok: {year} | Firma: {company}")
@@ -442,7 +462,7 @@ class EmissionUseCases:
         record = EnergyConsumption(
             id=self.repos.energy_consumption.next_id(), year=year, company=company,
             energy_source=energy_source, energy_type=energy_type,
-            amount=amount, unit=unit, source=source,
+            amount=amount, unit=unit, source=source, data_quality=data_quality,
         )
         ok, msg = self.repos.energy_consumption.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
