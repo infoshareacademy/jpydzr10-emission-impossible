@@ -357,9 +357,10 @@ def menu_1():
             ("3", "📈  Wskaźniki emisji"),
             ("4", "🔄  Przeliczniki"),
             ("5", "🔥  Dane emisyjne"),
-            ("6", "🔧  Narzędzia"),
-            ("7", "👤  Użytkownicy"),
-            ("8", "🤖  AI Asystent ESG"),
+            ("6", "🎯  Cele i symulacje"),
+            ("7", "🔧  Narzędzia"),
+            ("8", "👤  Użytkownicy"),
+            ("9", "🤖  AI Asystent ESG"),
             ("-", ""),
             ("0", "Zakończ"),
         ], icon="☰")
@@ -375,10 +376,12 @@ def menu_1():
         elif option == '5':
             menu_emission_data()
         elif option == '6':
-            menu_tools()
+            menu_targets_simulations()
         elif option == '7':
-            menu_users()
+            menu_tools()
         elif option == '8':
+            menu_users()
+        elif option == '9':
             menu_ai_agent()
         elif option == '0':
             return menu_0()
@@ -767,6 +770,129 @@ def menu_reports():
             return
         else:
             error_msg()
+
+def menu_targets_simulations():
+    """Podmenu: cele redukcji emisji i symulacje what-if."""
+    while True:
+        cls()
+        status_bar()
+        print_menu("CELE I SYMULACJE", [
+            ("1", "📊  Postęp redukcji vs cel"),
+            ("2", "➕  Dodaj cel redukcji"),
+            ("3", "🔮  Symulacja what-if"),
+            ("4", "📋  Wyświetl cele"),
+            ("5", "✏️   Edytuj cel"),
+            ("6", "🗑️   Usuń cel"),
+            ("-", ""),
+            ("0", "Powrót"),
+        ], icon="🎯")
+        option = prompt()
+        if option == '1':
+            if not require_login(): continue
+            company = choose_company()
+            if company is None: continue
+            uc.display_reduction_progress(company)
+            wait()
+        elif option == '2':
+            if not require_login(): continue
+            save_companies = get_save_companies()
+            if not save_companies:
+                error_msg("Brak uprawnień do zapisu.")
+                wait()
+                continue
+            uc.add_reduction_target_interactive(allowed_companies=save_companies)
+            wait()
+        elif option == '3':
+            if not require_login(): continue
+            _simulation_interactive()
+            wait()
+        elif option == '4':
+            if not require_login(): continue
+            uc.display_table("reduction_targets")
+            wait()
+        elif option == '5':
+            if not require_login(): continue
+            uc.display_table("reduction_targets")
+            uc.edit_record_interactive("reduction_targets")
+            wait()
+        elif option == '6':
+            if not require_login(): continue
+            uc.display_table("reduction_targets")
+            uc.delete_record_interactive("reduction_targets")
+            wait()
+        elif option == '0':
+            return
+        else:
+            error_msg()
+
+
+def _simulation_interactive():
+    """Interaktywna symulacja what-if."""
+    company = choose_company()
+    if company is None: return
+
+    year = safe_int("Rok do symulacji: ", MIN_YEAR, MAX_YEAR)
+    if year is None: return
+
+    # Sprawdź czy są dane
+    baseline = uc.generate_summary(year, year, company)
+    if baseline["total"] <= 0:
+        error_msg(f"Brak danych emisyjnych za rok {year} dla {company}.")
+        return
+
+    print(f"\n  Obecna emisja ({year}): {baseline['total']:.3f} tCO2e")
+    print(f"\n  {C.CYAN}Dostępne scenariusze:{C.RESET}")
+    print(f"    {C.YELLOW}1{C.RESET} {C.DIM}│{C.RESET} Przejście na OZE (% energii)")
+    print(f"    {C.YELLOW}2{C.RESET} {C.DIM}│{C.RESET} Poprawa efektywności energetycznej")
+    print(f"    {C.YELLOW}3{C.RESET} {C.DIM}│{C.RESET} Zmiana paliwa (np. węgiel → gaz)")
+    print(f"    {C.YELLOW}4{C.RESET} {C.DIM}│{C.RESET} Własna redukcja (% Scope 1 i 2)")
+
+    scenarios = []
+    while True:
+        choice = safe_input("\nScenariusz (numer lub 'ok' aby obliczyć): ")
+        if choice is None: return
+        if choice.lower() == "ok":
+            break
+
+        if choice == "1":
+            pct = safe_decimal("Ile % energii nie-OZE zamienić na OZE? ", Decimal("1"), Decimal("100"))
+            if pct is None: continue
+            scenarios.append({"strategy": "oze_switch", "params": {"pct": pct}})
+            info_msg(f"Dodano: przejście {pct}% energii na OZE")
+
+        elif choice == "2":
+            pct = safe_decimal("O ile % zmniejszyć zużycie? ", Decimal("1"), Decimal("100"))
+            if pct is None: continue
+            scenarios.append({"strategy": "efficiency", "params": {"pct": pct}})
+            info_msg(f"Dodano: redukcja zużycia o {pct}%")
+
+        elif choice == "3":
+            from app.application.class_models import FUEL_TYPES
+            from_fuel = safe_choice("Paliwo obecne: ", sorted(FUEL_TYPES))
+            if from_fuel is None: continue
+            to_fuel = safe_choice("Paliwo docelowe: ", sorted(FUEL_TYPES))
+            if to_fuel is None: continue
+            scenarios.append({"strategy": "fuel_switch", "params": {"from_fuel": from_fuel, "to_fuel": to_fuel}})
+            info_msg(f"Dodano: zamiana {from_fuel} → {to_fuel}")
+
+        elif choice == "4":
+            s1 = safe_decimal("Redukcja Scope 1 (%): ", Decimal("0"), Decimal("100"))
+            if s1 is None: continue
+            s2 = safe_decimal("Redukcja Scope 2 (%): ", Decimal("0"), Decimal("100"))
+            if s2 is None: continue
+            scenarios.append({"strategy": "custom", "params": {"scope1_reduction_pct": s1, "scope2_reduction_pct": s2}})
+            info_msg(f"Dodano: Scope 1 -{s1}%, Scope 2 -{s2}%")
+
+        else:
+            error_msg("Nieprawidłowy numer.")
+
+    if not scenarios:
+        error_msg("Nie dodano żadnych scenariuszy.")
+        return
+
+    result = uc.simulate_what_if(company, year, scenarios)
+    uc.display_simulation_result(result)
+
 
 def menu_tools():
     while True:

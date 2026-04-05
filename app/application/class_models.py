@@ -362,6 +362,57 @@ class EnergyPurchased(ActivityRecord):
             return None
         return v
 
+REDUCTION_STRATEGIES = {"fuel_switch", "oze_switch", "efficiency", "custom"}
+
+
+class ReductionTarget(BaseModel):
+    """Model dla tbl_reduction_targets.csv — cele redukcji emisji (SBTi-style).
+
+    Przechowuje cele redukcyjne: rok bazowy, rok docelowy, cel procentowy.
+    Ścieżka redukcji liniowa: stała redukcja % rocznie od base_year do target_year.
+    """
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    id: int = Field(ge=0, description="Unikalny ID celu")
+    company: str = Field(min_length=1, max_length=200, description="Nazwa firmy")
+    target_name: str = Field(min_length=1, max_length=300, description="Nazwa celu (np. 'SBTi 1.5C')")
+    base_year: int = Field(ge=MIN_YEAR, le=MAX_YEAR, description="Rok bazowy")
+    target_year: int = Field(ge=MIN_YEAR, description="Rok docelowy")
+    reduction_pct: Decimal = Field(gt=0, le=100, description="Cel redukcji w % (np. 42 = -42%)")
+    scope: str = Field(default="1+2", max_length=10, description="Zakres: 1, 2, 1+2")
+    notes: Optional[str] = Field(default=None, max_length=500, description="Uwagi")
+
+    @field_validator("target_year")
+    @classmethod
+    def target_after_base(cls, v, info):
+        base = info.data.get("base_year")
+        if base is not None and v <= base:
+            raise ValueError(f"Rok docelowy ({v}) musi być późniejszy niż bazowy ({base})")
+        return v
+
+    @field_validator("scope")
+    @classmethod
+    def validate_scope(cls, v: str) -> str:
+        v = v.strip()
+        if v not in ("1", "2", "1+2"):
+            raise ValueError(f"Nieprawidłowy zakres '{v}'. Dozwolone: 1, 2, 1+2")
+        return v
+
+    @field_validator("reduction_pct", mode="before")
+    @classmethod
+    def parse_reduction(cls, v):
+        if isinstance(v, str) and v.strip():
+            return Decimal(v.strip())
+        return v
+
+    @field_validator("notes", mode="before")
+    @classmethod
+    def parse_notes(cls, v) -> Optional[str]:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        return v.strip() if isinstance(v, str) else None
+
+
 CHANGE_TYPES = {"INSERT", "UPDATE", "DELETE"}
 
 class ChangeLog(BaseModel):

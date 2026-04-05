@@ -35,15 +35,11 @@ _CHAR_MAP = {
 
 def _safe_text(text: str) -> str:
     """Konwertuje tekst do zakresu Latin-1 (Helvetica nie obsługuje pełnego Unicode)."""
-    # Najpierw zamień znane znaki specjalne
     for orig, repl in _CHAR_MAP.items():
         text = text.replace(orig, repl)
-    # Potem usuń akcenty z liter (ą→a, ś→s, ł→l itd.)
     nfkd = unicodedata.normalize("NFKD", text)
     result = "".join(c for c in nfkd if not unicodedata.combining(c))
-    # Na koniec zamień ł/Ł (nie rozkłada się przez NFKD)
     result = result.replace("\u0142", "l").replace("\u0141", "L")
-    # Filtruj znaki poza Latin-1
     return result.encode("latin-1", errors="replace").decode("latin-1")
 
 
@@ -103,7 +99,6 @@ class EmissionPdfReport(FPDF):
         self.set_text_color(100, 100, 100)
         self.cell(0, 6, "Raport emisji gazow cieplarnianych (GHG)", new_x="LMARGIN", new_y="NEXT", align="C")
         self.ln(4)
-        # Linia oddzielająca
         self.set_draw_color(41, 128, 185)
         self.set_line_width(0.5)
         self.line(10, self.get_y(), 200, self.get_y())
@@ -145,15 +140,11 @@ def export_summary_pdf(summary: dict, company: str, filename: str = None) -> str
 
     pdf = EmissionPdfReport()
     pdf.alias_nb_pages()
-
-    # --- Informacje ogólne ---
     pdf._section_title("Informacje ogolne")
     pdf._key_value_row("Firma:", company)
     pdf._key_value_row("Okres:", summary.get("years_label", ""))
     pdf._key_value_row("Data raportu:", datetime.now().strftime("%Y-%m-%d"))
     pdf.ln(4)
-
-    # --- Scope 1 ---
     pdf._section_title("Scope 1 - Emisje bezposrednie")
 
     cols = [("Kategoria", 90), ("Emisja [tCO2e]", 50)]
@@ -170,13 +161,11 @@ def export_summary_pdf(summary: dict, company: str, filename: str = None) -> str
     for name, value in scope1_items:
         pdf._table_row([(name, 90), (_fmt(value), 50)])
 
-    # Suma Scope 1
     pdf.set_font("Helvetica", "B", 9)
     pdf.cell(90, 7, "RAZEM Scope 1", border=1, fill=True, align="C")
     pdf.cell(50, 7, _fmt(scope1_total), border=1, align="C")
     pdf.ln(6)
 
-    # --- Scope 2 ---
     pdf._section_title("Scope 2 - Emisje posrednie (energia)")
 
     cols = [("Kategoria", 90), ("Emisja [tCO2e]", 50)]
@@ -188,7 +177,6 @@ def export_summary_pdf(summary: dict, company: str, filename: str = None) -> str
     pdf.cell(50, 7, _fmt(summary["scope2_energy"]), border=1, align="C")
     pdf.ln(6)
 
-    # --- Podsumowanie ---
     pdf._section_title("Podsumowanie")
 
     pdf.set_font("Helvetica", "B", 12)
@@ -198,7 +186,6 @@ def export_summary_pdf(summary: dict, company: str, filename: str = None) -> str
     pdf.set_text_color(0, 0, 0)
     pdf.ln(4)
 
-    # Struktura procentowa
     if summary["total"] > 0:
         pdf.set_font("Helvetica", "", 10)
         s1_pct = (scope1_total / summary["total"] * 100).quantize(Decimal("0.1"))
@@ -206,7 +193,6 @@ def export_summary_pdf(summary: dict, company: str, filename: str = None) -> str
         pdf._key_value_row("Udzial Scope 1:", f"{s1_pct}%")
         pdf._key_value_row("Udzial Scope 2:", f"{s2_pct}%")
 
-    # --- Metodologia ---
     pdf.ln(6)
     pdf._section_title("Metodologia")
     pdf.set_font("Helvetica", "", 9)
@@ -242,15 +228,11 @@ def export_trend_pdf(trends: list[dict], company: str, year_from: int, year_to: 
 
     pdf = EmissionPdfReport()
     pdf.alias_nb_pages()
-
-    # --- Informacje ---
     pdf._section_title("Raport trendow emisji")
     pdf._key_value_row("Firma:", company)
     pdf._key_value_row("Zakres lat:", f"{year_from} - {year_to}")
     pdf._key_value_row("Data raportu:", datetime.now().strftime("%Y-%m-%d"))
     pdf.ln(4)
-
-    # --- Tabela trendów ---
     pdf._section_title("Emisje rok do roku")
 
     col_w = [20, 30, 30, 30, 30, 30]
@@ -273,7 +255,6 @@ def export_trend_pdf(trends: list[dict], company: str, year_from: int, year_to: 
             (change_str, col_w[4]),
         ])
 
-    # Podsumowanie zmiany
     if len(trends) >= 2:
         first = trends[0]["total"]
         last = trends[-1]["total"]

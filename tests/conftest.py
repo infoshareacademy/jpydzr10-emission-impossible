@@ -221,6 +221,16 @@ def test_data_folder(tmp_path):
         ],
     )
 
+    # --- tbl_reduction_targets.csv ---
+    _write_csv(os.path.join(folder, "tbl_reduction_targets.csv"),
+        ["id", "company", "target_name", "base_year", "target_year", "reduction_pct", "scope", "notes"],
+        [
+            {"id": 1, "company": "TestFirma A", "target_name": "SBTi 1.5C",
+             "base_year": 2024, "target_year": 2030, "reduction_pct": "42",
+             "scope": "1+2", "notes": "Cel zgodny z SBTi"},
+        ],
+    )
+
     # --- tbl_change_log.csv (pusty — audit log) ---
     _write_csv(os.path.join(folder, "tbl_change_log.csv"),
         ["id_rejestr_zmian", "login", "date_change", "table_name", "record_id",

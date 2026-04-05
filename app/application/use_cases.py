@@ -13,9 +13,9 @@ from dotenv import load_dotenv
 from app.infrastructure.repositories.file.repositories import RepositoryFactory
 from app.application.class_models import (
     StationaryCombustion, MobileCombustion, FugitiveEmission, ProcessEmission,
-    EnergyConsumption, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS, ENERGY_UNITS,
-    ENERGY_SOURCE_TYPES, ENERGY_TYPES, MAX_YEAR, MIN_YEAR,
-    DATA_QUALITY_LEVELS,
+    EnergyConsumption, ReductionTarget, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS,
+    ENERGY_UNITS, ENERGY_SOURCE_TYPES, ENERGY_TYPES, MAX_YEAR, MIN_YEAR,
+    DATA_QUALITY_LEVELS, REDUCTION_STRATEGIES,
 )
 from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm
 
@@ -1203,3 +1203,257 @@ class EmissionUseCases:
         WSKAZÓWKA: Jeśli wyniki są równe 0.000, może to oznaczać brak wskaźników emisji w tabeli factors.
         """
         return context
+
+    # ── Cele redukcji i symulacje ────────────────────────────────────
+
+    def add_reduction_target_interactive(self, allowed_companies: Optional[list[str]] = None) -> bool:
+        """Interaktywne dodawanie celu redukcji emisji."""
+        print("\n─── Dodawanie: Cel redukcji emisji ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        if allowed_companies:
+            company = self._choose_company_from_list(allowed_companies)
+        else:
+            company = safe_input("Firma: ")
+        if company is None: return False
+
+        target_name = safe_input("Nazwa celu (np. 'SBTi 1.5C', 'Strategia 2030'): ")
+        if target_name is None: return False
+
+        base_year = safe_int("Rok bazowy: ", MIN_YEAR, MAX_YEAR)
+        if base_year is None: return False
+
+        target_year = safe_int("Rok docelowy: ", base_year + 1, 2100)
+        if target_year is None: return False
+
+        reduction_pct = safe_decimal("Cel redukcji w % (np. 42 = spadek o 42%): ",
+                                      min_val=Decimal("0.1"), max_val=Decimal("100"))
+        if reduction_pct is None: return False
+
+        scope = safe_choice("Zakres: ", ["1", "2", "1+2"])
+        if scope is None: return False
+
+        notes = safe_input("Uwagi (opcjonalne): ", allow_empty=True) or None
+
+        # Pokaż ścieżkę redukcji
+        years = target_year - base_year
+        annual_rate = (reduction_pct / years).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+        print(f"\n  Cel: redukcja o {reduction_pct}% w {years} lat ({base_year}→{target_year})")
+        print(f"  Wymagana roczna redukcja: ~{annual_rate}%/rok (ścieżka liniowa)")
+
+        if not confirm("\nZapisać cel? "):
+            print("Anulowano.")
+            return False
+
+        record = ReductionTarget(
+            id=self.repos.reduction_targets.next_id(),
+            company=company, target_name=target_name,
+            base_year=base_year, target_year=target_year,
+            reduction_pct=reduction_pct, scope=scope, notes=notes,
+        )
+        ok, msg = self.repos.reduction_targets.add(record)
+        print(f"{'Zapisano cel!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def get_reduction_path(self, target: ReductionTarget, base_emission: Decimal) -> list[dict]:
+        """Oblicza ścieżkę redukcji liniowej od roku bazowego do docelowego.
+
+        Zwraca listę dict z kluczami: year, target_emission, reduction_pct_cumulative.
+        """
+        R = lambda d: d.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+        years = target.target_year - target.base_year
+        annual_reduction = base_emission * target.reduction_pct / 100 / years
+        path = []
+
+        for i in range(years + 1):
+            year = target.base_year + i
+            target_emission = R(base_emission - annual_reduction * i)
+            if target_emission < 0:
+                target_emission = Decimal("0")
+            cumulative_pct = R(Decimal(i) * target.reduction_pct / years)
+            path.append({
+                "year": year,
+                "target_emission": target_emission,
+                "reduction_pct_cumulative": cumulative_pct,
+            })
+        return path
+
+    def display_reduction_progress(self, company: str):
+        """Wyświetla postęp redukcji emisji vs cele."""
+        targets = self.repos.reduction_targets.get_for_company(company)
+        if not targets:
+            print(f"\n  Brak celów redukcji dla: {company}")
+            print("  Dodaj cel w menu: Cele i symulacje → Dodaj cel redukcji")
+            return
+
+        for target in targets:
+            # Emisja w roku bazowym
+            base_summary = self.generate_summary(target.base_year, target.base_year, company)
+            if target.scope == "1":
+                base_emission = (base_summary["scope1_stationary"] + base_summary["scope1_mobile"] +
+                                 base_summary["scope1_fugitive"] + base_summary["scope1_process"])
+            elif target.scope == "2":
+                base_emission = base_summary["scope2_energy"]
+            else:
+                base_emission = base_summary["total"]
+
+            if base_emission <= 0:
+                print(f"\n  [{target.target_name}] Brak danych za rok bazowy {target.base_year}.")
+                continue
+
+            path = self.get_reduction_path(target, base_emission)
+            current_year = MAX_YEAR  # bieżący rok
+
+            print(f"\n{'═' * 70}")
+            print(f"  CEL: {target.target_name} ({company})")
+            print(f"  Zakres: Scope {target.scope} | {target.base_year}→{target.target_year} | -{target.reduction_pct}%")
+            print(f"  Emisja bazowa ({target.base_year}): {base_emission:.3f} tCO2e")
+            print(f"{'═' * 70}")
+            print(f"  {'Rok':<6} {'Cel [tCO2e]':>14} {'Rzeczywista':>14} {'Status':>14} {'Odchylenie':>12}")
+            print(f"  {'─'*6} {'─'*14} {'─'*14} {'─'*14} {'─'*12}")
+
+            for point in path:
+                year = point["year"]
+                target_em = point["target_emission"]
+
+                if year > current_year:
+                    # Rok w przyszłości — brak danych
+                    print(f"  {year:<6} {target_em:>14.3f} {'—':>14} {'(przyszłość)':>14} {'—':>12}")
+                    continue
+
+                # Rzeczywista emisja
+                actual_summary = self.generate_summary(year, year, company)
+                if target.scope == "1":
+                    actual = (actual_summary["scope1_stationary"] + actual_summary["scope1_mobile"] +
+                              actual_summary["scope1_fugitive"] + actual_summary["scope1_process"])
+                elif target.scope == "2":
+                    actual = actual_summary["scope2_energy"]
+                else:
+                    actual = actual_summary["total"]
+
+                if actual <= 0 and year != target.base_year:
+                    print(f"  {year:<6} {target_em:>14.3f} {'brak danych':>14} {'—':>14} {'—':>12}")
+                    continue
+
+                diff = actual - target_em
+                if target_em > 0:
+                    diff_pct = (diff / target_em * 100).quantize(Decimal("0.1"))
+                else:
+                    diff_pct = Decimal("0")
+
+                if actual <= target_em:
+                    status = "✓ na torze"
+                else:
+                    status = "✗ powyżej"
+
+                print(f"  {year:<6} {target_em:>14.3f} {actual:>14.3f} {status:>14} {diff_pct:>+11.1f}%")
+
+            # Podsumowanie
+            target_final = path[-1]["target_emission"]
+            print(f"  {'─'*60}")
+            print(f"  Cel końcowy ({target.target_year}): {target_final:.3f} tCO2e "
+                  f"(redukcja o {target.reduction_pct}% vs {target.base_year})")
+            print(f"{'═' * 70}")
+
+    def simulate_what_if(self, company: str, year: int,
+                         scenarios: list[dict]) -> dict:
+        """Symulacja what-if — co jeśli zmienimy źródła energii/paliwa?
+
+        Args:
+            company: firma
+            year: rok do symulacji
+            scenarios: lista scenariuszy, każdy to dict:
+                - strategy: "fuel_switch" | "oze_switch" | "efficiency" | "custom"
+                - params: parametry zależne od strategii
+
+        Strategie:
+            fuel_switch: {"from_fuel": "węgiel", "to_fuel": "gaz ziemny"}
+                → przelicza ilość paliwa na nowe i oblicza nową emisję
+            oze_switch: {"pct": 50}
+                → % energii nie-OZE zamienione na OZE (emisja Scope 2 = 0)
+            efficiency: {"pct": 10}
+                → zmniejszenie zużycia o X% (wpływa na Scope 1 + 2)
+            custom: {"scope1_reduction_pct": 20, "scope2_reduction_pct": 30}
+                → bezpośrednia redukcja procentowa
+
+        Returns:
+            dict z kluczami: baseline (dict summary), simulated (dict summary),
+            savings (Decimal), savings_pct (Decimal)
+        """
+        R = lambda d: d.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+        baseline = self.generate_summary(year, year, company)
+        sim = dict(baseline)  # kopia
+
+        for scenario in scenarios:
+            strategy = scenario.get("strategy", "")
+            params = scenario.get("params", {})
+
+            if strategy == "oze_switch":
+                # Zamień X% energii nie-OZE na OZE → Scope 2 spada
+                pct = Decimal(str(params.get("pct", 0))) / 100
+                sim["scope2_energy"] = R(sim["scope2_energy"] * (1 - pct))
+
+            elif strategy == "efficiency":
+                # Redukcja zużycia o X% → wpływa na wszystkie scope
+                pct = Decimal(str(params.get("pct", 0))) / 100
+                factor = 1 - pct
+                for key in ("scope1_stationary", "scope1_mobile", "scope1_fugitive",
+                            "scope1_process", "scope2_energy"):
+                    sim[key] = R(sim[key] * factor)
+
+            elif strategy == "fuel_switch":
+                # Zamiana paliwa — przelicz emisję stacjonarną
+                from_fuel = params.get("from_fuel", "")
+                to_fuel = params.get("to_fuel", "")
+                if from_fuel and to_fuel:
+                    factor_from = self.repos.factors.get_factor(from_fuel)
+                    factor_to = self.repos.factors.get_factor(to_fuel)
+                    if factor_from and factor_to and factor_from.factor > 0:
+                        ratio = factor_to.factor / factor_from.factor
+                        sim["scope1_stationary"] = R(sim["scope1_stationary"] * ratio)
+
+            elif strategy == "custom":
+                s1_pct = Decimal(str(params.get("scope1_reduction_pct", 0))) / 100
+                s2_pct = Decimal(str(params.get("scope2_reduction_pct", 0))) / 100
+                for key in ("scope1_stationary", "scope1_mobile", "scope1_fugitive", "scope1_process"):
+                    sim[key] = R(sim[key] * (1 - s1_pct))
+                sim["scope2_energy"] = R(sim["scope2_energy"] * (1 - s2_pct))
+
+        # Przelicz total
+        sim["total"] = sum(v for k, v in sim.items() if k.startswith("scope") and isinstance(v, Decimal))
+        savings = R(baseline["total"] - sim["total"])
+        savings_pct = R(savings / baseline["total"] * 100) if baseline["total"] > 0 else Decimal("0")
+
+        return {
+            "baseline": baseline,
+            "simulated": sim,
+            "savings": savings,
+            "savings_pct": savings_pct,
+        }
+
+    def display_simulation_result(self, result: dict):
+        """Wyświetla wynik symulacji what-if w terminalu."""
+        b = result["baseline"]
+        s = result["simulated"]
+
+        print(f"\n{'═' * 65}")
+        print(f"  SYMULACJA WHAT-IF: {b['company']} ({b['years_label']})")
+        print(f"{'═' * 65}")
+        print(f"  {'Kategoria':<30} {'Obecna':>14} {'Symulacja':>14}")
+        print(f"  {'─'*30} {'─'*14} {'─'*14}")
+
+        categories = [
+            ("Scope 1 — stacjonarne", "scope1_stationary"),
+            ("Scope 1 — mobilne", "scope1_mobile"),
+            ("Scope 1 — niezorganizowane", "scope1_fugitive"),
+            ("Scope 1 — procesowe", "scope1_process"),
+            ("Scope 2 — energia", "scope2_energy"),
+        ]
+        for label, key in categories:
+            print(f"  {label:<30} {b[key]:>14.3f} {s[key]:>14.3f}")
+
+        print(f"  {'─'*30} {'─'*14} {'─'*14}")
+        print(f"  {'ŁĄCZNIE':<30} {b['total']:>14.3f} {s['total']:>14.3f}")
+        print(f"{'═' * 65}")
+        print(f"  Oszczędność: {result['savings']:.3f} tCO2e ({result['savings_pct']:.1f}%)")
+        print(f"{'═' * 65}")

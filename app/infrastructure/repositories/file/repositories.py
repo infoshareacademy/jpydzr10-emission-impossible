@@ -6,6 +6,7 @@ from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
     FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
     EnergyConsumption, EnergyPurchased, UserPermission, ChangeLog,
+    ReductionTarget,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -159,6 +160,19 @@ class PermissionRepository(CsvRepository[UserPermission]):
         return self.get_role(login) == "admin"
 
 
+class ReductionTargetRepository(CsvRepository[ReductionTarget]):
+    """Repozytorium celów redukcji emisji."""
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=ReductionTarget,
+            file_path=os.path.join(folder, "tbl_reduction_targets.csv"),
+        )
+
+    def get_for_company(self, company: str) -> list[ReductionTarget]:
+        """Zwraca cele redukcji dla danej firmy."""
+        return self.get_filtered(company=company)
+
+
 class ChangeLogRepository(CsvRepository[ChangeLog]):
     """Repozytorium rejestru zmian (audit log).
 
@@ -211,6 +225,7 @@ class RepositoryFactory:
         self.energy_purchased = EnergyPurchasedRepository(folder)
         self.authorisations = AuthorisationRepository(folder)
         self.permissions = PermissionRepository(folder)
+        self.reduction_targets = ReductionTargetRepository(folder)
 
     def set_audit_context(self, login: str):
         """Włącza audit log (trigger) dla wszystkich repozytoriów.

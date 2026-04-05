@@ -19,7 +19,6 @@ from app.application.class_models import (
     ProcessEmission, EnergyConsumption,
 )
 
-# Mapowanie nazw tabel na modele Pydantic
 TABLE_MODELS = {
     "stationary": StationaryCombustion,
     "mobile": MobileCombustion,
@@ -28,9 +27,7 @@ TABLE_MODELS = {
     "energy_consumption": EnergyConsumption,
 }
 
-# Pola pomijane przy imporcie (generowane automatycznie)
 SKIP_FIELDS = {"id"}
-
 
 def _read_csv_rows(file_path: str) -> list[dict]:
     """Wczytuje wiersze z pliku CSV."""

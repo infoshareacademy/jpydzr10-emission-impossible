@@ -1,0 +1,7 @@
+id,company,target_name,base_year,target_year,reduction_pct,scope,notes
+1,GreenTech Polska,SBTi 1.5°C — Scope 1+2,2023,2030,42,1+2,Cel zgodny ze sciezka SBTi 1.5C dla Scope 1+2
+2,GreenTech Polska,Neutralnosc Scope 2,2023,2028,100,2,Pelne przejscie na OZE do 2028
+3,GreenTech Logistyka,Redukcja floty 30%,2023,2027,30,1,Wymiana floty na hybrydy i EV
+4,GreenTech Produkcja,SBTi well-below 2°C,2023,2030,25,1+2,Cel well-below 2C dla przemyslu ciezkiego
+5,NovaChem Industries,Strategia dekarbonizacji 2030,2023,2030,50,1+2,Ambitny cel — wymaga zmian technologicznych
+6,EcoPartner Sp. z o.o.,Carbon neutral 2028,2023,2028,80,1+2,Cel niemal pelnej neutralnosci

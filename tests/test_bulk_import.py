@@ -122,7 +122,6 @@ class TestBulkImportCsv:
                 "energy_source": "Zakupiona", "energy_type": "Energia elektryczna nie OZE",
             })
 
-        # Przed importem jest 4 rekordy w e_cons (conftest)
         before = repos.energy_consumption.next_id()
         result = bulk_import(csv_path, "energy_consumption", repos.energy_consumption)
         assert result["imported"] == 1

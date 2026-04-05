@@ -13,7 +13,6 @@ class TestPdfExportSummary:
         from app.application.pdf_export import export_summary_pdf, EXPORT_FOLDER
 
         summary = uc.generate_summary(2025, 2025, "TestFirma A")
-        # Nadpisz folder eksportu na tmp
         import app.application.pdf_export as pdf_mod
         original_folder = pdf_mod.EXPORT_FOLDER
         pdf_mod.EXPORT_FOLDER = str(tmp_path)
@@ -22,7 +21,6 @@ class TestPdfExportSummary:
             path = export_summary_pdf(summary, "TestFirma A")
             assert os.path.isfile(path)
             assert path.endswith(".pdf")
-            # Plik powinien mieć rozsądny rozmiar (> 1KB)
             assert os.path.getsize(path) > 1000
         finally:
             pdf_mod.EXPORT_FOLDER = original_folder

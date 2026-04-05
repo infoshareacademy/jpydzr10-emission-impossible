@@ -410,6 +410,12 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - **Hurtowy import danych** — import rekordów emisyjnych z plików CSV lub Excel (.xlsx). Automatyczna walidacja Pydantic, nadawanie ID, raport błędów. Dostępny z menu Narzędzia
 - **Poziomy pewności danych (data_quality)** — każdy rekord może mieć oznaczenie jakości danych: *measured* (pomiar), *calculated* (obliczenie), *estimated* (szacunek) — zgodnie z wymogami GHG Protocol
 
+**Cele redukcji i symulacje:**
+
+- **Cele redukcji (SBTi-style)** — definiowanie celów redukcji emisji: rok bazowy, rok docelowy, % redukcji. Ścieżka redukcji liniowa z wizualizacją postępu rok po roku (rzeczywista emisja vs cel). Obsługuje Scope 1, 2 lub 1+2
+- **Symulacje what-if** — interaktywna analiza scenariuszy: co jeśli przejdziemy na OZE? Zmienimy paliwo? Poprawimy efektywność? Scenariusze łączą się kumulatywnie, wynik w porównaniu z aktualnym stanem
+- Dostępne strategie symulacji: przejście na OZE (%), poprawa efektywności (%), zmiana paliwa, własna redukcja Scope 1/2 (%)
+
 ### Zalety narzędzia
 
 | Cecha | Korzyść |
@@ -425,6 +431,7 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 | **Eksport CSV i PDF** | Łatwy import do Excela, Power BI + profesjonalny raport PDF gotowy do prezentacji |
 | **Hurtowy import CSV/Excel** | Szybkie ładowanie danych z zewnętrznych źródeł (faktur, kart paliwowych) zamiast ręcznego wpisywania |
 | **Poziomy pewności danych** | Oznaczenie measured/calculated/estimated — audytor widzi jakość każdego rekordu |
+| **Cele redukcji + symulacje** | Ścieżka SBTi z monitoringiem postępu + interaktywne scenariusze what-if (OZE, paliwa, efektywność) |
 | **Open source** | Pełna transparentność metodologii — audytor może zweryfikować każdy wzór |
 
 ---
@@ -646,6 +653,144 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 
 **Ważna uwaga o OZE:** Sam fakt, że dostawca „oferuje zieloną energię" nie wystarczy. Liczy się certyfikat Gwarancji Pochodzenia (GO) — formalny dokument potwierdzający, że konkretna ilość energii pochodzi ze źródła odnawialnego. Bez GO, nawet jeśli dostawca reklamuje się jako „zielony", energia powinna być raportowana jako nie-OZE.
 
+### Pewność danych (data_quality) — jak oceniać jakość źródeł?
+
+GHG Protocol wymaga, aby organizacja określiła jakość danych wykorzystanych do obliczeń emisji. Każdy rekord emisyjny w narzędziu ma pole **data_quality**, które przyjmuje jedną z trzech wartości:
+
+| Poziom | Opis | Przykłady | Wiarygodność |
+|--------|------|-----------|-------------|
+| **measured** | Dane zmierzone — pochodzą z dokumentu źródłowego | Faktura za gaz (10 000 m³), odczyt licznika energii, protokół serwisu klimatyzacji, karta paliwowa | Najwyższa — bezpośredni pomiar |
+| **calculated** | Dane obliczone — wyliczone z innej mierzalnej wielkości | Przebiegi km przeliczone na litry paliwa, zużycie energii oszacowane z mocy i godzin pracy urządzeń | Średnia — zależy od jakości założeń |
+| **estimated** | Dane szacunkowe — brak dokumentu źródłowego | „Zużywamy ok. 5 ton węgla rocznie", ekstrapolacja z jednego miesiąca na rok, dane branżowe uśrednione | Najniższa — wymaga weryfikacji |
+
+**Jak korzystać:**
+
+1. Przy dodawaniu każdego rekordu emisyjnego narzędzie pyta o pewność danych
+2. Pole jest opcjonalne — ale jego brak oznacza, że audytor nie wie, ile wart jest dany rekord
+3. Dążyć do maksymalizacji rekordów z poziomem **measured** — to fundament wiarygodnego raportu
+
+**Jak poprawić jakość danych:**
+
+| Obecny poziom | Co zrobić, aby podnieść |
+|---------------|------------------------|
+| estimated → calculated | Znajdź dane pośrednie: jeśli nie masz faktur za paliwo, sprawdź przebiegi floty i średnie spalanie |
+| estimated → measured | Poproś księgowość o oryginały faktur, dział techniczny o odczyty liczników |
+| calculated → measured | Zainstaluj podliczniki energii, wprowadź karty paliwowe, zbieraj protokoły serwisowe |
+
+**Dlaczego to ważne:**
+
+- Audytor ESG ocenia nie tylko wynik (ile tCO₂e) ale też **jak** go policzono
+- Raport CSRD wymaga ujawnienia poziomu niepewności danych
+- Rekordy *estimated* mogą wymagać dodatkowego uzasadnienia lub zastrzeżenia w raporcie
+- Im więcej *measured*, tym większa wiarygodność raportu — i tym mniejsze ryzyko przy audycie
+
+### Cele redukcji emisji — jak wyznaczać i monitorować?
+
+Narzędzie pozwala definiować cele redukcji emisji wzorowane na metodologii **SBTi** (Science Based Targets initiative) i monitorować postęp ich realizacji rok po roku.
+
+#### Czym jest cel redukcji?
+
+Cel redukcji to zobowiązanie do zmniejszenia emisji o określony procent w określonym czasie, np.:
+- *„Zmniejszyć emisje Scope 1+2 o 42% do 2030 roku (vs 2023)"* — zgodne ze ścieżką SBTi 1.5°C
+- *„Osiągnąć neutralność Scope 2 do 2028"* — pełne przejście na OZE
+- *„Zredukować Scope 1 o 30% do 2027"* — np. wymiana floty na hybrydy
+
+#### Jak dodać cel?
+
+Menu: **Cele i symulacje → Dodaj cel redukcji**
+
+| Pytanie | Co wpisać |
+|---------|-----------|
+| Firma | Spółka, dla której definiujesz cel |
+| Nazwa celu | Np. „SBTi 1.5°C", „Strategia dekarbonizacji 2030", „Carbon neutral 2028" |
+| Rok bazowy | Rok odniesienia — od niego liczymy redukcję. Najczęściej ostatni pełny rok z danymi |
+| Rok docelowy | Do kiedy cel ma być osiągnięty |
+| Redukcja (%) | O ile procent zmniejszyć emisję vs rok bazowy (np. 42 = spadek o 42%) |
+| Zakres | Scope 1, Scope 2 lub 1+2 — które emisje obejmuje cel |
+
+#### Jak działa ścieżka redukcji?
+
+Narzędzie dzieli cel **liniowo** na poszczególne lata. Przykład:
+
+- Emisja bazowa (2023): **530 tCO₂e**
+- Cel: **-42% do 2030** (7 lat)
+- Roczna redukcja: ~6%/rok = ~31.8 tCO₂e/rok
+
+```text
+Rok     Cel [tCO2e]   Rzeczywista    Status
+2023        530.000       530.000     ✓ na torze
+2024        498.000       496.000     ✓ na torze
+2025        466.000       479.000     ✗ powyżej (+2.7%)
+2026        434.000           —       (przyszłość)
+...
+2030        307.000           —       (cel końcowy)
+```
+
+- **✓ na torze** — rzeczywista emisja ≤ cel na dany rok
+- **✗ powyżej** — przekroczenie celu z podanym % odchylenia
+- **(przyszłość)** — lata bez danych (jeszcze nie nadeszły)
+
+#### Typowe cele (inspiracja)
+
+| Typ celu | Redukcja | Horyzont | Dla kogo |
+|----------|----------|----------|----------|
+| SBTi 1.5°C | -42% Scope 1+2 | 5-10 lat | Firmy dążące do najambitniejszego celu klimatycznego |
+| SBTi well-below 2°C | -25% Scope 1+2 | 5-10 lat | Firmy z przemysłu ciężkiego, gdzie szybsza redukcja jest trudna |
+| Neutralność Scope 2 | -100% Scope 2 | 3-5 lat | Firmy planujące pełne przejście na OZE |
+| Redukcja floty | -30% Scope 1 | 3-5 lat | Firmy z dużą flotą pojazdów (logistyka, dystrybucja) |
+
+### Symulacje what-if — planowanie działań redukcyjnych
+
+Symulacje pozwalają odpowiedzieć na pytanie: **„Co się stanie z naszymi emisjami, jeśli...?"** — bez zmiany rzeczywistych danych.
+
+#### Jak uruchomić symulację?
+
+Menu: **Cele i symulacje → Symulacja what-if**
+
+1. Wybierz firmę i rok do analizy
+2. Dodawaj scenariusze jeden po drugim (można łączyć kilka)
+3. Wpisz **ok** aby obliczyć wynik
+4. Narzędzie pokaże porównanie: obecna emisja vs po zastosowaniu scenariuszy
+
+#### Dostępne scenariusze
+
+| Scenariusz | Co robi | Przykład użycia |
+|------------|---------|-----------------|
+| **Przejście na OZE** | Zamienia X% energii nie-OZE na OZE → Scope 2 spada | „Co jeśli 50% energii z certyfikatem GO?" |
+| **Poprawa efektywności** | Zmniejsza zużycie o X% → Scope 1 i 2 spadają | „Co jeśli zmodernizujemy kotłownię o 15%?" |
+| **Zmiana paliwa** | Zamienia paliwo A na B → Scope 1 się zmienia | „Co jeśli wymienimy węgiel na gaz ziemny?" |
+| **Własna redukcja** | Bezpośrednio podajesz % redukcji Scope 1 i Scope 2 | „Co jeśli Scope 1 -20%, Scope 2 -50%?" |
+
+#### Przykład wyniku symulacji
+
+Scenariusz: *50% energii na OZE + 15% poprawa efektywności*
+
+```
+Kategoria                        Obecna      Symulacja
+Scope 1 — stacjonarne             43.430        36.916
+Scope 1 — mobilne                 31.452        26.734
+Scope 1 — niezorganizowane         3.046         2.589
+Scope 2 — energia                400.810       170.344
+────────────────────────────────────────────────────────
+ŁĄCZNIE                          478.738       236.583
+
+Oszczędność: 242.155 tCO2e (50.6%)
+```
+
+#### Jak wykorzystać symulacje w praktyce?
+
+1. **Porównaj z celem** — jeśli cel to -42% a symulacja daje -50%, plan jest wystarczający
+2. **Optymalizuj koszty** — porównaj kilka scenariuszy i wybierz najtańszy do wdrożenia
+3. **Raportuj zarządowi** — symulacja pokazuje konkretne liczby, nie ogólne obietnice
+4. **Iteruj** — łącz scenariusze: najpierw OZE, potem efektywność, potem zmiana paliwa — i sprawdź łączny efekt
+
+#### Ograniczenia symulacji
+
+- Symulacja operuje na **danych z wybranego roku** — nie przewiduje przyszłych zmian
+- Ścieżka redukcji jest **liniowa** — w rzeczywistości redukcja bywa nierównomierna
+- Scenariusz „zmiana paliwa" przelicza emisję proporcjonalnie do wskaźników — nie uwzględnia różnic w sprawnościach instalacji
+- Symulacja nie zmienia danych w CSV — to narzędzie analityczne, nie edycyjne
+
 ### Słowniczek terminów
 
 | Termin | Znaczenie |
@@ -665,6 +810,9 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | **Scope 2** | Emisje pośrednie z zakupionej energii |
 | **Scope 3** | Emisje pośrednie z łańcucha wartości |
 | **Audit log** | Rejestr zmian — automatyczny zapis każdej modyfikacji danych (jak trigger SQL) |
+| **Data quality** | Poziom pewności danych: measured (pomiar), calculated (obliczenie), estimated (szacunek) |
+| **What-if** | Symulacja hipotetyczna — analiza wpływu planowanych działań na emisje bez zmiany danych |
+| **Redukcja liniowa** | Ścieżka redukcji zakładająca stałą kwotę zmniejszenia emisji w każdym roku |
 
 ---
 
