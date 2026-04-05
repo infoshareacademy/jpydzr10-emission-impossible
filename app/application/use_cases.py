@@ -1457,3 +1457,57 @@ class EmissionUseCases:
         print(f"{'═' * 65}")
         print(f"  Oszczędność: {result['savings']:.3f} tCO2e ({result['savings_pct']:.1f}%)")
         print(f"{'═' * 65}")
+
+
+    def get_repo_by_table_name(self, table_name: str):
+        """Zwraca repozytorium po nazwie tabeli."""
+        repo_map = {
+            "stationary": self.repos.stationary,
+            "mobile": self.repos.mobile,
+            "process": self.repos.process,
+            "fugitive": self.repos.fugitive,
+            "energy_consumption": self.repos.energy_consumption,
+            "energy_purchased": self.repos.energy_purchased,
+        }
+        return repo_map.get(table_name)
+
+    def check_record_access(self, record_id: int, table_name: str, login: str) -> tuple[bool, str]:
+        """Sprawdza czy użytkownik ma uprawnienia do rekordu (read na spółce rekordu).
+
+        Zwraca (czy_ma_dostep, nazwa_spolki_lub_komunikat_bledu).
+        """
+        repo = self.get_repo_by_table_name(table_name)
+        if not repo:
+            return False, f"Nieznana tabela: {table_name}"
+        record = repo.get_by_id(record_id)
+        if not record:
+            return False, f"Nie znaleziono rekordu o ID {record_id} w tabeli {table_name}"
+        user_companies = self.get_user_companies(login, read_only=True)
+        if record.company not in user_companies:
+            return False, f"Brak uprawnień do spółki: {record.company} (rekord #{record_id})"
+        return True, record.company
+
+    def log_sent_email(self, sender: str, recipients: list[str], company: str,
+                       template_type: str, subject: str,
+                       table_name: Optional[str] = None,
+                       record_ids: Optional[list[int]] = None,
+                       scope: Optional[str] = None,
+                       year: Optional[int] = None):
+        """Zapisuje informację o wysłanym mailu do tbl_email_log.csv."""
+        from app.application.class_models import EmailLog
+        from datetime import datetime
+
+        log_entry = EmailLog(
+            id=self.repos.email_log.next_id(),
+            date=datetime.now(),
+            sender=sender,
+            recipients="; ".join(recipients),
+            company=company,
+            table_name=table_name,
+            record_ids=",".join(str(i) for i in record_ids) if record_ids else None,
+            template_type=template_type,
+            subject=subject,
+            scope=scope,
+            year=year,
+        )
+        self.repos.email_log.add(log_entry)

@@ -5,11 +5,17 @@ from os import getenv
 from dotenv import load_dotenv
 
 from app.application.use_cases import EmissionUseCases
-from app.core.validators.input_validators import safe_input, safe_int, safe_choice, safe_year_range, confirm
+from decimal import Decimal
+from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_year_range, confirm
 from app.application.class_models import MIN_YEAR, MAX_YEAR
 from app.core.entities.charts import plot_companies_comparison, plot_pie_chart, plot_trend_chart
 from app.application.pdf_export import export_summary_pdf, export_trend_pdf
 from app.application.bulk_import import bulk_import, TABLE_MODELS
+from app.application.email_sender import (
+    resolve_recipients, build_record_context, build_scope_context,
+    format_record_context, format_scope_context, build_email_message,
+    send_email, preview_message, TABLE_LABELS, TEMPLATE_LABELS,
+)
 import app.application.users.user_manager as user_manager
 
 load_dotenv()
@@ -63,9 +69,17 @@ def status_bar():
     print()
 
 def display_width(text: str) -> int:
-    """Oblicza rzeczywistą szerokość tekstu w terminalu (emoji = 2 kolumny)."""
+    """Oblicza rzeczywistą szerokość tekstu w terminalu (emoji = 2 kolumny).
+
+    Pomija variation selectors (U+FE0F, U+FE0E) i zero-width joiners (U+200D)
+    które nie zajmują miejsca w terminalu.
+    """
     w = 0
     for ch in text:
+        cp = ord(ch)
+        # Variation selectors i ZWJ — szerokość 0
+        if cp in (0xFE0F, 0xFE0E, 0x200D):
+            continue
         cat = unicodedata.east_asian_width(ch)
         if cat in ('W', 'F'):
             w += 2
@@ -92,6 +106,8 @@ def center_to(text: str, target: int) -> str:
 def print_menu(title, options, width=42, icon=""):
     if icon:
         title = f"{icon}  {title}"
+    # Oblicz max szerokość klucza aby wyrównać separator │
+    max_key_width = max((display_width(k) for k, _ in options if k != "-"), default=1)
     inner = width - 2
     print(f"  {C.CYAN}╔{'═' * inner}╗{C.RESET}")
     centered_title = center_to(title, inner)
@@ -102,8 +118,9 @@ def print_menu(title, options, width=42, icon=""):
             print(f"  {C.CYAN}╟{'─' * inner}╢{C.RESET}")
         else:
             color = C.DIM if key == "0" else C.YELLOW
-            raw_text = f"  {key} │ {label}"
-            colored_text = f"  {color}{key}{C.RESET} {C.DIM}│{C.RESET} {label}"
+            key_pad = ' ' * max(0, max_key_width - display_width(key))
+            raw_text = f"  {key}{key_pad} │ {label}"
+            colored_text = f"  {color}{key}{C.RESET}{key_pad} {C.DIM}│{C.RESET} {label}"
             padding = ' ' * max(0, inner - display_width(raw_text))
             print(f"  {C.CYAN}║{C.RESET}{colored_text}{padding}{C.CYAN}║{C.RESET}")
     print(f"  {C.CYAN}╚{'═' * inner}╝{C.RESET}")
@@ -361,6 +378,7 @@ def menu_1():
             ("7", "🔧  Narzędzia"),
             ("8", "👤  Użytkownicy"),
             ("9", "🤖  AI Asystent ESG"),
+            ("10", "📧  Komunikacja e-mail"),
             ("-", ""),
             ("0", "Zakończ"),
         ], icon="☰")
@@ -383,6 +401,8 @@ def menu_1():
             menu_users()
         elif option == '9':
             menu_ai_agent()
+        elif option == '10':
+            menu_email()
         elif option == '0':
             return menu_0()
         else:
@@ -781,8 +801,8 @@ def menu_targets_simulations():
             ("2", "➕  Dodaj cel redukcji"),
             ("3", "🔮  Symulacja what-if"),
             ("4", "📋  Wyświetl cele"),
-            ("5", "✏️   Edytuj cel"),
-            ("6", "🗑️   Usuń cel"),
+            ("5", "✏  Edytuj cel"),
+            ("6", "🗑  Usuń cel"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🎯")
@@ -977,6 +997,333 @@ def _bulk_import_interactive():
             print(f"    Wiersz {row_num}: {msg}")
         if len(result["errors"]) > 20:
             print(f"    ... i {len(result['errors']) - 20} więcej")
+
+
+SCOPE1_TABLES = {
+    "1": ("stationary", "Spalanie stacjonarne"),
+    "2": ("mobile", "Spalanie mobilne"),
+    "3": ("fugitive", "Emisje niezorganizowane"),
+    "4": ("process", "Emisje procesowe"),
+}
+
+SCOPE2_TABLES = {
+    "1": ("energy_consumption", "Zużycie energii"),
+}
+
+EMAIL_TEMPLATES = [
+    ("1", "weryfikacja", "Weryfikacja danych"),
+    ("2", "korekta", "Korekta danych"),
+    ("3", "brak_danych", "Brakujące dane"),
+    ("4", "odchylenie", "Wyjaśnienie odchylenia"),
+    ("5", "dane_zrodlowe", "Dane źródłowe (dokumenty)"),
+    ("6", "wlasna", "Własna wiadomość"),
+]
+
+
+def _choose_template() -> str | None:
+    """Wyświetla menu szablonów i zwraca klucz wybranego szablonu lub None."""
+    print(f"\n  {C.CYAN}Typ wiadomości:{C.RESET}")
+    for key, _, label in EMAIL_TEMPLATES:
+        print(f"    {C.YELLOW}{key}{C.RESET} {C.DIM}│{C.RESET} {label}")
+    raw = safe_input("Wybierz typ: ")
+    if raw is None:
+        return None
+    for key, template_key, _ in EMAIL_TEMPLATES:
+        if raw == key:
+            return template_key
+    error_msg("Nieprawidłowy wybór.")
+    return None
+
+
+def _choose_email_table() -> tuple[str, str] | None:
+    """Wybór tabeli emisyjnej — dostępne wszystkie tabele Scope 1 i 2."""
+    all_tables = {
+        "1": ("stationary", "Spalanie stacjonarne"),
+        "2": ("mobile", "Spalanie mobilne"),
+        "3": ("fugitive", "Emisje niezorganizowane"),
+        "4": ("process", "Emisje procesowe"),
+        "5": ("energy_consumption", "Zużycie energii"),
+    }
+    print(f"\n  {C.CYAN}Wybierz tabelę:{C.RESET}")
+    for key, (_, label) in all_tables.items():
+        print(f"    {C.YELLOW}{key}{C.RESET} {C.DIM}│{C.RESET} {label}")
+    raw = safe_input("Numer tabeli: ")
+    if raw is None or raw not in all_tables:
+        error_msg("Nieprawidłowy wybór.")
+        return None
+    return all_tables[raw]
+
+
+def _confirm_and_send_email(msg, sender_login, recipients, company, template_type,
+                            table_name=None, record_ids=None, scope=None, year=None):
+    """Podgląd, potwierdzenie i wysyłka maila + logowanie."""
+    print(f"\n  {C.CYAN}{'═' * 55}{C.RESET}")
+    print(f"  {C.BOLD}PODGLĄD WIADOMOŚCI{C.RESET}")
+    print(f"  {C.CYAN}{'═' * 55}{C.RESET}")
+    print(preview_message(msg))
+    print(f"  {C.CYAN}{'═' * 55}{C.RESET}")
+
+    if not confirm("\n  Wyślij? "):
+        info_msg("Anulowano wysyłkę.")
+        return
+
+    ok, result_msg = send_email(msg)
+    if ok:
+        success_msg(result_msg)
+        uc.log_sent_email(
+            sender=sender_login,
+            recipients=recipients,
+            company=company,
+            template_type=template_type,
+            subject=msg["Subject"],
+            table_name=table_name,
+            record_ids=record_ids,
+            scope=scope,
+            year=year,
+        )
+    else:
+        error_msg(result_msg)
+
+
+def menu_email():
+    """Główne podmenu komunikacji e-mail."""
+    while True:
+        cls()
+        status_bar()
+        print_menu("KOMUNIKACJA E-MAIL", [
+            ("1", "Wskaż spółkę (zakres/tabela)"),
+            ("2", "Wskaż konkretne ID rekordów"),
+            ("-", ""),
+            ("3", "Historia wysłanych wiadomości"),
+            ("-", ""),
+            ("0", "Powrót"),
+        ], icon="📧")
+        option = prompt()
+        if option == '1':
+            if not require_login():
+                continue
+            _email_by_company()
+            wait()
+        elif option == '2':
+            if not require_login():
+                continue
+            _email_by_record_ids()
+            wait()
+        elif option == '3':
+            if not require_login():
+                continue
+            _email_history()
+            wait()
+        elif option == '0':
+            return
+        else:
+            error_msg()
+
+
+def _email_by_company():
+    """Opcja [1] — Wskaż spółkę → podmenu zakresu → mail do osób z save + koordynator."""
+    company = choose_company()
+    if company is None:
+        return
+
+    recipients = resolve_recipients(company, uc.repos)
+    if not recipients:
+        error_msg(f"Brak odbiorców dla spółki: {company}")
+        return
+    info_msg(f"Odbiorcy: {', '.join(recipients)}")
+    print(f"\n  {C.CYAN}Zakres zapytania:{C.RESET}")
+    print(f"    {C.YELLOW}1{C.RESET} {C.DIM}│{C.RESET} Scope 1 (emisje bezpośrednie)")
+    print(f"    {C.YELLOW}2{C.RESET} {C.DIM}│{C.RESET} Scope 2 (energia)")
+    print(f"    {C.YELLOW}3{C.RESET} {C.DIM}│{C.RESET} Całkowity ślad węglowy (Scope 1+2)")
+    scope_choice = safe_input("Wybierz zakres: ")
+    if scope_choice is None:
+        return
+
+    scope = None
+    table_name = None
+    table_label = None
+
+    if scope_choice == "1":
+        scope = "1"
+        print(f"\n  {C.CYAN}Scope 1 — szczegóły:{C.RESET}")
+        for key, (_, label) in SCOPE1_TABLES.items():
+            print(f"    {C.YELLOW}{key}{C.RESET} {C.DIM}│{C.RESET} {label}")
+        print(f"    {C.YELLOW}5{C.RESET} {C.DIM}│{C.RESET} Cały Scope 1")
+        sub = safe_input("Wybierz: ")
+        if sub is None:
+            return
+        if sub in SCOPE1_TABLES:
+            table_name, table_label = SCOPE1_TABLES[sub]
+        elif sub == "5":
+            table_name = None  # cały Scope 1
+            table_label = None
+        else:
+            error_msg("Nieprawidłowy wybór.")
+            return
+
+    elif scope_choice == "2":
+        scope = "2"
+        table_name = None
+        table_label = None
+
+    elif scope_choice == "3":
+        scope = "1+2"
+        table_name = None
+        table_label = None
+    else:
+        error_msg("Nieprawidłowy wybór.")
+        return
+
+    available_years = uc.get_available_years(company)
+    if available_years:
+        print(f"\n  {C.DIM}Dostępne lata: {', '.join(str(y) for y in available_years)}{C.RESET}")
+    year = safe_int("Rok: ", MIN_YEAR, MAX_YEAR)
+    if year is None:
+        return
+
+    ctx = build_scope_context(company, year, scope, uc.repos, table_name)
+    context_text = format_scope_context(ctx)
+    print(f"\n  {C.CYAN}Dane do zapytania:{C.RESET}")
+    print(context_text)
+
+    template_type = _choose_template()
+    if template_type is None:
+        return
+    
+    custom_note = safe_input("Dodatkowa uwaga (Enter = pomiń): ", allow_empty=True) or ""
+    sender_user = None
+    for u in user_manager.user_manager.users:
+        if u.login == current_user:
+            sender_user = u
+            break
+    sender_name = f"{sender_user.name} {sender_user.surname}" if sender_user else current_user
+    msg = build_email_message(
+        template_type=template_type,
+        sender_name=sender_name,
+        recipients=recipients,
+        company=company,
+        context_text=context_text,
+        custom_note=custom_note,
+        year=year,
+        table_label=table_label or TABLE_LABELS.get(table_name, f"Scope {scope}"),
+    )
+
+    _confirm_and_send_email(
+        msg, current_user, recipients, company, template_type,
+        table_name=table_name, scope=scope, year=year,
+    )
+
+
+def _email_by_record_ids():
+    """Opcja [2] — Wskaż konkretne ID rekordów → mail do osób z save dla spółki rekordu."""
+    table_result = _choose_email_table()
+    if table_result is None:
+        return
+    table_name, table_label = table_result
+    repo = uc.get_repo_by_table_name(table_name)
+    if repo is None:
+        error_msg(f"Nieznana tabela: {table_name}")
+        return
+
+    # Wyświetl dostępne rekordy dla zalogowanego użytkownika
+    allowed = get_read_companies()
+    print(f"\n  {C.CYAN}Dostępne rekordy ({table_label}):{C.RESET}")
+    uc.display_table(table_name, allowed_companies=allowed)
+
+    raw_ids = safe_input("\nID rekordów (rozdzielone przecinkiem, np. 1,5,12): ")
+    if raw_ids is None:
+        return
+
+    try:
+        record_ids = [int(x.strip()) for x in raw_ids.split(",") if x.strip()]
+    except ValueError:
+        error_msg("Nieprawidłowe ID — podaj liczby rozdzielone przecinkiem.")
+        return
+
+    if not record_ids:
+        error_msg("Nie podano żadnych ID.")
+        return
+
+    records = []
+    companies_in_query = set()
+    for rid in record_ids:
+        ok, result = uc.check_record_access(rid, table_name, current_user)
+        if not ok:
+            error_msg(result)
+            return
+        record = repo.get_by_id(rid)
+        records.append(record)
+        companies_in_query.add(record.company)
+
+    context_parts = []
+    for record in records:
+        ctx = build_record_context(record, repo, uc.repos, table_name)
+        context_parts.append(format_record_context(ctx))
+
+    context_text = "\n\n".join(context_parts)
+    print(f"\n  {C.CYAN}Dane do zapytania:{C.RESET}")
+    print(context_text)
+    all_recipients = set()
+    for comp in companies_in_query:
+        all_recipients.update(resolve_recipients(comp, uc.repos))
+    recipients = sorted(all_recipients)
+
+    if not recipients:
+        error_msg("Brak odbiorców dla wskazanych spółek.")
+        return
+    info_msg(f"Odbiorcy: {', '.join(recipients)}")
+    template_type = _choose_template()
+    if template_type is None:
+        return
+
+    custom_note = safe_input("Dodatkowa uwaga (Enter = pomiń): ", allow_empty=True) or ""
+    sender_user = None
+    for u in user_manager.user_manager.users:
+        if u.login == current_user:
+            sender_user = u
+            break
+    sender_name = f"{sender_user.name} {sender_user.surname}" if sender_user else current_user
+    company_label = ", ".join(sorted(companies_in_query))
+    msg = build_email_message(
+        template_type=template_type,
+        sender_name=sender_name,
+        recipients=recipients,
+        company=company_label,
+        context_text=context_text,
+        custom_note=custom_note,
+        year=records[0].year if records else None,
+        table_label=table_label,
+    )
+
+    _confirm_and_send_email(
+        msg, current_user, recipients, company_label, template_type,
+        table_name=table_name, record_ids=record_ids, year=records[0].year if records else None,
+    )
+
+
+def _email_history():
+    """Wyświetla historię wysłanych wiadomości."""
+    logs, errors = uc.repos.email_log.get_all()
+    if not logs:
+        info_msg("Brak wysłanych wiadomości.")
+        return
+
+    if not uc.is_admin(current_user):
+        logs = [l for l in logs if l.sender == current_user]
+
+    if not logs:
+        info_msg("Brak Twoich wiadomości.")
+        return
+
+    print(f"\n  {C.CYAN}Historia wysłanych wiadomości ({len(logs)}):{C.RESET}\n")
+    for log in logs[-20:]:  # ostatnie 20
+        date_str = log.date.strftime("%Y-%m-%d %H:%M") if hasattr(log.date, 'strftime') else str(log.date)
+        template = TEMPLATE_LABELS.get(log.template_type, log.template_type)
+        print(f"  {C.DIM}[{date_str}]{C.RESET} {C.YELLOW}{template}{C.RESET}")
+        print(f"    {log.company} | Do: {log.recipients}")
+        if log.record_ids:
+            print(f"    ID: {log.record_ids} ({log.table_name})")
+        print()
 
 
 def menu_ai_agent():

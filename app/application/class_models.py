@@ -10,13 +10,11 @@ MAX_YEAR = datetime.now().year  # nie pozwalamy wpisać roku w przyszłości
 EMAIL_REGEX = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 PHONE_REGEX = re.compile(r"^\+?[\d\s\-\(\)]{7,20}$")
 
-# Tu można dodać pliki csv słownikowe
 ENERGY_UNITS = {"MWh", "kWh", "GJ", "MJ"}
 MASS_UNITS = {"kg", "t", "Mg"}
 VOLUME_UNITS = {"l", "m3"}
 ALL_UNITS = ENERGY_UNITS | MASS_UNITS | VOLUME_UNITS
 
-# Tu można dodać pliki csv słownikowe
 FUEL_TYPES = {
     "gaz ziemny",
     "olej opałowy lekki",
@@ -28,7 +26,6 @@ FUEL_TYPES = {
     "biomasa",
 }
 
-# Poziomy pewności danych — wymagane przez GHG Protocol
 DATA_QUALITY_LEVELS = {"measured", "calculated", "estimated"}
 
 
@@ -311,7 +308,6 @@ class UserPermission(BaseModel):
             raise ValueError(f"Nieznana rola '{v}'. Dozwolone: {sorted(USER_ROLES)}")
         return v
 
-# Dozwolone źródła energii — używane przy walidacji danych wejściowych
 ENERGY_SOURCE_TYPES = {
     "Zakupiona",
     "Wyprodukowana",
@@ -319,7 +315,6 @@ ENERGY_SOURCE_TYPES = {
     "Zużyta",
 }
 
-# Dozwolone typy energii — muszą odpowiadać nazwom w tbl_factors.csv
 ENERGY_TYPES = {
     "Energia elektryczna z OZE",
     "Energia elektryczna nie OZE",
@@ -408,6 +403,67 @@ class ReductionTarget(BaseModel):
     @field_validator("notes", mode="before")
     @classmethod
     def parse_notes(cls, v) -> Optional[str]:
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return None
+        return v.strip() if isinstance(v, str) else None
+
+
+EMAIL_TEMPLATE_TYPES = {
+    "weryfikacja",      # potwierdzenie poprawności danych
+    "korekta",          # prośba o korektę danych
+    "brak_danych",      # brakujące dane w porównaniu do roku ubiegłego
+    "odchylenie",       # wyjaśnienie wzrostu/spadku emisji
+    "wlasna",           # dowolna treść
+    "dane_zrodlowe",    # prośba o dokumenty potwierdzające
+}
+
+
+class EmailLog(BaseModel):
+    """Model dla tbl_email_log.csv — rejestr wysłanych wiadomości.
+
+    Każdy wysłany mail jest logowany tutaj — historia komunikacji z osobami
+    odpowiedzialnymi za dane emisyjne.
+    """
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    id: int = Field(ge=0, description="Unikalny ID wiadomości")
+    date: datetime = Field(description="Data wysłania (YYYY-MM-DD HH:MM:SS)")
+    sender: str = Field(min_length=1, max_length=100, description="Login nadawcy")
+    recipients: str = Field(min_length=1, max_length=1000, description="Adresy e-mail odbiorców (rozdzielone ;)")
+    company: str = Field(min_length=1, max_length=200, description="Nazwa spółki której dotyczy")
+    table_name: Optional[str] = Field(default=None, max_length=200, description="Tabela (jeśli dotyczy konkretnej)")
+    record_ids: Optional[str] = Field(default=None, max_length=500, description="ID rekordów (rozdzielone ,)")
+    template_type: str = Field(min_length=1, max_length=50, description="Typ szablonu wiadomości")
+    subject: str = Field(min_length=1, max_length=500, description="Temat wiadomości")
+    scope: Optional[str] = Field(default=None, max_length=10, description="Zakres: 1, 2, 1+2 (jeśli dotyczy)")
+    year: Optional[int] = Field(default=None, ge=MIN_YEAR, description="Rok którego dotyczy zapytanie")
+
+    @field_validator("template_type")
+    @classmethod
+    def validate_template_type(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in EMAIL_TEMPLATE_TYPES:
+            raise ValueError(f"Nieznany typ szablonu '{v}'. Dozwolone: {sorted(EMAIL_TEMPLATE_TYPES)}")
+        return v
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def parse_datetime(cls, v) -> datetime:
+        if isinstance(v, datetime):
+            return v
+        if isinstance(v, str):
+            v = v.strip()
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(v, fmt)
+                except ValueError:
+                    continue
+            raise ValueError(f"Nie można sparsować daty: '{v}'")
+        return v
+
+    @field_validator("record_ids", "table_name", "scope", mode="before")
+    @classmethod
+    def parse_optional_str(cls, v) -> Optional[str]:
         if v is None or (isinstance(v, str) and v.strip() == ""):
             return None
         return v.strip() if isinstance(v, str) else None

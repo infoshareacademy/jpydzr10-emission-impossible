@@ -6,7 +6,7 @@ from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
     FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
     EnergyConsumption, EnergyPurchased, UserPermission, ChangeLog,
-    ReductionTarget,
+    ReductionTarget, EmailLog,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -209,6 +209,36 @@ class ChangeLogRepository(CsvRepository[ChangeLog]):
         return self.get_filtered(login=login)
 
 
+class EmailLogRepository(CsvRepository[EmailLog]):
+    """Repozytorium rejestru wysłanych wiadomości e-mail.
+
+    Tylko zapis i odczyt — historia komunikacji z osobami odpowiedzialnymi za dane.
+    Bez backupu — sam log jest historią.
+    """
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EmailLog,
+            file_path=os.path.join(folder, "tbl_email_log.csv"),
+            backup=False,
+        )
+
+    def update(self, record_id, updates: dict) -> tuple[bool, str]:
+        """Zablokowane — rejestr e-mail jest niezmienny."""
+        return False, "Rejestr e-mail nie pozwala na edycję rekordów"
+
+    def delete(self, record_id) -> tuple[bool, str]:
+        """Zablokowane — rejestr e-mail jest niezmienny."""
+        return False, "Rejestr e-mail nie pozwala na usuwanie rekordów"
+
+    def get_by_company(self, company: str) -> list[EmailLog]:
+        """Zwraca historię maili dla danej spółki."""
+        return self.get_filtered(company=company)
+
+    def get_by_sender(self, sender: str) -> list[EmailLog]:
+        """Zwraca maile wysłane przez danego użytkownika."""
+        return self.get_filtered(sender=sender)
+
+
 class RepositoryFactory:
     def __init__(self, folder: str = FOLDER_PATH):
         self.folder = folder
@@ -226,6 +256,7 @@ class RepositoryFactory:
         self.authorisations = AuthorisationRepository(folder)
         self.permissions = PermissionRepository(folder)
         self.reduction_targets = ReductionTargetRepository(folder)
+        self.email_log = EmailLogRepository(folder)
 
     def set_audit_context(self, login: str):
         """Włącza audit log (trigger) dla wszystkich repozytoriów.

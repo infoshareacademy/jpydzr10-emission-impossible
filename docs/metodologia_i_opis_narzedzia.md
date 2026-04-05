@@ -18,6 +18,7 @@
 10. [Przypadki użycia](#10-przypadki-użycia)
 11. [Ciekawostki i anegdoty](#11-ciekawostki-i-anegdoty)
 12. [Instrukcja — Przewodnik po danych emisyjnych](#12-instrukcja--przewodnik-po-danych-emisyjnych)
+13. [Komunikacja e-mail — zapytania o dane](#13-komunikacja-e-mail--zapytania-o-dane)
 
 ---
 
@@ -410,6 +411,16 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - **Hurtowy import danych** — import rekordów emisyjnych z plików CSV lub Excel (.xlsx). Automatyczna walidacja Pydantic, nadawanie ID, raport błędów. Dostępny z menu Narzędzia
 - **Poziomy pewności danych (data_quality)** — każdy rekord może mieć oznaczenie jakości danych: *measured* (pomiar), *calculated* (obliczenie), *estimated* (szacunek) — zgodnie z wymogami GHG Protocol
 
+**Komunikacja e-mail:**
+- Wysyłanie zapytań do osób odpowiedzialnych za dane emisyjne (osoby z uprawnieniami save + koordynator spółki)
+- Automatyczne ustalanie odbiorców na podstawie tbl_authorisations (save=TRUE) i tbl_companies (co_mail)
+- 6 szablonów wiadomości: weryfikacja danych, korekta, brakujące dane, wyjaśnienie odchylenia, dane źródłowe (dokumenty), własna wiadomość
+- Kontekst rekordu generowany automatycznie: emisja deklarowana vs obliczona, odchylenie %, średnia z lat, porównanie rok do roku
+- Wskazywanie konkretnych ID rekordów (kilka na raz, np. 1,5,12) lub całej spółki z wyborem zakresu (Scope 1/2/1+2)
+- Podgląd wiadomości przed wysłaniem z potwierdzeniem
+- Tryb dry-run (domyślny) ��� zapis do pliku zamiast wysyłania, konfiguracja SMTP w .env
+- Rejestr wysłanych wiadomości w tbl_email_log.csv
+
 **Cele redukcji i symulacje:**
 
 - **Cele redukcji (SBTi-style)** — definiowanie celów redukcji emisji: rok bazowy, rok docelowy, % redukcji. Ścieżka redukcji liniowa z wizualizacją postępu rok po roku (rzeczywista emisja vs cel). Obsługuje Scope 1, 2 lub 1+2
@@ -432,6 +443,7 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 | **Hurtowy import CSV/Excel** | Szybkie ładowanie danych z zewnętrznych źródeł (faktur, kart paliwowych) zamiast ręcznego wpisywania |
 | **Poziomy pewności danych** | Oznaczenie measured/calculated/estimated — audytor widzi jakość każdego rekordu |
 | **Cele redukcji + symulacje** | Ścieżka SBTi z monitoringiem postępu + interaktywne scenariusze what-if (OZE, paliwa, efektywność) |
+| **Komunikacja e-mail** | Wysyłanie zapytań do osób odpowiedzialnych za dane — szablony, automatyczny kontekst rekordów, porównanie r/r |
 | **Open source** | Pełna transparentność metodologii — audytor może zweryfikować każdy wzór |
 
 ---
@@ -484,7 +496,15 @@ Firma rozważa przejęcie spółki produkcyjnej. Analityk wprowadza dane emisyjn
 
 Manager logistyki analizuje emisje ze spalania mobilnego — widzi, że ciężarówki 18t spalające diesel generują 70% emisji floty. To argument za wymianą na pojazdy LNG lub elektryczne.
 
-### Przypadek 4: Przejście na OZE
+### Przypadek 4: Weryfikacja danych emisyjnych e-mailem
+
+Analityk danych zauważa, że spalanie stacjonarne w GreenTech Produkcja wzrosło o 35% r/r. Wchodzi w menu Komunikacja e-mail → Wskaż spółkę → Scope 1 → Spalanie stacjonarne → rok 2025. Narzędzie automatycznie generuje kontekst: emisja bieżąca, rok ubiegły, odchylenie %, średnia z lat. Analityk wybiera szablon „Wyjaśnienie odchylenia", dodaje uwagę i wysyła zapytanie do osób z uprawnieniami save dla tej spółki + koordynatora (co_mail). Mail zawiera konkretne liczby — odbiorca wie, o co dokładnie chodzi.
+
+### Przypadek 5: Prośba o dokumenty źródłowe
+
+Przed audytem ESG analityk potrzebuje faktur potwierdzających zużycie paliwa w rekordach #14, #17 i #22. Wchodzi w Komunikacja e-mail → Wskaż konkretne ID → tabela: spalanie stacjonarne → wpisuje: 14,17,22. Narzędzie sprawdza uprawnienia, wyświetla kontekst każdego rekordu, analityk wybiera szablon „Dane źródłowe" i wysyła. Rejestr wysłanych wiadomości (tbl_email_log.csv) dokumentuje historię komunikacji.
+
+### Przypadek 6: Przejście na OZE
 
 Dyrektor finansowy porównuje scenariusze: obecne zużycie 4800 MWh energii nie-OZE generuje 3403 tCO₂e. Przejście na zieloną energię z certyfikatem GO redukuje Scope 2 do zera — oszczędność na uprawnieniach EU ETS: ~200-270 tys. EUR rocznie.
 
@@ -813,6 +833,105 @@ Oszczędność: 242.155 tCO2e (50.6%)
 | **Data quality** | Poziom pewności danych: measured (pomiar), calculated (obliczenie), estimated (szacunek) |
 | **What-if** | Symulacja hipotetyczna — analiza wpływu planowanych działań na emisje bez zmiany danych |
 | **Redukcja liniowa** | Ścieżka redukcji zakładająca stałą kwotę zmniejszenia emisji w każdym roku |
+| **Dry-run** | Tryb testowy wysyłki e-mail — wiadomość zapisywana do pliku zamiast wysyłana przez SMTP |
+
+---
+
+## 13. Komunikacja e-mail — zapytania o dane
+
+### Po co?
+
+W procesie weryfikacji danych emisyjnych analityk musi komunikować się z osobami odpowiedzialnymi za dane w poszczególnych spółkach — pytać o poprawność, prosić o korekty, wyjaśniać odchylenia, żądać dokumentów źródłowych. Moduł e-mail automatyzuje tę komunikację bezpośrednio z poziomu narzędzia.
+
+### Jak działa?
+
+Menu: **Menu główne → Komunikacja e-mail**
+
+#### Opcja 1: Wskaż spółkę (zakres/tabela)
+
+Służy do zapytań o dane zbiorcze — emisje całej spółki lub wybranej kategorii.
+
+1. Wybierz spółkę
+2. Wybierz zakres:
+   - **Scope 1** → podmenu: spalanie stacjonarne, mobilne, niezorganizowane, procesowe lub cały Scope 1
+   - **Scope 2** → energia (całość)
+   - **Scope 1+2** → całkowity ślad węglowy
+3. Wybierz rok — narzędzie automatycznie porównuje z rokiem n-1
+4. Narzędzie wyświetla kontekst: emisja bieżąca, emisja rok wcześniej, zmiana r/r (%), średnia z lat, rozkład kategorii
+5. Wybierz szablon wiadomości
+6. Dodaj opcjonalną uwagę
+7. Podgląd wiadomości → potwierdzenie → wysyłka
+
+**Odbiorcy ustalani automatycznie:** wszyscy użytkownicy z uprawnieniami save=TRUE dla danej spółki (login → e-mail z tbl_users) + adres koordynatora spółki (co_mail z tbl_companies).
+
+#### Opcja 2: Wskaż konkretne ID rekordów
+
+Służy do zapytań o konkretne rekordy — np. podejrzane wartości, brakujące dokumenty.
+
+1. Wybierz tabelę (spalanie stacjonarne, mobilne, niezorganizowane, procesowe, zużycie energii)
+2. Wpisz ID rekordów oddzielone przecinkiem (np. `14,17,22`)
+3. Narzędzie sprawdza uprawnienia użytkownika do spółek tych rekordów
+4. Wyświetla kontekst każdego rekordu osobno:
+   - Dane rekordu (spółka, rok, paliwo/energia, ilość, jednostka)
+   - Emisja deklarowana vs obliczona + odchylenie %
+   - Średnia emisji z wszystkich lat
+   - Porównanie do roku n-1
+5. Wybierz szablon → uwaga → podgląd → wyślij
+
+**Ważne:** Wszystkie wskazane ID muszą być z tej samej tabeli. Rekordy mogą być z różnych lat i różnych spółek — odbiorcy dobierani automatycznie dla każdej spółki.
+
+#### Opcja 3: Historia wysłanych wiadomości
+
+Wyświetla ostatnie 20 wiadomości wysłanych przez zalogowanego użytkownika. Admin widzi wiadomości wszystkich użytkowników.
+
+### Szablony wiadomości
+
+| Szablon | Kiedy używać | Przykład |
+|---------|-------------|---------|
+| **Weryfikacja danych** | Rutynowa prośba o potwierdzenie poprawności | „Proszę potwierdzić dane za 2025 rok" |
+| **Korekta danych** | Wykryto błąd wymagający poprawy | „Ilość diesel w rekordzie #14 wydaje się zawyżona" |
+| **Brakujące dane** | Brak danych w porównaniu do roku ubiegłego | „W 2025 brak danych o spalaniu mobilnym (było w 2024)" |
+| **Wyjaśnienie odchylenia** | Duża zmiana emisji/zużycia r/r | „Spalanie stacjonarne wzrosło o 35% — proszę o wyjaśnienie" |
+| **Dane źródłowe** | Audyt — potrzebne dokumenty | „Proszę o faktury/protokoły dla rekordów #14, #17, #22" |
+| **Własna wiadomość** | Nietypowe pytanie | Dowolna treść z kontekstem danych |
+
+### Konfiguracja
+
+W pliku `.env`:
+
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=twoj.email@gmail.com
+SMTP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+SMTP_FROM_NAME=Imię Nazwisko — Analityk danych
+EMAIL_DRY_RUN=true
+```
+
+- **EMAIL_DRY_RUN=true** (domyślnie) — wiadomości zapisywane do pliku w `data_files/export/` zamiast wysyłane. Idealne do testowania
+- **EMAIL_DRY_RUN=false** — prawdziwa wysyłka przez SMTP
+
+Dla Gmaila wymagane jest „Hasło do aplikacji" (App Password) — nie hasło do konta Google.
+
+### Rejestr wysłanych wiadomości
+
+Każda wysłana wiadomość (również w trybie dry-run) jest logowana w `data_files/tbl_email_log.csv`:
+
+| Pole | Opis |
+|------|------|
+| id | Unikalny ID wiadomości |
+| date | Data i godzina wysłania |
+| sender | Login nadawcy |
+| recipients | Adresy e-mail odbiorców (rozdzielone ;) |
+| company | Spółka której dotyczy |
+| table_name | Tabela (jeśli dotyczy konkretnej) |
+| record_ids | ID rekordów (rozdzielone ,) |
+| template_type | Typ szablonu |
+| subject | Temat wiadomości |
+| scope | Zakres (1, 2, 1+2) |
+| year | Rok którego dotyczy |
+
+Rejestr jest niezmienny (immutable) — jak audit log. Stanowi dokumentację komunikacji z osobami odpowiedzialnymi za dane, przydatną przy audycie ESG.
 
 ---
 

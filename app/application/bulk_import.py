@@ -71,7 +71,6 @@ def _read_excel_rows(file_path: str, sheet_name: Optional[str] = None) -> list[d
             if v is None:
                 row[h] = ""
             elif isinstance(v, float):
-                # Unikaj problemów z floatami — konwertuj na Decimal
                 row[h] = str(Decimal(str(v)))
             else:
                 row[h] = str(v).strip()
@@ -108,8 +107,6 @@ def bulk_import(file_path: str, repo_name: str, repo,
         return {"imported": 0, "errors": [(0, f"Nieznana tabela: {repo_name}")], "skipped": 0}
 
     model_class = TABLE_MODELS[repo_name]
-
-    # Wczytaj wiersze
     ext = os.path.splitext(file_path)[1].lower()
     if ext in (".xlsx", ".xls"):
         raw_rows = _read_excel_rows(file_path, sheet_name)
@@ -123,18 +120,14 @@ def bulk_import(file_path: str, repo_name: str, repo,
     skipped = 0
 
     for row_num, raw_row in enumerate(raw_rows, start=2):
-        # Usuń pole id — będzie nadane automatycznie
         row = {k: _parse_value(v) for k, v in raw_row.items() if k.lower() not in SKIP_FIELDS}
-
-        # Konwertuj pola numeryczne
         for field in ("amount", "emission_tco2eq", "factor"):
             if field in row and row[field] is not None:
                 try:
                     row[field] = Decimal(str(row[field]))
                 except (InvalidOperation, ValueError):
-                    pass  # Pydantic złapie błąd
+                    pass
 
-        # Nadaj automatyczne ID
         row["id"] = repo.next_id()
 
         try:
