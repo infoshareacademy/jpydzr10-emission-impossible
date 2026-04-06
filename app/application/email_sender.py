@@ -140,15 +140,19 @@ def build_record_context(record, repo, repos, table_name: str) -> dict:
 
     all_records = repo.get_filtered(company=record.company)
     emissions = []
+    years_with_data = set()
     for r in all_records:
         em = getattr(r, "emission_tco2eq", None)
         if em and em > 0:
             emissions.append(em)
+            years_with_data.add(r.year)
     if emissions:
         avg = sum(emissions) / len(emissions)
         ctx["avg_all_years"] = _round(avg)
+        ctx["avg_years_range"] = sorted(years_with_data)
     else:
         ctx["avg_all_years"] = None
+        ctx["avg_years_range"] = []
 
     prev_year = record.year - 1
     prev_records = [r for r in all_records if r.year == prev_year]
@@ -229,6 +233,8 @@ def build_scope_context(company: str, year: int, scope: str, repos,
         ctx["change_pct"] = None
 
     available_years = uc.get_available_years(company)
+    # Lata z danymi (emisja > 0) — do obliczenia średniej
+    years_with_data = []
     if available_years:
         totals = []
         for y in available_years:
@@ -241,9 +247,11 @@ def build_scope_context(company: str, year: int, scope: str, repos,
                 val = s["total"]
             if val > 0:
                 totals.append(val)
+                years_with_data.append(y)
         ctx["avg_all_years"] = _round(sum(totals) / len(totals)) if totals else None
     else:
         ctx["avg_all_years"] = None
+    ctx["avg_years_range"] = years_with_data
 
     return ctx
 
@@ -290,7 +298,12 @@ def format_record_context(ctx: dict) -> str:
         lines.append(line)
 
     if ctx.get("avg_all_years"):
-        lines.append(f"  Srednia z lat: {ctx['avg_all_years']} tCO2e")
+        years_range = ctx.get("avg_years_range", [])
+        if years_range:
+            years_info = f"{min(years_range)}-{max(years_range)}" if len(years_range) > 1 else str(years_range[0])
+            lines.append(f"  Srednia z lat ({years_info}): {ctx['avg_all_years']} tCO2e")
+        else:
+            lines.append(f"  Srednia z lat: {ctx['avg_all_years']} tCO2e")
     if ctx.get("prev_year_emission"):
         lines.append(f"  Rok {ctx['prev_year']}: {ctx['prev_year_emission']} tCO2e")
     elif ctx.get("prev_year"):
@@ -306,13 +319,22 @@ def format_scope_context(ctx: dict) -> str:
     table_info = f" — {ctx['table_label']}" if ctx.get("table_label") else ""
     lines.append(f"  {ctx['company']} | Rok {ctx['year']} | {scope_label}{table_info}")
     lines.append(f"  Emisja {ctx['year']}: {_round(ctx['emission_current'])} tCO2e")
-    lines.append(f"  Emisja {ctx['year'] - 1}: {_round(ctx['emission_prev'])} tCO2e")
 
-    if ctx.get("change_pct"):
-        lines.append(f"  Zmiana r/r: {ctx['change_pct']}%")
+    prev_year = ctx['year'] - 1
+    if ctx['emission_prev'] > 0:
+        lines.append(f"  Emisja {prev_year}: {_round(ctx['emission_prev'])} tCO2e")
+        if ctx.get("change_pct"):
+            lines.append(f"  Zmiana r/r: {ctx['change_pct']}%")
+    else:
+        lines.append(f"  Emisja {prev_year}: brak danych")
 
     if ctx.get("avg_all_years"):
-        lines.append(f"  Srednia z lat: {ctx['avg_all_years']} tCO2e")
+        years_range = ctx.get("avg_years_range", [])
+        if years_range:
+            years_info = f"{min(years_range)}-{max(years_range)}" if len(years_range) > 1 else str(years_range[0])
+            lines.append(f"  Srednia z lat ({years_info}): {ctx['avg_all_years']} tCO2e")
+        else:
+            lines.append(f"  Srednia z lat: {ctx['avg_all_years']} tCO2e")
 
     if ctx.get("breakdown"):
         lines.append("  Rozklad Scope 1:")
