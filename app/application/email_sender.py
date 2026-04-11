@@ -233,7 +233,6 @@ def build_scope_context(company: str, year: int, scope: str, repos,
         ctx["change_pct"] = None
 
     available_years = uc.get_available_years(company)
-    # Lata z danymi (emisja > 0) — do obliczenia średniej
     years_with_data = []
     if available_years:
         totals = []
