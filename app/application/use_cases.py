@@ -640,8 +640,13 @@ class EmissionUseCases:
         print("\n─── Dodawanie: Spółka ───")
         print("(Wpisz 'q' aby anulować)\n")
 
-        co_name = safe_input("Nazwa spółki: ")
-        if co_name is None: return False
+        while True:
+            co_name = safe_input("Nazwa spółki: ")
+            if co_name is None: return False
+            if self.repos.companies.exists_by_name(co_name):
+                print(f"  ✗ Spółka '{co_name}' już istnieje w bazie danych.")
+                continue
+            break
 
         co_country = safe_input("Kraj: ")
         if co_country is None: return False
@@ -693,7 +698,10 @@ class EmissionUseCases:
         return ok
 
     def add_factor_interactive(self) -> bool:
-        """Dodawanie nowego wskaźnika emisji do tbl_factors.csv."""
+        """Dodawanie nowego wskaźnika emisji do tbl_factors.csv.
+
+        Unikalność sprawdzana po (factor_name, country, year).
+        """
         print("\n─── Dodawanie: Wskaźnik emisji ───")
         print("(Wpisz 'q' aby anulować)\n")
 
@@ -703,6 +711,14 @@ class EmissionUseCases:
         country = safe_input("Kraj (np. Polska): ")
         if country is None: return False
 
+        while True:
+            year = safe_int("Rok obowiązywania wskaźnika: ", MIN_YEAR, MAX_YEAR)
+            if year is None: return False
+            if self.repos.factors.exists(factor_name, country, year):
+                print(f"  ✗ Wskaźnik '{factor_name}' dla {country} w roku {year} już istnieje.")
+                continue
+            break
+
         factor = safe_decimal("Wartość wskaźnika: ", min_val=Decimal("0"))
         if factor is None: return False
 
@@ -711,7 +727,7 @@ class EmissionUseCases:
 
         source = safe_input("Źródło (np. KOBiZE 2024, Enter = pomiń): ", allow_empty=True) or None
 
-        print(f"\n  Wskaźnik: {factor_name} | {country}")
+        print(f"\n  Wskaźnik: {factor_name} | {country} | {year}")
         print(f"  Wartość: {factor} {unit_factor} | Źródło: {source or '—'}")
 
         if not confirm("\nZapisać? "):
@@ -720,7 +736,7 @@ class EmissionUseCases:
 
         record = EmissionFactor(
             id=self.repos.factors.next_id(),
-            factor_name=factor_name, country=country,
+            factor_name=factor_name, country=country, year=year,
             factor=factor, unit_factor=unit_factor, source=source,
         )
         ok, msg = self.repos.factors.add(record)
@@ -728,15 +744,23 @@ class EmissionUseCases:
         return ok
 
     def add_converter_interactive(self) -> bool:
-        """Dodawanie nowego przelicznika jednostek do tbl_converters.csv."""
+        """Dodawanie nowego przelicznika jednostek do tbl_converters.csv.
+
+        Unikalność sprawdzana po (unit_from, unit_to).
+        """
         print("\n─── Dodawanie: Przelicznik jednostek ───")
         print("(Wpisz 'q' aby anulować)\n")
 
         unit_from = safe_input("Jednostka źródłowa (np. MWh): ")
         if unit_from is None: return False
 
-        unit_to = safe_input("Jednostka docelowa (np. GJ): ")
-        if unit_to is None: return False
+        while True:
+            unit_to = safe_input("Jednostka docelowa (np. GJ): ")
+            if unit_to is None: return False
+            if self.repos.converters.exists(unit_from, unit_to):
+                print(f"  ✗ Przelicznik '{unit_from}' → '{unit_to}' już istnieje.")
+                continue
+            break
 
         factor = safe_decimal("Mnożnik (unit_from × mnożnik = unit_to): ", min_val=Decimal("0.000001"))
         if factor is None: return False
@@ -807,12 +831,22 @@ class EmissionUseCases:
         return ok
 
     def add_permission_interactive(self) -> bool:
-        """Dodawanie roli użytkownika (admin)."""
+        """Dodawanie roli użytkownika (admin).
+
+        Jeden użytkownik może mieć tylko jedną rolę — duplikat loginu jest blokowany.
+        """
         print("\n─── Dodawanie: Rola użytkownika ───")
         print("(Wpisz 'q' aby anulować)\n")
 
-        login = safe_input("Login użytkownika: ")
-        if login is None: return False
+        while True:
+            login = safe_input("Login użytkownika: ")
+            if login is None: return False
+            if self.repos.permissions.exists(login):
+                existing_role = self.repos.permissions.get_role(login)
+                print(f"  ✗ Użytkownik '{login}' ma już przypisaną rolę: {existing_role}.")
+                print(f"    Użyj opcji 'Edytuj rolę' aby ją zmienić.")
+                continue
+            break
 
         role = safe_choice("Rola: ", sorted(USER_ROLES))
         if role is None: return False

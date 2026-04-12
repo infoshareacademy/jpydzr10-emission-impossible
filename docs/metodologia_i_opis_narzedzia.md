@@ -418,6 +418,8 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - System ról (admin / użytkownik) z kontrolą dostępu na poziomie spółki; admin może dodawać uprawnienia spółek i role użytkowników z poziomu menu
 - Walidacja spójności danych (czy firmy w danych emisyjnych istnieją w rejestrze firm)
 - Weryfikacja kompletności wskaźników i przeliczników
+- **Blokada duplikatów** — próba dodania istniejącej spółki, wskaźnika, przelicznika lub roli użytkownika jest blokowana natychmiast przy wpisywaniu pola (nie dopiero po zatwierdzeniu formularza)
+- **Walidacja inline pól spółki** — telefon, e-mail, KRS, REGON i NIP są weryfikowane formatowo przy każdym wpisaniu; błędna wartość wymusza ponowne wpisanie tego samego pola
 - Automatyczne kopie zapasowe przy każdej modyfikacji danych
 - **Rejestr zmian (audit log)** — automatyczne śledzenie każdej operacji INSERT/UPDATE/DELETE we wszystkich tabelach, z zapisem danych przed i po zmianie w formacie JSON, loginem użytkownika i datą zmiany
 - **Hurtowy import danych** — import rekordów emisyjnych z plików CSV lub Excel (.xlsx). Automatyczna walidacja Pydantic, nadawanie ID, raport błędów. Dostępny z menu Narzędzia
@@ -684,6 +686,31 @@ CodeCarbon zapisze szczegóły do pliku `emissions.csv` — ironicznie, kalkulat
 | Uwagi | Opcjonalne notatki — np. „umowa PPA z farmą wiatrową", „certyfikat GO nr 12345". |
 
 **Ważna uwaga o OZE:** Sam fakt, że dostawca „oferuje zieloną energię" nie wystarczy. Liczy się certyfikat Gwarancji Pochodzenia (GO) — formalny dokument potwierdzający, że konkretna ilość energii pochodzi ze źródła odnawialnego. Bez GO, nawet jeśli dostawca reklamuje się jako „zielony", energia powinna być raportowana jako nie-OZE.
+
+### Wskaźniki emisji — jak dodawać i aktualizować?
+
+Wskaźnik emisji (`tbl_factors.csv`) jest unikalny po kombinacji `(nazwa, kraj, rok)`. Oznacza to, że ten sam wskaźnik (np. „Energia elektryczna", Polska) może mieć różne wartości dla różnych lat — co pozwala śledzić zmianę wskaźnika KOBiZE rok do roku.
+
+| Pole | Opis | Przykład |
+| ---- | ---- | -------- |
+| Nazwa wskaźnika | Musi dokładnie odpowiadać nazwie paliwa lub typu energii | `Energia elektryczna nie OZE` |
+| Kraj | Kraj dla którego obowiązuje wskaźnik | `Polska` |
+| Rok | Rok obowiązywania (unikalność!) | `2025` |
+| Wartość | Liczba dziesiętna ≥ 0 | `0.709` |
+| Jednostka | Format: wynik/wejście | `tCO2e/MWh` |
+| Źródło | Publikacja (opcjonalne) | `KOBiZE 2025` |
+
+Przy wyszukiwaniu wskaźnika do obliczeń (`get_factor`) — jeśli nie podano roku, system automatycznie pobiera wskaźnik z **najnowszego dostępnego roku**.
+
+### Przeliczniki jednostek — jak dodawać?
+
+Przelicznik (`tbl_converters.csv`) jest unikalny po parze `(unit_from, unit_to)`. Przelicznik odwrotny jest wyliczany automatycznie — nie trzeba dodawać obu kierunków.
+
+| Pole | Opis | Przykład |
+| ---- | ---- | -------- |
+| Jednostka źródłowa | Jednostka przed przeliczeniem | `MWh` |
+| Jednostka docelowa | Jednostka po przeliczeniu | `GJ` |
+| Mnożnik | `unit_from × mnożnik = unit_to` | `3.6` |
 
 ### Pewność danych (data_quality) — jak oceniać jakość źródeł?
 

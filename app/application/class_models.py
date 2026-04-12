@@ -200,6 +200,7 @@ class EmissionFactor(BaseModel):
     id: int = Field(ge=0)
     factor_name: str = Field(min_length=1, max_length=200, description="Nazwa wskaźnika")
     country: str = Field(min_length=1, max_length=100, description="Kraj")
+    year: int = Field(ge=MIN_YEAR, le=MAX_YEAR, description="Rok obowiązywania wskaźnika")
     factor: Decimal = Field(ge=0, description="Wartość wskaźnika")
     unit_factor: str = Field(min_length=1, max_length=50, description="Jednostka")
     source: Optional[str] = Field(default=None, max_length=200, description="Źródło wskaźnika")

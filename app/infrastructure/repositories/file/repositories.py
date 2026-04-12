@@ -21,10 +21,16 @@ class CompanyRepository(CsvRepository[Company]):
             id_field="co_id",
         )
 
-    def get_by_name(self, name: str) -> Optional[Company]:
+    def exists_by_name(self, co_name: str) -> bool:
+        """Sprawdza czy spółka o podanej nazwie już istnieje."""
+        name_lower = co_name.strip().lower()
+        objects, _ = self.get_all()
+        return any(obj.co_name.lower() == name_lower for obj in objects)
+
+    def get_by_name(self, co_name: str) -> Optional[Company]:
         objects, _ = self.get_all()
         for obj in objects:
-            if obj.co_name.lower() == name.strip().lower():
+            if obj.co_name.lower() == co_name.strip().lower():
                 return obj
         return None
 
@@ -77,14 +83,40 @@ class FactorRepository(CsvRepository[EmissionFactor]):
             file_path=os.path.join(folder, "tbl_factors.csv"),
         )
 
-    def get_factor(self, name_part: str, country: Optional[str] = None) -> Optional[EmissionFactor]:
+    def get_factor(self, name_part: str, country: Optional[str] = None,
+                   year: Optional[int] = None) -> Optional[EmissionFactor]:
+        """Zwraca wskaźnik emisji pasujący do nazwy i kraju.
+
+        Jeśli year podany — filtruje po konkretnym roku.
+        Jeśli year pominięty — zwraca wskaźnik z najnowszego dostępnego roku.
+        """
         objects, _ = self.get_all()
         name_lower = name_part.strip().lower()
-        for obj in objects:
-            if name_lower in obj.factor_name.lower():
-                if country is None or obj.country.lower() == country.strip().lower():
-                    return obj
-        return None
+        matches = [
+            obj for obj in objects
+            if name_lower in obj.factor_name.lower()
+            and (country is None or obj.country.lower() == country.strip().lower())
+        ]
+        if not matches:
+            return None
+        if year is not None:
+            year_matches = [obj for obj in matches if obj.year == year]
+            if year_matches:
+                return year_matches[0]
+            # Fallback na najnowszy gdy brak wskaźnika dla danego roku
+        return max(matches, key=lambda obj: obj.year)
+
+    def exists(self, factor_name: str, country: str, year: int) -> bool:
+        """Sprawdza czy wskaźnik (factor_name, country, year) już istnieje."""
+        name_lower = factor_name.strip().lower()
+        country_lower = country.strip().lower()
+        objects, _ = self.get_all()
+        return any(
+            obj.factor_name.lower() == name_lower
+            and obj.country.lower() == country_lower
+            and obj.year == year
+            for obj in objects
+        )
 
 class AuthorisationRepository(CsvRepository[UserAuthorization]):
     def __init__(self, folder: str = FOLDER_PATH):
@@ -105,6 +137,14 @@ class ConverterRepository(CsvRepository[UnitConverter]):
         super().__init__(
             model_class=UnitConverter,
             file_path=os.path.join(folder, "tbl_converters.csv"),
+        )
+
+    def exists(self, unit_from: str, unit_to: str) -> bool:
+        """Sprawdza czy przelicznik (unit_from → unit_to) już istnieje."""
+        objects, _ = self.get_all()
+        return any(
+            obj.unit_from == unit_from.strip() and obj.unit_to == unit_to.strip()
+            for obj in objects
         )
 
     def convert(self, amount: Decimal, unit_from: str, unit_to: str) -> Decimal:
@@ -165,6 +205,10 @@ class PermissionRepository(CsvRepository[UserPermission]):
             model_class=UserPermission,
             file_path=os.path.join(folder, "tbl_permissions.csv"),
         )
+
+    def exists(self, login: str) -> bool:
+        """Sprawdza czy użytkownik ma już przypisaną rolę."""
+        return bool(self.get_filtered(login=login))
 
     def get_role(self, login: str) -> str:
         """Zwraca rolę użytkownika. Domyślnie 'użytkownik' jeśli brak wpisu."""
