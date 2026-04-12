@@ -9,3 +9,4 @@ co_id,co_name,co_country,co_city,co_street,co_zip,co_tel,co_mail,co_krs,co_regon
 7,EcoPartner Handel,Polska,Szczecin,Handlowa 7,70-001,+48 91 800 1000,handel@ecopartner.pl,0000889900,890123456,8518901234,EcoPartner SA
 8,NovaChem Industries,Polska,Warszawa,Chemiczna 1,09-400,+48 24 900 2000,info@novachem.pl,0000990011,901234567,7749012345,NovaChem SA
 9,NovaChem Recycling,Polska,Bydgoszcz,Ekologiczna 30,85-001,+48 52 100 3000,recycling@novachem.pl,0000001122,012345678,5540123456,NovaChem SA
+10,GreenTech Informatyka,Polska,Warszawa,Informatyczna 23,09-120,2330211,informatyka@greentech.pl,2222221133,111122223,1123456612,GreenTech

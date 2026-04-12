@@ -32,6 +32,9 @@ SCOPE1_REPOS = {
 
 SCOPE2_REPOS = {
     "1": ("energy_consumption", "Zużycie energii"),
+    "2": ("energy_purchased", "Zakupiona energia"),
+    "3": ("energy_produced", "Wyprodukowana energia"),
+    "4": ("energy_sold", "Sprzedana energia"),
 }
 class C:
     RESET   = "\033[0m"
@@ -264,8 +267,9 @@ def menu_admin_authorisations():
         status_bar()
         print_menu("UPRAWNIENIA SPÓŁEK", [
             ("1", "Wyświetl uprawnienia"),
-            ("2", "Edytuj uprawnienie"),
-            ("3", "Usuń uprawnienie"),
+            ("2", "Dodaj uprawnienie"),
+            ("3", "Edytuj uprawnienie"),
+            ("4", "Usuń uprawnienie"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🔑")
@@ -274,10 +278,13 @@ def menu_admin_authorisations():
             uc.display_table("authorisations")
             wait()
         elif option == '2':
+            uc.add_authorisation_interactive()
+            wait()
+        elif option == '3':
             uc.display_table("authorisations")
             uc.edit_record_interactive("authorisations")
             wait()
-        elif option == '3':
+        elif option == '4':
             uc.display_table("authorisations")
             uc.delete_record_interactive("authorisations")
             wait()
@@ -294,7 +301,8 @@ def menu_admin_permissions():
         status_bar()
         print_menu("ROLE UŻYTKOWNIKÓW", [
             ("1", "Wyświetl role"),
-            ("2", "Edytuj rolę"),
+            ("2", "Dodaj rolę"),
+            ("3", "Edytuj rolę"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="👑")
@@ -303,6 +311,9 @@ def menu_admin_permissions():
             uc.display_table("permissions")
             wait()
         elif option == '2':
+            uc.add_permission_interactive()
+            wait()
+        elif option == '3':
             uc.display_table("permissions")
             uc.edit_record_interactive("permissions")
             wait()
@@ -545,8 +556,9 @@ def menu_companies():
         status_bar()
         print_menu("PRZEDSIĘBIORSTWO", [
             ("1", "Wyświetl firmy"),
-            ("2", "Edytuj firmę"),
-            ("3", "Usuń firmę"),
+            ("2", "Dodaj firmę"),
+            ("3", "Edytuj firmę"),
+            ("4", "Usuń firmę"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🏢")
@@ -557,6 +569,14 @@ def menu_companies():
             wait()
         elif option == '2':
             if not require_login(): continue
+            if not is_admin():
+                error_msg("Dodawanie spółek wymaga uprawnień administratora.")
+                wait()
+                continue
+            uc.add_company_interactive()
+            wait()
+        elif option == '3':
+            if not require_login(): continue
             save_companies = get_save_companies()
             if not save_companies:
                 error_msg("Brak uprawnień do zapisu.")
@@ -565,7 +585,7 @@ def menu_companies():
             uc.display_companies(allowed_companies=save_companies)
             uc.edit_record_interactive("companies", allowed_companies=save_companies)
             wait()
-        elif option == '3':
+        elif option == '4':
             if not require_login(): continue
             save_companies = get_save_companies()
             if not save_companies:
@@ -586,7 +606,8 @@ def menu_factors():
         status_bar()
         print_menu("WSKAŹNIKI EMISJI", [
             ("1", "Wyświetl wskaźniki"),
-            ("2", "Edytuj wskaźnik"),
+            ("2", "Dodaj wskaźnik"),
+            ("3", "Edytuj wskaźnik"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="📈")
@@ -597,8 +618,16 @@ def menu_factors():
             wait()
         elif option == '2':
             if not require_login(): continue
-            if not get_save_companies():
-                error_msg("Brak uprawnień do edycji.")
+            if not is_admin():
+                error_msg("Dodawanie wskaźników wymaga uprawnień administratora.")
+                wait()
+                continue
+            uc.add_factor_interactive()
+            wait()
+        elif option == '3':
+            if not require_login(): continue
+            if not is_admin():
+                error_msg("Edycja wskaźników wymaga uprawnień administratora.")
                 wait()
                 continue
             uc.display_table("factors")
@@ -615,7 +644,8 @@ def menu_converters():
         status_bar()
         print_menu("PRZELICZNIKI", [
             ("1", "Wyświetl przeliczniki"),
-            ("2", "Edytuj przelicznik"),
+            ("2", "Dodaj przelicznik"),
+            ("3", "Edytuj przelicznik"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="🔄")
@@ -626,8 +656,16 @@ def menu_converters():
             wait()
         elif option == '2':
             if not require_login(): continue
-            if not get_save_companies():
-                error_msg("Brak uprawnień do edycji.")
+            if not is_admin():
+                error_msg("Dodawanie przeliczników wymaga uprawnień administratora.")
+                wait()
+                continue
+            uc.add_converter_interactive()
+            wait()
+        elif option == '3':
+            if not require_login(): continue
+            if not is_admin():
+                error_msg("Edycja przeliczników wymaga uprawnień administratora.")
                 wait()
                 continue
             uc.display_table("converters")
@@ -691,6 +729,9 @@ def menu_scope2_data():
         status_bar()
         print_menu("SCOPE 2 — ENERGIA POŚREDNIA", [
             ("1", "⚡  Zużycie energii"),
+            ("2", "🛒  Zakupiona energia"),
+            ("3", "☀️   Wyprodukowana energia"),
+            ("4", "💸  Sprzedana energia"),
             ("-", ""),
             ("0", "Powrót"),
         ], icon="⚡", width=46)
@@ -742,6 +783,12 @@ def menu_emission_crud(repo_name: str, label: str):
                 uc.add_fugitive_interactive(allowed_companies=save_companies)
             elif repo_name == "energy_consumption":
                 uc.add_energy_consumption_interactive(allowed_companies=save_companies)
+            elif repo_name == "energy_purchased":
+                uc.add_energy_purchased_interactive(allowed_companies=save_companies)
+            elif repo_name == "energy_produced":
+                uc.add_energy_produced_interactive(allowed_companies=save_companies)
+            elif repo_name == "energy_sold":
+                uc.add_energy_sold_interactive(allowed_companies=save_companies)
             wait()
         elif option == '3':
             if not require_login(): continue

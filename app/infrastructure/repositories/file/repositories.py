@@ -5,8 +5,8 @@ from typing import Optional
 from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
     FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
-    EnergyConsumption, EnergyPurchased, UserPermission, ChangeLog,
-    ReductionTarget, EmailLog,
+    EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold,
+    UserPermission, ChangeLog, ReductionTarget, EmailLog,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -141,6 +141,23 @@ class EnergyPurchasedRepository(CsvRepository[EnergyPurchased]):
             file_path=os.path.join(folder, "tbl_e_purc.csv"),
         )
 
+
+class EnergyProducedRepository(CsvRepository[EnergyProduced]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergyProduced,
+            file_path=os.path.join(folder, "tbl_e_prod.csv"),
+        )
+
+
+class EnergySoldRepository(CsvRepository[EnergySold]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergySold,
+            file_path=os.path.join(folder, "tbl_e_sold.csv"),
+        )
+
+
 class PermissionRepository(CsvRepository[UserPermission]):
     """Repozytorium ról użytkowników (admin / użytkownik)."""
     def __init__(self, folder: str = FOLDER_PATH):
@@ -253,6 +270,8 @@ class RepositoryFactory:
         # Nowe repozytoria dla energii
         self.energy_consumption = EnergyConsumptionRepository(folder)
         self.energy_purchased = EnergyPurchasedRepository(folder)
+        self.energy_produced = EnergyProducedRepository(folder)
+        self.energy_sold = EnergySoldRepository(folder)
         self.authorisations = AuthorisationRepository(folder)
         self.permissions = PermissionRepository(folder)
         self.reduction_targets = ReductionTargetRepository(folder)

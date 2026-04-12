@@ -12,3 +12,4 @@ id,login,company,save,read
 11,audytor1,GreenTech Polska,FALSE,TRUE
 12,audytor1,EcoPartner Sp. z o.o.,FALSE,TRUE
 13,audytor1,NovaChem Industries,FALSE,TRUE
+14,admin,GreenTech Informatyka,TRUE,TRUE

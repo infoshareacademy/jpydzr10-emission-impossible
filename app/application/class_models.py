@@ -357,6 +357,28 @@ class EnergyPurchased(ActivityRecord):
             return None
         return v
 
+# Model dla tbl_e_prod.csv — wyprodukowana energia (Scope 2)
+class EnergyProduced(ActivityRecord):
+    """Model dla tbl_e_prod.csv — energia wyprodukowana przez spółkę (np. OZE)"""
+    installation: str = Field(default="", max_length=200, description="Nazwa instalacji")
+    energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
+    factor: Decimal = Field(default=Decimal("0"), ge=0, description="Wskaźnik emisji")
+
+    @field_validator("factor", mode="before")
+    @classmethod
+    def parse_factor(cls, v):
+        if v is None or (isinstance(v, str) and v.strip() == ""):
+            return Decimal("0")
+        return v
+
+
+# Model dla tbl_e_sold.csv — sprzedana energia (Scope 2)
+class EnergySold(ActivityRecord):
+    """Model dla tbl_e_sold.csv — energia sprzedana przez spółkę"""
+    energy_type: str = Field(min_length=1, max_length=100, description="Typ energii")
+    customer: str = Field(default="", max_length=200, description="Odbiorca energii")
+
+
 REDUCTION_STRATEGIES = {"fuel_switch", "oze_switch", "efficiency", "custom"}
 
 

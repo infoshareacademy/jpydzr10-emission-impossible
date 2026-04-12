@@ -1,6 +1,7 @@
 import sys
+import re
 from decimal import Decimal, InvalidOperation
-from typing import Optional
+from typing import Optional, Callable
 
 def safe_input(prompt: str, allow_empty: bool = False, max_length: int = 200) -> Optional[str]:
     while True:
@@ -128,3 +129,64 @@ def safe_year_range(prompt: str, min_val: int = 1990, max_val: int = 2100,
 def confirm(prompt: str = "Czy na pewno? (tak/nie): ") -> bool:
     result = safe_bool(prompt)
     return result is True
+
+
+def safe_input_validated(
+    prompt: str,
+    validator: Callable[[str], Optional[str]],
+    allow_empty: bool = False,
+) -> Optional[str]:
+    """Pobiera dane od użytkownika i waliduje je funkcją validator.
+
+    validator(value) zwraca:
+    - None      → wartość poprawna, akceptuj
+    - str       → komunikat błędu, powtórz pytanie
+
+    Wpisanie 'q' anuluje i zwraca None.
+    """
+    while True:
+        value = safe_input(prompt, allow_empty=allow_empty)
+        if value is None:
+            return None
+        error = validator(value)
+        if error is None:
+            return value
+        print(f"  ✗ {error}")
+
+
+# ---------------------------------------------------------------------------
+# Gotowe validatory dla typowych pól spółki
+# ---------------------------------------------------------------------------
+
+_EMAIL_RE = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
+_PHONE_RE = re.compile(r"^\+?[\d\s\-\(\)]{7,20}$")
+
+
+def validate_email(v: str) -> Optional[str]:
+    """Zwraca None jeśli OK, komunikat błędu jeśli niepoprawny."""
+    return None if _EMAIL_RE.match(v.strip()) else f"Nieprawidłowy e-mail: '{v}'. Przykład: firma@domena.pl"
+
+
+def validate_phone(v: str) -> Optional[str]:
+    return None if _PHONE_RE.match(v.strip()) else f"Nieprawidłowy telefon: '{v}'. Przykład: +48 22 123 45 67"
+
+
+def validate_nip(v: str) -> Optional[str]:
+    digits = re.sub(r"[\s\-]", "", v.strip())
+    if not digits.isdigit() or len(digits) != 10:
+        return f"NIP musi mieć dokładnie 10 cyfr (podano: '{v}')"
+    return None
+
+
+def validate_regon(v: str) -> Optional[str]:
+    digits = re.sub(r"[\s\-]", "", v.strip())
+    if not digits.isdigit() or len(digits) not in (9, 14):
+        return f"REGON musi mieć 9 lub 14 cyfr (podano: '{v}')"
+    return None
+
+
+def validate_krs(v: str) -> Optional[str]:
+    digits = re.sub(r"[\s\-]", "", v.strip())
+    if not digits.isdigit() or len(digits) != 10:
+        return f"KRS musi mieć dokładnie 10 cyfr (podano: '{v}')"
+    return None

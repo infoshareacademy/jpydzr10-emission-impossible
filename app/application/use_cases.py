@@ -13,11 +13,17 @@ from dotenv import load_dotenv
 from app.infrastructure.repositories.file.repositories import RepositoryFactory
 from app.application.class_models import (
     StationaryCombustion, MobileCombustion, FugitiveEmission, ProcessEmission,
-    EnergyConsumption, ReductionTarget, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS,
+    EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold,
+    Company, EmissionFactor, UnitConverter, UserAuthorization, UserPermission,
+    ReductionTarget, FUEL_TYPES, MASS_UNITS, VOLUME_UNITS,
     ENERGY_UNITS, ENERGY_SOURCE_TYPES, ENERGY_TYPES, MAX_YEAR, MIN_YEAR,
-    DATA_QUALITY_LEVELS, REDUCTION_STRATEGIES,
+    DATA_QUALITY_LEVELS, REDUCTION_STRATEGIES, USER_ROLES,
 )
-from app.core.validators.input_validators import safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm
+from app.core.validators.input_validators import (
+    safe_input, safe_int, safe_decimal, safe_choice, safe_bool, confirm,
+    safe_input_validated, validate_email, validate_phone,
+    validate_nip, validate_regon, validate_krs,
+)
 
 load_dotenv()
 
@@ -465,6 +471,363 @@ class EmissionUseCases:
             amount=amount, unit=unit, source=source, data_quality=data_quality,
         )
         ok, msg = self.repos.energy_consumption.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_energy_purchased_interactive(self, allowed_companies: Optional[list[str]] = None) -> bool:
+        """Dodawanie zakupionej energii (Scope 2) — pola: energy_type, amount, unit, trader, factor."""
+        print("\n─── Dodawanie: Zakupiona energia (Scope 2) ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        year = safe_int("Rok: ", MIN_YEAR, MAX_YEAR)
+        if year is None: return False
+
+        if allowed_companies:
+            company = self._choose_company_from_list(allowed_companies)
+        else:
+            company = safe_input("Firma: ")
+        if company is None: return False
+
+        energy_type = safe_choice("Typ energii: ", sorted(ENERGY_TYPES))
+        if energy_type is None: return False
+
+        amount = safe_decimal("Ilość: ", min_val=Decimal("0"))
+        if amount is None: return False
+
+        unit = safe_choice("Jednostka: ", sorted(ENERGY_UNITS))
+        if unit is None: return False
+
+        trader = safe_input("Dostawca energii: ", allow_empty=True) or ""
+        source = safe_input("Źródło danych (np. faktura): ", allow_empty=True) or ""
+
+        dq_raw = safe_input(
+            "Pewność danych (measured/calculated/estimated, Enter = pomiń): ",
+            allow_empty=True,
+        )
+        data_quality = dq_raw.strip().lower() if dq_raw else None
+        if data_quality and data_quality not in DATA_QUALITY_LEVELS:
+            print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
+            data_quality = None
+
+        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type)
+
+        print(f"\n  Rok: {year} | Firma: {company}")
+        print(f"  Typ: {energy_type} | {amount} {unit} | Dostawca: {trader or '—'}")
+        print(f"  Emisja (obliczona z wskaźnika): ~{calc_emission:.3f} tCO2e")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = EnergyPurchased(
+            id=self.repos.energy_purchased.next_id(), year=year, company=company,
+            energy_type=energy_type, amount=amount, unit=unit,
+            trader=trader, factor=Decimal("0"), source=source, data_quality=data_quality,
+        )
+        ok, msg = self.repos.energy_purchased.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_energy_produced_interactive(self, allowed_companies: Optional[list[str]] = None) -> bool:
+        """Dodawanie wyprodukowanej energii (Scope 2) — pola: installation, energy_type, amount, unit."""
+        print("\n─── Dodawanie: Wyprodukowana energia (Scope 2) ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        year = safe_int("Rok: ", MIN_YEAR, MAX_YEAR)
+        if year is None: return False
+
+        if allowed_companies:
+            company = self._choose_company_from_list(allowed_companies)
+        else:
+            company = safe_input("Firma: ")
+        if company is None: return False
+
+        installation = safe_input("Nazwa instalacji: ", allow_empty=True) or ""
+
+        energy_type = safe_choice("Typ energii: ", sorted(ENERGY_TYPES))
+        if energy_type is None: return False
+
+        amount = safe_decimal("Ilość: ", min_val=Decimal("0"))
+        if amount is None: return False
+
+        unit = safe_choice("Jednostka: ", sorted(ENERGY_UNITS))
+        if unit is None: return False
+
+        source = safe_input("Źródło danych (np. odczyt licznika): ", allow_empty=True) or ""
+
+        dq_raw = safe_input(
+            "Pewność danych (measured/calculated/estimated, Enter = pomiń): ",
+            allow_empty=True,
+        )
+        data_quality = dq_raw.strip().lower() if dq_raw else None
+        if data_quality and data_quality not in DATA_QUALITY_LEVELS:
+            print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
+            data_quality = None
+
+        print(f"\n  Rok: {year} | Firma: {company}")
+        print(f"  Instalacja: {installation or '—'} | Typ: {energy_type} | {amount} {unit}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = EnergyProduced(
+            id=self.repos.energy_produced.next_id(), year=year, company=company,
+            installation=installation, energy_type=energy_type,
+            amount=amount, unit=unit, factor=Decimal("0"), source=source, data_quality=data_quality,
+        )
+        ok, msg = self.repos.energy_produced.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_energy_sold_interactive(self, allowed_companies: Optional[list[str]] = None) -> bool:
+        """Dodawanie sprzedanej energii (Scope 2) — pola: energy_type, amount, unit, customer."""
+        print("\n─── Dodawanie: Sprzedana energia (Scope 2) ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        year = safe_int("Rok: ", MIN_YEAR, MAX_YEAR)
+        if year is None: return False
+
+        if allowed_companies:
+            company = self._choose_company_from_list(allowed_companies)
+        else:
+            company = safe_input("Firma: ")
+        if company is None: return False
+
+        energy_type = safe_choice("Typ energii: ", sorted(ENERGY_TYPES))
+        if energy_type is None: return False
+
+        amount = safe_decimal("Ilość: ", min_val=Decimal("0"))
+        if amount is None: return False
+
+        unit = safe_choice("Jednostka: ", sorted(ENERGY_UNITS))
+        if unit is None: return False
+
+        customer = safe_input("Odbiorca energii: ", allow_empty=True) or ""
+        source = safe_input("Źródło danych (np. umowa PPA): ", allow_empty=True) or ""
+
+        dq_raw = safe_input(
+            "Pewność danych (measured/calculated/estimated, Enter = pomiń): ",
+            allow_empty=True,
+        )
+        data_quality = dq_raw.strip().lower() if dq_raw else None
+        if data_quality and data_quality not in DATA_QUALITY_LEVELS:
+            print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
+            data_quality = None
+
+        print(f"\n  Rok: {year} | Firma: {company}")
+        print(f"  Typ: {energy_type} | {amount} {unit} | Odbiorca: {customer or '—'}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = EnergySold(
+            id=self.repos.energy_sold.next_id(), year=year, company=company,
+            energy_type=energy_type, amount=amount, unit=unit,
+            customer=customer, source=source, data_quality=data_quality,
+        )
+        ok, msg = self.repos.energy_sold.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_company_interactive(self) -> bool:
+        """Dodawanie nowej spółki do tbl_companies.csv.
+
+        Każde pole jest walidowane na bieżąco — błędna wartość powoduje
+        ponowne pytanie o to samo pole (nie dopiero na etapie zapisu).
+        """
+        print("\n─── Dodawanie: Spółka ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        co_name = safe_input("Nazwa spółki: ")
+        if co_name is None: return False
+
+        co_country = safe_input("Kraj: ")
+        if co_country is None: return False
+
+        co_city = safe_input("Miasto: ")
+        if co_city is None: return False
+
+        co_street = safe_input("Ulica i numer: ")
+        if co_street is None: return False
+
+        co_zip = safe_input("Kod pocztowy: ")
+        if co_zip is None: return False
+
+        co_tel = safe_input_validated("Telefon: ", validate_phone)
+        if co_tel is None: return False
+
+        co_mail = safe_input_validated("E-mail kontaktowy: ", validate_email)
+        if co_mail is None: return False
+
+        co_krs = safe_input_validated("KRS (10 cyfr): ", validate_krs)
+        if co_krs is None: return False
+
+        co_regon = safe_input_validated("REGON (9 lub 14 cyfr): ", validate_regon)
+        if co_regon is None: return False
+
+        co_nip = safe_input_validated("NIP (10 cyfr): ", validate_nip)
+        if co_nip is None: return False
+
+        cg_name = safe_input("Grupa kapitałowa: ")
+        if cg_name is None: return False
+
+        print(f"\n  Spółka: {co_name} | {co_city}, {co_country}")
+        print(f"  NIP: {co_nip} | REGON: {co_regon} | KRS: {co_krs}")
+        print(f"  Grupa: {cg_name}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = Company(
+            co_id=self.repos.companies.next_id(),
+            co_name=co_name, co_country=co_country, co_city=co_city,
+            co_street=co_street, co_zip=co_zip, co_tel=co_tel,
+            co_mail=co_mail, co_krs=co_krs, co_regon=co_regon,
+            co_nip=co_nip, cg_name=cg_name,
+        )
+        ok, msg = self.repos.companies.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_factor_interactive(self) -> bool:
+        """Dodawanie nowego wskaźnika emisji do tbl_factors.csv."""
+        print("\n─── Dodawanie: Wskaźnik emisji ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        factor_name = safe_input("Nazwa wskaźnika: ")
+        if factor_name is None: return False
+
+        country = safe_input("Kraj (np. Polska): ")
+        if country is None: return False
+
+        factor = safe_decimal("Wartość wskaźnika: ", min_val=Decimal("0"))
+        if factor is None: return False
+
+        unit_factor = safe_input("Jednostka wskaźnika (np. tCO2e/MWh): ")
+        if unit_factor is None: return False
+
+        source = safe_input("Źródło (np. KOBiZE 2024, Enter = pomiń): ", allow_empty=True) or None
+
+        print(f"\n  Wskaźnik: {factor_name} | {country}")
+        print(f"  Wartość: {factor} {unit_factor} | Źródło: {source or '—'}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = EmissionFactor(
+            id=self.repos.factors.next_id(),
+            factor_name=factor_name, country=country,
+            factor=factor, unit_factor=unit_factor, source=source,
+        )
+        ok, msg = self.repos.factors.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_converter_interactive(self) -> bool:
+        """Dodawanie nowego przelicznika jednostek do tbl_converters.csv."""
+        print("\n─── Dodawanie: Przelicznik jednostek ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        unit_from = safe_input("Jednostka źródłowa (np. MWh): ")
+        if unit_from is None: return False
+
+        unit_to = safe_input("Jednostka docelowa (np. GJ): ")
+        if unit_to is None: return False
+
+        factor = safe_decimal("Mnożnik (unit_from × mnożnik = unit_to): ", min_val=Decimal("0.000001"))
+        if factor is None: return False
+
+        print(f"\n  Przelicznik: 1 {unit_from} = {factor} {unit_to}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = UnitConverter(
+            id=self.repos.converters.next_id(),
+            unit_from=unit_from, unit_to=unit_to, factor=factor,
+        )
+        ok, msg = self.repos.converters.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_authorisation_interactive(self) -> bool:
+        """Dodawanie uprawnienia do spółki dla użytkownika (admin)."""
+        print("\n─── Dodawanie: Uprawnienie spółki ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        login = safe_input("Login użytkownika: ")
+        if login is None: return False
+
+        # Wyświetl dostępne spółki
+        companies, _ = self.repos.companies.get_all()
+        if companies:
+            print(f"\n  Dostępne spółki:")
+            for i, c in enumerate(companies, 1):
+                print(f"    {i} │ {c.co_name}")
+            raw = safe_input("Wybierz numer spółki lub wpisz nazwę: ")
+            if raw is None: return False
+            try:
+                idx = int(raw)
+                if 1 <= idx <= len(companies):
+                    company = companies[idx - 1].co_name
+                else:
+                    company = raw
+            except ValueError:
+                company = raw
+        else:
+            company = safe_input("Nazwa spółki: ")
+            if company is None: return False
+
+        save_raw = safe_input("Uprawnienie zapisu (tak/nie): ", allow_empty=False)
+        if save_raw is None: return False
+        save = save_raw.strip().lower() in ("tak", "t", "yes", "1", "true")
+
+        read_raw = safe_input("Uprawnienie odczytu (tak/nie): ", allow_empty=False)
+        if read_raw is None: return False
+        read = read_raw.strip().lower() in ("tak", "t", "yes", "1", "true")
+
+        print(f"\n  Login: {login} | Spółka: {company}")
+        print(f"  Zapis: {'TAK' if save else 'NIE'} | Odczyt: {'TAK' if read else 'NIE'}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = UserAuthorization(
+            id=self.repos.authorisations.next_id(),
+            login=login, company=company, save=save, read=read,
+        )
+        ok, msg = self.repos.authorisations.add(record)
+        print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
+        return ok
+
+    def add_permission_interactive(self) -> bool:
+        """Dodawanie roli użytkownika (admin)."""
+        print("\n─── Dodawanie: Rola użytkownika ───")
+        print("(Wpisz 'q' aby anulować)\n")
+
+        login = safe_input("Login użytkownika: ")
+        if login is None: return False
+
+        role = safe_choice("Rola: ", sorted(USER_ROLES))
+        if role is None: return False
+
+        print(f"\n  Login: {login} | Rola: {role}")
+
+        if not confirm("\nZapisać? "):
+            print("Anulowano.")
+            return False
+
+        record = UserPermission(
+            id=self.repos.permissions.next_id(),
+            login=login, role=role,
+        )
+        ok, msg = self.repos.permissions.add(record)
         print(f"{'Zapisano!' if ok else f'Błąd: {msg}'}")
         return ok
 

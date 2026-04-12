@@ -219,37 +219,46 @@ Stosuje średni wskaźnik emisji dla sieci energetycznej w danym kraju. W Polsce
 **2. Metoda market-based (oparta na rynku)**
 Uwzględnia konkretne źródło energii zakupione przez firmę — np. zielone certyfikaty (Gwarancje Pochodzenia), umowy PPA, własną fotowoltaikę. Jeśli firma kupiła energię z OZE potwierdzoną certyfikatem GO, jej emisja z tego źródła wynosi 0.
 
-Narzędzie Emission Impossible obsługuje obie metody — użytkownik wybiera źródło energii (Zakupiona / Wyprodukowana) i typ energii (OZE / nie OZE).
+Narzędzie Emission Impossible obsługuje obie metody — użytkownik wybiera typ energii (OZE / nie OZE) i rodzaj przepływu energii w osobnych tabelach.
 
-### Kategorie Zakresu 2
+### Kategorie Zakresu 2 w narzędziu
 
-#### 4.1 Energia elektryczna
+Zakres 2 jest podzielony na **cztery osobne tabele** odpowiadające różnym przepływom energii:
 
-**Źródła danych:**
-- Faktury od dostawcy energii (MWh, kWh)
-- Umowy z dostawcą (czy energia jest z OZE?)
-- Certyfikaty Gwarancji Pochodzenia (GO)
-- Odczyty z własnej fotowoltaiki
+#### 4.0 Zużycie energii (`tbl_e_cons.csv`)
+
+Ogólna tabela zużycia energii — dla przypadków gdy nie wyodrębniamy zakupu, produkcji ani sprzedaży. Zawiera pole `energy_source` (Zakupiona / Wyprodukowana / Sprzedana / Zużyta).
+
+#### 4.1 Zakupiona energia (`tbl_e_purc.csv`)
+
+Energia zakupiona od zewnętrznego dostawcy. Dodatkowe pola: `trader` (nazwa dostawcy), `factor` (wskaźnik dostawcy). Źródła danych: faktury, umowy z dostawcą.
 
 **Wskaźniki dla Polski (KOBiZE 2024):**
 - Energia z sieci (nie OZE): **0,709 tCO₂e/MWh**
 - Energia z OZE (z certyfikatem GO): **0,000 tCO₂e/MWh**
 
-#### 4.2 Energia cieplna (ciepło sieciowe)
+#### 4.2 Wyprodukowana energia (`tbl_e_prod.csv`)
 
-**Źródła danych:**
-- Faktury od dostawcy ciepła (GJ)
-- Odczyty liczników ciepła
+Energia wytworzona przez własne instalacje (np. farma fotowoltaiczna, turbina wiatrowa, kogeneracja). Dodatkowe pole: `installation` (nazwa instalacji). Źródła: odczyty liczników, raporty OSD.
 
-**Wskaźnik:** 0,292 tCO₂e/GJ (KOBiZE 2024)
+#### 4.3 Sprzedana energia (`tbl_e_sold.csv`)
 
-#### 4.3 Para technologiczna
+Energia odsprzedana innym podmiotom (np. spółkom w grupie na podstawie umowy PPA). Dodatkowe pole: `customer` (odbiorca). Pozwala śledzić przepływy energii wewnątrz grupy kapitałowej.
 
-Stosowana w procesach przemysłowych. Wskaźnik: 0,292 tCO₂e/GJ.
+#### 4.4 Typy energii
 
-#### 4.4 Chłód
+Dla wszystkich czterech tabel obowiązują te same typy energii:
 
-Zakupiony chłód (np. z sieci chłodniczej). Wskaźnik: 0,180 tCO₂e/GJ.
+| Typ energii | Wskaźnik emisji |
+|-------------|-----------------|
+| Energia elektryczna nie OZE | 0,709 tCO₂e/MWh (KOBiZE 2024) |
+| Energia elektryczna z OZE | 0,000 tCO₂e/MWh |
+| Ciepło nie OZE | 0,292 tCO₂e/GJ (KOBiZE 2024) |
+| Ciepło z OZE | 0,000 tCO₂e/GJ |
+| Para Techniczna nie OZE | 0,292 tCO₂e/GJ |
+| Para Techniczna z OZE | 0,000 tCO₂e/GJ |
+| Chłód nie OZE | 0,180 tCO₂e/GJ |
+| Chłód z OZE | 0,000 tCO₂e/GJ |
 
 ### Przykładowe dane w narzędziu:
 
@@ -259,8 +268,10 @@ Zakupiony chłód (np. z sieci chłodniczej). Wskaźnik: 0,180 tCO₂e/GJ.
 | Firma | Nazwa spółki | GreenTech Polska |
 | Ilość | Zużyta ilość | 450 |
 | Jednostka | MWh, kWh, GJ, MJ | MWh |
-| Źródło energii | Zakupiona / Wyprodukowana / Sprzedana | Zakupiona |
 | Typ energii | Rodzaj energii | Energia elektryczna nie OZE |
+| Dostawca (zakupiona) | Nazwa dostawcy | PGE Obrót S.A. |
+| Instalacja (wyprodukowana) | Nazwa instalacji | Farma PV Wrocław |
+| Odbiorca (sprzedana) | Nazwa odbiorcy | GreenTech Polska |
 | Źródło danych | Skąd informacja | faktura |
 
 ---
@@ -381,7 +392,8 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 
 **Zbieranie danych:**
 - Interaktywne dodawanie rekordów emisyjnych z walidacją danych wejściowych
-- Obsługa wszystkich kategorii Zakresu 1 (spalanie stacjonarne, mobilne, emisje procesowe, fugitive) i Zakresu 2 (energia elektryczna, ciepło, para, chłód)
+- Obsługa wszystkich kategorii Zakresu 1 (spalanie stacjonarne, mobilne, emisje procesowe, fugitive) i Zakresu 2 (zużycie, zakupiona, wyprodukowana i sprzedana energia)
+- Interaktywne dodawanie nowych spółek, wskaźników emisji i przeliczników jednostek (tylko admin)
 - Automatyczna walidacja typów paliw, jednostek, zakresów dat
 - Podgląd szacunkowej emisji już przy wprowadzaniu danych
 - **Emisja deklarowana** — użytkownik może podać własną wartość emisji [tCO2eq] z zewnętrznego raportu (np. KOBiZE, DEFRA, pomiar). Jeśli podana — ma priorytet nad obliczeniem automatycznym. Jeśli odchylenie od wskaźnika > ±50% — narzędzie wyświetla ostrzeżenie i prosi o potwierdzenie poprawności danych
@@ -403,7 +415,7 @@ W kontekście raportowania ESG i audytów emisyjnych pełna historia zmian danyc
 - **Eksport do PDF** — profesjonalny raport emisji w formacie PDF z podsumowaniem, tabelami i metodyką. Dostępny z menu raportów
 
 **Zarządzanie danymi:**
-- System ról (admin / użytkownik) z kontrolą dostępu na poziomie spółki
+- System ról (admin / użytkownik) z kontrolą dostępu na poziomie spółki; admin może dodawać uprawnienia spółek i role użytkowników z poziomu menu
 - Walidacja spójności danych (czy firmy w danych emisyjnych istnieją w rejestrze firm)
 - Weryfikacja kompletności wskaźników i przeliczników
 - Automatyczne kopie zapasowe przy każdej modyfikacji danych
