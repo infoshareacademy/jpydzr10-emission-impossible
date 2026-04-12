@@ -700,7 +700,7 @@ Wskaźnik emisji (`tbl_factors.csv`) jest unikalny po kombinacji `(nazwa, kraj, 
 | Jednostka | Format: wynik/wejście | `tCO2e/MWh` |
 | Źródło | Publikacja (opcjonalne) | `KOBiZE 2025` |
 
-Przy wyszukiwaniu wskaźnika do obliczeń (`get_factor`) — jeśli nie podano roku, system automatycznie pobiera wskaźnik z **najnowszego dostępnego roku**.
+Przy wyszukiwaniu wskaźnika do obliczeń (`get_factor`) — system dobiera wskaźnik **dla roku rekordu emisyjnego**. Jeśli rekord dotyczy roku 2024, szukany jest wskaźnik z kolumną `rok=2024`. Jeśli brak wskaźnika dla tego roku — fallback na najnowszy dostępny rok. Ta logika obowiązuje we wszystkich ścieżkach obliczeniowych: Scope 1, Scope 2, podgląd emisji przy dodawaniu rekordu, walidacja plików, generowanie podsumowań i wysyłka e-mail.
 
 ### Przeliczniki jednostek — jak dodawać?
 

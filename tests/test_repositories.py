@@ -12,7 +12,8 @@ class TestFactorRepository:
     def test_find_by_exact_name(self, repos):
         f = repos.factors.get_factor("diesel", "Polska")
         assert f is not None
-        assert f.factor == Decimal("0.00268")
+        # bez roku → zwraca najnowszy (2025 w testowym conftest)
+        assert f.factor == Decimal("0.00270")
 
     def test_find_by_partial_name(self, repos):
         """Wyszukiwanie po fragmencie nazwy (substring match)."""
@@ -38,6 +39,45 @@ class TestFactorRepository:
         f = repos.factors.get_factor("diesel", "Polska")
         assert "/" in f.unit_factor
         assert "CO2" in f.unit_factor
+
+    def test_find_for_exact_year(self, repos):
+        """get_factor z year → zwraca wskaźnik dla tego roku."""
+        f = repos.factors.get_factor("diesel", "Polska", year=2024)
+        assert f is not None
+        assert f.year == 2024
+        assert f.factor == Decimal("0.00268")
+
+    def test_find_for_newer_year(self, repos):
+        """get_factor year=2025 → zwraca wskaźnik 2025."""
+        f = repos.factors.get_factor("diesel", "Polska", year=2025)
+        assert f is not None
+        assert f.year == 2025
+        assert f.factor == Decimal("0.00270")
+
+    def test_fallback_to_latest_when_year_missing(self, repos):
+        """Brak wskaźnika dla podanego roku → fallback na najnowszy."""
+        f = repos.factors.get_factor("gaz ziemny", "Polska", year=2025)
+        # gaz ziemny ma tylko rok 2024 w conftest — fallback na 2024
+        assert f is not None
+        assert f.year == 2024
+
+    def test_no_year_returns_latest(self, repos):
+        """Bez podania roku → zwraca wskaźnik z najnowszego roku."""
+        f = repos.factors.get_factor("diesel", "Polska")
+        assert f is not None
+        assert f.year == 2025  # 2025 jest nowszy niż 2024
+
+    def test_exists_true(self, repos):
+        """exists() zwraca True dla istniejącego (nazwa, kraj, rok)."""
+        assert repos.factors.exists("diesel", "Polska", 2024) is True
+        assert repos.factors.exists("diesel", "Polska", 2025) is True
+
+    def test_exists_false_wrong_year(self, repos):
+        """exists() zwraca False gdy brak wskaźnika dla danego roku."""
+        assert repos.factors.exists("gaz ziemny", "Polska", 2025) is False
+
+    def test_exists_false_unknown_name(self, repos):
+        assert repos.factors.exists("nieznane_paliwo", "Polska", 2024) is False
 
 
 class TestConverterRepository:

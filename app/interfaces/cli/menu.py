@@ -109,7 +109,6 @@ def center_to(text: str, target: int) -> str:
 def print_menu(title, options, width=42, icon=""):
     if icon:
         title = f"{icon}  {title}"
-    # Oblicz max szerokość klucza aby wyrównać separator │
     max_key_width = max((display_width(k) for k, _ in options if k != "-"), default=1)
     inner = width - 2
     print(f"  {C.CYAN}╔{'═' * inner}╗{C.RESET}")
@@ -968,7 +967,7 @@ def menu_tools():
         print_menu("NARZĘDZIA", [
             ("1", "Walidacja plików CSV"),
             ("2", "Przeładuj dane"),
-            ("3", "Weryfikacja wskaźników i przeliczeń"),
+            ("3", "Weryfikacja wskaźników/przeliczeń"),
             ("4", "Walidacja spójności danych"),
             ("5", "Import danych z pliku (CSV/Excel)"),
             ("-", ""),

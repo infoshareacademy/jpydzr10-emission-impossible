@@ -29,25 +29,25 @@ def test_data_folder(tmp_path):
     """Tworzy tymczasowy folder z pełnym zestawem plików CSV do testów."""
     folder = str(tmp_path)
 
-    # --- tbl_factors.csv ---
     _write_csv(os.path.join(folder, "tbl_factors.csv"),
-        ["id", "factor_name", "country", "factor", "unit_factor", "source"],
+        ["id", "factor_name", "country", "year", "factor", "unit_factor", "source"],
         [
-            {"id": 1, "factor_name": "gaz ziemny", "country": "Polska", "factor": "0.00202", "unit_factor": "tCO2e/m3", "source": "KOBiZE"},
-            {"id": 2, "factor_name": "diesel", "country": "Polska", "factor": "0.00268", "unit_factor": "tCO2e/l", "source": "DEFRA"},
-            {"id": 3, "factor_name": "benzyna", "country": "Polska", "factor": "0.00232", "unit_factor": "tCO2e/l", "source": "DEFRA"},
-            {"id": 4, "factor_name": "LPG", "country": "Polska", "factor": "0.00163", "unit_factor": "tCO2e/l", "source": "DEFRA"},
-            {"id": 5, "factor_name": "węgiel kamienny", "country": "Polska", "factor": "2.446", "unit_factor": "tCO2e/t", "source": "KOBiZE"},
-            {"id": 6, "factor_name": "olej opałowy lekki", "country": "Polska", "factor": "3.17", "unit_factor": "tCO2e/t", "source": "KOBiZE"},
-            {"id": 7, "factor_name": "olej opałowy ciężki", "country": "Polska", "factor": "3.17", "unit_factor": "tCO2e/t", "source": "KOBiZE"},
-            {"id": 8, "factor_name": "R410A", "country": "Polska", "factor": "2088", "unit_factor": "kgCO2e/kg", "source": "IPCC"},
-            {"id": 9, "factor_name": "R32", "country": "Polska", "factor": "675", "unit_factor": "kgCO2e/kg", "source": "IPCC"},
-            {"id": 10, "factor_name": "kalcynacja", "country": "Polska", "factor": "0.780", "unit_factor": "tCO2e/t", "source": "IPCC"},
-            {"id": 11, "factor_name": "Energia elektryczna nie OZE", "country": "Polska", "factor": "0.709", "unit_factor": "tCO2e/MWh", "source": "KOBiZE"},
-            {"id": 12, "factor_name": "Energia elektryczna z OZE", "country": "Polska", "factor": "0.0", "unit_factor": "tCO2e/MWh", "source": "GO"},
-            {"id": 13, "factor_name": "Energia cieplna", "country": "Polska", "factor": "0.292", "unit_factor": "tCO2e/GJ", "source": "KOBiZE"},
-            {"id": 14, "factor_name": "Chłód", "country": "Polska", "factor": "0.180", "unit_factor": "tCO2e/GJ", "source": "KOBiZE"},
-            {"id": 15, "factor_name": "biomasa", "country": "Polska", "factor": "0.0", "unit_factor": "tCO2e/t", "source": "neutralna"},
+            {"id": 1,  "factor_name": "gaz ziemny",                "country": "Polska", "year": 2024, "factor": "0.00202", "unit_factor": "tCO2e/m3",  "source": "KOBiZE"},
+            {"id": 2,  "factor_name": "diesel",                    "country": "Polska", "year": 2024, "factor": "0.00268", "unit_factor": "tCO2e/l",   "source": "DEFRA"},
+            {"id": 3,  "factor_name": "benzyna",                   "country": "Polska", "year": 2024, "factor": "0.00232", "unit_factor": "tCO2e/l",   "source": "DEFRA"},
+            {"id": 4,  "factor_name": "LPG",                       "country": "Polska", "year": 2024, "factor": "0.00163", "unit_factor": "tCO2e/l",   "source": "DEFRA"},
+            {"id": 5,  "factor_name": "węgiel kamienny",           "country": "Polska", "year": 2024, "factor": "2.446",   "unit_factor": "tCO2e/t",   "source": "KOBiZE"},
+            {"id": 6,  "factor_name": "olej opałowy lekki",        "country": "Polska", "year": 2024, "factor": "3.17",    "unit_factor": "tCO2e/t",   "source": "KOBiZE"},
+            {"id": 7,  "factor_name": "olej opałowy ciężki",       "country": "Polska", "year": 2024, "factor": "3.17",    "unit_factor": "tCO2e/t",   "source": "KOBiZE"},
+            {"id": 8,  "factor_name": "R410A",                     "country": "Polska", "year": 2024, "factor": "2088",    "unit_factor": "kgCO2e/kg", "source": "IPCC"},
+            {"id": 9,  "factor_name": "R32",                       "country": "Polska", "year": 2024, "factor": "675",     "unit_factor": "kgCO2e/kg", "source": "IPCC"},
+            {"id": 10, "factor_name": "kalcynacja",                "country": "Polska", "year": 2024, "factor": "0.780",   "unit_factor": "tCO2e/t",   "source": "IPCC"},
+            {"id": 11, "factor_name": "Energia elektryczna nie OZE","country": "Polska","year": 2024, "factor": "0.709",   "unit_factor": "tCO2e/MWh", "source": "KOBiZE"},
+            {"id": 12, "factor_name": "Energia elektryczna z OZE", "country": "Polska", "year": 2024, "factor": "0.0",     "unit_factor": "tCO2e/MWh", "source": "GO"},
+            {"id": 13, "factor_name": "Energia cieplna",           "country": "Polska", "year": 2024, "factor": "0.292",   "unit_factor": "tCO2e/GJ",  "source": "KOBiZE"},
+            {"id": 14, "factor_name": "Chłód",                     "country": "Polska", "year": 2024, "factor": "0.180",   "unit_factor": "tCO2e/GJ",  "source": "KOBiZE"},
+            {"id": 15, "factor_name": "biomasa",                   "country": "Polska", "year": 2024, "factor": "0.0",     "unit_factor": "tCO2e/t",   "source": "neutralna"},
+            {"id": 16, "factor_name": "diesel",                    "country": "Polska", "year": 2025, "factor": "0.00270", "unit_factor": "tCO2e/l",   "source": "DEFRA"},
         ],
     )
 
@@ -200,6 +200,18 @@ def test_data_folder(tmp_path):
         [],
     )
 
+    # --- tbl_e_prod.csv (pusty) ---
+    _write_csv(os.path.join(folder, "tbl_e_prod.csv"),
+        ["id", "year", "company", "amount", "unit", "source", "installation", "energy_type", "factor"],
+        [],
+    )
+
+    # --- tbl_e_sold.csv (pusty) ---
+    _write_csv(os.path.join(folder, "tbl_e_sold.csv"),
+        ["id", "year", "company", "amount", "unit", "source", "energy_type", "customer"],
+        [],
+    )
+
     # --- tbl_authorisations.csv ---
     _write_csv(os.path.join(folder, "tbl_authorisations.csv"),
         ["id", "login", "company", "save", "read"],
@@ -235,6 +247,13 @@ def test_data_folder(tmp_path):
     _write_csv(os.path.join(folder, "tbl_change_log.csv"),
         ["id_rejestr_zmian", "login", "date_change", "table_name", "record_id",
          "change_type", "previous_data", "actual_data"],
+        [],
+    )
+
+    # --- tbl_email_log.csv (pusty) ---
+    _write_csv(os.path.join(folder, "tbl_email_log.csv"),
+        ["id", "date_sent", "sender", "company", "year", "recipients",
+         "subject", "template", "notes"],
         [],
     )
 

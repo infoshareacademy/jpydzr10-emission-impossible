@@ -38,11 +38,11 @@ class TestGenerateSummary:
         assert s["scope1_stationary"] == Decimal("489.200")
 
     def test_mobile_calculates_when_empty(self, uc):
-        """Spalanie mobilne bez deklarowanej emisji → oblicza z wskaźnika."""
+        """Spalanie mobilne bez deklarowanej emisji → oblicza z wskaźnika dla roku rekordu."""
         s = uc.generate_summary(2025, 2025, "TestFirma A")
-        # ID 1: 2400 l benzyna × 0.00232 = 5.568 (emission_tco2eq puste)
-        # ID 2: 5000 l diesel × 0.00268 = 13.400 (emission_tco2eq puste)
-        expected = Decimal("5.568") + Decimal("13.400")
+        # ID 1 (rok 2025): 2400 l benzyna × 0.00232 = 5.568  (brak wskaźnika 2025 → fallback 2024)
+        # ID 2 (rok 2025): 5000 l diesel  × 0.00270 = 13.500 (wskaźnik 2025 istnieje)
+        expected = Decimal("5.568") + Decimal("13.500")
         assert s["scope1_mobile"] == R(expected)
 
     def test_mobile_lpg(self, uc):

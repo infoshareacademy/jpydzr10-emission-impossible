@@ -186,16 +186,32 @@ class TestEnergyConsumptionModel:
 class TestEmissionFactorModel:
     def test_valid_factor(self):
         f = EmissionFactor(
-            id=1, factor_name="diesel", country="Polska",
+            id=1, factor_name="diesel", country="Polska", year=2024,
             factor=Decimal("0.00268"), unit_factor="tCO2e/l", source="DEFRA",
         )
         assert f.factor == Decimal("0.00268")
+        assert f.year == 2024
+
+    def test_valid_factor_different_year(self):
+        """Ten sam wskaźnik dla innego roku — dozwolony."""
+        f = EmissionFactor(
+            id=2, factor_name="diesel", country="Polska", year=2025,
+            factor=Decimal("0.00270"), unit_factor="tCO2e/l", source="DEFRA",
+        )
+        assert f.year == 2025
 
     def test_negative_factor_rejected(self):
         with pytest.raises(ValidationError):
             EmissionFactor(
-                id=1, factor_name="test", country="PL",
+                id=1, factor_name="test", country="PL", year=2024,
                 factor=Decimal("-1"), unit_factor="t/t",
+            )
+
+    def test_year_required(self):
+        with pytest.raises(ValidationError):
+            EmissionFactor(
+                id=1, factor_name="diesel", country="Polska",
+                factor=Decimal("0.00268"), unit_factor="tCO2e/l",
             )
 
 

@@ -114,7 +114,7 @@ class StationaryCombustion(ActivityRecord):
         if v is None or (isinstance(v, str) and v.strip() == ""):
             return None
         if isinstance(v, bool):
-            return None  # Stary format — ignoruj
+            return None
         return v.strip()
 
 

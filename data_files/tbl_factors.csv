@@ -319,3 +319,4 @@ id,factor_name,country,year,factor,unit_factor,source
 318,R404A,Polska,2025,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
 319,kalcynacja,Polska,2025,0.78,tCO2e/t,IPCC 2006
 320,reakcja chemiczna,Polska,2025,0.04,tCO2e/t,KOBiZE WE
+321,LPG,Polska,2026,0.00154,tCO2e/l,KOBiZE 2026

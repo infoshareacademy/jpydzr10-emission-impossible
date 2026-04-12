@@ -928,7 +928,7 @@ class EmissionUseCases:
             if hasattr(record, "amount") and hasattr(record, "unit"):
                 factor_key = getattr(record, "fuel", None) or getattr(record, "product", None) or getattr(record, "process", None) or getattr(record, "energy_type", None)
                 if factor_key:
-                    calc = self._calculate_emission_for_record(record.amount, record.unit, factor_key)
+                    calc = self._calculate_emission_for_record(record.amount, record.unit, factor_key, year=getattr(record, "year", None))
                     try:
                         user_em = Decimal(new_value)
                         if not self._check_emission_deviation(user_em, calc):
