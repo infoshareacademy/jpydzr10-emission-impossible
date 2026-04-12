@@ -38,10 +38,15 @@ class EmissionUseCases:
         self.repos = RepositoryFactory(data_folder)
 
     def _calculate_emission_for_record(self, amount: Decimal, unit: str,
-                                          factor_key: str, country: str = "Polska") -> Decimal:
+                                          factor_key: str, country: str = "Polska",
+                                          year: Optional[int] = None) -> Decimal:
         """Oblicza emisję dla pojedynczego rekordu na podstawie wskaźnika emisji.
-        Zwraca emisję w tonach CO2e lub Decimal('0') jeśli brak wskaźnika."""
-        factor_obj = self.repos.factors.get_factor(factor_key, country)
+
+        Jeśli year podany — szuka wskaźnika z dokładnego roku (fallback na najnowszy).
+        Jeśli year pominięty — używa najnowszego dostępnego wskaźnika.
+        Zwraca emisję w tonach CO2e lub Decimal('0') jeśli brak wskaźnika.
+        """
+        factor_obj = self.repos.factors.get_factor(factor_key, country, year=year)
         if not factor_obj:
             return Decimal("0")
         try:
@@ -239,7 +244,7 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, fuel)
+        calc_emission = self._calculate_emission_for_record(amount, unit, fuel, year=year)
         ef = self._collect_emission_fields(calc_emission)
         if ef is None: return False
 
@@ -286,7 +291,7 @@ class EmissionUseCases:
         if unit is None: return False
         source = safe_input("Źródło: ", allow_empty=True) or ""
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, fuel)
+        calc_emission = self._calculate_emission_for_record(amount, unit, fuel, year=year)
         ef = self._collect_emission_fields(calc_emission)
         if ef is None: return False
 
@@ -338,7 +343,7 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, process)
+        calc_emission = self._calculate_emission_for_record(amount, unit, process, year=year)
         ef = self._collect_emission_fields(calc_emission)
         if ef is None: return False
 
@@ -392,7 +397,7 @@ class EmissionUseCases:
 
         source = safe_input("Źródło danych: ", allow_empty=True) or ""
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, product)
+        calc_emission = self._calculate_emission_for_record(amount, unit, product, year=year)
         ef = self._collect_emission_fields(calc_emission)
         if ef is None: return False
 
@@ -455,7 +460,7 @@ class EmissionUseCases:
             print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
             data_quality = None
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type)
+        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type, year=year)
 
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Źródło: {energy_source} | Typ: {energy_type} | {amount} {unit}")
@@ -509,7 +514,7 @@ class EmissionUseCases:
             print(f"  Nieznany poziom '{data_quality}'. Dozwolone: {sorted(DATA_QUALITY_LEVELS)}")
             data_quality = None
 
-        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type)
+        calc_emission = self._calculate_emission_for_record(amount, unit, energy_type, year=year)
 
         print(f"\n  Rok: {year} | Firma: {company}")
         print(f"  Typ: {energy_type} | {amount} {unit} | Dostawca: {trader or '—'}")
@@ -1000,9 +1005,9 @@ class EmissionUseCases:
                     continue
 
                 factor_key_value = getattr(record, factor_key_field)
-                factor_obj = self.repos.factors.get_factor(factor_key_value, country)
+                factor_obj = self.repos.factors.get_factor(factor_key_value, country, year=record.year)
                 if not factor_obj:
-                    print(f"  [!] Brak wskaźnika emisji dla: '{factor_key_value}'. Pomijam rekord ID: {record.id}")
+                    print(f"  [!] Brak wskaźnika emisji dla: '{factor_key_value}' (rok {record.year}). Pomijam rekord ID: {record.id}")
                     success = False
                     continue
 
@@ -1055,11 +1060,11 @@ class EmissionUseCases:
         print(f"Obliczanie: energy_consumption ({len(records)} rekordów)...")
 
         for record in records:
-            # Szukamy wskaźnika emisji po typie energii
-            factor_obj = self.repos.factors.get_factor(record.energy_type, country)
+            # Szukamy wskaźnika emisji po typie energii i roku rekordu
+            factor_obj = self.repos.factors.get_factor(record.energy_type, country, year=record.year)
 
             if not factor_obj:
-                print(f"  [!] Brak wskaźnika dla: '{record.energy_type}'. Pomijam ID: {record.id}")
+                print(f"  [!] Brak wskaźnika dla: '{record.energy_type}' (rok {record.year}). Pomijam ID: {record.id}")
                 success = False
                 continue
 
@@ -1103,10 +1108,16 @@ class EmissionUseCases:
         return success
 
     def _emission_or_calc(self, record, factor_key: str, country: str = "Polska") -> Decimal:
-        """Zwraca emisję rekordu: deklarowaną (emission_tco2eq) jeśli podana, wyliczoną jeśli nie."""
+        """Zwraca emisję rekordu: deklarowaną (emission_tco2eq) jeśli podana, wyliczoną jeśli nie.
+
+        Rok rekordu (record.year) jest przekazywany do get_factor() — wskaźnik
+        dobierany jest dla tego samego roku co rekord emisyjny.
+        """
         if record.emission_tco2eq is not None and record.emission_tco2eq > 0:
             return record.emission_tco2eq
-        return self._calculate_emission_for_record(record.amount, record.unit, factor_key, country)
+        return self._calculate_emission_for_record(
+            record.amount, record.unit, factor_key, country, year=record.year
+        )
 
     def generate_summary(self, year_from: int, year_to: int, company: str,
                          country: str = "Polska") -> dict:
@@ -1145,7 +1156,7 @@ class EmissionUseCases:
         # Scope 2: zużycie energii — zawsze oblicz (bez emission_tco2eq)
         for r in self._get_records_in_range(self.repos.energy_consumption, year_from, year_to, company):
             s["scope2_energy"] += self._calculate_emission_for_record(
-                r.amount, r.unit, r.energy_type, country)
+                r.amount, r.unit, r.energy_type, country, year=r.year)
 
         # Zaokrąglenie
         for k in s:
@@ -1513,13 +1524,15 @@ class EmissionUseCases:
             records, _ = repo.get_all()
             for record in records:
                 factor_key_value = getattr(record, factor_key_field)
-                factor_obj = self.repos.factors.get_factor(factor_key_value, country)
+                factor_obj = self.repos.factors.get_factor(
+                    factor_key_value, country, year=record.year
+                )
 
                 if not factor_obj:
                     issues.append({
                         "tabela_zrodlowa": source_name,
                         "id": record.id,
-                        "info": f"Brak wskaźnika emisji dla: '{factor_key_value}' (kraj: {country})",
+                        "info": f"Brak wskaźnika emisji dla: '{factor_key_value}' (kraj: {country}, rok: {record.year})",
                     })
                     continue
 
@@ -1799,12 +1812,12 @@ class EmissionUseCases:
                     sim[key] = R(sim[key] * factor)
 
             elif strategy == "fuel_switch":
-                # Zamiana paliwa — przelicz emisję stacjonarną
+                # Zamiana paliwa — przelicz emisję stacjonarną (wskaźnik z roku symulacji)
                 from_fuel = params.get("from_fuel", "")
                 to_fuel = params.get("to_fuel", "")
                 if from_fuel and to_fuel:
-                    factor_from = self.repos.factors.get_factor(from_fuel)
-                    factor_to = self.repos.factors.get_factor(to_fuel)
+                    factor_from = self.repos.factors.get_factor(from_fuel, "Polska", year=year)
+                    factor_to = self.repos.factors.get_factor(to_fuel, "Polska", year=year)
                     if factor_from and factor_to and factor_from.factor > 0:
                         ratio = factor_to.factor / factor_from.factor
                         sim["scope1_stationary"] = R(sim["scope1_stationary"] * ratio)

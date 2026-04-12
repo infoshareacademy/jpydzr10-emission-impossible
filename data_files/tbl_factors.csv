@@ -1,27 +1,321 @@
 id,factor_name,country,year,factor,unit_factor,source
-1,Energia elektryczna,Polska,2024,0.709,tCO2e/MWh,KOBiZE 2024
-2,Energia cieplna,Polska,2024,0.292,tCO2e/GJ,KOBiZE 2024
-3,Para technologiczna,Polska,2024,0.292,tCO2e/GJ,KOBiZE 2024
-4,Chłód,Polska,2024,0.180,tCO2e/GJ,KOBiZE 2024
-5,gaz ziemny,Polska,2024,0.00202,tCO2e/m3,KOBiZE WE
-6,olej opałowy lekki,Polska,2024,3.17,tCO2e/t,KOBiZE WE
-7,olej opałowy ciężki,Polska,2024,3.17,tCO2e/t,KOBiZE WE
-8,węgiel kamienny,Polska,2024,2.446,tCO2e/t,KOBiZE WE
-9,koks,Polska,2024,3.40,tCO2e/t,KOBiZE WE
-10,benzyna,Polska,2024,0.00232,tCO2e/l,DEFRA 2024
-11,diesel,Polska,2024,0.00268,tCO2e/l,DEFRA 2024
-12,LPG,Polska,2024,0.00163,tCO2e/l,DEFRA 2024
-13,pellet,Polska,2024,0.084,tCO2e/t,KOBiZE WE
-14,biomasa,Polska,2024,0.0,tCO2e/t,neutralna CO2
-15,drewno,Polska,2024,0.0,tCO2e/t,neutralna CO2
-16,R410A,Polska,2024,2088,kgCO2e/kg,IPCC AR5 GWP-100
-17,R32,Polska,2024,675,kgCO2e/kg,IPCC AR5 GWP-100
-18,R404A,Polska,2024,3922,kgCO2e/kg,IPCC AR5 GWP-100
-19,kalcynacja,Polska,2024,0.780,tCO2e/t,IPCC 2006 Vol.3 Ch.2
-20,reakcja chemiczna,Polska,2024,0.040,tCO2e/t,KOBiZE WE
-21,topienie metali,Polska,2024,0.150,tCO2e/t,KOBiZE WE
-22,synteza,Polska,2024,1.694,tCO2e/t,IPCC 2006 Vol.3 Ch.3
-23,redukcja,Polska,2024,0.490,tCO2e/t,KOBiZE WE
-24,spawanie,Polska,2024,0.098,tCO2e/t,KOBiZE WE
-25,Energia elektryczna nie OZE,Polska,2024,0.709,tCO2e/MWh,KOBiZE 2024
-26,Energia elektryczna z OZE,Polska,2024,0.0,tCO2e/MWh,certyfikat GO — emisja zerowa
+1,Energia elektryczna,Polska,2010,0.815,tCO2e/MWh,KOBiZE 2010
+2,Energia cieplna,Polska,2010,0.32,tCO2e/GJ,KOBiZE 2010
+3,Para technologiczna,Polska,2010,0.32,tCO2e/GJ,KOBiZE 2010
+4,Chłód,Polska,2010,0.18,tCO2e/GJ,KOBiZE 2010
+5,gaz ziemny,Polska,2010,0.00202,tCO2e/m3,KOBiZE WE
+6,olej opałowy lekki,Polska,2010,3.17,tCO2e/t,KOBiZE WE
+7,olej opałowy ciężki,Polska,2010,3.17,tCO2e/t,KOBiZE WE
+8,węgiel kamienny,Polska,2010,2.446,tCO2e/t,KOBiZE WE
+9,koks,Polska,2010,3.4,tCO2e/t,KOBiZE WE
+10,benzyna,Polska,2010,0.00231,tCO2e/l,DEFRA 2010
+11,diesel,Polska,2010,0.00263,tCO2e/l,DEFRA 2010
+12,LPG,Polska,2010,0.00161,tCO2e/l,DEFRA 2010
+13,pellet,Polska,2010,0.084,tCO2e/t,KOBiZE WE
+14,biomasa,Polska,2010,0.0,tCO2e/t,neutralna CO2
+15,drewno,Polska,2010,0.0,tCO2e/t,neutralna CO2
+16,R410A,Polska,2010,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+17,R32,Polska,2010,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+18,R404A,Polska,2010,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+19,kalcynacja,Polska,2010,0.78,tCO2e/t,IPCC 2006
+20,reakcja chemiczna,Polska,2010,0.04,tCO2e/t,KOBiZE WE
+21,Energia elektryczna,Polska,2011,0.825,tCO2e/MWh,KOBiZE 2011
+22,Energia cieplna,Polska,2011,0.318,tCO2e/GJ,KOBiZE 2011
+23,Para technologiczna,Polska,2011,0.318,tCO2e/GJ,KOBiZE 2011
+24,Chłód,Polska,2011,0.18,tCO2e/GJ,KOBiZE 2011
+25,gaz ziemny,Polska,2011,0.00202,tCO2e/m3,KOBiZE WE
+26,olej opałowy lekki,Polska,2011,3.17,tCO2e/t,KOBiZE WE
+27,olej opałowy ciężki,Polska,2011,3.17,tCO2e/t,KOBiZE WE
+28,węgiel kamienny,Polska,2011,2.446,tCO2e/t,KOBiZE WE
+29,koks,Polska,2011,3.4,tCO2e/t,KOBiZE WE
+30,benzyna,Polska,2011,0.00231,tCO2e/l,DEFRA 2011
+31,diesel,Polska,2011,0.00265,tCO2e/l,DEFRA 2011
+32,LPG,Polska,2011,0.00161,tCO2e/l,DEFRA 2011
+33,pellet,Polska,2011,0.084,tCO2e/t,KOBiZE WE
+34,biomasa,Polska,2011,0.0,tCO2e/t,neutralna CO2
+35,drewno,Polska,2011,0.0,tCO2e/t,neutralna CO2
+36,R410A,Polska,2011,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+37,R32,Polska,2011,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+38,R404A,Polska,2011,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+39,kalcynacja,Polska,2011,0.78,tCO2e/t,IPCC 2006
+40,reakcja chemiczna,Polska,2011,0.04,tCO2e/t,KOBiZE WE
+41,Energia elektryczna,Polska,2012,0.831,tCO2e/MWh,KOBiZE 2012
+42,Energia cieplna,Polska,2012,0.316,tCO2e/GJ,KOBiZE 2012
+43,Para technologiczna,Polska,2012,0.316,tCO2e/GJ,KOBiZE 2012
+44,Chłód,Polska,2012,0.18,tCO2e/GJ,KOBiZE 2012
+45,gaz ziemny,Polska,2012,0.00202,tCO2e/m3,KOBiZE WE
+46,olej opałowy lekki,Polska,2012,3.17,tCO2e/t,KOBiZE WE
+47,olej opałowy ciężki,Polska,2012,3.17,tCO2e/t,KOBiZE WE
+48,węgiel kamienny,Polska,2012,2.446,tCO2e/t,KOBiZE WE
+49,koks,Polska,2012,3.4,tCO2e/t,KOBiZE WE
+50,benzyna,Polska,2012,0.00232,tCO2e/l,DEFRA 2012
+51,diesel,Polska,2012,0.00267,tCO2e/l,DEFRA 2012
+52,LPG,Polska,2012,0.00161,tCO2e/l,DEFRA 2012
+53,pellet,Polska,2012,0.084,tCO2e/t,KOBiZE WE
+54,biomasa,Polska,2012,0.0,tCO2e/t,neutralna CO2
+55,drewno,Polska,2012,0.0,tCO2e/t,neutralna CO2
+56,R410A,Polska,2012,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+57,R32,Polska,2012,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+58,R404A,Polska,2012,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+59,kalcynacja,Polska,2012,0.78,tCO2e/t,IPCC 2006
+60,reakcja chemiczna,Polska,2012,0.04,tCO2e/t,KOBiZE WE
+61,Energia elektryczna,Polska,2013,0.823,tCO2e/MWh,KOBiZE 2013
+62,Energia cieplna,Polska,2013,0.314,tCO2e/GJ,KOBiZE 2013
+63,Para technologiczna,Polska,2013,0.314,tCO2e/GJ,KOBiZE 2013
+64,Chłód,Polska,2013,0.18,tCO2e/GJ,KOBiZE 2013
+65,gaz ziemny,Polska,2013,0.00202,tCO2e/m3,KOBiZE WE
+66,olej opałowy lekki,Polska,2013,3.17,tCO2e/t,KOBiZE WE
+67,olej opałowy ciężki,Polska,2013,3.17,tCO2e/t,KOBiZE WE
+68,węgiel kamienny,Polska,2013,2.446,tCO2e/t,KOBiZE WE
+69,koks,Polska,2013,3.4,tCO2e/t,KOBiZE WE
+70,benzyna,Polska,2013,0.00231,tCO2e/l,DEFRA 2013
+71,diesel,Polska,2013,0.00263,tCO2e/l,DEFRA 2013
+72,LPG,Polska,2013,0.00161,tCO2e/l,DEFRA 2013
+73,pellet,Polska,2013,0.084,tCO2e/t,KOBiZE WE
+74,biomasa,Polska,2013,0.0,tCO2e/t,neutralna CO2
+75,drewno,Polska,2013,0.0,tCO2e/t,neutralna CO2
+76,R410A,Polska,2013,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+77,R32,Polska,2013,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+78,R404A,Polska,2013,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+79,kalcynacja,Polska,2013,0.78,tCO2e/t,IPCC 2006
+80,reakcja chemiczna,Polska,2013,0.04,tCO2e/t,KOBiZE WE
+81,Energia elektryczna,Polska,2014,0.812,tCO2e/MWh,KOBiZE 2014
+82,Energia cieplna,Polska,2014,0.312,tCO2e/GJ,KOBiZE 2014
+83,Para technologiczna,Polska,2014,0.312,tCO2e/GJ,KOBiZE 2014
+84,Chłód,Polska,2014,0.18,tCO2e/GJ,KOBiZE 2014
+85,gaz ziemny,Polska,2014,0.00202,tCO2e/m3,KOBiZE WE
+86,olej opałowy lekki,Polska,2014,3.17,tCO2e/t,KOBiZE WE
+87,olej opałowy ciężki,Polska,2014,3.17,tCO2e/t,KOBiZE WE
+88,węgiel kamienny,Polska,2014,2.446,tCO2e/t,KOBiZE WE
+89,koks,Polska,2014,3.4,tCO2e/t,KOBiZE WE
+90,benzyna,Polska,2014,0.0023,tCO2e/l,DEFRA 2014
+91,diesel,Polska,2014,0.00261,tCO2e/l,DEFRA 2014
+92,LPG,Polska,2014,0.00161,tCO2e/l,DEFRA 2014
+93,pellet,Polska,2014,0.084,tCO2e/t,KOBiZE WE
+94,biomasa,Polska,2014,0.0,tCO2e/t,neutralna CO2
+95,drewno,Polska,2014,0.0,tCO2e/t,neutralna CO2
+96,R410A,Polska,2014,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+97,R32,Polska,2014,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+98,R404A,Polska,2014,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+99,kalcynacja,Polska,2014,0.78,tCO2e/t,IPCC 2006
+100,reakcja chemiczna,Polska,2014,0.04,tCO2e/t,KOBiZE WE
+101,Energia elektryczna,Polska,2015,0.798,tCO2e/MWh,KOBiZE 2015
+102,Energia cieplna,Polska,2015,0.31,tCO2e/GJ,KOBiZE 2015
+103,Para technologiczna,Polska,2015,0.31,tCO2e/GJ,KOBiZE 2015
+104,Chłód,Polska,2015,0.18,tCO2e/GJ,KOBiZE 2015
+105,gaz ziemny,Polska,2015,0.00202,tCO2e/m3,KOBiZE WE
+106,olej opałowy lekki,Polska,2015,3.17,tCO2e/t,KOBiZE WE
+107,olej opałowy ciężki,Polska,2015,3.17,tCO2e/t,KOBiZE WE
+108,węgiel kamienny,Polska,2015,2.446,tCO2e/t,KOBiZE WE
+109,koks,Polska,2015,3.4,tCO2e/t,KOBiZE WE
+110,benzyna,Polska,2015,0.0023,tCO2e/l,DEFRA 2015
+111,diesel,Polska,2015,0.00261,tCO2e/l,DEFRA 2015
+112,LPG,Polska,2015,0.00161,tCO2e/l,DEFRA 2015
+113,pellet,Polska,2015,0.084,tCO2e/t,KOBiZE WE
+114,biomasa,Polska,2015,0.0,tCO2e/t,neutralna CO2
+115,drewno,Polska,2015,0.0,tCO2e/t,neutralna CO2
+116,R410A,Polska,2015,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+117,R32,Polska,2015,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+118,R404A,Polska,2015,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+119,kalcynacja,Polska,2015,0.78,tCO2e/t,IPCC 2006
+120,reakcja chemiczna,Polska,2015,0.04,tCO2e/t,KOBiZE WE
+121,Energia elektryczna,Polska,2016,0.781,tCO2e/MWh,KOBiZE 2016
+122,Energia cieplna,Polska,2016,0.308,tCO2e/GJ,KOBiZE 2016
+123,Para technologiczna,Polska,2016,0.308,tCO2e/GJ,KOBiZE 2016
+124,Chłód,Polska,2016,0.18,tCO2e/GJ,KOBiZE 2016
+125,gaz ziemny,Polska,2016,0.00202,tCO2e/m3,KOBiZE WE
+126,olej opałowy lekki,Polska,2016,3.17,tCO2e/t,KOBiZE WE
+127,olej opałowy ciężki,Polska,2016,3.17,tCO2e/t,KOBiZE WE
+128,węgiel kamienny,Polska,2016,2.446,tCO2e/t,KOBiZE WE
+129,koks,Polska,2016,3.4,tCO2e/t,KOBiZE WE
+130,benzyna,Polska,2016,0.00228,tCO2e/l,DEFRA 2016
+131,diesel,Polska,2016,0.0026,tCO2e/l,DEFRA 2016
+132,LPG,Polska,2016,0.00161,tCO2e/l,DEFRA 2016
+133,pellet,Polska,2016,0.084,tCO2e/t,KOBiZE WE
+134,biomasa,Polska,2016,0.0,tCO2e/t,neutralna CO2
+135,drewno,Polska,2016,0.0,tCO2e/t,neutralna CO2
+136,R410A,Polska,2016,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+137,R32,Polska,2016,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+138,R404A,Polska,2016,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+139,kalcynacja,Polska,2016,0.78,tCO2e/t,IPCC 2006
+140,reakcja chemiczna,Polska,2016,0.04,tCO2e/t,KOBiZE WE
+141,Energia elektryczna,Polska,2017,0.778,tCO2e/MWh,KOBiZE 2017
+142,Energia cieplna,Polska,2017,0.306,tCO2e/GJ,KOBiZE 2017
+143,Para technologiczna,Polska,2017,0.306,tCO2e/GJ,KOBiZE 2017
+144,Chłód,Polska,2017,0.18,tCO2e/GJ,KOBiZE 2017
+145,gaz ziemny,Polska,2017,0.00202,tCO2e/m3,KOBiZE WE
+146,olej opałowy lekki,Polska,2017,3.17,tCO2e/t,KOBiZE WE
+147,olej opałowy ciężki,Polska,2017,3.17,tCO2e/t,KOBiZE WE
+148,węgiel kamienny,Polska,2017,2.446,tCO2e/t,KOBiZE WE
+149,koks,Polska,2017,3.4,tCO2e/t,KOBiZE WE
+150,benzyna,Polska,2017,0.0023,tCO2e/l,DEFRA 2017
+151,diesel,Polska,2017,0.0026,tCO2e/l,DEFRA 2017
+152,LPG,Polska,2017,0.00161,tCO2e/l,DEFRA 2017
+153,pellet,Polska,2017,0.084,tCO2e/t,KOBiZE WE
+154,biomasa,Polska,2017,0.0,tCO2e/t,neutralna CO2
+155,drewno,Polska,2017,0.0,tCO2e/t,neutralna CO2
+156,R410A,Polska,2017,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+157,R32,Polska,2017,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+158,R404A,Polska,2017,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+159,kalcynacja,Polska,2017,0.78,tCO2e/t,IPCC 2006
+160,reakcja chemiczna,Polska,2017,0.04,tCO2e/t,KOBiZE WE
+161,Energia elektryczna,Polska,2018,0.765,tCO2e/MWh,KOBiZE 2018
+162,Energia cieplna,Polska,2018,0.304,tCO2e/GJ,KOBiZE 2018
+163,Para technologiczna,Polska,2018,0.304,tCO2e/GJ,KOBiZE 2018
+164,Chłód,Polska,2018,0.18,tCO2e/GJ,KOBiZE 2018
+165,gaz ziemny,Polska,2018,0.00202,tCO2e/m3,KOBiZE WE
+166,olej opałowy lekki,Polska,2018,3.17,tCO2e/t,KOBiZE WE
+167,olej opałowy ciężki,Polska,2018,3.17,tCO2e/t,KOBiZE WE
+168,węgiel kamienny,Polska,2018,2.446,tCO2e/t,KOBiZE WE
+169,koks,Polska,2018,3.4,tCO2e/t,KOBiZE WE
+170,benzyna,Polska,2018,0.00231,tCO2e/l,DEFRA 2018
+171,diesel,Polska,2018,0.00263,tCO2e/l,DEFRA 2018
+172,LPG,Polska,2018,0.00161,tCO2e/l,DEFRA 2018
+173,pellet,Polska,2018,0.084,tCO2e/t,KOBiZE WE
+174,biomasa,Polska,2018,0.0,tCO2e/t,neutralna CO2
+175,drewno,Polska,2018,0.0,tCO2e/t,neutralna CO2
+176,R410A,Polska,2018,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+177,R32,Polska,2018,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+178,R404A,Polska,2018,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+179,kalcynacja,Polska,2018,0.78,tCO2e/t,IPCC 2006
+180,reakcja chemiczna,Polska,2018,0.04,tCO2e/t,KOBiZE WE
+181,Energia elektryczna,Polska,2019,0.719,tCO2e/MWh,KOBiZE 2019
+182,Energia cieplna,Polska,2019,0.302,tCO2e/GJ,KOBiZE 2019
+183,Para technologiczna,Polska,2019,0.302,tCO2e/GJ,KOBiZE 2019
+184,Chłód,Polska,2019,0.18,tCO2e/GJ,KOBiZE 2019
+185,gaz ziemny,Polska,2019,0.00202,tCO2e/m3,KOBiZE WE
+186,olej opałowy lekki,Polska,2019,3.17,tCO2e/t,KOBiZE WE
+187,olej opałowy ciężki,Polska,2019,3.17,tCO2e/t,KOBiZE WE
+188,węgiel kamienny,Polska,2019,2.446,tCO2e/t,KOBiZE WE
+189,koks,Polska,2019,3.4,tCO2e/t,KOBiZE WE
+190,benzyna,Polska,2019,0.00231,tCO2e/l,DEFRA 2019
+191,diesel,Polska,2019,0.00259,tCO2e/l,DEFRA 2019
+192,LPG,Polska,2019,0.00161,tCO2e/l,DEFRA 2019
+193,pellet,Polska,2019,0.084,tCO2e/t,KOBiZE WE
+194,biomasa,Polska,2019,0.0,tCO2e/t,neutralna CO2
+195,drewno,Polska,2019,0.0,tCO2e/t,neutralna CO2
+196,R410A,Polska,2019,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+197,R32,Polska,2019,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+198,R404A,Polska,2019,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+199,kalcynacja,Polska,2019,0.78,tCO2e/t,IPCC 2006
+200,reakcja chemiczna,Polska,2019,0.04,tCO2e/t,KOBiZE WE
+201,Energia elektryczna,Polska,2020,0.698,tCO2e/MWh,KOBiZE 2020
+202,Energia cieplna,Polska,2020,0.3,tCO2e/GJ,KOBiZE 2020
+203,Para technologiczna,Polska,2020,0.3,tCO2e/GJ,KOBiZE 2020
+204,Chłód,Polska,2020,0.18,tCO2e/GJ,KOBiZE 2020
+205,gaz ziemny,Polska,2020,0.00202,tCO2e/m3,KOBiZE WE
+206,olej opałowy lekki,Polska,2020,3.17,tCO2e/t,KOBiZE WE
+207,olej opałowy ciężki,Polska,2020,3.17,tCO2e/t,KOBiZE WE
+208,węgiel kamienny,Polska,2020,2.446,tCO2e/t,KOBiZE WE
+209,koks,Polska,2020,3.4,tCO2e/t,KOBiZE WE
+210,benzyna,Polska,2020,0.00221,tCO2e/l,DEFRA 2020
+211,diesel,Polska,2020,0.00255,tCO2e/l,DEFRA 2020
+212,LPG,Polska,2020,0.00161,tCO2e/l,DEFRA 2020
+213,pellet,Polska,2020,0.084,tCO2e/t,KOBiZE WE
+214,biomasa,Polska,2020,0.0,tCO2e/t,neutralna CO2
+215,drewno,Polska,2020,0.0,tCO2e/t,neutralna CO2
+216,R410A,Polska,2020,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+217,R32,Polska,2020,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+218,R404A,Polska,2020,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+219,kalcynacja,Polska,2020,0.78,tCO2e/t,IPCC 2006
+220,reakcja chemiczna,Polska,2020,0.04,tCO2e/t,KOBiZE WE
+221,Energia elektryczna,Polska,2021,0.708,tCO2e/MWh,KOBiZE 2021
+222,Energia cieplna,Polska,2021,0.298,tCO2e/GJ,KOBiZE 2021
+223,Para technologiczna,Polska,2021,0.298,tCO2e/GJ,KOBiZE 2021
+224,Chłód,Polska,2021,0.18,tCO2e/GJ,KOBiZE 2021
+225,gaz ziemny,Polska,2021,0.00202,tCO2e/m3,KOBiZE WE
+226,olej opałowy lekki,Polska,2021,3.17,tCO2e/t,KOBiZE WE
+227,olej opałowy ciężki,Polska,2021,3.17,tCO2e/t,KOBiZE WE
+228,węgiel kamienny,Polska,2021,2.446,tCO2e/t,KOBiZE WE
+229,koks,Polska,2021,3.4,tCO2e/t,KOBiZE WE
+230,benzyna,Polska,2021,0.00219,tCO2e/l,DEFRA 2021
+231,diesel,Polska,2021,0.00251,tCO2e/l,DEFRA 2021
+232,LPG,Polska,2021,0.00161,tCO2e/l,DEFRA 2021
+233,pellet,Polska,2021,0.084,tCO2e/t,KOBiZE WE
+234,biomasa,Polska,2021,0.0,tCO2e/t,neutralna CO2
+235,drewno,Polska,2021,0.0,tCO2e/t,neutralna CO2
+236,R410A,Polska,2021,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+237,R32,Polska,2021,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+238,R404A,Polska,2021,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+239,kalcynacja,Polska,2021,0.78,tCO2e/t,IPCC 2006
+240,reakcja chemiczna,Polska,2021,0.04,tCO2e/t,KOBiZE WE
+241,Energia elektryczna,Polska,2022,0.708,tCO2e/MWh,KOBiZE 2022
+242,Energia cieplna,Polska,2022,0.296,tCO2e/GJ,KOBiZE 2022
+243,Para technologiczna,Polska,2022,0.296,tCO2e/GJ,KOBiZE 2022
+244,Chłód,Polska,2022,0.18,tCO2e/GJ,KOBiZE 2022
+245,gaz ziemny,Polska,2022,0.00202,tCO2e/m3,KOBiZE WE
+246,olej opałowy lekki,Polska,2022,3.17,tCO2e/t,KOBiZE WE
+247,olej opałowy ciężki,Polska,2022,3.17,tCO2e/t,KOBiZE WE
+248,węgiel kamienny,Polska,2022,2.446,tCO2e/t,KOBiZE WE
+249,koks,Polska,2022,3.4,tCO2e/t,KOBiZE WE
+250,benzyna,Polska,2022,0.00234,tCO2e/l,DEFRA 2022
+251,diesel,Polska,2022,0.00269,tCO2e/l,DEFRA 2022
+252,LPG,Polska,2022,0.00161,tCO2e/l,DEFRA 2022
+253,pellet,Polska,2022,0.084,tCO2e/t,KOBiZE WE
+254,biomasa,Polska,2022,0.0,tCO2e/t,neutralna CO2
+255,drewno,Polska,2022,0.0,tCO2e/t,neutralna CO2
+256,R410A,Polska,2022,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+257,R32,Polska,2022,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+258,R404A,Polska,2022,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+259,kalcynacja,Polska,2022,0.78,tCO2e/t,IPCC 2006
+260,reakcja chemiczna,Polska,2022,0.04,tCO2e/t,KOBiZE WE
+261,Energia elektryczna,Polska,2023,0.708,tCO2e/MWh,KOBiZE 2023
+262,Energia cieplna,Polska,2023,0.294,tCO2e/GJ,KOBiZE 2023
+263,Para technologiczna,Polska,2023,0.294,tCO2e/GJ,KOBiZE 2023
+264,Chłód,Polska,2023,0.18,tCO2e/GJ,KOBiZE 2023
+265,gaz ziemny,Polska,2023,0.00202,tCO2e/m3,KOBiZE WE
+266,olej opałowy lekki,Polska,2023,3.17,tCO2e/t,KOBiZE WE
+267,olej opałowy ciężki,Polska,2023,3.17,tCO2e/t,KOBiZE WE
+268,węgiel kamienny,Polska,2023,2.446,tCO2e/t,KOBiZE WE
+269,koks,Polska,2023,3.4,tCO2e/t,KOBiZE WE
+270,benzyna,Polska,2023,0.00229,tCO2e/l,DEFRA 2023
+271,diesel,Polska,2023,0.00266,tCO2e/l,DEFRA 2023
+272,LPG,Polska,2023,0.00161,tCO2e/l,DEFRA 2023
+273,pellet,Polska,2023,0.084,tCO2e/t,KOBiZE WE
+274,biomasa,Polska,2023,0.0,tCO2e/t,neutralna CO2
+275,drewno,Polska,2023,0.0,tCO2e/t,neutralna CO2
+276,R410A,Polska,2023,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+277,R32,Polska,2023,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+278,R404A,Polska,2023,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+279,kalcynacja,Polska,2023,0.78,tCO2e/t,IPCC 2006
+280,reakcja chemiczna,Polska,2023,0.04,tCO2e/t,KOBiZE WE
+281,Energia elektryczna,Polska,2024,0.709,tCO2e/MWh,KOBiZE 2024
+282,Energia cieplna,Polska,2024,0.292,tCO2e/GJ,KOBiZE 2024
+283,Para technologiczna,Polska,2024,0.292,tCO2e/GJ,KOBiZE 2024
+284,Chłód,Polska,2024,0.18,tCO2e/GJ,KOBiZE 2024
+285,gaz ziemny,Polska,2024,0.00202,tCO2e/m3,KOBiZE WE
+286,olej opałowy lekki,Polska,2024,3.17,tCO2e/t,KOBiZE WE
+287,olej opałowy ciężki,Polska,2024,3.17,tCO2e/t,KOBiZE WE
+288,węgiel kamienny,Polska,2024,2.446,tCO2e/t,KOBiZE WE
+289,koks,Polska,2024,3.4,tCO2e/t,KOBiZE WE
+290,benzyna,Polska,2024,0.00232,tCO2e/l,DEFRA 2024
+291,diesel,Polska,2024,0.00268,tCO2e/l,DEFRA 2024
+292,LPG,Polska,2024,0.00163,tCO2e/l,DEFRA 2024
+293,pellet,Polska,2024,0.084,tCO2e/t,KOBiZE WE
+294,biomasa,Polska,2024,0.0,tCO2e/t,neutralna CO2
+295,drewno,Polska,2024,0.0,tCO2e/t,neutralna CO2
+296,R410A,Polska,2024,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+297,R32,Polska,2024,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+298,R404A,Polska,2024,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+299,kalcynacja,Polska,2024,0.78,tCO2e/t,IPCC 2006
+300,reakcja chemiczna,Polska,2024,0.04,tCO2e/t,KOBiZE WE
+301,Energia elektryczna,Polska,2025,0.685,tCO2e/MWh,KOBiZE 2025
+302,Energia cieplna,Polska,2025,0.292,tCO2e/GJ,KOBiZE 2025
+303,Para technologiczna,Polska,2025,0.292,tCO2e/GJ,KOBiZE 2025
+304,Chłód,Polska,2025,0.18,tCO2e/GJ,KOBiZE 2025
+305,gaz ziemny,Polska,2025,0.00202,tCO2e/m3,KOBiZE WE
+306,olej opałowy lekki,Polska,2025,3.17,tCO2e/t,KOBiZE WE
+307,olej opałowy ciężki,Polska,2025,3.17,tCO2e/t,KOBiZE WE
+308,węgiel kamienny,Polska,2025,2.446,tCO2e/t,KOBiZE WE
+309,koks,Polska,2025,3.4,tCO2e/t,KOBiZE WE
+310,benzyna,Polska,2025,0.00233,tCO2e/l,DEFRA 2025
+311,diesel,Polska,2025,0.00267,tCO2e/l,DEFRA 2025
+312,LPG,Polska,2025,0.00163,tCO2e/l,DEFRA 2025
+313,pellet,Polska,2025,0.084,tCO2e/t,KOBiZE WE
+314,biomasa,Polska,2025,0.0,tCO2e/t,neutralna CO2
+315,drewno,Polska,2025,0.0,tCO2e/t,neutralna CO2
+316,R410A,Polska,2025,2088.0,kgCO2e/kg,IPCC AR5 GWP-100
+317,R32,Polska,2025,675.0,kgCO2e/kg,IPCC AR5 GWP-100
+318,R404A,Polska,2025,3922.0,kgCO2e/kg,IPCC AR5 GWP-100
+319,kalcynacja,Polska,2025,0.78,tCO2e/t,IPCC 2006
+320,reakcja chemiczna,Polska,2025,0.04,tCO2e/t,KOBiZE WE

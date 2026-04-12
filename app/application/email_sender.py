@@ -261,16 +261,17 @@ def _calculate_record_emission(record, table_name: str, repos) -> Decimal:
     uc = EmissionUseCases.__new__(EmissionUseCases)
     uc.repos = repos
 
+    year = getattr(record, "year", None)
     if table_name == "stationary":
-        return uc._calculate_emission_for_record(record.amount, record.unit, record.fuel)
+        return uc._calculate_emission_for_record(record.amount, record.unit, record.fuel, year=year)
     elif table_name == "mobile":
-        return uc._calculate_emission_for_record(record.amount, record.unit, record.fuel)
+        return uc._calculate_emission_for_record(record.amount, record.unit, record.fuel, year=year)
     elif table_name == "fugitive":
-        return uc._calculate_emission_for_record(record.amount, record.unit, record.product)
+        return uc._calculate_emission_for_record(record.amount, record.unit, record.product, year=year)
     elif table_name == "process":
-        return uc._calculate_emission_for_record(record.amount, record.unit, record.process)
+        return uc._calculate_emission_for_record(record.amount, record.unit, record.process, year=year)
     elif table_name == "energy_consumption":
-        return uc._calculate_emission_for_record(record.amount, record.unit, record.energy_type)
+        return uc._calculate_emission_for_record(record.amount, record.unit, record.energy_type, year=year)
     return Decimal("0")
 
 
