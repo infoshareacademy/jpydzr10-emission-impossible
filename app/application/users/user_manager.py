@@ -47,22 +47,21 @@ class UserManager:
                 writer.writerow(user.__dict__)
 
     def add_user(self, name, surname, email, phone_number, login, password):
-        # Basic validations
         if not all([name, surname, email, phone_number, login, password]):
-            print("All fields are required.")
+            print("Wszystkie pola są wymagane.")
             return None
         if not re.match(EMAIL_REGEX, email):
-            print("Invalid email format.")
+            print("Nieprawidłowy format e-mail.")
             return None
         if any(u.login == login for u in self.users):
-            print(f"Login '{login}' already exists.")
+            print(f"Login '{login}' już istnieje.")
             return None
 
         hashed = ph.hash(password)
         new_user = User(name, surname, email, phone_number, login, hashed)
         self.users.append(new_user)
         self._save_users()
-        print(f" User '{login}' added successfully.")
+        print(f"Użytkownik '{login}' został dodany.")
         return new_user
 
     def authenticate_user(self, login, password):
@@ -82,35 +81,35 @@ class UserManager:
         for user in self.users:
             if user.login == login:
                 if not new_value:
-                    print("Value cannot be empty.")
+                    print("Wartość nie może być pusta.")
                     return False
                 if field == "email" and not re.match(EMAIL_REGEX, new_value):
-                    print("Invalid email format.")
+                    print("Nieprawidłowy format e-mail.")
                     return False
                 if hasattr(user, field):
                     if field == "password":
                         new_value = ph.hash(new_value)
                     setattr(user, field, new_value)
                     self._save_users()
-                    print(f"Updated {field} for {login}.")
+                    print(f"Zaktualizowano pole '{field}' dla użytkownika '{login}'.")
                     return True
                 else:
-                    print(f"Field '{field}' does not exist.")
+                    print(f"Pole '{field}' nie istnieje.")
                     return False
-        print(f"User '{login}' not found.")
+        print(f"Nie znaleziono użytkownika '{login}'.")
         return False
 
     def list_users(self):
-        print("\nCurrent users:")
+        print("\nLista użytkowników:")
         for u in self.users:
-            print(f"{u.login} - {u.name} {u.surname}")
+            print(f"  {u.login} — {u.name} {u.surname}")
         print()
 
 user_manager = UserManager()
 
 def user_prompt():
     login = input("Login: ")
-    password = getpass("Password: ")
+    password = getpass("Hasło: ")
     user = user_manager.authenticate_user(login, password)
     if user:
         print(f"Witaj {user.name} {user.surname}!")
@@ -118,27 +117,54 @@ def user_prompt():
     else:
         return None
 
+EDITABLE_FIELDS = {
+    "1": ("name", "Imię"),
+    "2": ("surname", "Nazwisko"),
+    "3": ("email", "E-mail"),
+    "4": ("phone_number", "Numer telefonu"),
+    "5": ("login", "Login"),
+    "6": ("password", "Hasło"),
+}
+
 def create_user():
-    print("Create a new user:")
-    name = input("Name: ")
-    surname = input("Surname: ")
-    email = input("Email: ")
-    phone_number = input("Phone number: ")
+    print("\n─── Tworzenie nowego użytkownika ───")
+    print("(Wpisz 'q' aby anulować)\n")
+    name = input("Imię: ")
+    if name.lower() == 'q': return
+    surname = input("Nazwisko: ")
+    if surname.lower() == 'q': return
+    email = input("E-mail: ")
+    if email.lower() == 'q': return
+    phone_number = input("Numer telefonu: ")
+    if phone_number.lower() == 'q': return
     login = input("Login: ")
-    password = getpass("Password: ")
+    if login.lower() == 'q': return
+    password = getpass("Hasło: ")
+    if password.lower() == 'q': return
     user_manager.add_user(name, surname, email, phone_number, login, password)
 
 def edit_user():
-    login = input("Your login: ")
-    password = getpass("Your password: ")
+    print("\n─── Edycja danych użytkownika ───\n")
+    login = input("Twój login: ")
+    password = getpass("Twoje hasło: ")
     user = user_manager.authenticate_user(login, password)
     if not user:
-        print("Invalid login. Cannot edit.")
+        print("Nieprawidłowy login lub hasło. Nie można edytować.")
         return
-    print(f"Editing info for {user.name} {user.surname}")
-    field = input("Field to edit (name, surname, email, phone_number, login, password): ")
+    print(f"\nEdycja danych dla: {user.name} {user.surname}\n")
+    print("  Dostępne pola:")
+    for key, (field, label) in EDITABLE_FIELDS.items():
+        current = getattr(user, field, "")
+        if field == "password":
+            current = "********"
+        print(f"    {key} │ {label}: {current}")
+    choice = input("\nWybierz numer pola: ").strip()
+    if choice not in EDITABLE_FIELDS:
+        print("Nieprawidłowy wybór.")
+        return
+    field, label = EDITABLE_FIELDS[choice]
     if field == "password":
-        new_value = getpass("New password: ")
+        new_value = getpass(f"Nowe hasło: ")
     else:
-        new_value = input(f"New value for {field}: ")
+        new_value = input(f"Nowa wartość dla '{label}': ")
     user_manager.edit_user(login, field, new_value)

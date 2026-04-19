@@ -1,0 +1,28 @@
+name: Testy
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop, "feat_*", "feature/*", "fix/*"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kodu
+        uses: actions/checkout@v4
+
+      - name: Instalacja Pythona
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalacja uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Instalacja zależności
+        run: uv sync
+
+      - name: Uruchomienie testów
+        run: uv run pytest tests/ -v --tb=short

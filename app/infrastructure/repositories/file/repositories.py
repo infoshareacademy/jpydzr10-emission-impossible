@@ -4,7 +4,9 @@ from typing import Optional
 
 from app.application.class_models import (
     Company, StationaryCombustion, MobileCombustion, ProcessEmission,
-    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization, EnergyConsumption, EnergyPurchased,
+    FugitiveEmission, EmissionFactor, UnitConverter, UserAuthorization,
+    EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold,
+    UserPermission, ChangeLog, ReductionTarget, EmailLog,
 )
 from app.infrastructure.repositories.file.csv_repository import CsvRepository
 
@@ -19,10 +21,16 @@ class CompanyRepository(CsvRepository[Company]):
             id_field="co_id",
         )
 
-    def get_by_name(self, name: str) -> Optional[Company]:
+    def exists_by_name(self, co_name: str) -> bool:
+        """Sprawdza czy spółka o podanej nazwie już istnieje."""
+        name_lower = co_name.strip().lower()
+        objects, _ = self.get_all()
+        return any(obj.co_name.lower() == name_lower for obj in objects)
+
+    def get_by_name(self, co_name: str) -> Optional[Company]:
         objects, _ = self.get_all()
         for obj in objects:
-            if obj.co_name.lower() == name.strip().lower():
+            if obj.co_name.lower() == co_name.strip().lower():
                 return obj
         return None
 
@@ -75,21 +83,46 @@ class FactorRepository(CsvRepository[EmissionFactor]):
             file_path=os.path.join(folder, "tbl_factors.csv"),
         )
 
-    def get_factor(self, name_part: str, country: Optional[str] = None) -> Optional[EmissionFactor]:
+    def get_factor(self, name_part: str, country: Optional[str] = None,
+                   year: Optional[int] = None) -> Optional[EmissionFactor]:
+        """Zwraca wskaźnik emisji pasujący do nazwy i kraju.
+
+        Jeśli year podany — filtruje po konkretnym roku.
+        Jeśli year pominięty — zwraca wskaźnik z najnowszego dostępnego roku.
+        """
         objects, _ = self.get_all()
         name_lower = name_part.strip().lower()
-        for obj in objects:
-            if name_lower in obj.factor_name.lower():
-                if country is None or obj.country.lower() == country.strip().lower():
-                    return obj
-        return None
+        matches = [
+            obj for obj in objects
+            if name_lower in obj.factor_name.lower()
+            and (country is None or obj.country.lower() == country.strip().lower())
+        ]
+        if not matches:
+            return None
+        if year is not None:
+            year_matches = [obj for obj in matches if obj.year == year]
+            if year_matches:
+                return year_matches[0]
+            # Fallback na najnowszy gdy brak wskaźnika dla danego roku
+        return max(matches, key=lambda obj: obj.year)
+
+    def exists(self, factor_name: str, country: str, year: int) -> bool:
+        """Sprawdza czy wskaźnik (factor_name, country, year) już istnieje."""
+        name_lower = factor_name.strip().lower()
+        country_lower = country.strip().lower()
+        objects, _ = self.get_all()
+        return any(
+            obj.factor_name.lower() == name_lower
+            and obj.country.lower() == country_lower
+            and obj.year == year
+            for obj in objects
+        )
 
 class AuthorisationRepository(CsvRepository[UserAuthorization]):
     def __init__(self, folder: str = FOLDER_PATH):
         super().__init__(
             model_class=UserAuthorization,
             file_path=os.path.join(folder, "tbl_authorisations.csv"),
-            id_field="login",
         )
 
     def get_companies_for_user(self, login: str, read_only: bool = True) -> list[str]:
@@ -104,6 +137,14 @@ class ConverterRepository(CsvRepository[UnitConverter]):
         super().__init__(
             model_class=UnitConverter,
             file_path=os.path.join(folder, "tbl_converters.csv"),
+        )
+
+    def exists(self, unit_from: str, unit_to: str) -> bool:
+        """Sprawdza czy przelicznik (unit_from → unit_to) już istnieje."""
+        objects, _ = self.get_all()
+        return any(
+            obj.unit_from == unit_from.strip() and obj.unit_to == unit_to.strip()
+            for obj in objects
         )
 
     def convert(self, amount: Decimal, unit_from: str, unit_to: str) -> Decimal:
@@ -140,9 +181,129 @@ class EnergyPurchasedRepository(CsvRepository[EnergyPurchased]):
             file_path=os.path.join(folder, "tbl_e_purc.csv"),
         )
 
+
+class EnergyProducedRepository(CsvRepository[EnergyProduced]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergyProduced,
+            file_path=os.path.join(folder, "tbl_e_prod.csv"),
+        )
+
+
+class EnergySoldRepository(CsvRepository[EnergySold]):
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EnergySold,
+            file_path=os.path.join(folder, "tbl_e_sold.csv"),
+        )
+
+
+class PermissionRepository(CsvRepository[UserPermission]):
+    """Repozytorium ról użytkowników (admin / użytkownik)."""
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=UserPermission,
+            file_path=os.path.join(folder, "tbl_permissions.csv"),
+        )
+
+    def exists(self, login: str) -> bool:
+        """Sprawdza czy użytkownik ma już przypisaną rolę."""
+        return bool(self.get_filtered(login=login))
+
+    def get_role(self, login: str) -> str:
+        """Zwraca rolę użytkownika. Domyślnie 'użytkownik' jeśli brak wpisu."""
+        records = self.get_filtered(login=login)
+        if records:
+            return records[0].role
+        return "użytkownik"
+
+    def is_admin(self, login: str) -> bool:
+        return self.get_role(login) == "admin"
+
+
+class ReductionTargetRepository(CsvRepository[ReductionTarget]):
+    """Repozytorium celów redukcji emisji."""
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=ReductionTarget,
+            file_path=os.path.join(folder, "tbl_reduction_targets.csv"),
+        )
+
+    def get_for_company(self, company: str) -> list[ReductionTarget]:
+        """Zwraca cele redukcji dla danej firmy."""
+        return self.get_filtered(company=company)
+
+
+class ChangeLogRepository(CsvRepository[ChangeLog]):
+    """Repozytorium rejestru zmian (audit log).
+
+    Działa jak tabela audit — tylko zapis (add) i odczyt.
+    Nie pozwala na update ani delete — zapewnia integralność logu.
+    Backup wyłączony — sam log jest kopią historii zmian.
+    """
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=ChangeLog,
+            file_path=os.path.join(folder, "tbl_change_log.csv"),
+            id_field="id_rejestr_zmian",
+            backup=False,
+        )
+
+    def update(self, record_id, updates: dict) -> tuple[bool, str]:
+        """Zablokowane — rejestr zmian jest niezmienny (immutable)."""
+        return False, "Rejestr zmian nie pozwala na edycję rekordów"
+
+    def delete(self, record_id) -> tuple[bool, str]:
+        """Zablokowane — rejestr zmian jest niezmienny (immutable)."""
+        return False, "Rejestr zmian nie pozwala na usuwanie rekordów"
+
+    def get_by_table(self, table_name: str) -> list[ChangeLog]:
+        """Zwraca historię zmian dla danej tabeli."""
+        return self.get_filtered(table_name=table_name)
+
+    def get_by_record(self, table_name: str, record_id: str) -> list[ChangeLog]:
+        """Zwraca historię zmian konkretnego rekordu."""
+        return self.get_filtered(table_name=table_name, record_id=record_id)
+
+    def get_by_user(self, login: str) -> list[ChangeLog]:
+        """Zwraca wszystkie zmiany wykonane przez danego użytkownika."""
+        return self.get_filtered(login=login)
+
+
+class EmailLogRepository(CsvRepository[EmailLog]):
+    """Repozytorium rejestru wysłanych wiadomości e-mail.
+
+    Tylko zapis i odczyt — historia komunikacji z osobami odpowiedzialnymi za dane.
+    Bez backupu — sam log jest historią.
+    """
+    def __init__(self, folder: str = FOLDER_PATH):
+        super().__init__(
+            model_class=EmailLog,
+            file_path=os.path.join(folder, "tbl_email_log.csv"),
+            backup=False,
+        )
+
+    def update(self, record_id, updates: dict) -> tuple[bool, str]:
+        """Zablokowane — rejestr e-mail jest niezmienny."""
+        return False, "Rejestr e-mail nie pozwala na edycję rekordów"
+
+    def delete(self, record_id) -> tuple[bool, str]:
+        """Zablokowane — rejestr e-mail jest niezmienny."""
+        return False, "Rejestr e-mail nie pozwala na usuwanie rekordów"
+
+    def get_by_company(self, company: str) -> list[EmailLog]:
+        """Zwraca historię maili dla danej spółki."""
+        return self.get_filtered(company=company)
+
+    def get_by_sender(self, sender: str) -> list[EmailLog]:
+        """Zwraca maile wysłane przez danego użytkownika."""
+        return self.get_filtered(sender=sender)
+
+
 class RepositoryFactory:
     def __init__(self, folder: str = FOLDER_PATH):
         self.folder = folder
+        self.change_log = ChangeLogRepository(folder)
         self.companies = CompanyRepository(folder)
         self.stationary = StationaryCombustionRepository(folder)
         self.mobile = MobileCombustionRepository(folder)
@@ -153,7 +314,24 @@ class RepositoryFactory:
         # Nowe repozytoria dla energii
         self.energy_consumption = EnergyConsumptionRepository(folder)
         self.energy_purchased = EnergyPurchasedRepository(folder)
+        self.energy_produced = EnergyProducedRepository(folder)
+        self.energy_sold = EnergySoldRepository(folder)
         self.authorisations = AuthorisationRepository(folder)
+        self.permissions = PermissionRepository(folder)
+        self.reduction_targets = ReductionTargetRepository(folder)
+        self.email_log = EmailLogRepository(folder)
+
+    def set_audit_context(self, login: str):
+        """Włącza audit log (trigger) dla wszystkich repozytoriów.
+
+        Wywołaj po zalogowaniu użytkownika — od tego momentu każda zmiana
+        (add/update/delete) w dowolnym repo będzie rejestrowana w tbl_change_log.csv.
+        """
+        for name in vars(self):
+            attr = getattr(self, name)
+            # Podpinamy audit do wszystkich repo OPRÓCZ samego change_log
+            if isinstance(attr, CsvRepository) and not isinstance(attr, ChangeLogRepository):
+                attr.set_audit_context(self.change_log, login)
 
     def reload_all(self):
         for name in vars(self):

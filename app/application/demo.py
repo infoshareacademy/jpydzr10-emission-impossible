@@ -109,11 +109,11 @@ def demo_05_summaries():
     for company in companies:
         print(f"\nUruchamiam silnik obliczeniowy dla: {company}...")
         for year in years:
-            uc.calculate_scope_1(year=year, company=company)
+            uc.calculate_scope_1(year_from=year, year_to=year, company=company)
 
     for company in companies:
         for year in years:
-            uc.display_summary(year=year, company=company)
+            uc.display_summary(year_from=year, year_to=year, company=company)
 
 def demo_06_validation():
     print("\n" + "═" * 65)

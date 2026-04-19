@@ -1,13 +1,31 @@
 import csv
+import json
 import os
 import shutil
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Generic, TypeVar, Type, Optional
+from typing import Generic, TypeVar, Type, Optional, TYPE_CHECKING
 from pydantic import BaseModel, ValidationError
 
+if TYPE_CHECKING:
+    from app.infrastructure.repositories.file.repositories import ChangeLogRepository
+
 T = TypeVar("T", bound=BaseModel)
+
+
+def _record_to_json(record: BaseModel) -> str:
+    """Serializuje rekord Pydantic do JSONa (przygotowany pod JSONB w SQL)."""
+    data = record.model_dump()
+    for key, value in data.items():
+        if isinstance(value, Decimal):
+            data[key] = str(value)
+        elif isinstance(value, datetime):
+            data[key] = value.strftime("%Y-%m-%d %H:%M:%S")
+        elif isinstance(value, bool):
+            data[key] = value
+    return json.dumps(data, ensure_ascii=False)
+
 
 class CsvRepository(Generic[T]):
     def __init__(
@@ -23,6 +41,41 @@ class CsvRepository(Generic[T]):
         self.backup = backup
         self._cache: list[T] = []
         self._loaded: bool = False
+        self._audit_log: Optional["ChangeLogRepository"] = None
+        self._audit_login: Optional[str] = None
+
+    def set_audit_context(self, audit_log: "ChangeLogRepository", login: str):
+        """Ustawia kontekst audytu — repozytorium logu i login użytkownika.
+
+        Wywoływane przez RepositoryFactory po zalogowaniu użytkownika.
+        Działa jak włączenie triggera w SQL.
+        """
+        self._audit_log = audit_log
+        self._audit_login = login
+
+    def _log_change(self, change_type: str, record_id, previous: Optional[BaseModel] = None, actual: Optional[BaseModel] = None):
+        """Zapisuje zmianę do rejestru zmian (trigger audit).
+
+        Wywoływane automatycznie przez add(), update(), delete().
+        Jeśli audit log nie jest skonfigurowany —  pomija (brak triggera).
+        """
+        if self._audit_log is None or self._audit_login is None:
+            return
+
+        from app.application.class_models import ChangeLog
+
+        table_name = self.file_path.stem
+        log_entry = ChangeLog(
+            id_rejestr_zmian=self._audit_log.next_id(),
+            login=self._audit_login,
+            date_change=datetime.now(),
+            table_name=table_name,
+            record_id=str(record_id),
+            change_type=change_type,
+            previous_data=_record_to_json(previous) if previous else None,
+            actual_data=_record_to_json(actual) if actual else None,
+        )
+        self._audit_log.add(log_entry)
 
     def get_all(self) -> tuple[list[T], list[str]]:
         if self._loaded:
@@ -95,6 +148,9 @@ class CsvRepository(Generic[T]):
         success, msg = self._save_all()
         if not success:
             self._cache.pop()  # Cofnij jeśli zapis się nie udał
+        else:
+            # Trigger audit: INSERT — tylko actual_data
+            self._log_change("INSERT", new_id, actual=record)
         return success, msg
 
     def update(self, record_id, updates: dict) -> tuple[bool, str]:
@@ -102,6 +158,7 @@ class CsvRepository(Generic[T]):
 
         for i, obj in enumerate(objects):
             if getattr(obj, self.id_field) == record_id:
+                previous_obj = obj  # Kopia przed zmianą (dla audit logu)
                 current_data = obj.model_dump()
                 current_data.update(updates)
                 try:
@@ -111,13 +168,25 @@ class CsvRepository(Generic[T]):
                     return False, f"Błąd walidacji: {msgs}"
 
                 self._cache[i] = updated_obj
-                return self._save_all()
+                success, msg = self._save_all()
+                if success:
+                    # Trigger audit: UPDATE — previous_data + actual_data
+                    self._log_change("UPDATE", record_id, previous=previous_obj, actual=updated_obj)
+                return success, msg
 
         return False, f"Nie znaleziono rekordu z {self.id_field}={record_id}"
 
     def delete(self, record_id) -> tuple[bool, str]:
         self.get_all()
         original_len = len(self._cache)
+
+        # Znajdź rekord przed usunięciem (dla audit logu)
+        deleted_obj = None
+        for obj in self._cache:
+            if getattr(obj, self.id_field) == record_id:
+                deleted_obj = obj
+                break
+
         self._cache = [
             obj for obj in self._cache
             if getattr(obj, self.id_field) != record_id
@@ -126,7 +195,11 @@ class CsvRepository(Generic[T]):
         if len(self._cache) == original_len:
             return False, f"Nie znaleziono rekordu z {self.id_field}={record_id}"
 
-        return self._save_all()
+        success, msg = self._save_all()
+        if success and deleted_obj is not None:
+            # Trigger audit: DELETE — tylko previous_data
+            self._log_change("DELETE", record_id, previous=deleted_obj)
+        return success, msg
 
     def next_id(self) -> int:
         objects, _ = self.get_all()
@@ -169,6 +242,8 @@ class CsvRepository(Generic[T]):
                     for key, value in row.items():
                         if isinstance(value, Decimal):
                             row[key] = str(value)
+                        elif isinstance(value, datetime):
+                            row[key] = value.strftime("%Y-%m-%d %H:%M:%S")
                         elif isinstance(value, bool):
                             row[key] = "TRUE" if value else "FALSE"
                         elif value is None:
