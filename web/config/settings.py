@@ -42,7 +42,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts.apps.AccountsConfig',
+    'ai_services.apps.AiServicesConfig',
+    'calculator.apps.CalculatorConfig',
+    'companies.apps.CompaniesConfig',
+    'emissions.apps.EmissionsConfig',
+    'notifications.apps.NotificationsConfig',
+    'reports.apps.ReportsConfig',
+    'what_if.apps.WhatifConfig',
 ]
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
