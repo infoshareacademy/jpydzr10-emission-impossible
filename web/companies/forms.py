@@ -23,7 +23,7 @@ class CompaniesForm(forms.ModelForm):
                 'placeholder': 'Enter the Company name',
             }),
             'country': forms.Select(attrs={
-                'class': 'form-select'
+                'class': 'form-select',
             }),
             'city': forms.TextInput(attrs={
                 'class': 'form-control',

@@ -23,6 +23,8 @@ class Countries(CoreModel):
                                    unique=True,
                                    blank=False,
                                    )
+    def __str__(self):
+        return self.name
 
 
 class Companies(CoreModel):

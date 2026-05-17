@@ -1,10 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Zarządzanie firmą</title>
 </head>
 <body>
+
+    {% if form and not is_delete %}
+        <h1>
+            {% if object %}Edytuj firmę: {{ object.name }}{% else %}Dodaj nową firmę{% endif %}
+        </h1>
+
+        <!-- atrybut novalidate zapobiega blokowaniu wysyłania przez przeglądarkę,
+             pozwala zadziałać Twoim metodom clean_krs i clean_phone z forms.py -->
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit">Zapisz</button>
+            <a href="javascript:history.back()">Anuluj</a>
+        </form>
+
+    {% elif is_delete %}
+        <h1>Potwierdzenie usunięcia</h1>
+        <p>Czy na pewno chcesz trwale usunąć firmę: <strong>{{ object.name }}</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Tak, usuń</button>
+            <a href="javascript:history.back()">Nie, wróć</a>
+        </form>
+
+    {% elif object %}
+        <h1>Szczegóły firmy</h1>
+
+        <ul>
+            <li><strong>Nazwa firmy:</strong> {{ object.name }}</li>
+            <li><strong>Kraj:</strong> {{ object.country }}</li>
+            <li><strong>Miasto:</strong> {{ object.city }}</li>
+            <li><strong>Ulica:</strong> {{ object.street|default:"Brak" }}</li>
+            <li><strong>Kod pocztowy:</strong> {{ object.zip }}</li>
+            <li><strong>Telefon:</strong> {{ object.phone|default:"Brak" }}</li>
+            <li><strong>E-mail:</strong> {{ object.mail }}</li>
+            <li><strong>KRS:</strong> {{ object.krs }}</li>
+            <li><strong>REGON:</strong> {{ object.regon }}</li>
+            <li><strong>NIP:</strong> {{ object.nip }}</li>
+            <li><strong>Grupa kapitałowa:</strong> {{ object.capital_group_name }}</li>
+        </ul>
+
+        <br>
+        <a href="javascript:history.back()">Powrót do listy</a>
+
+    {% else %}
+        <h1>Brak danych do wyświetlenia</h1>
+        <p>Nie przekazano formularza ani obiektu.</p>
+    {% endif %}
 
 </body>
 </html>

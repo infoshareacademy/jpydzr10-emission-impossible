@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from crum import get_current_user
 
 
 # Create your models here.
@@ -25,3 +26,14 @@ class CoreModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        user = get_current_user()
+
+        if user and not user.is_anonymous:
+            if not self.pk:
+                self.created_by = user
+
+            self.updated_by = user
+
+        super().save(*args, **kwargs)
