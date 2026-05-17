@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Lista Twoich spółek</h1>
+
+<ul>
+    {% for company in companies %}
+        <li>
+            <strong>{{ company.name }}</strong><br>
+            NIP: {{ company.nip }} | KRS: {{ company.krs }}<br>
+            Adres: {{ company.city }}, {{ company.street }}
+        </li>
+    {% empty %}
+        <li>Nie masz przypisanych żadnych spółek.</li>
+    {% endfor %}
+</ul>
+</body>
+</html>

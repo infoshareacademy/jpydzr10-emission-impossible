@@ -8,11 +8,10 @@ Użycie:
     from calculator.units import ureg, Q_, convert, parse_factor_unit
 """
 
-import pint
 from dataclasses import dataclass
 from typing import Optional
 
-# ── Rejestr jednostek ────────────────────────────────────────────────────────
+import pint
 
 ureg = pint.UnitRegistry()
 ureg.formatter.default_format = "~P"
@@ -27,32 +26,34 @@ _UNIT_ALIASES: dict[str, str] = {
     # energia
     "MWh": "MWh",
     "kWh": "kWh",
-    "GJ":  "GJ",
-    "MJ":  "MJ",
+    "GJ": "GJ",
+    "MJ": "MJ",
     # masa
-    "kg":  "kg",
-    "t":   "metric_ton",
-    "Mg":  "Mg",
+    "kg": "kg",
+    "t": "metric_ton",
+    "Mg": "Mg",
     # objętość
-    "l":   "liter",
-    "m3":  "m3",
+    "l": "liter",
+    "m3": "m3",
     # CO2 (wynik wskaźnika)
-    "tCO2e":  "tCO2e",
+    "tCO2e": "tCO2e",
     "kgCO2e": "kgCO2e",
 }
 
-_MASS_ALIASES   = {"kg", "t", "metric_ton", "mg"}
+_MASS_ALIASES = {"kg", "t", "metric_ton", "mg"}
 _VOLUME_ALIASES = {"l", "liter", "m3", "meter3", "meter ** 3"}
 _ENERGY_ALIASES = {"mj", "gj", "kwh", "mwh"}
+
 
 @dataclass
 class FuelSpec:
     """
     Parametry fizyczne paliwa przekazywane z modelu Django.
     """
-    density_kg_per_m3: Optional[float] = None   # gęstość [kg/m³]
-    calorific_mj_per_kg: Optional[float] = None # wartość opałowa [MJ/kg]
-    calorific_mj_per_m3: Optional[float] = None # wartość opałowa [MJ/m³]
+
+    density_kg_per_m3: Optional[float] = None  # gęstość [kg/m³]
+    calorific_mj_per_kg: Optional[float] = None  # wartość opałowa [MJ/kg]
+    calorific_mj_per_m3: Optional[float] = None  # wartość opałowa [MJ/m³]
 
 
 def _resolve(unit_str: str) -> str:
@@ -61,6 +62,7 @@ def _resolve(unit_str: str) -> str:
     if unit_str in _UNIT_ALIASES:
         return _UNIT_ALIASES[unit_str]
     return unit_str
+
 
 def convert(value: float | int, unit_from: str, unit_to: str) -> float:
     """
@@ -100,6 +102,7 @@ def parse_factor_unit(unit_factor: str) -> tuple[str, str | None]:
         return num.strip(), den.strip()
     return unit_factor, None
 
+
 def convert_via_fuel(
     value: float | int,
     unit_from: str,
@@ -132,9 +135,9 @@ def convert_via_fuel(
     ut = _resolve(unit_to).lower()
 
     from_mass = uf in _MASS_ALIASES
-    to_mass   = ut in _MASS_ALIASES
-    from_vol  = uf in _VOLUME_ALIASES
-    to_vol    = ut in _VOLUME_ALIASES
+    to_mass = ut in _MASS_ALIASES
+    from_vol = uf in _VOLUME_ALIASES
+    to_vol = ut in _VOLUME_ALIASES
     to_energy = ut in _ENERGY_ALIASES
 
     if from_vol and to_mass:
