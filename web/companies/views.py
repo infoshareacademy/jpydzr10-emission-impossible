@@ -36,11 +36,13 @@ class CompaniesListView(CompanyAccessMixin, ListView):
     template_name = 'companies/companies_list.html'
     context_object_name = 'companies'
 
+
 class CompaniesDetailView(CompanyAccessMixin, DetailView):
     model = Companies
     template_name = 'companies/companies_detail.html'
     pk_url_kwarg = 'pk'
     context_object_name = 'company'
+
 
 class CompaniesCreateView(LoginRequiredMixin, CreateView):
     model = Companies
@@ -49,7 +51,17 @@ class CompaniesCreateView(LoginRequiredMixin, CreateView):
     required_permission = 'save'
     success_url = '/companies/'
 
-    # def form_valid(self, form):
-    #     form.instance.created_by = self.request.user
-    #     form.instance.updated_by = self.request.user
-    #     return super().form_valid(form)
+
+class CompaniesUpdateView(LoginRequiredMixin, CreateView):
+    model = Companies
+    pk_url_kwarg = 'pk'
+    form_class = CompaniesForm
+    template_name = 'companies/companies_detail.html'
+    required_permission = 'save'
+
+
+class CompaniesDeleteView(LoginRequiredMixin, CreateView):
+    model = Companies
+    pk_url_kwarg = 'pk'
+    form_class = CompaniesForm
+    template_name = 'companies/companies_detail.html'
