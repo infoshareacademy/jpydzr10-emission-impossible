@@ -1,7 +1,8 @@
 from django import forms
+from .models import EnergyConsumption, EnergyPurchased
+from django.utils import timezone
 from django.core.exceptions import ValidationError
-from datetime import datetime
-from .models import EnergyConsumption
+
 
 ENERGY_TYPES = [
     ('Energia elektryczna z OZE', 'Energia elektryczna z OZE'),
@@ -53,11 +54,9 @@ class EnergyConsumptionForm(forms.ModelForm):
         year = self.cleaned_data.get('year')
         if year is None:
             return year
-        current_year = datetime.now().year
+        current_year = timezone.now().year
         if year < 2010 or year > current_year:
-            raise ValidationError(
-                f'Rok musi być między 2010 a {current_year}.'
-            )
+            raise ValidationError(f'Rok musi być między 2010 a {current_year}.')
         return year
 
     def clean_amount(self):
@@ -80,3 +79,41 @@ class EnergyConsumptionForm(forms.ModelForm):
         if not source:
             self.add_error('source', 'Źródło danych jest wymagane.')
         return cleaned_data
+
+
+class EnergyPurchasedForm(forms.ModelForm):
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
+    unit = forms.ChoiceField(choices=UNITS)
+
+    class Meta:
+        model = EnergyPurchased
+        fields = [
+            'year', 'company', 'energy_type',
+            'amount', 'unit', 'trader', 'source'
+        ]
+        labels = {
+            'year': 'Rok',
+            'company': 'Firma',
+            'energy_type': 'Typ energii',
+            'amount': 'Ilość',
+            'unit': 'Jednostka',
+            'trader': 'Dostawca',
+            'source': 'Źródło danych',
+        }
+
+    def clean_year(self):
+        year = self.cleaned_data.get('year')
+        if year is None:
+            return year
+        current_year = timezone.now().year
+        if year < 2010 or year > current_year:
+            raise ValidationError(f'Rok musi być między 2010 a {current_year}.')
+        return year
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is None:
+            return amount
+        if amount <= 0:
+            raise ValidationError('Ilość musi być większa od zera.')
+        return amount

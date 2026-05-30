@@ -23,7 +23,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ title }}</h1>
-        <a href="{% url 'energy_consumption_add' %}" class="btn btn-success btn-lg">
+        <a href="{% url 'energy_purchased_add' %}" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Dodaj nowy rekord
         </a>
     </div>
@@ -60,7 +60,7 @@
                 <th>ID</th>
                 <th>Rok</th>
                 <th>Firma</th>
-                <th>Źródło energii</th>
+                <th>Dostawca</th>
                 <th>Typ energii</th>
                 <th>Ilość</th>
                 <th>Jednostka</th>
@@ -74,7 +74,7 @@
                 <td><strong>{{ record.id }}</strong></td>
                 <td>{{ record.year }}</td>
                 <td>{{ record.company }}</td>
-                <td>{{ record.energy_source|default:"—" }}</td>
+                <td>{{ record.trader|default:"—" }}</td>
                 <td>{{ record.energy_type|default:"—" }}</td>
                 <td class="text-end">{{ record.amount|floatformat:2 }}</td>
                 <td>{{ record.unit }}</td>
@@ -82,11 +82,11 @@
                     {{ record.emission_tco2eq|floatformat:2|default:"—" }} t
                 </td>
                 <td>
-                    <a href="{% url 'energy_consumption_edit' record.id %}"
-                       class="btn btn-sm btn-warning me-1">
-                        Edytuj
+                    <a href="{% url 'energy_purchased_list' %}"
+                        class="btn btn-secondary btn-lg px-4">
+                         <i class="bi bi-arrow-left"></i> Anuluj
                     </a>
-                    <a href="{% url 'energy_consumption_delete' record.id %}"
+                    <a href="{% url 'energy_purchased_delete' record.id %}"
                        class="btn btn-sm btn-danger">
                         Usuń
                     </a>
