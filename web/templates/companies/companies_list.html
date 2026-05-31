@@ -1,22 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>Lista Twoich spółek</h1>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Panel Zarządzania Spółkami</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/symbols/outlined">
+        <style>
+            body { font-family: 'Public Sans', sans-serif; background-color: #f0f2f5; }
+            .pixel-progress-segment { height: 100%; border-right: 1px solid rgba(0,0,0,0.1); flex: 1; }
+        </style>
+    </head>
+    <body class="p-4 md:p-8">
 
-<ul>
-    {% for company in companies %}
-        <li>
-            <strong>{{ company.name }}</strong><br>
-            NIP: {{ company.nip }} | KRS: {{ company.krs }}<br>
-            Adres: {{ company.city }}, {{ company.street }}
-        </li>
-    {% empty %}
-        <li>Nie masz przypisanych żadnych spółek.</li>
-    {% endfor %}
-</ul>
-</body>
+        <div class="max-w-7xl mx-auto space-y-8">
+
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-4xl font-black text-black uppercase tracking-tighter">Zarządzanie Spółkami</h2>
+                    <p class="text-gray-600 font-medium">Struktura organizacyjna i monitoring emisji podmiotów.</p>
+                </div>
+                <a href="{% url 'company-create' %}" class="bg-[#A3E635] text-black font-bold px-6 py-3 border-2 border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center gap-2 uppercase text-sm">
+                    <span class="material-symbols-outlined">add_business</span>
+                    Dodaj spółkę
+                </a>
+            </header>
+
+            <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000] p-4 flex flex-col md:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                    <input class="w-full pl-10 pr-4 py-2 border-2 border-black focus:bg-yellow-50 outline-none transition-colors" placeholder="Szukaj po NIP lub nazwie..." type="text">
+                </div>
+                <select class="py-2 px-4 border-2 border-black font-bold outline-none cursor-pointer bg-white">
+                    <option>Wszystkie sektory</option>
+                    <option>Transport</option>
+                    <option>IT & Tech</option>
+                    <option>Produkcja</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for company in companies %}
+                    <article class="bg-white border-2 border-black shadow-[6px_6px_0px_0px_#000] p-6 flex flex-col gap-5 hover:-translate-y-1 transition-transform relative group">
+
+                        <div class="absolute top-2 right-2 flex gap-2">
+                            <a href="{% url 'company-update' company.pk %}" class="p-1 hover:bg-gray-100 border border-transparent hover:border-black transition-all" title="Edytuj spółkę">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </a>
+                        </div>
+
+                        <header class="flex items-center gap-4">
+                            <div class="w-14 h-14 border-2 border-black bg-yellow-400 flex items-center justify-center font-black text-xl shadow-[2px_2px_0px_0px_#000]">
+                                {{ company.name|slice:":1"|upper }}
+                            </div>
+                            <div class="overflow-hidden">
+                                <h3 class="font-black text-xl truncate uppercase tracking-tight" title="{{ company.name }}">{{ company.name }}</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-black text-white uppercase tracking-widest">
+                                    {{ company.capital_group_name|default:"Niezależna" }}
+                                </span>
+                            </div>
+                        </header>
+
+                        <div class="bg-gray-50 border-2 border-black p-3 space-y-1">
+                            <div class="flex justify-between text-[10px] font-bold text-gray-500 uppercase">
+                                <span>Lokalizacja</span>
+                                <span>NIP</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-sm">
+                                <span>{{ company.city|default:"Brak danych" }}</span>
+                                <span>{{ company.nip|default:"Brak NIP" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end">
+                                <span class="text-[10px] font-black uppercase tracking-widest">Kompletność danych</span>
+                                <span class="text-sm font-black">85%</span>
+                            </div>
+                            <div class="h-4 w-full border-2 border-black bg-white p-0.5">
+                                <div class="h-full bg-[#A3E635] flex" style="width: 85%">
+                                    <div class="pixel-progress-segment"></div>
+                                    <div class="pixel-progress-segment"></div>
+                                    <div class="pixel-progress-segment"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'company-detail' company.pk %}" class="mt-2 w-full py-3 bg-black text-white font-bold hover:bg-gray-800 transition-colors flex justify-center items-center gap-2 text-sm uppercase tracking-wider shadow-[4px_4px_0px_0px_#A3E635]">
+                            Szczegóły
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </article>
+
+                {% empty %}
+                    <div class="col-span-full bg-yellow-100 border-4 border-dashed border-black p-12 text-center">
+                        <span class="material-symbols-outlined text-6xl mb-4">folder_off</span>
+                        <p class="text-xl font-black uppercase">Brak przypisanych spółek</p>
+                        <p class="text-gray-600 mb-6">Nie masz przypisanych żadnych spółek do odczytu.</p>
+                        <a href="{% url 'company-create' %}" class="inline-flex bg-[#A3E635] text-black font-bold px-6 py-3 border-2 border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all items-center gap-2 uppercase text-sm">
+                            Dodaj pierwszą spółkę
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </body>
 </html>
