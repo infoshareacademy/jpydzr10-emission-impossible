@@ -19,7 +19,7 @@ class CompaniesForm(forms.ModelForm):
 
     class Meta:
         model = Companies
-        fields = "__all__"
+        exclude = ["created_at", "updated_at", "created_by", "updated_by"]
 
     def clean_krs(self):
         krs = str(self.cleaned_data.get("krs"))

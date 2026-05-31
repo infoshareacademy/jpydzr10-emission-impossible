@@ -1,9 +1,18 @@
 from django import forms
-from .models import EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from .models import (
+    EnergyConsumption,
+    EnergyProduced,
+    EnergyPurchased,
+    EnergySold,
+    FugitiveEmission,
+    MobileCombustion,
+    ProcessEmission,
+    StationaryCombustion,
+)
 
 ENERGY_TYPES = [
     ('Energia elektryczna z OZE', 'Energia elektryczna z OZE'),
@@ -200,3 +209,63 @@ class EnergySoldForm(forms.ModelForm):
                 params={'current_year': current_year}
             )
         return year
+
+class Scope1BaseForm(forms.ModelForm):
+    """
+    Klasa bazowa dla wszystkich formularzy Zakresu 1.
+    Automatycznie nakłada brutalistyczne style Tailwind na każde pole.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+            # Bazowe klasy neo-brutalizmu
+            css_classes = "w-full px-4 py-2 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all outline-none font-body-md"
+
+            # Wymuszenie Textarea dla dłuższych tekstów
+            if isinstance(field.widget, forms.Textarea):
+                field.widget.attrs["class"] = css_classes + " min-h-[100px] resize-y"
+            else:
+                field.widget.attrs["class"] = css_classes
+
+            # Dynamiczne generowanie placeholderów
+            label = field.label or field_name
+            if not field.widget.attrs.get("placeholder"):
+                field.widget.attrs["placeholder"] = f"Wprowadź: {label}"
+
+
+class StationaryCombustionForm(Scope1BaseForm):
+    class Meta:
+        model = StationaryCombustion
+        fields = "__all__"
+        widgets = {
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class MobileCombustionForm(Scope1BaseForm):
+    class Meta:
+        model = MobileCombustion
+        fields = "__all__"
+        widgets = {
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class ProcessEmissionForm(Scope1BaseForm):
+    class Meta:
+        model = ProcessEmission
+        fields = "__all__"
+        widgets = {
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class FugitiveEmissionForm(Scope1BaseForm):
+    class Meta:
+        model = FugitiveEmission
+        fields = "__all__"
+        widgets = {
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }

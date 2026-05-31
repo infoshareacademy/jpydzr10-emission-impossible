@@ -1,16 +1,14 @@
-from django.db import models
 from decimal import Decimal
 
+from companies.models import Companies
 from django.db import models
-from decimal import Decimal
-
 
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
 
 class BaseRecord(models.Model):
     year = models.IntegerField()
-    company = models.CharField(max_length=200)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='%(class)s_records')
     data_quality = models.CharField(
         max_length=20, blank=True, null=True
     )
