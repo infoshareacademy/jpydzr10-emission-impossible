@@ -1,7 +1,8 @@
 from django import forms
-from .models import EnergyConsumption, EnergyPurchased
+from .models import EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 ENERGY_TYPES = [
@@ -41,13 +42,13 @@ class EnergyConsumptionForm(forms.ModelForm):
             'amount', 'unit', 'source'
         ]
         labels = {
-            'year': 'Rok',
-            'company': 'Firma',
-            'energy_source': 'Źródło energii',
-            'energy_type': 'Typ energii',
-            'amount': 'Ilość',
-            'unit': 'Jednostka',
-            'source': 'Źródło danych',
+            'year': _('Rok'),
+            'company': _('Firma'),
+            'energy_source': _('Źródło energii'),
+            'energy_type': _('Typ energii'),
+            'amount': _('Ilość'),
+            'unit': _('Jednostka'),
+            'source': _('Źródło danych'),
         }
 
     def clean_year(self):
@@ -56,7 +57,10 @@ class EnergyConsumptionForm(forms.ModelForm):
             return year
         current_year = timezone.now().year
         if year < 2010 or year > current_year:
-            raise ValidationError(f'Rok musi być między 2010 a {current_year}.')
+            raise ValidationError(
+                _('Rok musi być między 2010 a %(current_year)s.'),
+                params={'current_year': current_year}
+            )
         return year
 
     def clean_amount(self):
@@ -64,7 +68,7 @@ class EnergyConsumptionForm(forms.ModelForm):
         if amount is None:
             return amount
         if amount <= 0:
-            raise ValidationError('Ilość musi być większa od zera.')
+            raise ValidationError(_('Ilość musi być większa od zera.'))
         return amount
 
     def clean(self):
@@ -92,13 +96,13 @@ class EnergyPurchasedForm(forms.ModelForm):
             'amount', 'unit', 'trader', 'source'
         ]
         labels = {
-            'year': 'Rok',
-            'company': 'Firma',
-            'energy_type': 'Typ energii',
-            'amount': 'Ilość',
-            'unit': 'Jednostka',
-            'trader': 'Dostawca',
-            'source': 'Źródło danych',
+            'year': _('Rok'),
+            'company': _('Firma'),
+            'energy_type': _('Typ energii'),
+            'amount': _('Ilość'),
+            'unit': _('Jednostka'),
+            'trader': _('Dostawca'),
+            'source': _('Źródło danych'),
         }
 
     def clean_year(self):
@@ -107,7 +111,10 @@ class EnergyPurchasedForm(forms.ModelForm):
             return year
         current_year = timezone.now().year
         if year < 2010 or year > current_year:
-            raise ValidationError(f'Rok musi być między 2010 a {current_year}.')
+            raise ValidationError(
+                _('Rok musi być między 2010 a %(current_year)s.'),
+                params={'current_year': current_year}
+            )
         return year
 
     def clean_amount(self):
@@ -115,5 +122,81 @@ class EnergyPurchasedForm(forms.ModelForm):
         if amount is None:
             return amount
         if amount <= 0:
-            raise ValidationError('Ilość musi być większa od zera.')
+            raise ValidationError(_('Ilość musi być większa od zera.'))
         return amount
+
+class EnergyProducedForm(forms.ModelForm):
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
+    unit = forms.ChoiceField(choices=UNITS)
+
+    class Meta:
+        model = EnergyProduced
+        fields = [
+            'year', 'company', 'energy_type',
+            'amount', 'unit', 'installation', 'source'
+        ]
+        labels = {
+            'year': _('Rok'),
+            'company': _('Firma'),
+            'energy_type': _('Typ energii'),
+            'amount': _('Ilość'),
+            'unit': _('Jednostka'),
+            'installation': _('Instalacja'),
+            'source': _('Źródło danych'),
+        }
+
+    def clean_year(self):
+        year = self.cleaned_data.get('year')
+        if year is None:
+            return year
+        current_year = timezone.now().year
+        if year < 2010 or year > current_year:
+            raise ValidationError(
+                _('Rok musi być między 2010 a %(current_year)s.'),
+                params={'current_year': current_year}
+            )
+        return year
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is None:
+            return amount
+        if amount <= 0:
+            raise ValidationError(_('Ilość musi być większa od zera.'))
+        return amount
+
+class EnergySoldForm(forms.ModelForm):
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
+    unit = forms.ChoiceField(choices=UNITS)
+
+    class Meta:
+        model = EnergySold
+        fields = [
+            'year', 'company', 'energy_type',
+            'amount', 'unit', 'customer', 'source'
+        ]
+        labels = {
+            'year': _('Rok'),
+            'company': _('Firma'),
+            'energy_type': _('Typ energii'),
+            'amount': _('Ilość'),
+            'unit': _('Jednostka'),
+            'customer': _('Odbiorca'),
+            'source': _('Źródło danych'),
+        }
+        widgets = {
+            'year': forms.NumberInput(attrs={'min': 2010}),
+            'amount': forms.NumberInput(attrs={'min': 0.01}),
+        }
+
+    def clean_year(self):
+        year = self.cleaned_data.get('year')
+        if year is None:
+            return year
+        current_year = timezone.now().year
+        if year < 2010 or year > current_year:
+            raise ValidationError(
+                _('Rok musi być między 2010 a %(current_year)s.'),
+                params={'current_year': current_year}
+            )
+        return year

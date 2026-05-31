@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import EnergyConsumption, EnergyPurchased
-from .forms import EnergyConsumptionForm, EnergyPurchasedForm
+from django.utils.translation import gettext_lazy as _
+from .models import EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold
+from .forms import EnergyConsumptionForm, EnergyPurchasedForm, EnergyProducedForm, EnergySoldForm
 from django.core.paginator import Paginator
 
 
@@ -167,4 +168,154 @@ def energy_purchased_delete(request, pk):
     return render(request, 'emissions/energy_purchased_confirm_delete.html', {
         'record': record,
         'title': 'Potwierdź usunięcie'
+    })
+
+def energy_produced_list(request):
+    """Wyświetla listę rekordów wyprodukowanej energii."""
+    records = EnergyProduced.objects.all().order_by('-year', 'company')
+    company = request.GET.get('company', '').strip()
+    year_str = request.GET.get('year', '').strip()
+
+    if company:
+        records = records.filter(company__icontains=company)
+    if year_str:
+        try:
+            year = int(year_str)
+            records = records.filter(year=year)
+        except ValueError:
+            pass
+
+    paginator = Paginator(records, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    elided_page_range = paginator.get_elided_page_range(
+        page_obj.number, on_each_side=2, on_ends=1
+    )
+
+    context = {
+        'records': page_obj,
+        'page_obj': page_obj,
+        'page_range': elided_page_range,
+        'title': 'Wyprodukowana energia',
+        'filter_company': company,
+        'filter_year': year_str,
+    }
+    return render(request, 'emissions/energy_produced_list.html', context)
+
+#@login_required
+def energy_produced_add(request):
+    if request.method == 'POST':
+        form = EnergyProducedForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Rekord wyprodukowanej energii został dodany.')
+            return redirect('energy_produced_list')
+    else:
+        form = EnergyProducedForm()
+    return render(request, 'emissions/energy_produced_form.html', {
+        'form': form,
+        'title': 'Dodaj wyprodukowaną energię'
+    })
+
+#@login_required
+def energy_produced_edit(request, pk):
+    record = get_object_or_404(EnergyProduced, pk=pk)
+    if request.method == 'POST':
+        form = EnergyProducedForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Rekord został zaktualizowany.')
+            return redirect('energy_produced_list')
+    else:
+        form = EnergyProducedForm(instance=record)
+    return render(request, 'emissions/energy_produced_form.html', {
+        'form': form,
+        'title': 'Edytuj wyprodukowaną energię'
+    })
+
+#@login_required
+def energy_produced_delete(request, pk):
+    record = get_object_or_404(EnergyProduced, pk=pk)
+    if request.method == 'POST':
+        record.delete()
+        messages.success(request, 'Rekord został usunięty.')
+        return redirect('energy_produced_list')
+    return render(request, 'emissions/energy_produced_confirm_delete.html', {
+        'record': record,
+        'title': 'Potwierdź usunięcie'
+    })
+
+def energy_sold_list(request):
+    """Wyświetla listę rekordów sprzedanej energii."""
+    records = EnergySold.objects.all().order_by('-year', 'company')
+    company = request.GET.get('company', '').strip()
+    year_str = request.GET.get('year', '').strip()
+
+    if company:
+        records = records.filter(company__icontains=company)
+    if year_str:
+        try:
+            year = int(year_str)
+            records = records.filter(year=year)
+        except ValueError:
+            pass
+
+    paginator = Paginator(records, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    elided_page_range = paginator.get_elided_page_range(
+        page_obj.number, on_each_side=2, on_ends=1
+    )
+
+    context = {
+        'records': page_obj,
+        'page_obj': page_obj,
+        'page_range': elided_page_range,
+        'title': _('Sprzedana energia'),
+        'filter_company': company,
+        'filter_year': year_str,
+    }
+    return render(request, 'emissions/energy_sold_list.html', context)
+
+# @login_required
+def energy_sold_add(request):
+    if request.method == 'POST':
+        form = EnergySoldForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _('Rekord sprzedanej energii został dodany.'))
+            return redirect('energy_sold_list')
+    else:
+        form = EnergySoldForm()
+    return render(request, 'emissions/energy_sold_form.html', {
+        'form': form,
+        'title': _('Dodaj sprzedaną energię')
+    })
+
+# @login_required
+def energy_sold_edit(request, pk):
+    record = get_object_or_404(EnergySold, pk=pk)
+    if request.method == 'POST':
+        form = EnergySoldForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _('Rekord został zaktualizowany.'))
+            return redirect('energy_sold_list')
+    else:
+        form = EnergySoldForm(instance=record)
+    return render(request, 'emissions/energy_sold_form.html', {
+        'form': form,
+        'title': _('Edytuj sprzedaną energię')
+    })
+
+# @login_required
+def energy_sold_delete(request, pk):
+    record = get_object_or_404(EnergySold, pk=pk)
+    if request.method == 'POST':
+        record.delete()
+        messages.success(request, _('Rekord został usunięty.'))
+        return redirect('energy_sold_list')
+    return render(request, 'emissions/energy_sold_confirm_delete.html', {
+        'record': record,
+        'title': _('Potwierdź usunięcie')
     })
