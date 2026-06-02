@@ -69,7 +69,14 @@
         </style>
     </head>
     <body class="bg-background text-on-background font-body-md min-h-screen flex">
-        <div class="pt-24 px-6 lg:px-12 max-w-7xl mx-auto">
+        <div class="pt-12 px-6 lg:px-12 max-w-7xl mx-auto w-full">
+
+            <div class="mb-8">
+                <a href="{% url 'companies:companies-list' %}" class="inline-flex items-center gap-2 text-sm font-bold uppercase hover:underline text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    Wróć do listy firm
+                </a>
+            </div>
 
             <div class="mb-12">
                 <h2 class="text-4xl font-bold text-on-surface mb-2 tracking-tight">Kalkulator Emisji</h2>
