@@ -17,12 +17,25 @@ class BaseRecord(models.Model):
     class Meta:
         abstract = True  # ← brak tabeli w bazie!
 
+class RecordStatus(models.TextChoices):
+    DRAFT = "DRAFT", _("Roboczy")
+    PENDING = "PENDING", _("Do akceptacji")
+    APPROVED = "APPROVED", _("Zatwierdzony")
+    VERIFIED = "VERIFIED", _("Zweryfikowany")
+    REJECTED = "REJECTED", _("Odrzucony")
+
 
 class ActivityRecord(BaseRecord):
     amount = models.DecimalField(max_digits=12, decimal_places=3)
     unit = models.CharField(max_length=20)
     source = models.CharField(max_length=200, blank=True, null=True)
-
+    status = models.CharField(
+        max_length=20,
+        choices=RecordStatus.choices,
+        default=RecordStatus.DRAFT,
+        verbose_name=_("Status"),
+    )
+    
     class Meta:
         abstract = True  # ← też abstrakcyjny!
 
