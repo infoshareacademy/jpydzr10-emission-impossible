@@ -71,9 +71,24 @@ urlpatterns = [
         "<int:company_id>/dashboard/", views.DashboardView.as_view(), name="dashboard"
     ),
     path(
+        "company/<int:company_id>/stationary/",
+        views.StationaryCombustionListView.as_view(),
+        name="stationarycombustion-list",
+    ),
+    path(
         "<int:company_id>/scope1/stationary/add/",
         views.StationaryCombustionCreateView.as_view(),
-        name="stationary-add",
+        name="stationarycombustion-add",
+    ),
+    path(
+        "company/<int:company_id>/stationary/<int:pk>/edit/",
+        views.StationaryCombustionUpdateView.as_view(),
+        name="stationarycombustion-edit",
+    ),
+    path(
+        "company/<int:company_id>/stationary/<int:pk>/delete/",
+        views.StationaryCombustionDeleteView.as_view(),
+        name="stationarycombustion-delete",
     ),
     path(
         "<int:company_id>/scope1/mobile/add/",

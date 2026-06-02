@@ -1,8 +1,11 @@
+import openpyxl
 from companies.models import Companies
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -383,9 +386,20 @@ class Scope1CreateMixin(LoginRequiredMixin):
     template_name = (
         "emissions/scope1_form.html"  # Jeden uniwersalny szablon dla formularzy
     )
-    success_url = reverse_lazy("emissions:dashboard", kwargs={"company_id": 1})
+    url_name_prefix = None
+
+    def get_url_prefix(self):
+        return self.url_name_prefix or self.model._meta.model_name
+
+    def get_success_url(self):
+        prefix = self.get_url_prefix()
+        return reverse_lazy(
+            f"emissions:{prefix}-list",
+            kwargs={"company_id": self.kwargs.get("company_id")},
+        )
 
     def form_valid(self, form):
+        form.instance.company_id = self.kwargs.get("company_id")
         messages.success(
             self.request, f"Pomyślnie dodano wpis do: {self.model._meta.verbose_name}"
         )
@@ -395,13 +409,130 @@ class Scope1CreateMixin(LoginRequiredMixin):
         context = super().get_context_data(**kwargs)
         context["model_verbose_name"] = self.model._meta.verbose_name
         context["company_id"] = self.kwargs.get("company_id")
+        prefix = self.get_url_prefix()
+        context["list_url_name"] = f"emissions:{prefix}-list"
+
         return context
 
 
-class StationaryCombustionListView(LoginRequiredMixin, ListView):
+class EmissionListMixin(LoginRequiredMixin, ListView):
+    """
+    Uniwersalny widok listy dla wszystkich kategorii emisji.
+    Obsługuje paginację, filtrowanie, sortowanie i eksport do XLSX.
+    """
+
+    paginate_by = 15
+    template_name = "emissions/scope1_list.html"
+    filter_fields = ["year", "status"]
+    search_fields = []
+    default_sort = "-year"
+
+    def get_queryset(self):
+        self.company = get_object_or_404(Companies, pk=self.kwargs.get("company_id"))
+        qs = self.model.objects.filter(company=self.company).select_related("company")
+
+        self.current_sort = self.request.GET.get("sort", self.default_sort)
+        self.current_year = self.request.GET.get("year", "")
+        self.current_status = self.request.GET.get("status", "")
+        self.current_search = self.request.GET.get("q", "")
+
+        if self.current_year:
+            qs = qs.filter(year=self.current_year)
+        if self.current_status:
+            qs = qs.filter(status=self.current_status)
+        if self.current_search and self.search_fields:
+
+            search_query = Q()
+            for field in self.search_fields:
+                search_query |= Q(**{f"{field}__icontains": self.current_search})
+            qs = qs.filter(search_query)
+
+        return qs.order_by(self.current_sort)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        status_choices = (
+            getattr(self.model._meta.get_field("status"), "choices", [])
+            if hasattr(self.model, "status")
+            else []
+        )
+        context.update(
+            {
+                "company": self.company,
+                "model_verbose_name": self.model._meta.verbose_name,
+                "model_verbose_name_plural": self.model._meta.verbose_name_plural,
+                "current_sort": self.current_sort,
+                "current_year": self.current_year,
+                "current_status": self.current_status,
+                "current_search": self.current_search,
+                "status_choices": status_choices,
+                "add_url_name": f"emissions:{self.model._meta.model_name}-add",
+                "edit_url_name": f"emissions:{self.model._meta.model_name}-edit",
+                "delete_url_name": f"emissions:{self.model._meta.model_name}-delete",
+            }
+        )
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if "export" in request.GET:
+            return self.export_to_excel()
+        return super().get(request, *args, **kwargs)
+
+    def export_to_excel(self):
+        """Eksportuje wyfiltrowany QuerySet do pliku .xlsx."""
+        qs = self.get_queryset()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = str(self.model._meta.verbose_name_plural)[:31]
+        fields = [f for f in self.model._meta.fields if f.name not in ["id", "company"]]
+        ws.append([f.verbose_name.title() for f in fields])
+
+        for obj in qs:
+            row = []
+            for field in fields:
+                value = getattr(obj, field.name)
+                if hasattr(obj, f"get_{field.name}_display"):
+                    value = getattr(obj, f"get_{field.name}_display")()
+                row.append(str(value) if value is not None else "")
+            ws.append(row)
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        filename = f"export_{self.model._meta.model_name}_{self.company.pk}.xlsx"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        wb.save(response)
+        return response
+
+
+class Scope1DeleteMixin(LoginRequiredMixin):
+    """Wspólna logika dla usuwania rekordów z Zakresu 1.
+    Dynamicznie określa adres przekierowania powrotnego na listę.
+    """
+
+    def get_success_url(self):
+        return reverse_lazy(
+            f"emissions:{self.model._meta.model_name}-list",
+            kwargs={"company_id": self.kwargs.get("company_id")},
+        )
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(
+            self.request,
+            f"Pomyślnie usunięto wpis z: {self.model._meta.verbose_name}",
+        )
+        return super().delete(request, *args, **kwargs)
+
+
+class StationaryCombustionDeleteView(Scope1DeleteMixin, DeleteView):
+    """Widok usuwania rekordów dla spalania stacjonarnego."""
+
     model = StationaryCombustion
-    template_name = "emissions/stationary_list.html"
-    context_object_name = "records"
+
+
+class StationaryCombustionListView(EmissionListMixin):
+    model = StationaryCombustion
+    search_fields = ["fuel", "installation"]
 
 
 class StationaryCombustionCreateView(Scope1CreateMixin, CreateView):
@@ -411,6 +542,7 @@ class StationaryCombustionCreateView(Scope1CreateMixin, CreateView):
 
 class StationaryCombustionUpdateView(Scope1CreateMixin, UpdateView):
     model = StationaryCombustion
+    form_class = StationaryCombustionForm
 
     def form_valid(self, form):
         messages.success(self.request, "Pomyślnie zaktualizowano wpis.")
