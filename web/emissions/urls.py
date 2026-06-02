@@ -70,8 +70,24 @@ urlpatterns = [
     path(
         "<int:company_id>/dashboard/", views.DashboardView.as_view(), name="dashboard"
     ),
-    path('<int:company_id>/scope1/stationary/add/', views.StationaryCombustionCreateView.as_view(), name='stationary-add'),
-    path('<int:company_id>/scope1/mobile/add/', views.MobileCombustionCreateView.as_view(), name='mobile-add'),
-    path('<int:company_id>/scope1/process/add/', views.ProcessEmissionCreateView.as_view(), name='process-add'),
-    path('<int:company_id>/scope1/fugitive/add/', views.FugitiveEmissionCreateView.as_view(), name='fugitive-add')
+    path(
+        "<int:company_id>/scope1/stationary/add/",
+        views.StationaryCombustionCreateView.as_view(),
+        name="stationary-add",
+    ),
+    path(
+        "<int:company_id>/scope1/mobile/add/",
+        views.MobileCombustionCreateView.as_view(),
+        name="mobile-add",
+    ),
+    path(
+        "<int:company_id>/scope1/process/add/",
+        views.ProcessEmissionCreateView.as_view(),
+        name="process-add",
+    ),
+    path(
+        "<int:company_id>/scope1/fugitive/add/",
+        views.FugitiveEmissionCreateView.as_view(),
+        name="fugitive-add",
+    ),
 ]

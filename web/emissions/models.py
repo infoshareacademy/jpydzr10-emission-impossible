@@ -6,12 +6,13 @@ from django.db import models
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
 
+
 class BaseRecord(models.Model):
     year = models.IntegerField()
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='%(class)s_records')
-    data_quality = models.CharField(
-        max_length=20, blank=True, null=True
+    company = models.ForeignKey(
+        Companies, on_delete=models.CASCADE, related_name="%(class)s_records"
     )
+    data_quality = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         abstract = True  # ← brak tabeli w bazie!
@@ -25,6 +26,7 @@ class ActivityRecord(BaseRecord):
     class Meta:
         abstract = True  # ← też abstrakcyjny!
 
+
 class StationaryCombustion(ActivityRecord):
     fuel = models.CharField(max_length=100)
     installation = models.CharField(max_length=200)
@@ -35,9 +37,9 @@ class StationaryCombustion(ActivityRecord):
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_stationary_combustion'
-        verbose_name = 'Spalanie stacjonarne'
-        verbose_name_plural = 'Spalanie stacjonarne'
+        db_table = "tbl_stationary_combustion"
+        verbose_name = "Spalanie stacjonarne"
+        verbose_name_plural = "Spalanie stacjonarne"
 
 
 class MobileCombustion(ActivityRecord):
@@ -50,9 +52,9 @@ class MobileCombustion(ActivityRecord):
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_mobile_combustion'
-        verbose_name = 'Spalanie mobilne'
-        verbose_name_plural = 'Spalanie mobilne'
+        db_table = "tbl_mobile_combustion"
+        verbose_name = "Spalanie mobilne"
+        verbose_name_plural = "Spalanie mobilne"
 
 
 class ProcessEmission(ActivityRecord):
@@ -65,9 +67,9 @@ class ProcessEmission(ActivityRecord):
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_process_emissions'
-        verbose_name = 'Emisja procesowa'
-        verbose_name_plural = 'Emisje procesowe'
+        db_table = "tbl_process_emissions"
+        verbose_name = "Emisja procesowa"
+        verbose_name_plural = "Emisje procesowe"
 
 
 class FugitiveEmission(ActivityRecord):
@@ -80,9 +82,10 @@ class FugitiveEmission(ActivityRecord):
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_fugitive_emissions'
-        verbose_name = 'Emisja niezorganizowana'
-        verbose_name_plural = 'Emisje niezorganizowane'
+        db_table = "tbl_fugitive_emissions"
+        verbose_name = "Emisja niezorganizowana"
+        verbose_name_plural = "Emisje niezorganizowane"
+
 
 class EnergyConsumption(ActivityRecord):
     energy_source = models.CharField(max_length=100)
@@ -92,48 +95,45 @@ class EnergyConsumption(ActivityRecord):
     )
 
     class Meta:
-        db_table = 'tbl_e_cons'
-        verbose_name = 'Zużycie energii'
-        verbose_name_plural = 'Zużycie energii'
+        db_table = "tbl_e_cons"
+        verbose_name = "Zużycie energii"
+        verbose_name_plural = "Zużycie energii"
 
 
 class EnergyPurchased(ActivityRecord):
     energy_type = models.CharField(max_length=100)
-    trader = models.CharField(max_length=200, blank=True, default='')
-    factor = models.DecimalField(
-        max_digits=12, decimal_places=3, default=Decimal('0')
-    )
+    trader = models.CharField(max_length=200, blank=True, default="")
+    factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))
     emission_tco2eq = models.DecimalField(
         max_digits=12, decimal_places=3, null=True, blank=True
     )
 
     class Meta:
-        db_table = 'tbl_e_purc'
-        verbose_name = 'Zakupiona energia'
-        verbose_name_plural = 'Zakupiona energia'
+        db_table = "tbl_e_purc"
+        verbose_name = "Zakupiona energia"
+        verbose_name_plural = "Zakupiona energia"
 
 
 class EnergyProduced(ActivityRecord):
-    installation = models.CharField(max_length=200, blank=True, default='')
+    installation = models.CharField(max_length=200, blank=True, default="")
     energy_type = models.CharField(max_length=100)
-    factor = models.DecimalField(
-        max_digits=12, decimal_places=3, default=Decimal('0')
-    )
+    factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))
 
     class Meta:
-        db_table = 'tbl_e_prod'
-        verbose_name = 'Wyprodukowana energia'
-        verbose_name_plural = 'Wyprodukowana energia'
+        db_table = "tbl_e_prod"
+        verbose_name = "Wyprodukowana energia"
+        verbose_name_plural = "Wyprodukowana energia"
 
 
 class EnergySold(ActivityRecord):
     energy_type = models.CharField(max_length=100)
-    customer = models.CharField(max_length=200, blank=True, default='')
+    customer = models.CharField(max_length=200, blank=True, default="")
 
     class Meta:
-        db_table = 'tbl_e_sold'
-        verbose_name = 'Sprzedana energia'
-        verbose_name_plural = 'Sprzedana energia'
+        db_table = "tbl_e_sold"
+        verbose_name = "Sprzedana energia"
+        verbose_name_plural = "Sprzedana energia"
+
 
 class EmissionFactor(models.Model):
     factor_name = models.CharField(max_length=200)
@@ -144,9 +144,9 @@ class EmissionFactor(models.Model):
     source = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_factors'
-        verbose_name = 'Wskaźnik emisji'
-        verbose_name_plural = 'Wskaźniki emisji'
+        db_table = "tbl_factors"
+        verbose_name = "Wskaźnik emisji"
+        verbose_name_plural = "Wskaźniki emisji"
 
 
 class UnitConverter(models.Model):
@@ -155,9 +155,9 @@ class UnitConverter(models.Model):
     factor = models.DecimalField(max_digits=12, decimal_places=5)
 
     class Meta:
-        db_table = 'tbl_converters'
-        verbose_name = 'Przelicznik jednostek'
-        verbose_name_plural = 'Przeliczniki jednostek'
+        db_table = "tbl_converters"
+        verbose_name = "Przelicznik jednostek"
+        verbose_name_plural = "Przeliczniki jednostek"
 
 
 class ReductionTarget(models.Model):
@@ -166,13 +166,14 @@ class ReductionTarget(models.Model):
     base_year = models.PositiveIntegerField()
     target_year = models.PositiveIntegerField()
     reduction_pct = models.DecimalField(max_digits=5, decimal_places=2)
-    scope = models.CharField(max_length=10, default='1+2')
+    scope = models.CharField(max_length=10, default="1+2")
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_reduction_targets'
-        verbose_name = 'Cel redukcji'
-        verbose_name_plural = 'Cele redukcji'
+        db_table = "tbl_reduction_targets"
+        verbose_name = "Cel redukcji"
+        verbose_name_plural = "Cele redukcji"
+
 
 class EmailLog(models.Model):
     date = models.DateTimeField()
@@ -187,9 +188,9 @@ class EmailLog(models.Model):
     year = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_email_log'
-        verbose_name = 'Log email'
-        verbose_name_plural = 'Logi email'
+        db_table = "tbl_email_log"
+        verbose_name = "Log email"
+        verbose_name_plural = "Logi email"
 
 
 class ChangeLog(models.Model):
@@ -203,6 +204,6 @@ class ChangeLog(models.Model):
     actual_data = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = 'tbl_change_log'
-        verbose_name = 'Log zmian'
-        verbose_name_plural = 'Logi zmian'
+        db_table = "tbl_change_log"
+        verbose_name = "Log zmian"
+        verbose_name_plural = "Logi zmian"

@@ -10,6 +10,7 @@ dependencies = [
     "codecarbon>=3.2.6",
     "django>=6.0.4",
     "django-crum>=0.7.9",
+    "djhtml>=3.0.11",
     "fpdf2>=2.8.7",
     "matplotlib>=3.9.0",
     "openpyxl>=3.1.5",
