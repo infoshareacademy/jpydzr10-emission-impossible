@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from companies.models import Companies
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
@@ -16,6 +17,7 @@ class BaseRecord(models.Model):
 
     class Meta:
         abstract = True  # ← brak tabeli w bazie!
+
 
 class RecordStatus(models.TextChoices):
     DRAFT = "DRAFT", _("Roboczy")
@@ -35,7 +37,7 @@ class ActivityRecord(BaseRecord):
         default=RecordStatus.DRAFT,
         verbose_name=_("Status"),
     )
-    
+
     class Meta:
         abstract = True  # ← też abstrakcyjny!
 
