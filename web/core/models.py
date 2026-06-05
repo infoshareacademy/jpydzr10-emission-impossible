@@ -1,9 +1,6 @@
 from django.db import models
 from django.conf import settings
-from crum import get_current_user
 
-
-# Create your models here.
 class CoreModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
@@ -27,13 +24,17 @@ class CoreModel(models.Model):
         abstract = True
         ordering = ["-created_at"]
 
-    def save(self, *args, **kwargs):
-        user = get_current_user()
+class ChangeLog(models.Model):
+    id_rejestr_zmian = models.AutoField(primary_key=True)
+    login = models.CharField(max_length=100)
+    date_change = models.DateTimeField()
+    table_name = models.CharField(max_length=200)
+    record_id = models.CharField(max_length=50)
+    change_type = models.CharField(max_length=10)
+    previous_data = models.TextField(blank=True, null=True)
+    actual_data = models.TextField(blank=True, null=True)
 
-        if user and not user.is_anonymous:
-            if not self.pk:
-                self.created_by = user
-
-            self.updated_by = user
-
-        super().save(*args, **kwargs)
+    class Meta:
+        db_table = "tbl_change_log"
+        verbose_name = "Log zmian"
+        verbose_name_plural = "Logi zmian"

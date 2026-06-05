@@ -1,11 +1,13 @@
 import openpyxl
 from companies.models import Companies
+from calculator.calculation import calculate_record_emissions
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -379,7 +381,7 @@ def energy_sold_delete(request, pk):
 
 class Scope1CreateMixin(LoginRequiredMixin):
     """
-    Wspólna logika dla wszystkich widoków dodawania z Zakresu 1.
+    Wspólna logika dla wszystkich widoków dodawania i aktualizacji z Zakresu 1.
     Używa tego samego szablonu formularza i wraca na dashboard.
     """
 
@@ -399,11 +401,32 @@ class Scope1CreateMixin(LoginRequiredMixin):
         )
 
     def form_valid(self, form):
-        form.instance.company_id = self.kwargs.get("company_id")
+        instance = form.save(commit=False)
+        instance.company_id = self.kwargs.get("company_id")
+
+        is_new = instance.pk is None
+
+        if is_new:
+            instance.created_by = self.request.user
+            instance.created_by = self.request.user
+        
+        instance.updated_by = self.request.user
+        instance.updated_by = self.request.user
+
+        try:
+            calculate_record_emissions(instance)
+        except ValidationError as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+
+        instance.save()
+        
+        action_text = "dodano wpis do" if is_new else "zaktualizowano wpis w"
         messages.success(
-            self.request, f"Pomyślnie dodano wpis do: {self.model._meta.verbose_name}"
+            self.request, f"Pomyślnie {action_text}: {self.model._meta.verbose_name}"
         )
-        return super().form_valid(form)
+        
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -543,10 +566,6 @@ class StationaryCombustionCreateView(Scope1CreateMixin, CreateView):
 class StationaryCombustionUpdateView(Scope1CreateMixin, UpdateView):
     model = StationaryCombustion
     form_class = StationaryCombustionForm
-
-    def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie zaktualizowano wpis.")
-        return super().form_valid(form)
 
 
 class MobileCombustionCreateView(Scope1CreateMixin, CreateView):

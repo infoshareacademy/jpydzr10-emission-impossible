@@ -4,11 +4,13 @@ from companies.models import Companies
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from core.models import CoreModel
+
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
 
 
-class BaseRecord(models.Model):
+class BaseRecord(CoreModel):
     year = models.IntegerField()
     company = models.ForeignKey(
         Companies, on_delete=models.CASCADE, related_name="%(class)s_records"
@@ -16,7 +18,7 @@ class BaseRecord(models.Model):
     data_quality = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
-        abstract = True  # ← brak tabeli w bazie!
+        abstract = True
 
 
 class RecordStatus(models.TextChoices):
@@ -37,19 +39,42 @@ class ActivityRecord(BaseRecord):
         default=RecordStatus.DRAFT,
         verbose_name=_("Status"),
     )
+    emission_tco2eq = models.DecimalField(
+        max_digits=12, decimal_places=3, null=True, blank=True,
+        verbose_name=_("Emisja zadeklarowana")
+    )
+    
+    calculated_emission_tco2eq = models.DecimalField(
+        max_digits=12, decimal_places=3, null=True, blank=True,
+        verbose_name=_("Emisja (Wyliczona przez system)")
+    )
+    
+    applied_factor_value = models.DecimalField(
+        max_digits=12, decimal_places=5, null=True, blank=True,
+        verbose_name=_("Użyty wskaźnik (Wartość)")
+    )
+    applied_factor_unit = models.CharField(
+        max_length=50, null=True, blank=True,
+        verbose_name=_("Użyty wskaźnik (Jednostka)")
+    )
+
+    applied_converter_value = models.DecimalField(
+        max_digits=12, decimal_places=5, default=Decimal('1.00000'),
+        verbose_name=_("Użyty przelicznik jednostek (Wartość)")
+    )
+    applied_converter_unit = models.CharField(
+        max_length=50, null=True, blank=True, default='',
+        verbose_name=_("Użyty przelicznik jednostek (Jednostka)")
+    )
 
     class Meta:
-        abstract = True  # ← też abstrakcyjny!
+        abstract = True
 
 
 class StationaryCombustion(ActivityRecord):
     fuel = models.CharField(max_length=100)
     installation = models.CharField(max_length=200)
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
     raport = models.CharField(max_length=300, blank=True, null=True)
-    notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "tbl_stationary_combustion"
@@ -60,11 +85,7 @@ class StationaryCombustion(ActivityRecord):
 class MobileCombustion(ActivityRecord):
     vehicle = models.CharField(max_length=200)
     fuel = models.CharField(max_length=100)
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
     raport = models.CharField(max_length=300, blank=True, null=True)
-    notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "tbl_mobile_combustion"
@@ -75,11 +96,7 @@ class MobileCombustion(ActivityRecord):
 class ProcessEmission(ActivityRecord):
     process = models.CharField(max_length=200)
     product = models.CharField(max_length=200)
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
     raport = models.CharField(max_length=300, blank=True, null=True)
-    notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "tbl_process_emissions"
@@ -90,9 +107,6 @@ class ProcessEmission(ActivityRecord):
 class FugitiveEmission(ActivityRecord):
     installation = models.CharField(max_length=200)
     product = models.CharField(max_length=200)
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
     raport = models.CharField(max_length=300, blank=True, null=True)
     notes = models.CharField(max_length=500, blank=True, null=True)
 
@@ -105,9 +119,6 @@ class FugitiveEmission(ActivityRecord):
 class EnergyConsumption(ActivityRecord):
     energy_source = models.CharField(max_length=100)
     energy_type = models.CharField(max_length=100)
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
 
     class Meta:
         db_table = "tbl_e_cons"
@@ -119,9 +130,6 @@ class EnergyPurchased(ActivityRecord):
     energy_type = models.CharField(max_length=100)
     trader = models.CharField(max_length=200, blank=True, default="")
     factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))
-    emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True
-    )
 
     class Meta:
         db_table = "tbl_e_purc"
@@ -164,32 +172,6 @@ class EmissionFactor(models.Model):
         verbose_name_plural = "Wskaźniki emisji"
 
 
-class UnitConverter(models.Model):
-    unit_from = models.CharField(max_length=20)
-    unit_to = models.CharField(max_length=20)
-    factor = models.DecimalField(max_digits=12, decimal_places=5)
-
-    class Meta:
-        db_table = "tbl_converters"
-        verbose_name = "Przelicznik jednostek"
-        verbose_name_plural = "Przeliczniki jednostek"
-
-
-class ReductionTarget(models.Model):
-    company = models.CharField(max_length=200)
-    target_name = models.CharField(max_length=300)
-    base_year = models.PositiveIntegerField()
-    target_year = models.PositiveIntegerField()
-    reduction_pct = models.DecimalField(max_digits=5, decimal_places=2)
-    scope = models.CharField(max_length=10, default="1+2")
-    notes = models.CharField(max_length=500, blank=True, null=True)
-
-    class Meta:
-        db_table = "tbl_reduction_targets"
-        verbose_name = "Cel redukcji"
-        verbose_name_plural = "Cele redukcji"
-
-
 class EmailLog(models.Model):
     date = models.DateTimeField()
     sender = models.CharField(max_length=100)
@@ -206,19 +188,3 @@ class EmailLog(models.Model):
         db_table = "tbl_email_log"
         verbose_name = "Log email"
         verbose_name_plural = "Logi email"
-
-
-class ChangeLog(models.Model):
-    id_rejestr_zmian = models.AutoField(primary_key=True)
-    login = models.CharField(max_length=100)
-    date_change = models.DateTimeField()
-    table_name = models.CharField(max_length=200)
-    record_id = models.CharField(max_length=50)
-    change_type = models.CharField(max_length=10)
-    previous_data = models.TextField(blank=True, null=True)
-    actual_data = models.TextField(blank=True, null=True)
-
-    class Meta:
-        db_table = "tbl_change_log"
-        verbose_name = "Log zmian"
-        verbose_name_plural = "Logi zmian"
