@@ -409,7 +409,7 @@ class Scope1CreateMixin(LoginRequiredMixin):
         if is_new:
             instance.created_by = self.request.user
             instance.created_by = self.request.user
-        
+
         instance.updated_by = self.request.user
         instance.updated_by = self.request.user
 
@@ -420,12 +420,12 @@ class Scope1CreateMixin(LoginRequiredMixin):
             return self.form_invalid(form)
 
         instance.save()
-        
+
         action_text = "dodano wpis do" if is_new else "zaktualizowano wpis w"
         messages.success(
             self.request, f"Pomyślnie {action_text}: {self.model._meta.verbose_name}"
         )
-        
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -494,6 +494,13 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
                 "delete_url_name": f"emissions:{self.model._meta.model_name}-delete",
             }
         )
+        query_params = self.request.GET.copy()
+        if "page" in query_params:
+            del query_params["page"]
+
+        clean_query_string = query_params.urlencode()
+        context["query_string"] = f"{clean_query_string}&" if clean_query_string else ""
+
         return context
 
     def get(self, request, *args, **kwargs):

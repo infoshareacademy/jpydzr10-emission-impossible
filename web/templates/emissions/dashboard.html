@@ -90,47 +90,47 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <a href="{% url 'emissions:stationarycombustion-list' company.pk %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
+                    <a href="{% url 'emissions:stationarycombustion-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
                         <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
                             <span class="material-symbols-outlined">factory</span>
                         </div>
                         <h4 class="text-lg font-bold text-on-surface mb-2">Spalanie stacjonarne</h4>
                         <p class="text-sm text-on-surface-variant mb-6 flex-1">Kotły, piece, generatory, turbiny używające paliw kopalnych na terenie firmy.</p>
                         <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
+                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
                         </div>
                     </a>
 
-                    <a href="{% url 'emissions:mobile-add' company.pk %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
+                    <a href="{% url 'emissions:mobilecombustion-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
                         <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
                             <span class="material-symbols-outlined">local_shipping</span>
                         </div>
                         <h4 class="text-lg font-bold text-on-surface mb-2">Spalanie mobilne</h4>
                         <p class="text-sm text-on-surface-variant mb-6 flex-1">Pojazdy firmowe, wózki widłowe, flota transportowa należąca do organizacji.</p>
                         <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
+                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
                         </div>
                     </a>
 
-                    <a href="{% url 'emissions:process-add' company.pk %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
+                    <a href="{% url 'emissions:processemission-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
                         <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
                             <span class="material-symbols-outlined">science</span>
                         </div>
                         <h4 class="text-lg font-bold text-on-surface mb-2">Emisje procesowe</h4>
                         <p class="text-sm text-on-surface-variant mb-6 flex-1">Fizyczne lub chemiczne procesy technologiczne specyficzne dla branży.</p>
                         <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
+                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
                         </div>
                     </a>
 
-                    <a href="{% url 'emissions:fugitive-add' company.pk %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
+                    <a href="{% url 'emissions:fugitiveemission-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
                         <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
                             <span class="material-symbols-outlined">air</span>
                         </div>
                         <h4 class="text-lg font-bold text-on-surface mb-2">Emisje niezorganizowane</h4>
                         <p class="text-sm text-on-surface-variant mb-6 flex-1">Wycieki czynników chłodniczych (np. z klimatyzacji) lub gazów technicznych.</p>
                         <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
+                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
                         </div>
                     </a>
                 </div>
