@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     "reports.apps.ReportsConfig",
     "what_if.apps.WhatIfConfig",
+    "tailwind",  
+    "theme",          
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
@@ -130,3 +132,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+TAILWIND_APP_NAME = "theme"

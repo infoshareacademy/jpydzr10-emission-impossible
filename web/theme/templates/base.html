@@ -1,0 +1,362 @@
+{% load static tailwind_tags %}
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% block title %}Emission Impossible{% endblock %}</title>
+    {% tailwind_css %}
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-family: "Material Symbols Outlined" !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none !important;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body class="min-h-screen bg-bg text-text-main">
+    <!-- ===================== -->
+    <!-- NAVBAR -->
+    <!-- ===================== -->
+    <nav class="sticky top-0 z-30 bg-bg-nav border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+        <!-- Logo (replace with SVG later) -->
+        <div class="flex flex-col mr-4">
+          <span
+            class="font-heading font-bold text-xl text-text-main tracking-wide"
+            >EMISSION</span
+          >
+          <span
+            class="font-mono text-text-muted tracking-widest"
+            style="font-size: 9px; margin-top: -2px"
+            >IMPOSSIBLE</span
+          >
+        </div>
+
+        <!-- Search -->
+        <div class="relative flex-1 max-w-xs">
+          <span
+            class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted"
+            style="left: 10px; font-size: 16px"
+            >search</span
+          >
+          <input
+            type="text"
+            placeholder="Szukaj..."
+            style="
+              background: rgba(255, 255, 255, 0.06);
+              border: 1px solid rgba(200, 245, 53, 0.2);
+              border-radius: 8px;
+              color: #e8f4f0;
+              font-family: &quot;Roboto Mono&quot;, monospace;
+              font-size: 13px;
+              padding: 7px 14px 7px 36px;
+              outline: none;
+              width: 100%;
+            "
+          />
+        </div>
+
+        <div class="flex-1"></div>
+
+        <!-- Burger button -->
+        <button
+          id="burger"
+          class="text-text-muted hover:text-accent transition-colors p-2"
+        >
+          <span id="burger-icon" class="material-symbols-outlined">menu</span>
+        </button>
+
+        <!-- User -->
+        <div class="flex items-center gap-3">
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              border: 1px solid rgba(200, 245, 53, 0.3);
+              background: #1d3a42;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <span
+              class="material-symbols-outlined text-text-muted"
+              style="
+                font-size: 20px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >account_circle</span
+            >
+          </div>
+          <span class="text-text-muted font-mono text-sm">
+            {% if user.is_authenticated %}@{{ user.username }}{% else
+            %}@Użytkownik{% endif %}
+          </span>
+        </div>
+      </div>
+      <!-- Lime accent line -->
+      <div
+        style="
+          height: 2px;
+          background: linear-gradient(to right, #c8f535, #a0d020, transparent);
+        "
+      ></div>
+
+      <!-- ===================== -->
+      <!-- DROPDOWN MENU -->
+      <!-- ===================== -->
+      <div
+        id="dropdown"
+        class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden transition-all duration-300"
+        style="
+          max-height: 0;
+          background: rgba(17, 23, 32, 0.85);
+          backdrop-filter: blur(8px);
+        "
+      >
+        <div
+          class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+        >
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >book_2</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Raporty</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >business</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Przedsiębiorstwo</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >pie_chart</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Wskaźniki Emisji</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >bar_chart</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Przeliczniki</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >task</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Dane emisji</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >local_fire_department</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Cele i symulacje</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >key</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Narzędzia</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >group</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Użytkownicy</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >auto_awesome</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >AI Asystent ESG</span
+            >
+          </a>
+
+          <a
+            href="#"
+            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >mail</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Komunikacja e-mail</span
+            >
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== -->
+    <!-- MAIN CONTENT -->
+    <!-- ===================== -->
+    <main class="max-w-7xl mx-auto px-6 lg:px-12 py-10">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+
+    <!-- ===================== -->
+    <!-- DROPDOWN JAVASCRIPT -->
+    <!-- ===================== -->
+    <script>
+      const dropdown = document.getElementById("dropdown");
+      const burger = document.getElementById("burger");
+      const burgerIcon = document.getElementById("burger-icon");
+      let isOpen = false;
+
+      burger.addEventListener("click", () => {
+        isOpen = !isOpen;
+        if (isOpen) {
+          dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+          burgerIcon.textContent = "close";
+        } else {
+          dropdown.style.maxHeight = "0";
+          burgerIcon.textContent = "menu";
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.style.maxHeight = "0";
+          burgerIcon.textContent = "menu";
+          isOpen = false;
+        }
+      });
+    </script>
+  </body>
+</html>
