@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('emissions', '0001_initial'),
+        ("emissions", "0001_initial"),
     ]
 
     operations = []

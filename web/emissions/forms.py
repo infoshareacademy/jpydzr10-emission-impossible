@@ -295,7 +295,8 @@ class FugitiveEmissionForm(Scope1BaseForm):
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
 
+
 class EmissionFactorForm(forms.ModelForm):
     class Meta:
         model = EmissionFactor
-        fields = ['year', 'factor_name', 'factor', 'unit_factor', 'source', 'country']
+        fields = ["year", "factor_name", "factor", "unit_factor", "source", "country"]
