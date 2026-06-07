@@ -38,7 +38,6 @@
     </style>
     {% block extra_head %}{% endblock %}
   </head>
-
   <body class="min-h-screen bg-bg text-text-main">
     <!-- ===================== -->
     <!-- NAVBAR -->
@@ -102,6 +101,7 @@
         >
           Panel Administratora
         </a>
+
         <!-- User -->
         <div class="flex items-center gap-3">
           <div
@@ -126,11 +126,12 @@
             >
           </div>
           <span class="text-text-muted font-mono text-sm">
-            {% if user.is_authenticated %}@{{ user.username }}{%
-            else%}@Użytkownik{% endif %}
+            {% if user.is_authenticated %}@{{ user.username }}{% else %}
+            @Użytkownik{% endif %}
           </span>
         </div>
       </div>
+
       <!-- Lime accent line -->
       <div
         style="
@@ -156,7 +157,7 @@
         >
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -171,10 +172,9 @@
               >Raporty</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -189,10 +189,9 @@
               >Przedsiębiorstwo</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -207,10 +206,9 @@
               >Wskaźniki Emisji</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -225,28 +223,9 @@
               >Przeliczniki</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >task</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Dane emisji</span
-            >
-          </a>
-
-          <a
-            href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -261,28 +240,9 @@
               >Cele i symulacje</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >key</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Narzędzia</span
-            >
-          </a>
-
-          <a
-            href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -297,10 +257,9 @@
               >Użytkownicy</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -315,10 +274,9 @@
               >AI Asystent ESG</span
             >
           </a>
-
           <a
             href="#"
-            class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent hover:bg-border-subtle transition-colors group"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -331,6 +289,23 @@
             <span
               class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
               >Komunikacja e-mail</span
+            >
+          </a>
+          <a
+            href="/admin/"
+            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+              style="
+                font-size: 32px;
+                font-variation-settings: &quot;FILL&quot; 1;
+              "
+              >admin_panel_settings</span
+            >
+            <span
+              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
+              >Panel Administratora</span
             >
           </a>
         </div>
@@ -354,7 +329,6 @@
       <div
         class="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-1 md:grid-cols-3 gap-8"
       >
-        <!-- Logo & copyright -->
         <div class="flex flex-col gap-3">
           <div>
             <span
@@ -371,8 +345,6 @@
             © 2026 Emission Impossible.<br />Wszelkie prawa zastrzeżone.
           </p>
         </div>
-
-        <!-- Navigation links -->
         <div class="flex flex-col gap-2">
           <span
             class="font-mono text-xs text-accent uppercase tracking-widest mb-2"
@@ -399,8 +371,6 @@
             >Przeliczniki</a
           >
         </div>
-
-        <!-- More links -->
         <div class="flex flex-col gap-2">
           <span
             class="font-mono text-xs text-accent uppercase tracking-widest mb-2"
@@ -428,8 +398,6 @@
           >
         </div>
       </div>
-
-      <!-- Bottom bar -->
       <div
         style="
           height: 2px;
@@ -448,7 +416,6 @@
       const burger = document.getElementById("burger");
       const burgerIcon = document.getElementById("burger-icon");
       let isOpen = false;
-
       burger.addEventListener("click", () => {
         isOpen = !isOpen;
         if (isOpen) {
@@ -459,7 +426,6 @@
           burgerIcon.textContent = "menu";
         }
       });
-
       document.addEventListener("click", (e) => {
         if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
           dropdown.style.maxHeight = "0";
