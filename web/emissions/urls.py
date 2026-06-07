@@ -67,16 +67,18 @@ urlpatterns = [
         views.energy_sold_delete,
         name="energy_sold_delete",
     ),
+    # DASHBOARD
     path(
         "<int:company_id>/dashboard/", views.DashboardView.as_view(), name="dashboard"
     ),
+    # SPALANIE STACJONARNE (Stationary Combustion)
     path(
         "company/<int:company_id>/stationary/",
         views.StationaryCombustionListView.as_view(),
         name="stationarycombustion-list",
     ),
     path(
-        "<int:company_id>/scope1/stationary/add/",
+        "company/<int:company_id>/stationary/add/",
         views.StationaryCombustionCreateView.as_view(),
         name="stationarycombustion-add",
     ),
@@ -90,19 +92,67 @@ urlpatterns = [
         views.StationaryCombustionDeleteView.as_view(),
         name="stationarycombustion-delete",
     ),
+    # SPALANIE MOBILNE (Mobile Combustion)
     path(
-        "<int:company_id>/scope1/mobile/add/",
+        "company/<int:company_id>/mobile/",
+        views.MobileCombustionListView.as_view(),
+        name="mobilecombustion-list",
+    ),
+    path(
+        "company/<int:company_id>/mobile/add/",
         views.MobileCombustionCreateView.as_view(),
-        name="mobile-add",
+        name="mobilecombustion-add",
     ),
     path(
-        "<int:company_id>/scope1/process/add/",
+        "company/<int:company_id>/mobile/<int:pk>/edit/",
+        views.MobileCombustionUpdateView.as_view(),
+        name="mobilecombustion-edit",
+    ),
+    path(
+        "company/<int:company_id>/mobile/<int:pk>/delete/",
+        views.MobileCombustionDeleteView.as_view(),
+        name="mobilecombustion-delete",
+    ),
+    # EMISJA PROCESOWA (Process Emission)
+    path(
+        "company/<int:company_id>/process/",
+        views.ProcessEmissionListView.as_view(),
+        name="processemission-list",
+    ),
+    path(
+        "company/<int:company_id>/process/add/",
         views.ProcessEmissionCreateView.as_view(),
-        name="process-add",
+        name="processemission-add",
     ),
     path(
-        "<int:company_id>/scope1/fugitive/add/",
+        "company/<int:company_id>/process/<int:pk>/edit/",
+        views.ProcessEmissionUpdateView.as_view(),
+        name="processemission-edit",
+    ),
+    path(
+        "company/<int:company_id>/process/<int:pk>/delete/",
+        views.ProcessEmissionDeleteView.as_view(),
+        name="processemission-delete",
+    ),
+    # EMISJA NIEZORGANIZOWANA (Fugitive Emission)
+    path(
+        "company/<int:company_id>/fugitive/",
+        views.FugitiveEmissionListView.as_view(),
+        name="fugitiveemission-list",
+    ),
+    path(
+        "company/<int:company_id>/fugitive/add/",
         views.FugitiveEmissionCreateView.as_view(),
-        name="fugitive-add",
+        name="fugitiveemission-add",
+    ),
+    path(
+        "company/<int:company_id>/fugitive/<int:pk>/edit/",
+        views.FugitiveEmissionUpdateView.as_view(),
+        name="fugitiveemission-edit",
+    ),
+    path(
+        "company/<int:company_id>/fugitive/<int:pk>/delete/",
+        views.FugitiveEmissionDeleteView.as_view(),
+        name="fugitiveemission-delete",
     ),
 ]

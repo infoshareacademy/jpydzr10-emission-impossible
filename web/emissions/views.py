@@ -1,10 +1,10 @@
 import openpyxl
-from companies.models import Companies
 from calculator.calculation import calculate_record_emissions
+from companies.models import Companies
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
@@ -573,14 +573,56 @@ class MobileCombustionCreateView(Scope1CreateMixin, CreateView):
     form_class = MobileCombustionForm
 
 
+class MobileCombustionListView(EmissionListMixin):
+    model = MobileCombustion
+    search_fields = ["fuel", "vehicle"]
+
+
+class MobileCombustionUpdateView(Scope1CreateMixin, UpdateView):
+    model = MobileCombustion
+    form_class = MobileCombustionForm
+
+
+class MobileCombustionDeleteView(Scope1DeleteMixin, DeleteView):
+    model = MobileCombustion
+
+
 class ProcessEmissionCreateView(Scope1CreateMixin, CreateView):
     model = ProcessEmission
     form_class = ProcessEmissionForm
 
 
+class ProcessEmissionListView(EmissionListMixin):
+    model = ProcessEmission
+    search_fields = ["process", "product"]
+
+
+class ProcessEmissionUpdateView(Scope1CreateMixin, UpdateView):
+    model = ProcessEmission
+    form_class = ProcessEmissionForm
+
+
+class ProcessEmissionDeleteView(Scope1DeleteMixin, DeleteView):
+    model = ProcessEmission
+
+
 class FugitiveEmissionCreateView(Scope1CreateMixin, CreateView):
     model = FugitiveEmission
     form_class = FugitiveEmissionForm
+
+
+class FugitiveEmissionListView(EmissionListMixin):
+    model = FugitiveEmission
+    search_fields = ["installation", "product"]
+
+
+class FugitiveEmissionUpdateView(Scope1CreateMixin, UpdateView):
+    model = FugitiveEmission
+    form_class = FugitiveEmissionForm
+
+
+class FugitiveEmissionDeleteView(Scope1DeleteMixin, DeleteView):
+    model = FugitiveEmission
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
