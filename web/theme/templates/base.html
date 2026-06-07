@@ -44,7 +44,7 @@
     <!-- NAVBAR -->
     <!-- ===================== -->
     <nav
-      class="sticky top-0 z-30 border-b border-border-subtle"
+      class="sticky top-0 z-30 relative border-b border-border-subtle"
       style="background: rgba(17, 23, 32, 0.85); backdrop-filter: blur(8px)"
     >
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
@@ -87,16 +87,6 @@
 
         <div class="flex-1"></div>
 
-        <!-- Admin button -->
-<a href="/admin/" class="text-text-muted hover:text-accent transition-colors font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">
-  Panel Administratora
-</a>
-
-<!-- Burger button -->
-<button
-  id="burger"
-
-
         <!-- Burger button -->
         <button
           id="burger"
@@ -105,6 +95,13 @@
           <span id="burger-icon" class="material-symbols-outlined">menu</span>
         </button>
 
+        <!-- Admin button -->
+        <a
+          href="/admin/"
+          class="text-text-muted hover:text-accent transition-colors font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent"
+        >
+          Panel Administratora
+        </a>
         <!-- User -->
         <div class="flex items-center gap-3">
           <div
@@ -129,7 +126,8 @@
             >
           </div>
           <span class="text-text-muted font-mono text-sm">
-            {% if user.is_authenticated %}@{{ user.username }}{% else%}@Użytkownik{% endif %}
+            {% if user.is_authenticated %}@{{ user.username }}{%
+            else%}@Użytkownik{% endif %}
           </span>
         </div>
       </div>
@@ -159,7 +157,6 @@
           <a
             href="#"
             class="flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-            style="background: rgba(42, 63, 74, 0.8)"
           >
             <span
               class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
@@ -348,43 +345,98 @@
     </main>
 
     <!-- ===================== -->
-<!-- FOOTER -->
-<!-- ===================== -->
-<footer class="border-t border-border-subtle mt-20" style="background: rgba(17, 23, 32, 0.85);">
-  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- FOOTER -->
+    <!-- ===================== -->
+    <footer
+      class="border-t border-border-subtle mt-20"
+      style="background: rgba(17, 23, 32, 0.85)"
+    >
+      <div
+        class="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-1 md:grid-cols-3 gap-8"
+      >
+        <!-- Logo & copyright -->
+        <div class="flex flex-col gap-3">
+          <div>
+            <span
+              class="font-heading font-bold text-xl text-text-main tracking-wide"
+              >EMISSION</span
+            >
+            <span
+              class="font-mono text-text-muted tracking-widest block"
+              style="font-size: 9px"
+              >IMPOSSIBLE</span
+            >
+          </div>
+          <p class="font-mono text-xs text-text-muted">
+            © 2026 Emission Impossible.<br />Wszelkie prawa zastrzeżone.
+          </p>
+        </div>
 
-    <!-- Logo & copyright -->
-    <div class="flex flex-col gap-3">
-      <div>
-        <span class="font-heading font-bold text-xl text-text-main tracking-wide">EMISSION</span>
-        <span class="font-mono text-text-muted tracking-widest block" style="font-size:9px;">IMPOSSIBLE</span>
+        <!-- Navigation links -->
+        <div class="flex flex-col gap-2">
+          <span
+            class="font-mono text-xs text-accent uppercase tracking-widest mb-2"
+            >Nawigacja</span
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Raporty</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Przedsiębiorstwo</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Wskaźniki Emisji</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Przeliczniki</a
+          >
+        </div>
+
+        <!-- More links -->
+        <div class="flex flex-col gap-2">
+          <span
+            class="font-mono text-xs text-accent uppercase tracking-widest mb-2"
+            >Więcej</span
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Cele i symulacje</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Użytkownicy</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >AI Asystent ESG</a
+          >
+          <a
+            href="#"
+            class="font-mono text-sm text-text-muted hover:text-text-main transition-colors"
+            >Komunikacja e-mail</a
+          >
+        </div>
       </div>
-      <p class="font-mono text-xs text-text-muted">© 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.</p>
-    </div>
 
-    <!-- Navigation links -->
-    <div class="flex flex-col gap-2">
-      <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Nawigacja</span>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Raporty</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przedsiębiorstwo</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Wskaźniki Emisji</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
-    </div>
-
-    <!-- More links -->
-    <div class="flex flex-col gap-2">
-      <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Więcej</span>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Użytkownicy</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">AI Asystent ESG</a>
-      <a href="#" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Komunikacja e-mail</a>
-    </div>
-
-  </div>
-
-  <!-- Bottom bar -->
-  <div style="height:2px; background:linear-gradient(to right, #c8f535, #a0d020, transparent);"></div>
-</footer>
+      <!-- Bottom bar -->
+      <div
+        style="
+          height: 2px;
+          background: linear-gradient(to right, #c8f535, #a0d020, transparent);
+        "
+      ></div>
+    </footer>
 
     {% block extra_scripts %}{% endblock %}
 
