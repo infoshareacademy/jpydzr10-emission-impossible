@@ -1,9 +1,7 @@
+from core.models import CoreModel
 from django.db import models
 
-from core.models import CoreModel
 
-
-# Create your models here.
 class FuelType(CoreModel):
     name = models.CharField(max_length=50)
     symbol = models.CharField(max_length=20, unique=True)
@@ -32,6 +30,7 @@ class FuelSpec(CoreModel):
         Supplier,
         on_delete=models.CASCADE,
         blank=True,
+        null=True,
         related_name="fuel_specs",
     )
 
