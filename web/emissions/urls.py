@@ -155,4 +155,9 @@ urlpatterns = [
         views.FugitiveEmissionDeleteView.as_view(),
         name="fugitiveemission-delete",
     ),
+# --- SŁOWNIK WSKAŹNIKÓW EMISJI ---
+    path('factors/', views.EmissionFactorListView.as_view(), name='factor-list'),
+    path('factors/add/', views.EmissionFactorCreateView.as_view(), name='factor-add'),
+    path('factors/<int:pk>/edit/', views.EmissionFactorUpdateView.as_view(), name='factor-edit'),
+    path('factors/<int:pk>/delete/', views.EmissionFactorDeleteView.as_view(), name='factor-delete'),
 ]

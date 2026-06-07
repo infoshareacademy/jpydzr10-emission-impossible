@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
+    EmissionFactor,
     EnergyConsumption,
     EnergyProduced,
     EnergyPurchased,
@@ -293,3 +294,8 @@ class FugitiveEmissionForm(Scope1BaseForm):
         widgets = {
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
+
+class EmissionFactorForm(forms.ModelForm):
+    class Meta:
+        model = EmissionFactor
+        fields = ['year', 'factor_name', 'factor', 'unit_factor', 'source', 'country']

@@ -20,6 +20,7 @@ from django.views.generic import (
 )
 
 from .forms import (
+    EmissionFactorForm,
     EnergyConsumptionForm,
     EnergyProducedForm,
     EnergyPurchasedForm,
@@ -30,6 +31,7 @@ from .forms import (
     StationaryCombustionForm,
 )
 from .models import (
+    EmissionFactor,
     EnergyConsumption,
     EnergyProduced,
     EnergyPurchased,
@@ -408,16 +410,17 @@ class Scope1CreateMixin(LoginRequiredMixin):
 
         if is_new:
             instance.created_by = self.request.user
-            instance.created_by = self.request.user
 
-        instance.updated_by = self.request.user
         instance.updated_by = self.request.user
 
         try:
             calculate_record_emissions(instance)
         except ValidationError as e:
-            form.add_error(None, str(e))
-            return self.form_invalid(form)
+            instance.calculated_emission_tco2eq = None
+            instance.factor_used = None
+            messages.warning(
+                self.request, f"Zapisano rekord, ale nie wyliczono emisji. Powód: {e}"
+            )
 
         instance.save()
 
@@ -647,3 +650,146 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context["company"] = company
 
         return context
+
+
+class EmissionFactorListView(LoginRequiredMixin, ListView):
+    model = EmissionFactor
+    template_name = "emissions/factor_list.html"
+    paginate_by = 15
+
+    def get_missing_factors(self):
+        """Skanuje całą bazę i zwraca zbiór (rok, nazwa_paliwa), dla których brakuje wskaźnika."""
+        required = set()
+
+        for model in [StationaryCombustion, MobileCombustion]:
+            for year, factor_name in model.objects.values_list(
+                "year", "fuel"
+            ).distinct():
+                if year and factor_name:
+                    required.add((year, factor_name))
+
+        for year, factor_name in ProcessEmission.objects.values_list(
+            "year", "process"
+        ).distinct():
+            if year and factor_name:
+                required.add((year, factor_name))
+
+        for year, factor_name in FugitiveEmission.objects.values_list(
+            "year", "product"
+        ).distinct():
+            if year and factor_name:
+                required.add((year, factor_name))
+
+        for model in [EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold]:
+            for year, factor_name in model.objects.values_list(
+                "year", "energy_type"
+            ).distinct():
+                if year and factor_name:
+                    required.add((year, factor_name))
+
+        existing = set(EmissionFactor.objects.values_list("year", "factor_name"))
+
+        return required - existing
+
+    def get_queryset(self):
+        qs = super().get_queryset().order_by("-year", "factor_name")
+
+        self.current_year = self.request.GET.get("year", "")
+        self.current_search = self.request.GET.get("q", "")
+        self.show_missing = self.request.GET.get("status") == "missing"
+
+        if self.show_missing and (
+            self.request.user.is_superuser
+            or getattr(self.request.user, "role", "") == "admin"
+        ):
+            missing_set = self.get_missing_factors()
+            virtual_factors = []
+
+            for year, name in sorted(list(missing_set), key=lambda x: (-x[0], x[1])):
+                if self.current_year and str(year) != self.current_year:
+                    continue
+                if (
+                    self.current_search
+                    and self.current_search.lower() not in name.lower()
+                ):
+                    continue
+
+                dummy = EmissionFactor(year=year, factor_name=name)
+                dummy.is_missing = True
+                virtual_factors.append(dummy)
+
+            return virtual_factors
+
+        if self.current_year:
+            qs = qs.filter(year=self.current_year)
+        if self.current_search:
+            qs = qs.filter(factor_name__icontains=self.current_search)
+
+        for obj in qs:
+            obj.is_missing = False
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["current_year"] = self.current_year
+        context["current_search"] = self.current_search
+        context["show_missing"] = self.show_missing
+        context["is_admin"] = (
+            self.request.user.is_superuser
+            or getattr(self.request.user, "role", "") == "admin"
+        )
+
+        query_params = self.request.GET.copy()
+        if "page" in query_params:
+            del query_params["page"]
+        clean_qs = query_params.urlencode()
+        context["query_string"] = f"{clean_qs}&" if clean_qs else ""
+
+        return context
+
+
+class EmissionFactorCreateView(LoginRequiredMixin, CreateView):
+    model = EmissionFactor
+    form_class = EmissionFactorForm
+    template_name = "emissions/factor_form.html"
+    success_url = reverse_lazy("emissions:factor-list")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if "year" in self.request.GET:
+            initial["year"] = self.request.GET.get("year")
+        if "factor_name" in self.request.GET:
+            initial["factor_name"] = self.request.GET.get("factor_name")
+
+        # Domyślnie podpowiadamy Polskę, bo tam działamy najczęściej
+        initial["country"] = "PL"
+        return initial
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "Pomyślnie dodano nowy wskaźnik emisji. Możesz teraz przeliczyć brakujące rekordy!",
+        )
+        return super().form_valid(form)
+
+
+class EmissionFactorUpdateView(LoginRequiredMixin, UpdateView):
+    model = EmissionFactor
+    form_class = EmissionFactorForm
+    template_name = "emissions/factor_form.html"
+    success_url = reverse_lazy("emissions:factor-list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Zaktualizowano wskaźnik emisji.")
+        return super().form_valid(form)
+
+
+class EmissionFactorDeleteView(LoginRequiredMixin, DeleteView):
+    model = EmissionFactor
+    template_name = "emissions/factor_confirm_delete.html"
+    success_url = reverse_lazy("emissions:factor-list")
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Usunięto wskaźnik emisji z bazy.")
+        return super().delete(request, *args, **kwargs)

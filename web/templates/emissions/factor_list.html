@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Słownik Wskaźników Emisji - Emission Impossible</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+        <style>
+            body { font-family: 'Inter', sans-serif; background-color: #f7faf6; }
+            .stepped-border { clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px); }
+        </style>
+    </head>
+    <body class="p-4 md:p-8 min-h-screen">
+
+        <div class="max-w-7xl mx-auto space-y-6">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <a href="#" class="text-sm font-bold uppercase hover:underline mb-2 inline-block text-gray-500">&larr; Wróć do Panelu Startowego</a>
+                    <h1 class="text-4xl font-black uppercase tracking-tighter">Wskaźniki Emisji (KOBiZE/DEFRA)</h1>
+                </div>
+
+                {% if is_admin %}
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{% url 'emissions:factor-add' %}" class="px-4 py-2 bg-[#005440] text-white border-2 border-black font-bold uppercase tracking-wider text-sm shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all flex items-center gap-2 stepped-border">
+                            <span class="material-symbols-outlined text-sm">add</span> Dodaj Nowy Wskaźnik
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form method="get" class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000] stepped-border flex flex-wrap gap-4 items-end">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-xs uppercase text-gray-700 tracking-wide">Szukaj (Paliwo/Energia)</label>
+                    <input type="text" name="q" value="{{ current_search }}" placeholder="np. Gaz ziemny" class="border-2 border-black px-3 py-1 text-sm focus:outline-none">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-xs uppercase text-gray-700 tracking-wide">Rok</label>
+                    <input type="number" name="year" value="{{ current_year }}" placeholder="YYYY" class="border-2 border-black px-3 py-1 text-sm focus:outline-none w-24">
+                </div>
+
+                {% if is_admin %}
+                    <div class="flex flex-col gap-1">
+                        <label class="font-bold text-xs uppercase text-gray-700 tracking-wide">Status wskaźnika</label>
+                        <select name="status" class="border-2 border-black px-3 py-1 text-sm focus:outline-none bg-yellow-50">
+                            <option value="">Wszystkie w bazie</option>
+                            <option value="missing" {% if show_missing %}selected{% endif %}>⚠️ Pokaż Brakujące (Wymagane przez wpisy)</option>
+                        </select>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="px-4 py-1.5 bg-black text-white font-bold uppercase text-sm hover:bg-gray-800 transition-colors">Filtruj</button>
+                {% if current_year or current_search or show_missing %}
+                    <a href="?" class="text-xs font-bold underline text-gray-600 hover:text-black">Wyczyść</a>
+                {% endif %}
+            </form>
+
+            <div class="bg-white border-2 border-black shadow-[6px_6px_0px_0px_#000] stepped-border overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b-2 border-black uppercase text-xs tracking-wider">
+                            <th class="p-4 font-black w-24">Rok</th>
+                            <th class="p-4 font-black">Źródło (Paliwo / Energia)</th>
+                            <th class="p-4 font-black text-right">Wartość Wskaźnika</th>
+                            <th class="p-4 font-black">Źródło danych</th>
+                            {% if is_admin %}
+                                <th class="p-4 font-black text-center w-32">Akcje</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for obj in object_list %}
+                            <tr class="border-b border-gray-200 transition-colors {% if obj.is_missing %}bg-red-50 hover:bg-red-100{% else %}hover:bg-gray-50{% endif %}">
+                                <td class="p-4 font-bold {% if obj.is_missing %}text-red-700{% endif %}">{{ obj.year }}</td>
+                                <td class="p-4 font-bold {% if obj.is_missing %}text-red-700{% endif %}">
+                                    {{ obj.factor_name }}
+                                    {% if obj.is_missing %}
+                                        <span class="ml-2 px-2 py-0.5 bg-red-200 text-red-800 text-[10px] uppercase border border-red-800">Brak w bazie</span>
+                                    {% endif %}
+                                </td>
+                                <td class="p-4 text-right font-mono font-bold">
+                                    {% if obj.is_missing %}
+                                        —
+                                    {% else %}
+                                        {{ obj.factor }} <span class="text-xs text-gray-500">{{ obj.unit_factor }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="p-4 text-xs text-gray-600">
+                                    {% if obj.is_missing %}
+                                        Wymagane przez raporty firm!
+                                    {% else %}
+                                        {{ obj.source|default:"—" }}
+                                    {% endif %}
+                                </td>
+
+                                {% if is_admin %}
+                                    <td class="p-4 text-center space-x-2">
+                                        {% if obj.is_missing %}
+                                            <a href="{% url 'emissions:factor-add' %}?year={{ obj.year }}&factor_name={{ obj.factor_name|urlencode }}" class="inline-flex items-center justify-center px-2 py-1 border-2 border-red-700 bg-red-600 text-white hover:bg-red-700 font-bold text-xs uppercase" title="Uzupełnij">
+                                                <span class="material-symbols-outlined text-[16px] mr-1">add_circle</span> Uzupełnij
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'emissions:factor-edit' obj.pk %}" class="inline-flex items-center justify-center w-8 h-8 border-2 border-black hover:bg-gray-200 transition-colors" title="Edytuj">
+                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-500 font-bold uppercase">
+                                    {% if show_missing %}Hurra! Wszystkie wskaźniki dla wprowadzonych danych są uzupełnione.{% else %}Brak wyników do wyświetlenia.{% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </body>
+</html>

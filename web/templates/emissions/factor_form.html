@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>{% if object %}Edytuj{% else %}Dodaj{% endif %} Wskaźnik - Emission Impossible</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+        <style>
+            body { background-color: #f7faf6; }
+            .stepped-border { clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px); }
+        </style>
+    </head>
+    <body class="p-8 min-h-screen flex items-center justify-center">
+
+        <div class="max-w-xl w-full bg-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_#000] stepped-border">
+
+            <h1 class="text-3xl font-black uppercase tracking-tighter mb-6 border-b-2 border-black pb-4">
+                {% if object %}Edycja Wskaźnika{% else %}Nowy Wskaźnik{% endif %}
+            </h1>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="space-y-4">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="pt-6 flex justify-between items-center border-t-2 border-black">
+                    <a href="{% url 'emissions:factor-list' %}" class="text-sm font-bold uppercase hover:underline text-gray-600">
+                        &larr; Anuluj
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-[#005440] text-white border-2 border-black font-bold uppercase tracking-wider text-sm shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all stepped-border">
+                        Zapisz wskaźnik
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </body>
+</html>
