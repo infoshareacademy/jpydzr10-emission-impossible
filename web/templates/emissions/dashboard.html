@@ -1,196 +1,626 @@
-<!DOCTYPE html>
-<html lang="pl">
-    <head>
-        <meta charset="utf-8"/>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-        <title>Wybór źródła emisji — Emission Impossible</title>
-        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-        <script id="tailwind-config">
-            tailwind.config = {
-                darkMode: "class",
-                theme: {
-                    extend: {
-                        "colors": {
-                            "primary": "#005440",
-                            "primary-container": "#0f6e56",
-                            "on-primary": "#ffffff",
-                            "surface": "#f7faf6",
-                            "surface-variant": "#e0e3e0",
-                            "surface-container": "#ebefeb",
-                            "surface-container-high": "#e5e9e5",
-                            "surface-container-highest": "#e0e3e0",
-                            "surface-container-low": "#f1f4f1",
-                            "surface-bright": "#f7faf6",
-                            "on-surface": "#181d1a",
-                            "on-surface-variant": "#3f4944",
-                            "outline-variant": "#bec9c3",
-                            "background": "#f7faf6",
-                            "on-background": "#181d1a",
-                            "secondary-container": "#adddff"
-                        },
-                        "fontFamily": {
-                            "headline-xl": ["Inter"],
-                            "headline-lg": ["Inter"],
-                            "headline-md": ["Inter"],
-                            "body-lg": ["Inter"],
-                            "body-md": ["Inter"],
-                            "label-sm": ["JetBrains Mono"]
-                        }
-                    }
-                }
-            }
-        </script>
-        <style>
-            .stepped-border {
-                clip-path: polygon(
-                    4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px
-                );
-            }
-            .pixel-pattern {
-                background-image: radial-gradient(#e0e3e0 1px, transparent 1px);
-                background-size: 8px 8px;
-            }
-            .material-symbols-outlined {
-                font-family: 'Material Symbols Outlined' !important;
-                font-weight: normal;
-                font-style: normal;
-                font-size: 24px;
-                line-height: 1;
-                letter-spacing: normal;
-                text-transform: none !important;
-                display: inline-block;
-                white-space: nowrap;
-                word-wrap: normal;
-                direction: ltr;
-                -webkit-font-smoothing: antialiased;
-            }
-        </style>
-    </head>
-    <body class="bg-background text-on-background font-body-md min-h-screen flex">
-        <div class="pt-12 px-6 lg:px-12 max-w-7xl mx-auto w-full">
+{% extends "base.html" %} {% block title %}Kalkulator Emisji — Emission
+Impossible{% endblock %} {% block content %}
 
-            <div class="mb-8">
-                <a href="{% url 'companies:companies-list' %}" class="inline-flex items-center gap-2 text-sm font-bold uppercase hover:underline text-on-surface-variant hover:text-primary transition-colors">
-                    <span class="material-symbols-outlined text-sm">arrow_back</span>
-                    Wróć do listy firm
-                </a>
-            </div>
+<!-- Back link -->
+<div class="mb-8">
+  <a
+    href="{% url 'companies:companies-list' %}"
+    style="
+      font-family: &quot;Roboto Mono&quot;, monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: #7ab5ae;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    "
+  >
+    <span class="material-symbols-outlined" style="font-size: 16px"
+      >arrow_back</span
+    >
+    Wróć do listy firm
+  </a>
+</div>
 
-            <div class="mb-12">
-                <h2 class="text-4xl font-bold text-on-surface mb-2 tracking-tight">Kalkulator Emisji</h2>
-                <p class="text-lg text-on-surface-variant max-w-2xl">Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla wybranej firmy.</p>
-            </div>
+<!-- Page title -->
+<div class="mb-10">
+  <div class="flex items-center gap-3 mb-1">
+    <div
+      style="
+        width: 4px;
+        height: 32px;
+        background: #c8f535;
+        border-radius: 999px;
+      "
+    ></div>
+    <h1
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: #e8f4f0;
+        letter-spacing: 0.04em;
+      "
+    >
+      Kalkulator Emisji
+    </h1>
+  </div>
+  <p
+    style="
+      font-family: &quot;Roboto Mono&quot;, monospace;
+      font-size: 13px;
+      color: #7ab5ae;
+      letter-spacing: 0.04em;
+      margin-left: 16px;
+    "
+  >
+    Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla
+    wybranej firmy.
+  </p>
+</div>
 
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="px-3 py-1 bg-primary text-on-primary text-xs font-label-sm uppercase tracking-wider stepped-border font-bold">Zakres 1</span>
-                    <h3 class="text-2xl font-bold text-on-surface">Emisje bezpośrednie</h3>
-                </div>
+<!-- SCOPE 1 -->
+<section class="mb-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      style="
+        font-family: &quot;Roboto Mono&quot;, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 4px;
+        background: rgba(200, 245, 53, 0.12);
+        color: #c8f535;
+        border: 1px solid rgba(200, 245, 53, 0.3);
+      "
+      >Zakres 1</span
+    >
+    <span
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: #e8f4f0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      "
+      >Emisje bezpośrednie</span
+    >
+  </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <a href="{% url 'emissions:stationarycombustion-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
-                            <span class="material-symbols-outlined">factory</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Spalanie stacjonarne</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Kotły, piece, generatory, turbiny używające paliw kopalnych na terenie firmy.</p>
-                        <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
-                        </div>
-                    </a>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <a
+      href="{% url 'emissions:stationarycombustion-list' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >factory</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Spalanie stacjonarne</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Kotły, piece, generatory</span
+      >
+    </a>
 
-                    <a href="{% url 'emissions:mobilecombustion-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
-                            <span class="material-symbols-outlined">local_shipping</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Spalanie mobilne</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Pojazdy firmowe, wózki widłowe, flota transportowa należąca do organizacji.</p>
-                        <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
-                        </div>
-                    </a>
+    <a
+      href="{% url 'emissions:mobile-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >local_shipping</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Spalanie mobilne</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Pojazdy, flota transportowa</span
+      >
+    </a>
 
-                    <a href="{% url 'emissions:processemission-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
-                            <span class="material-symbols-outlined">science</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Emisje procesowe</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Fizyczne lub chemiczne procesy technologiczne specyficzne dla branży.</p>
-                        <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
-                        </div>
-                    </a>
+    <a
+      href="{% url 'emissions:process-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >science</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Emisje procesowe</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Procesy technologiczne</span
+      >
+    </a>
 
-                    <a href="{% url 'emissions:fugitiveemission-list' company.id %}" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-primary-container text-on-primary flex items-center justify-center stepped-border mb-4 group-hover:bg-primary transition-colors">
-                            <span class="material-symbols-outlined">air</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Emisje niezorganizowane</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Wycieki czynników chłodniczych (np. z klimatyzacji) lub gazów technicznych.</p>
-                        <div class="inline-flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">list</span> Przejdź do rejestru
-                        </div>
-                    </a>
-                </div>
-            </div>
+    <a
+      href="{% url 'emissions:fugitive-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >air</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Emisje niezorganizowane</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Wycieki czynników chłodniczych</span
+      >
+    </a>
+  </div>
+</section>
 
-            <hr class="border-outline-variant mb-12 border-t-2 border-dashed">
+<hr
+  style="
+    border: none;
+    border-top: 1px dashed rgba(42, 63, 74, 0.8);
+    margin-bottom: 3rem;
+  "
+/>
 
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="px-3 py-1 bg-[#adddff] text-[#144b68] text-xs font-label-sm uppercase tracking-wider stepped-border font-bold">Zakres 2</span>
-                    <h3 class="text-2xl font-bold text-on-surface">Emisje pośrednie energetyczne</h3>
-                </div>
+<!-- SCOPE 2 -->
+<section class="mb-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      style="
+        font-family: &quot;Roboto Mono&quot;, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 4px;
+        background: rgba(100, 200, 240, 0.12);
+        color: #6ac8e8;
+        border: 1px solid rgba(100, 200, 240, 0.3);
+      "
+      >Zakres 2</span
+    >
+    <span
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: #e8f4f0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      "
+      >Emisje pośrednie energetyczne</span
+    >
+  </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <a href="#" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-surface-container-high border-2 border-outline-variant flex items-center justify-center stepped-border mb-4 group-hover:bg-secondary-container transition-colors">
-                            <span class="material-symbols-outlined">electric_bolt</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Zakupiona energia</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Rejestr energii elektrycznej, cieplnej, pary wodnej z sieci zewnętrznej.</p>
-                        <div class="inline-flex items-center gap-2 text-[#144b68] text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
-                        </div>
-                    </a>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #c2eef8, #52b8dc);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >electric_bolt</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Zakupiona energia</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Energia z sieci zewnętrznej</span
+      >
+    </a>
 
-                    <a href="#" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-surface-container-high border-2 border-outline-variant flex items-center justify-center stepped-border mb-4 group-hover:bg-secondary-container transition-colors">
-                            <span class="material-symbols-outlined">solar_power</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Wyprodukowana</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Energia wytworzona na własne potrzeby (np. instalacje fotowoltaiczne).</p>
-                        <div class="inline-flex items-center gap-2 text-[#144b68] text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
-                        </div>
-                    </a>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #c2eef8, #52b8dc);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >solar_power</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Wyprodukowana</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Fotowoltaika, własne źródła</span
+      >
+    </a>
 
-                    <a href="#" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-surface-container-high border-2 border-outline-variant flex items-center justify-center stepped-border mb-4 group-hover:bg-secondary-container transition-colors">
-                            <span class="material-symbols-outlined">outbound</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Sprzedana energia</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Odprzedaż nadwyżek wyprodukowanej energii do sieci lub innych podmiotów.</p>
-                        <div class="inline-flex items-center gap-2 text-[#144b68] text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
-                        </div>
-                    </a>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #c2eef8, #52b8dc);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >outbound</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Sprzedana energia</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Odprzedaż nadwyżek do sieci</span
+      >
+    </a>
 
-                    <a href="#" class="bg-surface border-2 border-outline-variant p-6 stepped-border shadow-[4px_4px_0px_0px_#D1D5DB] flex flex-col hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group">
-                        <div class="w-12 h-12 bg-surface-container-high border-2 border-outline-variant flex items-center justify-center stepped-border mb-4 group-hover:bg-secondary-container transition-colors">
-                            <span class="material-symbols-outlined">analytics</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-on-surface mb-2">Całkowite zużycie</h4>
-                        <p class="text-sm text-on-surface-variant mb-6 flex-1">Zbiorcze raportowanie konsumpcji dla danego źródła i typu energii.</p>
-                        <div class="inline-flex items-center gap-2 text-[#144b68] text-sm font-bold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">add</span> Dodaj wpis
-                        </div>
-                    </a>
-                </div>
-            </div>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #c2eef8, #52b8dc);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >analytics</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Całkowite zużycie</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Zbiorcze raportowanie</span
+      >
+    </a>
+  </div>
+</section>
 
-        </div>
-    </body>
-</html>
+{% endblock %}

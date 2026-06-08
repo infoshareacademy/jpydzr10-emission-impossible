@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -51,6 +50,8 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     "reports.apps.ReportsConfig",
     "what_if.apps.WhatIfConfig",
+    "tailwind",
+    "theme",
 ]
 
 SITE_ID = 1
@@ -134,6 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+TAILWIND_APP_NAME = "theme"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
