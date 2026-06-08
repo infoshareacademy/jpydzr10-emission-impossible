@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent  # to jest web/
 
 # Wskaż .env w folderze głównym (poziom wyżej niż web/)
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "ai_services.apps.AiServicesConfig",
     "calculator.apps.CalculatorConfig",
     "companies.apps.CompaniesConfig",
@@ -51,6 +52,8 @@ INSTALLED_APPS = [
     "reports.apps.ReportsConfig",
     "what_if.apps.WhatIfConfig",
 ]
+
+SITE_ID = 1
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
@@ -131,3 +134,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Dane uwierzytelniające
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+# Domyślny adres nadawcy (zapobiega oznaczaniu jako spam przy niezgodności nagłówków)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
