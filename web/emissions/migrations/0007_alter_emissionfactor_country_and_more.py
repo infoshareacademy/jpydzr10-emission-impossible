@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 verbose_name="Kraj",
             ),
         ),
-
         # KROK 2: Wypełnij country_new na podstawie starego pola country (string)
         migrations.RunSQL(
             sql="""
@@ -40,20 +39,17 @@ class Migration(migrations.Migration):
                 WHERE f.country_new_id = c.id
             """,
         ),
-
         # KROK 3: Usuń starą kolumnę country (CharField)
         migrations.RemoveField(
             model_name="emissionfactor",
             name="country",
         ),
-
         # KROK 4: Zmień nazwę country_new na country
         migrations.RenameField(
             model_name="emissionfactor",
             old_name="country_new",
             new_name="country",
         ),
-
         # KROK 5: Zmień fuel w StationaryCombustion z CharField na ForeignKey
         migrations.AddField(
             model_name="stationarycombustion",
@@ -67,7 +63,6 @@ class Migration(migrations.Migration):
                 verbose_name="Paliwo",
             ),
         ),
-
         migrations.RunSQL(
             sql="""
                 UPDATE tbl_stationary_combustion sc
@@ -77,18 +72,15 @@ class Migration(migrations.Migration):
             """,
             reverse_sql=migrations.RunSQL.noop,
         ),
-
         migrations.RemoveField(
             model_name="stationarycombustion",
             name="fuel",
         ),
-
         migrations.RenameField(
             model_name="stationarycombustion",
             old_name="fuel_new",
             new_name="fuel",
         ),
-
         # KROK 6: Zmień fuel w MobileCombustion z CharField na ForeignKey
         migrations.AddField(
             model_name="mobilecombustion",
@@ -102,7 +94,6 @@ class Migration(migrations.Migration):
                 verbose_name="Paliwo",
             ),
         ),
-
         migrations.RunSQL(
             sql="""
                 UPDATE tbl_mobile_combustion mc
@@ -112,12 +103,10 @@ class Migration(migrations.Migration):
             """,
             reverse_sql=migrations.RunSQL.noop,
         ),
-
         migrations.RemoveField(
             model_name="mobilecombustion",
             name="fuel",
         ),
-
         migrations.RenameField(
             model_name="mobilecombustion",
             old_name="fuel_new",

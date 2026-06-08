@@ -241,7 +241,12 @@ class Scope1BaseForm(forms.ModelForm):
     Automatycznie nakłada brutalistyczne style Tailwind na każde pole.
     """
 
-    HIDDEN_FIELDS = {"created_by", "updated_by", "note", "company",}
+    HIDDEN_FIELDS = {
+        "created_by",
+        "updated_by",
+        "note",
+        "company",
+    }
     READONLY_FIELDS = {
         "calculated_emission_tco2eq",
         "applied_factor_value",

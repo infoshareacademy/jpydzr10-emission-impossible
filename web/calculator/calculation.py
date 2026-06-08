@@ -33,8 +33,9 @@ def calculate_record_emissions(instance) -> None:
 
     # 2. Pobranie Wskaźnika z bazy
     factor_obj = EmissionFactor.objects.filter(
-        factor_name=lookup_value, 
-        year=getattr(instance, 'year', None)
+        factor_name=lookup_value,
+        year=getattr(instance, "year", None),
+        country=instance.company.country,
     ).first()
 
     # Zmienne startowe

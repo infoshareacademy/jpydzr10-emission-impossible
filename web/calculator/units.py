@@ -40,7 +40,7 @@ _UNIT_ALIASES: dict[str, str] = {
     "kgCO2e": "kgCO2e",
 }
 
-_MASS_ALIASES = {"kg", "t", "metric_ton", "mg"}
+_MASS_ALIASES = {"kg", "t", "metric_ton", "mg", "metric_ton", "Mg"}
 _VOLUME_ALIASES = {"l", "liter", "m3", "meter3", "meter ** 3"}
 _ENERGY_ALIASES = {"mj", "gj", "kwh", "mwh"}
 
@@ -131,11 +131,13 @@ def convert_via_fuel(
     if fuel_spec is None:
         return convert(value, unit_from, unit_to)
 
-    uf = _resolve(unit_from).lower()
-    ut = _resolve(unit_to).lower()
+    uf_resolved = _resolve(unit_from)
+    ut_resolved = _resolve(unit_to)
+    uf = uf_resolved.lower()
+    ut = ut_resolved.lower()
 
-    from_mass = uf in _MASS_ALIASES
-    to_mass = ut in _MASS_ALIASES
+    from_mass = uf in _MASS_ALIASES or unit_from in _MASS_ALIASES
+    to_mass = ut in _MASS_ALIASES or unit_to in _MASS_ALIASES
     from_vol = uf in _VOLUME_ALIASES
     to_vol = ut in _VOLUME_ALIASES
     to_energy = ut in _ENERGY_ALIASES
