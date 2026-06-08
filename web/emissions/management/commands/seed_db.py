@@ -1,10 +1,7 @@
 import random
 from decimal import Decimal
 
-# Konta i firmy
 from accounts.models import UserCompanyPermission
-
-# Kalkulator i słowniki
 from calculator.calculation import calculate_record_emissions
 from calculator.models import FuelSpec, FuelType, Supplier
 from companies.models import Companies, CompaniesGroup, Countries
@@ -13,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-# Modele Emisji
 from emissions.models import (
     EmissionFactor,
     EnergyConsumption,
@@ -38,7 +34,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.WARNING("Rozpoczynam generowanie danych..."))
 
         # =====================================================================
-        # 1. GENEROWANIE UŻYTKOWNIKÓW
+        # 1. UŻYTKOWNICY
         # =====================================================================
         admin, _ = User.objects.get_or_create(
             username="admin",
@@ -61,21 +57,36 @@ class Command(BaseCommand):
             user1.set_password("test1234")
             user1.save()
 
+        user2, _ = User.objects.get_or_create(
+            username="anowak",
+            defaults={"email": "anowak@example.com", "role": "audytor"},
+        )
+        if not user2.check_password("test1234"):
+            user2.set_password("test1234")
+            user2.save()
+
         # =====================================================================
-        # 2. GENEROWANIE STRUKTURY FIRM
+        # 2. STRUKTURA FIRM
         # =====================================================================
-        country, _ = Countries.objects.get_or_create(
+        poland, _ = Countries.objects.get_or_create(
             code_alfa_2="PL", defaults={"name": "Polska"}
         )
+        germany, _ = Countries.objects.get_or_create(
+            code_alfa_2="DE", defaults={"name": "Niemcy"}
+        )
+
         group, _ = CompaniesGroup.objects.get_or_create(
-            gk_name="Grupa Kapitałowa Test", lvl_in_structure=1
+            gk_name="Grupa Kapitałowa Test", defaults={"lvl_in_structure": 1}
+        )
+        group2, _ = CompaniesGroup.objects.get_or_create(
+            gk_name="Holding Przemysłowy", defaults={"lvl_in_structure": 2}
         )
 
         company1, _ = Companies.objects.get_or_create(
             nip="1112223344",
             defaults={
                 "name": "Fabryka Emisji Sp. z o.o.",
-                "country": country,
+                "country": poland,
                 "city": "Gdańsk",
                 "zip": "80-000",
                 "phone": "123456789",
@@ -86,12 +97,60 @@ class Command(BaseCommand):
             },
         )
 
+        company2, _ = Companies.objects.get_or_create(
+            nip="5556667788",
+            defaults={
+                "name": "Energetyka Polska S.A.",
+                "country": poland,
+                "city": "Warszawa",
+                "zip": "00-001",
+                "phone": "987654321",
+                "mail": "biuro@energetyka.pl",
+                "krs": 222222222,  # 9 cyfr — mieści się w integer
+                "regon": 222222222,
+                "capital_group_name": group,
+            },
+        )
+
+        company3, _ = Companies.objects.get_or_create(
+            nip="9990001112",
+            defaults={
+                "name": "Logistyka Centrum Sp. z o.o.",
+                "country": poland,
+                "city": "Kraków",
+                "zip": "30-001",
+                "phone": "111222333",
+                "mail": "info@logistyka.pl",
+                "krs": 333333333,  # 9 cyfr
+                "regon": 333333333,
+                "capital_group_name": group2,
+            },
+        )
+
+        companies = [company1, company2, company3]
+
+        # Uprawnienia użytkowników
+        for company in companies:
+            UserCompanyPermission.objects.get_or_create(
+                user=admin,
+                company=company,
+                defaults={"can_save": True, "can_read": True},
+            )
         UserCompanyPermission.objects.get_or_create(
             user=user1, company=company1, defaults={"can_save": True, "can_read": True}
         )
+        UserCompanyPermission.objects.get_or_create(
+            user=user1, company=company2, defaults={"can_save": False, "can_read": True}
+        )
+        UserCompanyPermission.objects.get_or_create(
+            user=user2, company=company2, defaults={"can_save": False, "can_read": True}
+        )
+        UserCompanyPermission.objects.get_or_create(
+            user=user2, company=company3, defaults={"can_save": False, "can_read": True}
+        )
 
         # =====================================================================
-        # 3. LISTY POMOCNICZE DO LOSOWANIA
+        # 3. LISTY POMOCNICZE
         # =====================================================================
         years = [2022, 2023, 2024]
         statuses = [
@@ -115,7 +174,7 @@ class Command(BaseCommand):
             return Decimal(random.uniform(min_val, max_val)).quantize(Decimal("0.001"))
 
         # =====================================================================
-        # 3.5. GENEROWANIE SŁOWNIKÓW (PALIWA, DOSTAWCY, SPECYFIKACJE)
+        # 3.5. SŁOWNIKI (PALIWA, DOSTAWCY, SPECYFIKACJE)
         # =====================================================================
         self.stdout.write("Generowanie słowników (Paliwa, Dostawcy, Specyfikacje)...")
 
@@ -124,23 +183,32 @@ class Command(BaseCommand):
         supplier_pgg, _ = Supplier.objects.get_or_create(name="Polska Grupa Górnicza")
 
         fuel_diesel, _ = FuelType.objects.get_or_create(
-            name="Olej napędowy (ON)", symbol="ON", category="liquid"
+            symbol="ON", defaults={"name": "Olej napędowy (ON)", "category": "liquid"}
         )
         fuel_petrol, _ = FuelType.objects.get_or_create(
-            name="Benzyna (Pb95)", symbol="PB95", category="liquid"
+            symbol="PB95", defaults={"name": "Benzyna (Pb95)", "category": "liquid"}
         )
         fuel_lpg, _ = FuelType.objects.get_or_create(
-            name="LPG", symbol="LPG", category="gas"
+            symbol="LPG", defaults={"name": "LPG", "category": "gas"}
         )
         fuel_gas, _ = FuelType.objects.get_or_create(
-            name="Gaz ziemny", symbol="GAZ", category="gas"
+            symbol="GAZ", defaults={"name": "Gaz ziemny", "category": "gas"}
         )
         fuel_coal, _ = FuelType.objects.get_or_create(
-            name="Węgiel kamienny", symbol="WEG", category="solid"
+            symbol="WEG", defaults={"name": "Węgiel kamienny", "category": "solid"}
         )
         fuel_pellet, _ = FuelType.objects.get_or_create(
-            name="Pellet drzewny", symbol="PEL", category="solid"
+            symbol="PEL", defaults={"name": "Pellet drzewny", "category": "solid"}
         )
+
+        fuel_type_map = {
+            "Olej napędowy (ON)": fuel_diesel,
+            "Benzyna (Pb95)": fuel_petrol,
+            "LPG": fuel_lpg,
+            "Gaz ziemny": fuel_gas,
+            "Węgiel kamienny": fuel_coal,
+            "Pellet drzewny": fuel_pellet,
+        }
 
         # Domyślne specyfikacje
         FuelSpec.objects.get_or_create(
@@ -234,11 +302,9 @@ class Command(BaseCommand):
         )
 
         # =====================================================================
-        # 3.6. GENEROWANIE WSKAŹNIKÓW EMISJI (REALISTYCZNE JEDNOSTKI)
+        # 3.6. WSKAŹNIKI EMISJI
         # =====================================================================
-        self.stdout.write(
-            "Generowanie słowników wskaźników emisji dla paliw i energii..."
-        )
+        self.stdout.write("Generowanie wskaźników emisji...")
 
         all_fuels = (
             fuels_stationary
@@ -254,10 +320,9 @@ class Command(BaseCommand):
         )
 
         for y in years:
-            # Ogólny wskaźnik sieciowy KOBiZE dla Zakresu 2
             EmissionFactor.objects.get_or_create(
                 factor_name=f"Wskaźnik KOBiZE {y}",
-                country="PL",
+                country=poland,
                 year=y,
                 defaults={
                     "factor": rand_decimal(0.6, 0.8),
@@ -265,21 +330,19 @@ class Command(BaseCommand):
                     "source": "KOBiZE",
                 },
             )
-            # Wskaźniki dedykowane dla paliw i procesów z Zakresu 1
             for fuel_name in all_fuels:
-                # Realistyczne jednostki rynkowe KOBiZE
                 if fuel_name == "Gaz ziemny":
                     u_factor = "kgCO2e/m3"
-                elif fuel_name in fuels_stationary:  # Węgiel, Pellet
+                elif fuel_name in fuels_stationary:
                     u_factor = "kgCO2e/Mg"
-                elif fuel_name in fuels_mobile:  # ON, Pb95, LPG
+                elif fuel_name in fuels_mobile:
                     u_factor = "kgCO2e/l"
-                else:  # Gazy chłodnicze, procesy
+                else:
                     u_factor = "kgCO2e/kg"
 
                 EmissionFactor.objects.get_or_create(
                     factor_name=fuel_name,
-                    country="PL",
+                    country=poland,
                     year=y,
                     defaults={
                         "factor": rand_decimal(1.5, 2.9),
@@ -289,149 +352,151 @@ class Command(BaseCommand):
                 )
 
         # =====================================================================
-        # 4. GENEROWANIE DANYCH DLA ZAKRESU 1 (~20 rekordów na tabelę)
+        # 4. DANE ZAKRESU 1 — dla każdej spółki
         # =====================================================================
-        self.stdout.write(
-            "Generowanie danych Zakresu 1 z automatycznym przeliczaniem..."
-        )
-        for i in range(20):
-            # Spalanie stacjonarne
-            fuel_stat = random.choice(fuels_stationary)
-            # Gaz kupujemy w m3, ciała stałe w Mg/t
-            unit_stat = (
-                "m3" if fuel_stat == "Gaz ziemny" else random.choice(["Mg", "t"])
-            )
+        self.stdout.write("Generowanie danych Zakresu 1...")
 
-            stat_comb = StationaryCombustion(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(10, 5000),
-                unit=unit_stat,
-                source=f"Faktura {i}/2023",
-                fuel=fuel_stat,
-                installation=f"Kocioł nr {random.randint(1, 5)} hala {random.choice(['A', 'B', 'C'])}",
-                emission_tco2eq=rand_decimal(1, 100),
-            )
-            try:
-                calculate_record_emissions(stat_comb)
-            except ValidationError as e:
-                self.stdout.write(self.style.ERROR(f"Błąd stat: {e}"))
-            stat_comb.save()
+        for company in companies:
+            self.stdout.write(f"  → {company.name}")
+            for i in range(20):
+                # Spalanie stacjonarne
+                fuel_stat_name = random.choice(fuels_stationary)
+                fuel_stat_fk = fuel_type_map[fuel_stat_name]
+                unit_stat = (
+                    "m3"
+                    if fuel_stat_name == "Gaz ziemny"
+                    else random.choice(["Mg", "t"])
+                )
 
-            # Spalanie mobilne
-            mob_comb = MobileCombustion(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(50, 2000),
-                unit="l",
-                source=f"Raport floty {i}",
-                fuel=random.choice(fuels_mobile),
-                vehicle=f"Pojazd {random.choice(['Osobowy', 'Dostawczy', 'Wózek widłowy'])} - {random.randint(100, 999)}",
-                emission_tco2eq=rand_decimal(0.5, 20),
-            )
-            try:
-                calculate_record_emissions(mob_comb)
-            except ValidationError as e:
-                self.stdout.write(self.style.ERROR(f"Błąd mob: {e}"))
-            mob_comb.save()
+                stat_comb = StationaryCombustion(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(10, 5000),
+                    unit=unit_stat,
+                    source=f"Faktura {i}/2023",
+                    fuel=fuel_stat_fk,
+                    installation=f"Kocioł nr {random.randint(1, 5)} hala {random.choice(['A', 'B', 'C'])}",
+                    emission_tco2eq=rand_decimal(1, 100),
+                )
+                try:
+                    calculate_record_emissions(stat_comb)
+                except ValidationError as e:
+                    self.stdout.write(self.style.ERROR(f"Błąd stat: {e}"))
+                stat_comb.save()
 
-            # Emisje procesowe
-            proc_choice = random.choice(["A", "B", "X"])
-            proc_emis = ProcessEmission(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(5, 50),
-                unit="t",
-                source="Raport technologiczny",
-                process=f"Proces chemiczny typu {proc_choice}",
-                product=f"Produkt końcowy {random.randint(1, 100)}",
-                emission_tco2eq=rand_decimal(10, 150),
-            )
-            proc_emis.fuel = f"Proces chemiczny typu {proc_choice}"
-            try:
-                calculate_record_emissions(proc_emis)
-            except ValidationError as e:
-                self.stdout.write(self.style.ERROR(f"Błąd proc: {e}"))
-            proc_emis.save()
+                # Spalanie mobilne
+                fuel_mob_name = random.choice(fuels_mobile)
+                fuel_mob_fk = fuel_type_map[fuel_mob_name]
 
-            # Emisje niezorganizowane
-            prod_choice = random.choice(["R410A", "R134a", "SF6"])
-            fug_emis = FugitiveEmission(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(1, 15),
-                unit="kg",
-                source="Karta Urządzenia",
-                installation=f"Klimatyzator biurowy nr {random.randint(1, 20)}",
-                product=prod_choice,
-                emission_tco2eq=rand_decimal(2, 30),
-            )
-            fug_emis.fuel = prod_choice
-            try:
-                calculate_record_emissions(fug_emis)
-            except ValidationError as e:
-                self.stdout.write(self.style.ERROR(f"Błąd fug: {e}"))
-            fug_emis.save()
+                mob_comb = MobileCombustion(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(50, 2000),
+                    unit="l",
+                    source=f"Raport floty {i}",
+                    fuel=fuel_mob_fk,
+                    vehicle=f"Pojazd {random.choice(['Osobowy', 'Dostawczy', 'Wózek widłowy'])} - {random.randint(100, 999)}",
+                    emission_tco2eq=rand_decimal(0.5, 20),
+                )
+                try:
+                    calculate_record_emissions(mob_comb)
+                except ValidationError as e:
+                    self.stdout.write(self.style.ERROR(f"Błąd mob: {e}"))
+                mob_comb.save()
+
+                # Emisje procesowe
+                proc_choice = random.choice(["A", "B", "X"])
+                proc_emis = ProcessEmission(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(5, 50),
+                    unit="t",
+                    source="Raport technologiczny",
+                    process=f"Proces chemiczny typu {proc_choice}",
+                    product=f"Produkt końcowy {random.randint(1, 100)}",
+                    emission_tco2eq=rand_decimal(10, 150),
+                )
+                try:
+                    calculate_record_emissions(proc_emis)
+                except ValidationError as e:
+                    self.stdout.write(self.style.ERROR(f"Błąd proc: {e}"))
+                proc_emis.save()
+
+                # Emisje niezorganizowane
+                prod_choice = random.choice(["R410A", "R134a", "SF6"])
+                fug_emis = FugitiveEmission(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(1, 15),
+                    unit="kg",
+                    source="Karta Urządzenia",
+                    installation=f"Klimatyzator biurowy nr {random.randint(1, 20)}",
+                    product=prod_choice,
+                    emission_tco2eq=rand_decimal(2, 30),
+                )
+                try:
+                    calculate_record_emissions(fug_emis)
+                except ValidationError as e:
+                    self.stdout.write(self.style.ERROR(f"Błąd fug: {e}"))
+                fug_emis.save()
 
         # =====================================================================
-        # 5. GENEROWANIE DANYCH DLA ZAKRESU 2 (Energia)
+        # 5. DANE ZAKRESU 2 — dla każdej spółki
         # =====================================================================
         self.stdout.write("Generowanie danych Zakresu 2...")
-        for i in range(20):
-            EnergyConsumption.objects.create(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(1000, 50000),
-                unit=random.choice(["kWh", "MWh", "GJ"]),
-                source="Liczniki wewnętrzne",
-                energy_source=random.choice(["Zakupiona", "Wyprodukowana"]),
-                energy_type=random.choice(energy_types),
-                emission_tco2eq=rand_decimal(5, 200),
-            )
 
-            EnergyPurchased.objects.create(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(500, 10000),
-                unit="MWh",
-                source="Faktura od dostawcy",
-                trader=random.choice(["PGE", "Tauron", "Enea", "Energa"]),
-                energy_type=random.choice(energy_types),
-                factor=rand_decimal(0.1, 0.9),
-                emission_tco2eq=rand_decimal(10, 500),
-            )
-
-            EnergyProduced.objects.create(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(100, 2000),
-                unit="MWh",
-                source="System SCADA",
-                installation=f"Instalacja Fotowoltaiczna na dachu {random.choice(['Hali A', 'Biura'])}",
-                energy_type="Energia elektryczna z OZE",
-                factor=rand_decimal(0, 0.05),
-            )
-
-            EnergySold.objects.create(
-                year=random.choice(years),
-                company=company1,
-                status=random.choice(statuses),
-                amount=rand_decimal(50, 500),
-                unit="MWh",
-                source="Faktury sprzedażowe",
-                customer=f"Odbiorca Zewnętrzny {random.randint(1, 5)}",
-                energy_type="Energia elektryczna z OZE",
-            )
+        for company in companies:
+            self.stdout.write(f"  → {company.name}")
+            for i in range(20):
+                EnergyConsumption.objects.create(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(1000, 50000),
+                    unit=random.choice(["kWh", "MWh", "GJ"]),
+                    source="Liczniki wewnętrzne",
+                    energy_source=random.choice(["Zakupiona", "Wyprodukowana"]),
+                    energy_type=random.choice(energy_types),
+                    emission_tco2eq=rand_decimal(5, 200),
+                )
+                EnergyPurchased.objects.create(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(500, 10000),
+                    unit="MWh",
+                    source="Faktura od dostawcy",
+                    trader=random.choice(["PGE", "Tauron", "Enea", "Energa"]),
+                    energy_type=random.choice(energy_types),
+                    factor=rand_decimal(0.1, 0.9),
+                    emission_tco2eq=rand_decimal(10, 500),
+                )
+                EnergyProduced.objects.create(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(100, 2000),
+                    unit="MWh",
+                    source="System SCADA",
+                    installation=f"Instalacja Fotowoltaiczna na dachu {random.choice(['Hali A', 'Biura'])}",
+                    energy_type="Energia elektryczna z OZE",
+                    factor=rand_decimal(0, 0.05),
+                )
+                EnergySold.objects.create(
+                    year=random.choice(years),
+                    company=company,
+                    status=random.choice(statuses),
+                    amount=rand_decimal(50, 500),
+                    unit="MWh",
+                    source="Faktury sprzedażowe",
+                    customer=f"Odbiorca Zewnętrzny {random.randint(1, 5)}",
+                    energy_type="Energia elektryczna z OZE",
+                )
 
         self.stdout.write(
-            self.style.SUCCESS(
-                "Pomyślnie wygenerowano testowe dane, słowniki i PRZELICZONO EMISJE!"
-            )
+            self.style.SUCCESS("Pomyślnie wygenerowano testowe dane dla 3 spółek!")
         )

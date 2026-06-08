@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from companies.models import Companies
+from calculator.models import FuelType
+from companies.models import Companies, Countries
+from core.models import CoreModel
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from core.models import CoreModel
 
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
@@ -40,31 +40,47 @@ class ActivityRecord(BaseRecord):
         verbose_name=_("Status"),
     )
     emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True,
-        verbose_name=_("Emisja zadeklarowana")
+        max_digits=12,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Emisja zadeklarowana"),
     )
-    
+
     calculated_emission_tco2eq = models.DecimalField(
-        max_digits=12, decimal_places=3, null=True, blank=True,
-        verbose_name=_("Emisja (Wyliczona przez system)")
+        max_digits=12,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Emisja (Wyliczona przez system)"),
     )
-    
+
     applied_factor_value = models.DecimalField(
-        max_digits=12, decimal_places=5, null=True, blank=True,
-        verbose_name=_("Użyty wskaźnik (Wartość)")
+        max_digits=12,
+        decimal_places=5,
+        null=True,
+        blank=True,
+        verbose_name=_("Użyty wskaźnik (Wartość)"),
     )
     applied_factor_unit = models.CharField(
-        max_length=50, null=True, blank=True,
-        verbose_name=_("Użyty wskaźnik (Jednostka)")
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name=_("Użyty wskaźnik (Jednostka)"),
     )
 
     applied_converter_value = models.DecimalField(
-        max_digits=12, decimal_places=5, default=Decimal('1.00000'),
-        verbose_name=_("Użyty przelicznik jednostek (Wartość)")
+        max_digits=12,
+        decimal_places=5,
+        default=Decimal("1.00000"),
+        verbose_name=_("Użyty przelicznik jednostek (Wartość)"),
     )
     applied_converter_unit = models.CharField(
-        max_length=50, null=True, blank=True, default='',
-        verbose_name=_("Użyty przelicznik jednostek (Jednostka)")
+        max_length=50,
+        null=True,
+        blank=True,
+        default="",
+        verbose_name=_("Użyty przelicznik jednostek (Jednostka)"),
     )
 
     class Meta:
@@ -72,7 +88,12 @@ class ActivityRecord(BaseRecord):
 
 
 class StationaryCombustion(ActivityRecord):
-    fuel = models.CharField(max_length=100)
+    fuel = models.ForeignKey(
+        FuelType,
+        on_delete=models.PROTECT,
+        related_name="stationary_combustions",
+        verbose_name=_("Paliwo"),
+    )
     installation = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
 
@@ -84,7 +105,12 @@ class StationaryCombustion(ActivityRecord):
 
 class MobileCombustion(ActivityRecord):
     vehicle = models.CharField(max_length=200)
-    fuel = models.CharField(max_length=100)
+    fuel = models.ForeignKey(
+        FuelType,
+        on_delete=models.PROTECT,
+        related_name="mobile_combustion",
+        verbose_name=_("Paliwo"),
+    )
     raport = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
@@ -108,7 +134,6 @@ class FugitiveEmission(ActivityRecord):
     installation = models.CharField(max_length=200)
     product = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
-    notes = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "tbl_fugitive_emissions"
@@ -160,7 +185,12 @@ class EnergySold(ActivityRecord):
 
 class EmissionFactor(models.Model):
     factor_name = models.CharField(max_length=200)
-    country = models.CharField(max_length=100)
+    country = models.ForeignKey(
+        Countries,
+        on_delete=models.PROTECT,
+        related_name="emission_factors",
+        verbose_name=_("Kraj"),
+    )
     year = models.PositiveIntegerField()
     factor = models.DecimalField(max_digits=12, decimal_places=5)
     unit_factor = models.CharField(max_length=50)

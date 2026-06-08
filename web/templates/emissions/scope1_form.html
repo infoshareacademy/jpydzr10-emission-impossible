@@ -28,43 +28,47 @@
                     Dodaj: {{ model_verbose_name|default:"Nowy wpis" }}
                 </h2>
             </header>
-
+            <div class="mt-4 flex items-center gap-3 px-4 py-3 bg-gray-100 border-2 border-gray-300 stepped-border">
+                <span class="text-xs font-black uppercase text-gray-500 tracking-wider">Spółka:</span>
+                <span class="font-bold text-black">{{ company.name }}</span>
+            </div>
+        </header>
         <!-- Formularz -->
-            <form method="post" action="" class="space-y-6">
-                {% csrf_token %}
+        <form method="post" action="" class="space-y-6">
+            {% csrf_token %}
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Pętla renderująca wszystkie pola formularza dynamicznie -->
-                    {% for field in form %}
-                        <div class="flex flex-col gap-1 {% if field.name == 'notes' or field.name == 'company' %}md:col-span-2{% endif %}">
-                            <label for="{{ field.id_for_label }}" class="font-bold text-sm uppercase text-gray-700 tracking-wide">
-                                {{ field.label }}
-                            </label>
+                {% for field in form %}
+                    <div class="flex flex-col gap-1 {% if field.name == 'notes' or field.name == 'company' %}md:col-span-2{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="font-bold text-sm uppercase text-gray-700 tracking-wide">
+                            {{ field.label }}
+                        </label>
 
-                            {{ field }}
+                        {{ field }}
 
                         <!-- Obsługa błędów walidacji pola -->
-                            {% if field.errors %}
-                                <div class="bg-red-100 border border-red-500 text-red-700 px-3 py-1 text-xs font-bold mt-1">
-                                    {{ field.errors|striptags }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+                        {% if field.errors %}
+                            <div class="bg-red-100 border border-red-500 text-red-700 px-3 py-1 text-xs font-bold mt-1">
+                                {{ field.errors|striptags }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
 
             <!-- Przyciski akcji -->
-                <div class="flex gap-4 pt-6 mt-6 border-t-2 border-gray-200">
-                    <a href="{% url list_url_name company_id %}" class="flex-1 py-3 bg-gray-200 text-black border-2 border-black font-bold uppercase tracking-wider text-center hover:bg-gray-300 transition-colors shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">                        Anuluj
-                    </a>
-                    <button type="submit" class="flex-1 py-3 bg-[#005440] text-white border-2 border-black font-bold uppercase tracking-wider hover:bg-[#0f6e56] transition-colors shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none flex justify-center items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">save</span>
-                        Zapisz wpis
-                    </button>
-                </div>
-            </form>
+            <div class="flex gap-4 pt-6 mt-6 border-t-2 border-gray-200">
+                <a href="{% url list_url_name company_id %}" class="flex-1 py-3 bg-gray-200 text-black border-2 border-black font-bold uppercase tracking-wider text-center hover:bg-gray-300 transition-colors shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">                        Anuluj
+                </a>
+                <button type="submit" class="flex-1 py-3 bg-[#005440] text-white border-2 border-black font-bold uppercase tracking-wider hover:bg-[#0f6e56] transition-colors shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    Zapisz wpis
+                </button>
+            </div>
+        </form>
 
-        </div>
+    </div>
 
-    </body>
+</body>
 </html>

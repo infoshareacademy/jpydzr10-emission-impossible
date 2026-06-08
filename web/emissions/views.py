@@ -453,7 +453,9 @@ class Scope1CreateMixin(LoginRequiredMixin):
         context["company_id"] = self.kwargs.get("company_id")
         prefix = self.get_url_prefix()
         context["list_url_name"] = f"emissions:{prefix}-list"
-
+        context["company"] = get_object_or_404(
+            Companies, pk=self.kwargs.get("company_id")
+        )
         return context
 
 
