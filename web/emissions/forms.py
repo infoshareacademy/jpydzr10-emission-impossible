@@ -241,23 +241,48 @@ class Scope1BaseForm(forms.ModelForm):
     Automatycznie nakłada brutalistyczne style Tailwind na każde pole.
     """
 
+    HIDDEN_FIELDS = {"created_by", "updated_by", "note"}
+    READONLY_FIELDS = {
+        "calculated_emission_tco2eq",
+        "applied_factor_value",
+        "applied_factor_unit",
+        "applied_converter_value",
+        "applied_converter_unit",
+    }
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Usuń ukryte pola całkowicie z formularza
+        for field_name in self.HIDDEN_FIELDS:
+            if field_name in self.fields:
+                del self.fields[field_name]
+
         for field_name, field in self.fields.items():
-            # Bazowe klasy neo-brutalizmu
-            css_classes = "w-full px-4 py-2 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all outline-none font-body-md"
-
-            # Wymuszenie Textarea dla dłuższych tekstów
-            if isinstance(field.widget, forms.Textarea):
-                field.widget.attrs["class"] = css_classes + " min-h-[100px] resize-y"
+            # Pola tylko do odczytu
+            if field_name in self.READONLY_FIELDS:
+                field.required = False
+                field.widget.attrs.update({
+                    "readonly": True,
+                    "disabled": True,
+                    "class": (
+                        "w-full px-4 py-2 bg-gray-100 border-2 border-gray-300 "
+                        "text-gray-500 cursor-not-allowed outline-none font-body-md"
+                    ),
+                })
             else:
-                field.widget.attrs["class"] = css_classes
-
-            # Dynamiczne generowanie placeholderów
-            label = field.label or field_name
-            if not field.widget.attrs.get("placeholder"):
-                field.widget.attrs["placeholder"] = f"Wprowadź: {label}"
+                # Standardowe pola — istniejący styl brutalistyczny
+                field.widget.attrs.update({
+                    "class": (
+                        "w-full px-4 py-2 bg-white border-2 border-black "
+                        "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] "
+                        "focus:translate-x-[1px] focus:translate-y-[1px] "
+                        "focus:shadow-none transition-all outline-none font-body-md"
+                    )
+                })
+                if not field.widget.attrs.get("placeholder"):
+                    label = field.label or field_name
+                    field.widget.attrs["placeholder"] = f"Wprowadź: {label}"
 
 
 class StationaryCombustionForm(Scope1BaseForm):

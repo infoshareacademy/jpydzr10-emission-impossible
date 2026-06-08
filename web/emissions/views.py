@@ -408,6 +408,22 @@ class Scope1CreateMixin(LoginRequiredMixin):
 
         is_new = instance.pk is None
 
+        if not is_new:
+            try:
+                db_instance = self.model.objects.get(pk=instance.pk)
+                for field_name in (
+                    "calculated_emission_tco2eq",
+                    "applied_factor_value",
+                    "applied_factor_unit",
+                    "applied_converter_value",
+                    "applied_converter_unit",
+                ):
+                    setattr(
+                        instance, field_name, getattr(db_instance, field_name, None)
+                    )
+            except self.model.DoesNotExist:
+                pass
+
         if is_new:
             instance.created_by = self.request.user
 
