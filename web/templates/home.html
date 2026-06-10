@@ -1,5 +1,7 @@
-{% extends "base.html" %} {% block title %}Panel startowy — Emission
-  Impossible{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% block title %}Panel startowy — Emission Impossible{% endblock %}
+
+{% block content %}
 
 <!-- ===================== -->
 <!-- PAGE TITLE -->
@@ -28,7 +30,7 @@
 <!-- ===================== -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
   <!-- Raporty -->
-      <a href="#" class="flex flex-col items-center gap-4 group">
+      <a href="{% url 'reports:ghg-report' %}" class="flex flex-col items-center gap-4 group">
         <div
           class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
           style="
@@ -81,7 +83,7 @@
               </a>
 
   <!-- Wskaźniki Emisji -->
-              <a href="#" class="flex flex-col items-center gap-4 group">
+              <a href="{% url 'emissions:factor-list' %}" class="flex flex-col items-center gap-4 group">
                 <div
                   class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
                   style="

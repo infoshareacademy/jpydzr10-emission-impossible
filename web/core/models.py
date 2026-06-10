@@ -1,5 +1,6 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class CoreModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -23,6 +24,7 @@ class CoreModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+
 
 class ChangeLog(models.Model):
     id_rejestr_zmian = models.AutoField(primary_key=True)
