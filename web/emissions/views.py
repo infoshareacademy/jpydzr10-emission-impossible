@@ -2,7 +2,6 @@ import openpyxl
 from calculator.calculation import calculate_record_emissions
 from companies.models import Companies
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
@@ -17,11 +16,14 @@ from django.views.generic import (
     ListView,
     TemplateView,
     UpdateView,
+    View,
+    FormView,
 )
 
 from .forms import (
     EmissionFactorForm,
     EnergyConsumptionForm,
+    EnergyConsumptionImportForm,
     EnergyProducedForm,
     EnergyPurchasedForm,
     EnergySoldForm,
@@ -43,342 +45,238 @@ from .models import (
 )
 
 
-def energy_consumption_list(request):
-    """Wyświetla listę rekordów zużycia energii z możliwością filtrowania."""
-    records = EnergyConsumption.objects.all().order_by("-year", "company")
-    company = request.GET.get("company", "").strip()
-    year_str = request.GET.get("year", "").strip()
+class Scope2CreateMixin(LoginRequiredMixin):
+    """
+    Wspólna logika dla wszystkich widoków dodawania i aktualizacji z Zakresu 2.
+    Automatycznie oblicza emisję przy zapisie.
+    """
 
-    if company:
-        records = records.filter(company__icontains=company)
+    template_name = "emissions/energy_form.html"
 
-    if year_str:
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        is_new = instance.pk is None
+
+        if not is_new:
+            try:
+                db_instance = self.model.objects.get(pk=instance.pk)
+                for field_name in ['calculated_emission_tco2eq', 'applied_factor_value']:
+                    setattr(instance, field_name, getattr(db_instance, field_name, None))
+            except self.model.DoesNotExist:
+                pass
+
+        if is_new:
+            instance.created_by = self.request.user
+
+        instance.updated_by = self.request.user
+
         try:
-            year = int(year_str)
-            records = records.filter(year=year)
-        except ValueError:
-            pass
+            calculate_record_emissions(instance)
+        except ValidationError as e:
+            instance.calculated_emission_tco2eq = None
+            messages.warning(self.request, f"Zapisano rekord, ale nie wyliczono emisji. Powód: {e}")
 
-    paginator = Paginator(records, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    elided_page_range = paginator.get_elided_page_range(
-        page_obj.number, on_each_side=2, on_ends=1
-    )
+        instance.save()
 
-    context = {
-        "records": page_obj,
-        "page_obj": page_obj,
-        "page_range": elided_page_range,
-        "title": "Zużycie energii",
-        "filter_company": company,
-        "filter_year": year_str,
-    }
-    return render(request, "emissions/energy_consumption_list.html", context)
+        action_text = "dodano wpis do" if is_new else "zaktualizowano wpis w"
+        messages.success(self.request, f"Pomyślnie {action_text}: {self.model._meta.verbose_name}")
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model_verbose_name'] = self.model._meta.verbose_name
+        return context
 
 
-# @login_required
-def energy_consumption_add(request):
-    """Formularz dodawania nowego rekordu zużycia energii."""
-    if request.method == "POST":
-        form = EnergyConsumptionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord zużycia energii został dodany.")
-            return redirect("energy_consumption_list")
-    else:
-        form = EnergyConsumptionForm()
+class Scope2ListMixin(LoginRequiredMixin, ListView):
+    """
+    Uniwersalny widok listy dla wszystkich kategorii Scope 2.
+    Obsługuje paginację, filtrowanie, sortowanie i eksport.
+    """
 
-    return render(
-        request,
-        "emissions/energy_consumption_form.html",
-        {"form": form, "title": "Dodaj zużycie energii"},
-    )
+    paginate_by = 10
+    template_name = "emissions/energy_list.html"
+    default_sort = "-year"
 
+    def get_queryset(self):
+        qs = self.model.objects.all().order_by(self.default_sort)
 
-# @login_required
-def energy_consumption_edit(request, pk):
-    """Formularz edycji istniejącego rekordu zużycia energii."""
-    record = get_object_or_404(EnergyConsumption, pk=pk)
+        self.current_sort = self.request.GET.get('sort', self.default_sort)
+        self.current_year = self.request.GET.get('year', '')
+        self.current_company = self.request.GET.get('company', '')
 
-    if request.method == "POST":
-        form = EnergyConsumptionForm(request.POST, instance=record)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord został zaktualizowany.")
-            return redirect("energy_consumption_list")
-    else:
-        form = EnergyConsumptionForm(instance=record)
+        if self.current_year:
+            qs = qs.filter(year=self.current_year)
+        if self.current_company:
+            qs = qs.filter(company__icontains=self.current_company)
 
-    return render(
-        request,
-        "emissions/energy_consumption_form.html",
-        {"form": form, "title": "Edytuj zużycie energii"},
-    )
+        return qs.order_by(self.current_sort)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'model_verbose_name': self.model._meta.verbose_name,
+            'model_verbose_name_plural': self.model._meta.verbose_name_plural,
+            'current_sort': self.current_sort,
+            'current_year': self.current_year,
+            'current_company': self.current_company,
+            'add_url_name': f'emissions:{self.model._meta.model_name}-add',
+            'edit_url_name': f'emissions:{self.model._meta.model_name}-edit',
+            'delete_url_name': f'emissions:{self.model._meta.model_name}-delete',
+        })
+        return context
 
-# @login_required
-def energy_consumption_delete(request, pk):
-    """Usuwa rekord zużycia energii po potwierdzeniu."""
-    record = get_object_or_404(EnergyConsumption, pk=pk)
+    def get(self, request, *args, **kwargs):
+        if 'export' in request.GET:
+            return self.export_to_excel()
+        return super().get(request, *args, **kwargs)
 
-    if request.method == "POST":
-        record.delete()
-        messages.success(request, "Rekord został usunięty.")
-        return redirect("energy_consumption_list")
+    def export_to_excel(self):
+        """Eksportuje do pliku .xlsx"""
+        qs = self.get_queryset()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = str(self.model._meta.verbose_name_plural)[:31]
 
-    return render(
-        request,
-        "emissions/energy_consumption_confirm_delete.html",
-        {"record": record, "title": "Potwierdź usunięcie"},
-    )
+        fields = [f for f in self.model._meta.fields if f.name not in ['id']]
+        ws.append([f.verbose_name.title() for f in fields])
 
+        for obj in qs:
+            row = []
+            for field in fields:
+                value = getattr(obj, field.name)
+                if hasattr(obj, f'get_{field.name}_display'):
+                    value = getattr(obj, f'get_{field.name}_display')()
+                row.append(str(value) if value is not None else '')
+            ws.append(row)
 
-def energy_purchased_list(request):
-    """Wyświetla listę rekordów zakupionej energii z filtrowaniem i paginacją."""
-    records = EnergyPurchased.objects.all().order_by("-year", "company")
-    company = request.GET.get("company", "").strip()
-    year_str = request.GET.get("year", "").strip()
-
-    if company:
-        records = records.filter(company__icontains=company)
-    if year_str:
-        try:
-            year = int(year_str)
-            records = records.filter(year=year)
-        except ValueError:
-            pass
-
-    paginator = Paginator(records, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    elided_page_range = paginator.get_elided_page_range(
-        page_obj.number, on_each_side=2, on_ends=1
-    )
-
-    context = {
-        "records": page_obj,
-        "page_obj": page_obj,
-        "page_range": elided_page_range,
-        "title": "Zakupiona energia",
-        "filter_company": company,
-        "filter_year": year_str,
-    }
-    return render(request, "emissions/energy_purchased_list.html", context)
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        filename = f'export_{self.model._meta.model_name}.xlsx'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        wb.save(response)
+        return response
 
 
-# @login_required
-def energy_purchased_add(request):
-    if request.method == "POST":
-        form = EnergyPurchasedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord zakupionej energii został dodany.")
-            return redirect("energy_purchased_list")
-    else:
-        form = EnergyPurchasedForm()
-    return render(
-        request,
-        "emissions/energy_purchased_form.html",
-        {"form": form, "title": "Dodaj zakupioną energię"},
-    )
+class Scope2DeleteMixin(LoginRequiredMixin):
+    """Wspólna logika dla usuwania rekordów z Zakresu 2."""
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(
+            self.request,
+            f"Pomyślnie usunięto wpis z: {self.model._meta.verbose_name}"
+        )
+        return super().delete(request, *args, **kwargs)
 
 
-# @login_required
-def energy_purchased_edit(request, pk):
-    record = get_object_or_404(EnergyPurchased, pk=pk)
-    if request.method == "POST":
-        form = EnergyPurchasedForm(request.POST, instance=record)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord został zaktualizowany.")
-            return redirect("energy_purchased_list")
-    else:
-        form = EnergyPurchasedForm(instance=record)
-    return render(
-        request,
-        "emissions/energy_purchased_form.html",
-        {"form": form, "title": "Edytuj zakupioną energię"},
-    )
+# ===== ENERGY CONSUMPTION =====
+class EnergyConsumptionListView(Scope2ListMixin):
+    model = EnergyConsumption
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Zużycie energii')
+        return context
 
 
-# @login_required
-def energy_purchased_delete(request, pk):
-    record = get_object_or_404(EnergyPurchased, pk=pk)
-    if request.method == "POST":
-        record.delete()
-        messages.success(request, "Rekord został usunięty.")
-        return redirect("energy_purchased_list")
-    return render(
-        request,
-        "emissions/energy_purchased_confirm_delete.html",
-        {"record": record, "title": "Potwierdź usunięcie"},
-    )
+class EnergyConsumptionCreateView(Scope2CreateMixin, CreateView):
+    model = EnergyConsumption
+    form_class = EnergyConsumptionForm
+    success_url = reverse_lazy('energy_consumption_list')
 
 
-def energy_produced_list(request):
-    """Wyświetla listę rekordów wyprodukowanej energii."""
-    records = EnergyProduced.objects.all().order_by("-year", "company")
-    company = request.GET.get("company", "").strip()
-    year_str = request.GET.get("year", "").strip()
-
-    if company:
-        records = records.filter(company__icontains=company)
-    if year_str:
-        try:
-            year = int(year_str)
-            records = records.filter(year=year)
-        except ValueError:
-            pass
-
-    paginator = Paginator(records, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    elided_page_range = paginator.get_elided_page_range(
-        page_obj.number, on_each_side=2, on_ends=1
-    )
-
-    context = {
-        "records": page_obj,
-        "page_obj": page_obj,
-        "page_range": elided_page_range,
-        "title": "Wyprodukowana energia",
-        "filter_company": company,
-        "filter_year": year_str,
-    }
-    return render(request, "emissions/energy_produced_list.html", context)
+class EnergyConsumptionUpdateView(Scope2CreateMixin, UpdateView):
+    model = EnergyConsumption
+    form_class = EnergyConsumptionForm
+    success_url = reverse_lazy('energy_consumption_list')
 
 
-# @login_required
-def energy_produced_add(request):
-    if request.method == "POST":
-        form = EnergyProducedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord wyprodukowanej energii został dodany.")
-            return redirect("energy_produced_list")
-    else:
-        form = EnergyProducedForm()
-    return render(
-        request,
-        "emissions/energy_produced_form.html",
-        {"form": form, "title": "Dodaj wyprodukowaną energię"},
-    )
+class EnergyConsumptionDeleteView(Scope2DeleteMixin, DeleteView):
+    model = EnergyConsumption
+    success_url = reverse_lazy('energy_consumption_list')
 
 
-# @login_required
-def energy_produced_edit(request, pk):
-    record = get_object_or_404(EnergyProduced, pk=pk)
-    if request.method == "POST":
-        form = EnergyProducedForm(request.POST, instance=record)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Rekord został zaktualizowany.")
-            return redirect("energy_produced_list")
-    else:
-        form = EnergyProducedForm(instance=record)
-    return render(
-        request,
-        "emissions/energy_produced_form.html",
-        {"form": form, "title": "Edytuj wyprodukowaną energię"},
-    )
+# ===== ENERGY PURCHASED =====
+class EnergyPurchasedListView(Scope2ListMixin):
+    model = EnergyPurchased
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Zakupiona energia')
+        return context
 
 
-# @login_required
-def energy_produced_delete(request, pk):
-    record = get_object_or_404(EnergyProduced, pk=pk)
-    if request.method == "POST":
-        record.delete()
-        messages.success(request, "Rekord został usunięty.")
-        return redirect("energy_produced_list")
-    return render(
-        request,
-        "emissions/energy_produced_confirm_delete.html",
-        {"record": record, "title": "Potwierdź usunięcie"},
-    )
+class EnergyPurchasedCreateView(Scope2CreateMixin, CreateView):
+    model = EnergyPurchased
+    form_class = EnergyPurchasedForm
+    success_url = reverse_lazy('energy_purchased_list')
 
 
-def energy_sold_list(request):
-    """Wyświetla listę rekordów sprzedanej energii."""
-    records = EnergySold.objects.all().order_by("-year", "company")
-    company = request.GET.get("company", "").strip()
-    year_str = request.GET.get("year", "").strip()
-
-    if company:
-        records = records.filter(company__icontains=company)
-    if year_str:
-        try:
-            year = int(year_str)
-            records = records.filter(year=year)
-        except ValueError:
-            pass
-
-    paginator = Paginator(records, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    elided_page_range = paginator.get_elided_page_range(
-        page_obj.number, on_each_side=2, on_ends=1
-    )
-
-    context = {
-        "records": page_obj,
-        "page_obj": page_obj,
-        "page_range": elided_page_range,
-        "title": _("Sprzedana energia"),
-        "filter_company": company,
-        "filter_year": year_str,
-    }
-    return render(request, "emissions/energy_sold_list.html", context)
+class EnergyPurchasedUpdateView(Scope2CreateMixin, UpdateView):
+    model = EnergyPurchased
+    form_class = EnergyPurchasedForm
+    success_url = reverse_lazy('energy_purchased_list')
 
 
-# @login_required
-def energy_sold_add(request):
-    if request.method == "POST":
-        form = EnergySoldForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, _("Rekord sprzedanej energii został dodany."))
-            return redirect("energy_sold_list")
-    else:
-        form = EnergySoldForm()
-    return render(
-        request,
-        "emissions/energy_sold_form.html",
-        {"form": form, "title": _("Dodaj sprzedaną energię")},
-    )
+class EnergyPurchasedDeleteView(Scope2DeleteMixin, DeleteView):
+    model = EnergyPurchased
+    success_url = reverse_lazy('energy_purchased_list')
 
 
-# @login_required
-def energy_sold_edit(request, pk):
-    record = get_object_or_404(EnergySold, pk=pk)
-    if request.method == "POST":
-        form = EnergySoldForm(request.POST, instance=record)
-        if form.is_valid():
-            form.save()
-            messages.success(request, _("Rekord został zaktualizowany."))
-            return redirect("energy_sold_list")
-    else:
-        form = EnergySoldForm(instance=record)
-    return render(
-        request,
-        "emissions/energy_sold_form.html",
-        {"form": form, "title": _("Edytuj sprzedaną energię")},
-    )
+# ===== ENERGY PRODUCED =====
+class EnergyProducedListView(Scope2ListMixin):
+    model = EnergyProduced
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Wyprodukowana energia')
+        return context
 
 
-# @login_required
-def energy_sold_delete(request, pk):
-    record = get_object_or_404(EnergySold, pk=pk)
-    if request.method == "POST":
-        record.delete()
-        messages.success(request, _("Rekord został usunięty."))
-        return redirect("energy_sold_list")
-    return render(
-        request,
-        "emissions/energy_sold_confirm_delete.html",
-        {"record": record, "title": _("Potwierdź usunięcie")},
-    )
+class EnergyProducedCreateView(Scope2CreateMixin, CreateView):
+    model = EnergyProduced
+    form_class = EnergyProducedForm
+    success_url = reverse_lazy('energy_produced_list')
+
+
+class EnergyProducedUpdateView(Scope2CreateMixin, UpdateView):
+    model = EnergyProduced
+    form_class = EnergyProducedForm
+    success_url = reverse_lazy('energy_produced_list')
+
+
+class EnergyProducedDeleteView(Scope2DeleteMixin, DeleteView):
+    model = EnergyProduced
+    success_url = reverse_lazy('energy_produced_list')
+
+
+# ===== ENERGY SOLD =====
+class EnergySoldListView(Scope2ListMixin):
+    model = EnergySold
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Sprzedana energia')
+        return context
+
+
+class EnergySoldCreateView(Scope2CreateMixin, CreateView):
+    model = EnergySold
+    form_class = EnergySoldForm
+    success_url = reverse_lazy('energy_sold_list')
+
+
+class EnergySoldUpdateView(Scope2CreateMixin, UpdateView):
+    model = EnergySold
+    form_class = EnergySoldForm
+    success_url = reverse_lazy('energy_sold_list')
+
+
+class EnergySoldDeleteView(Scope2DeleteMixin, DeleteView):
+    model = EnergySold
+    success_url = reverse_lazy('energy_sold_list')
 
 
 class Scope1CreateMixin(LoginRequiredMixin):
@@ -811,3 +709,95 @@ class EmissionFactorDeleteView(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Usunięto wskaźnik emisji z bazy.")
         return super().delete(request, *args, **kwargs)
+
+
+class EnergyConsumptionTemplateDownloadView(LoginRequiredMixin, View):
+    """Pobiera szablon XLSX do wgrania danych."""
+
+    def get(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Zużycie energii"
+
+        headers = ['year', 'company', 'energy_source', 'energy_type', 'amount', 'unit', 'source']
+        ws.append(headers)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia.xlsx"'
+        wb.save(response)
+        return response
+
+
+class EnergyConsumptionImportView(LoginRequiredMixin, FormView):
+    """Widok importu danych z pliku XLSX."""
+
+    template_name = 'emissions/energy_consumption_import.html'
+    form_class = EnergyConsumptionImportForm  # tworzymy ten formularz
+    success_url = reverse_lazy('energy_consumption_list')
+
+    def form_valid(self, form):
+        file = form.cleaned_data['file']
+
+        # Walidacja pliku
+        try:
+            wb = openpyxl.load_workbook(file)
+            ws = wb.active
+        except Exception as e:
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
+            return self.form_invalid(form)
+
+        # Pobierz nagłówki
+        headers = [cell.value for cell in ws[1]]
+        expected_headers = ['year', 'company', 'energy_source', 'energy_type', 'amount', 'unit', 'source']
+
+        if headers != expected_headers:
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
+            return self.form_invalid(form)
+
+        # Policz rekordy
+        records_count = ws.max_row - 1
+        context = self.get_context_data(form=form)
+        context['records_count'] = records_count
+        context['confirm'] = True
+
+        # Jeśli to potwierdzenie — zapisz dane
+        if 'confirm' in self.request.POST:
+            imported = 0
+            duplicates = 0
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                year, company, energy_source, energy_type, amount, unit, source = row
+
+                # Sprawdź duplikat
+                exists = EnergyConsumption.objects.filter(
+                    year=year,
+                    company=company,
+                    energy_source=energy_source,
+                    energy_type=energy_type
+                ).exists()
+
+                if exists:
+                    duplicates += 1
+                    continue
+
+                # Dodaj do bazy
+                EnergyConsumption.objects.create(
+                    year=year,
+                    company=company,
+                    energy_source=energy_source,
+                    energy_type=energy_type,
+                    amount=amount,
+                    unit=unit,
+                    source=source
+                )
+                imported += 1
+
+            messages.success(
+                self.request,
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
+            )
+            return redirect(self.success_url)
+
+        return self.render_to_response(context)
