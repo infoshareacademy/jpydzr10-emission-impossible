@@ -359,3 +359,69 @@ class EnergyConsumptionImportForm(forms.Form):
             if file.size > 5 * 1024 * 1024:  # 5MB
                 raise ValidationError(_('Plik jest za duży (max 5MB)'))
         return file
+
+
+class EnergyPurchasedImportForm(forms.Form):
+    """Formularz do wgrywania pliku XLSX z danymi zakupionej energii."""
+
+    file = forms.FileField(
+        label=_('Wybierz plik XLSX'),
+        help_text=_('Maksymalny rozmiar: 5MB'),
+        widget=forms.FileInput(attrs={
+            'accept': '.xlsx',
+            'class': 'form-control'
+        })
+    )
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            if not file.name.endswith('.xlsx'):
+                raise ValidationError(_('Obsługiwany jest tylko format .xlsx'))
+            if file.size > 5 * 1024 * 1024:  # 5MB
+                raise ValidationError(_('Plik jest za duży (max 5MB)'))
+        return file
+
+
+class EnergyProducedImportForm(forms.Form):
+    """Formularz do wgrywania pliku XLSX z danymi wyprodukowanej energii."""
+
+    file = forms.FileField(
+        label=_('Wybierz plik XLSX'),
+        help_text=_('Maksymalny rozmiar: 5MB'),
+        widget=forms.FileInput(attrs={
+            'accept': '.xlsx',
+            'class': 'form-control'
+        })
+    )
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            if not file.name.endswith('.xlsx'):
+                raise ValidationError(_('Obsługiwany jest tylko format .xlsx'))
+            if file.size > 5 * 1024 * 1024:  # 5MB
+                raise ValidationError(_('Plik jest za duży (max 5MB)'))
+        return file
+
+
+class EnergySoldImportForm(forms.Form):
+    """Formularz do wgrywania pliku XLSX z danymi sprzedanej energii."""
+
+    file = forms.FileField(
+        label=_('Wybierz plik XLSX'),
+        help_text=_('Maksymalny rozmiar: 5MB'),
+        widget=forms.FileInput(attrs={
+            'accept': '.xlsx',
+            'class': 'form-control'
+        })
+    )
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            if not file.name.endswith('.xlsx'):
+                raise ValidationError(_('Obsługiwany jest tylko format .xlsx'))
+            if file.size > 5 * 1024 * 1024:  # 5MB
+                raise ValidationError(_('Plik jest za duży (max 5MB)'))
+        return file

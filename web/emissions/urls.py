@@ -132,11 +132,19 @@ urlpatterns = [
         name="factor-delete",
     ),
 
-    # import
-    path('energia/szablon/', views.EnergyConsumptionTemplateDownloadView.as_view(), name='energy_consumption_template'),
-    path('energia/importuj/', views.EnergyConsumptionImportView.as_view(), name='energy_consumption_import'),
-
     # Energy Consumption Import
     path('energia/szablon/', views.EnergyConsumptionTemplateDownloadView.as_view(), name='energy_consumption_template'),
     path('energia/importuj/', views.EnergyConsumptionImportView.as_view(), name='energy_consumption_import'),
+
+    # Energy Purchased Import
+    path('energia-zakupiona/szablon/', views.EnergyPurchasedTemplateDownloadView.as_view(), name='energy_purchased_template'),
+    path('energia-zakupiona/importuj/', views.EnergyPurchasedImportView.as_view(), name='energy_purchased_import'),
+
+    # Energy Produced Import
+    path('energia-wyprodukowana/szablon/', views.EnergyProducedTemplateDownloadView.as_view(), name='energy_produced_template'),
+    path('energia-wyprodukowana/importuj/', views.EnergyProducedImportView.as_view(), name='energy_produced_import'),
+
+    # Energy Sold Import
+    path('energia-sprzedana/szablon/', views.EnergySoldTemplateDownloadView.as_view(), name='energy_sold_template'),
+    path('energia-sprzedana/importuj/', views.EnergySoldImportView.as_view(), name='energy_sold_import'),
 ]

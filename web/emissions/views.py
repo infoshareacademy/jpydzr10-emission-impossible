@@ -25,8 +25,11 @@ from .forms import (
     EnergyConsumptionForm,
     EnergyConsumptionImportForm,
     EnergyProducedForm,
+    EnergyProducedImportForm,
     EnergyPurchasedForm,
+    EnergyPurchasedImportForm,
     EnergySoldForm,
+    EnergySoldImportForm,
     FugitiveEmissionForm,
     MobileCombustionForm,
     ProcessEmissionForm,
@@ -45,7 +48,7 @@ from .models import (
 )
 
 
-class Scope2CreateMixin(LoginRequiredMixin):
+class Scope2CreateMixin(LoginRequiredMixin, FormView):
     """
     Wspólna logika dla wszystkich widoków dodawania i aktualizacji z Zakresu 2.
     Automatycznie oblicza emisję przy zapisie.
@@ -159,8 +162,7 @@ class Scope2ListMixin(LoginRequiredMixin, ListView):
         wb.save(response)
         return response
 
-
-class Scope2DeleteMixin(LoginRequiredMixin):
+class Scope2DeleteMixin(LoginRequiredMixin, DeleteView):
     """Wspólna logika dla usuwania rekordów z Zakresu 2."""
 
     def delete(self, request, *args, **kwargs):
@@ -790,6 +792,267 @@ class EnergyConsumptionImportView(LoginRequiredMixin, FormView):
                     energy_type=energy_type,
                     amount=amount,
                     unit=unit,
+                    source=source
+                )
+                imported += 1
+
+            messages.success(
+                self.request,
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
+            )
+            return redirect(self.success_url)
+
+        return self.render_to_response(context)
+
+
+# ===== ENERGY PURCHASED IMPORT =====
+
+class EnergyPurchasedTemplateDownloadView(LoginRequiredMixin, View):
+    """Pobiera szablon XLSX dla zakupionej energii."""
+
+    def get(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Zakupiona energia"
+
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'trader', 'source']
+        ws.append(headers)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_zakupiona.xlsx"'
+        wb.save(response)
+        return response
+
+
+class EnergyPurchasedImportView(LoginRequiredMixin, FormView):
+    """Widok importu danych zakupionej energii."""
+
+    template_name = 'emissions/energy_purchased_import.html'
+    form_class = EnergyPurchasedImportForm
+    success_url = reverse_lazy('energy_purchased_list')
+
+    def form_valid(self, form):
+        file = form.cleaned_data['file']
+
+        try:
+            wb = openpyxl.load_workbook(file)
+            ws = wb.active
+        except Exception as e:
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
+            return self.form_invalid(form)
+
+        headers = [cell.value for cell in ws[1]]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'trader', 'source']
+
+        if headers != expected_headers:
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
+            return self.form_invalid(form)
+
+        records_count = ws.max_row - 1
+        context = self.get_context_data(form=form)
+        context['records_count'] = records_count
+        context['confirm'] = True
+
+        if 'confirm' in self.request.POST:
+            imported = 0
+            duplicates = 0
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                year, company, energy_type, amount, unit, trader, source = row
+
+                exists = EnergyPurchased.objects.filter(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
+                ).exists()
+
+                if exists:
+                    duplicates += 1
+                    continue
+
+                EnergyPurchased.objects.create(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type,
+                    amount=amount,
+                    unit=unit,
+                    trader=trader,
+                    source=source
+                )
+                imported += 1
+
+            messages.success(
+                self.request,
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
+            )
+            return redirect(self.success_url)
+
+        return self.render_to_response(context)
+
+
+# ===== ENERGY PRODUCED IMPORT =====
+
+class EnergyProducedTemplateDownloadView(LoginRequiredMixin, View):
+    """Pobiera szablon XLSX dla wyprodukowanej energii."""
+
+    def get(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Wyprodukowana energia"
+
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'installation', 'source']
+        ws.append(headers)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_wyprodukowana.xlsx"'
+        wb.save(response)
+        return response
+
+
+class EnergyProducedImportView(LoginRequiredMixin, FormView):
+    """Widok importu danych wyprodukowanej energii."""
+
+    template_name = 'emissions/energy_produced_import.html'
+    form_class = EnergyProducedImportForm
+    success_url = reverse_lazy('energy_produced_list')
+
+    def form_valid(self, form):
+        file = form.cleaned_data['file']
+
+        try:
+            wb = openpyxl.load_workbook(file)
+            ws = wb.active
+        except Exception as e:
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
+            return self.form_invalid(form)
+
+        headers = [cell.value for cell in ws[1]]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'installation', 'source']
+
+        if headers != expected_headers:
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
+            return self.form_invalid(form)
+
+        records_count = ws.max_row - 1
+        context = self.get_context_data(form=form)
+        context['records_count'] = records_count
+        context['confirm'] = True
+
+        if 'confirm' in self.request.POST:
+            imported = 0
+            duplicates = 0
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                year, company, energy_type, amount, unit, installation, source = row
+
+                exists = EnergyProduced.objects.filter(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
+                ).exists()
+
+                if exists:
+                    duplicates += 1
+                    continue
+
+                EnergyProduced.objects.create(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type,
+                    amount=amount,
+                    unit=unit,
+                    installation=installation,
+                    source=source
+                )
+                imported += 1
+
+            messages.success(
+                self.request,
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
+            )
+            return redirect(self.success_url)
+
+        return self.render_to_response(context)
+
+
+# ===== ENERGY SOLD IMPORT =====
+
+class EnergySoldTemplateDownloadView(LoginRequiredMixin, View):
+    """Pobiera szablon XLSX dla sprzedanej energii."""
+
+    def get(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Sprzedana energia"
+
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'customer', 'source']
+        ws.append(headers)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_sprzedana.xlsx"'
+        wb.save(response)
+        return response
+
+
+class EnergySoldImportView(LoginRequiredMixin, FormView):
+    """Widok importu danych sprzedanej energii."""
+
+    template_name = 'emissions/energy_sold_import.html'
+    form_class = EnergySoldImportForm
+    success_url = reverse_lazy('energy_sold_list')
+
+    def form_valid(self, form):
+        file = form.cleaned_data['file']
+
+        try:
+            wb = openpyxl.load_workbook(file)
+            ws = wb.active
+        except Exception as e:
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
+            return self.form_invalid(form)
+
+        headers = [cell.value for cell in ws[1]]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'customer', 'source']
+
+        if headers != expected_headers:
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
+            return self.form_invalid(form)
+
+        records_count = ws.max_row - 1
+        context = self.get_context_data(form=form)
+        context['records_count'] = records_count
+        context['confirm'] = True
+
+        if 'confirm' in self.request.POST:
+            imported = 0
+            duplicates = 0
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                year, company, energy_type, amount, unit, customer, source = row
+
+                exists = EnergySold.objects.filter(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
+                ).exists()
+
+                if exists:
+                    duplicates += 1
+                    continue
+
+                EnergySold.objects.create(
+                    year=year,
+                    company=company,
+                    energy_type=energy_type,
+                    amount=amount,
+                    unit=unit,
+                    customer=customer,
                     source=source
                 )
                 imported += 1
