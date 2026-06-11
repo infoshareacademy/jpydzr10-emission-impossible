@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
+from . import views
+
 app_name = "accounts"
 
 urlpatterns = [
@@ -28,4 +30,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("profile/", views.ProfileView.as_view(), name="profile"),
+    path("profile/edit/", views.ProfileEditView.as_view(), name="profile_edit"),
+    path("delete/", views.DeleteAccountView.as_view(), name="account_delete"),
 ]

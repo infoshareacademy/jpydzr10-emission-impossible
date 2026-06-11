@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Edycja Profilu - Emission Impossible{% endblock %}
+
+{% block extra_head %}
+    <style>
+  /* Stylizacja dla różnych typów pól tekstowych generowanych przez Django */
+        .terminal-edit-form input[type="text"],
+        .terminal-edit-form input[type="email"] {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 245, 53, 0.2);
+            color: #e8f4f0;
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            padding: 8px 12px;
+            outline: none;
+            width: 100%;
+            border-radius: 2px;
+            transition: border-color 0.2s ease;
+        }
+        .terminal-edit-form input[type="text"]:focus,
+        .terminal-edit-form input[type="email"]:focus {
+            border-color: #c8f535;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-md mx-auto space-y-6">
+
+        <div class="border-b border-border-subtle pb-4">
+            <h1 class="font-heading font-bold text-2xl text-text-main flex items-center gap-3">
+                <span class="material-symbols-outlined text-accent">edit_note</span>
+                >_ AKTUALIZACJA_DANYCH
+            </h1>
+            <p class="font-mono text-xs text-text-muted mt-1">Modyfikacja rekordów osobowych zgodnie z deklaracją RODO.</p>
+        </div>
+
+        <form method="post" class="space-y-5 terminal-edit-form p-6 border border-border-subtle rounded-sm" style="background: rgba(42, 63, 74, 0.2);">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-3 bg-red-900/20 border border-red-900 text-red-400 font-mono text-xs rounded-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>_ ERR: {{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="flex flex-col gap-1.5">
+                    <label for="{{ field.id_for_label }}" class="font-mono text-xs text-text-muted uppercase tracking-wider">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <span class="font-mono text-[11px] text-text-muted leading-relaxed block mt-0.5">
+                            {{ field.help_text }}
+                        </span>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <span class="font-mono text-xs text-red-400 mt-1 block">
+                            _ FIELD_ERR: {{ error }}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="pt-4 flex items-center justify-between font-mono text-sm">
+                <a href="{% url 'accounts:profile' %}" class="text-text-muted hover:text-text-main transition-colors">
+                    [ Porzuć zmiany ]
+                </a>
+                <button type="submit" class="px-4 py-2 text-accent border border-accent/40 hover:border-accent hover:bg-accent/10 transition-all rounded-sm">
+                    [ Zapisz strukturę ]
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
