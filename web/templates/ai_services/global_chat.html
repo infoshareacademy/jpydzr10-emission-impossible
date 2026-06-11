@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Globalny Asystent ESG{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Centralny Asystent AI</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Zadawaj pytania dotyczące śladu węglowego dowolnej spółki w systemie, do której masz dostęp.</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
+
+            <div class="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-6 items-start md:items-center rounded-t-lg">
+
+                <div class="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2 w-full md:w-auto">
+                    <label for="company-select" class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Podmiot:</label>
+                    <select id="company-select" class="w-full md:w-56 text-sm border-gray-300 dark:border-gray-600 rounded-md focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-white">
+                        <option value="" disabled selected>--- Wybierz z listy ---</option>
+                        {% for company in companies %}
+                            <option value="{{ company.id }}">{{ company.name }}</option>
+                        {% empty %}
+                            <option value="" disabled>Brak przypisanych spółek</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2 w-full md:w-auto">
+                    <label for="scope-select" class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Zakres analizy:</label>
+                    <select id="scope-select" class="w-full md:w-64 text-sm border-gray-300 dark:border-gray-600 rounded-md focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-white">
+                        <option value="ALL" selected>Cały Ślad Węglowy (Wszystkie dane)</option>
+                        <option value="Z1">Zakres 1 (Emisje bezpośrednie)</option>
+                        <option value="Z2">Zakres 2 (Emisje pośrednie)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
+                <div class="flex items-start space-x-3 max-w-3xl">
+                    <div class="bg-emerald-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">AI</div>
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-gray-800 dark:text-gray-200 text-sm shadow-sm leading-relaxed">
+                        Dzień dobry. Wybierz spółkę z listy powyżej oraz określ zakres merytoryczny, a następnie zadaj mi pytanie dotyczące zweryfikowanych danych emisyjnych.
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat-loading" class="hidden px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center space-x-2">
+                <span>Bielik przetwarza bazę danych i generuje analitykę...</span>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-lg">
+                <form id="chat-form" class="flex space-x-3">
+                    <input type="text" id="user-input" placeholder="Np. Zrób podsumowanie emisji dla wybranego zakresu..."
+                           class="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400" autocomplete="off" required>
+                    <button type="submit" id="send-btn" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-md text-sm transition-colors duration-200">
+                        Zapytaj
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const companySelect = document.getElementById('company-select');
+            const scopeSelect = document.getElementById('scope-select');
+            const chatWindow = document.getElementById('chat-window');
+            const chatLoading = document.getElementById('chat-loading');
+            const sendBtn = document.getElementById('send-btn');
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+
+            function appendMessage(role, text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex items-start space-x-3 max-w-3xl mb-4 ' + (role === 'user' ? ' justify-end ml-auto space-x-reverse' : '');
+
+                const avatar = role === 'user' ?
+                '<div class="bg-gray-700 dark:bg-gray-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">JA</div>' :
+                    '<div class="bg-emerald-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">AI</div>';
+
+                const bubbleClass = role === 'user' ?
+                'bg-emerald-50 dark:bg-emerald-900 text-gray-800 dark:text-emerald-50 border border-emerald-200 dark:border-emerald-800' :
+                    'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200';
+
+                messageDiv.innerHTML = `
+                ${avatar}
+                <div class="${bubbleClass} rounded-lg p-3 text-sm shadow-sm whitespace-pre-wrap leading-relaxed">${text}</div>
+            `;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+            }
+
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const question = userInput.value.trim();
+                const selectedCompanyId = companySelect.value;
+                const selectedScope = scopeSelect.value;
+
+                if (!question) return;
+                if (!selectedCompanyId) {
+                    appendMessage('system', 'System: Przed zadaniem pytania musisz wybrać podmiot z listy.');
+                    return;
+                }
+
+                appendMessage('user', question);
+                userInput.value = '';
+
+                chatLoading.classList.remove('hidden');
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                companySelect.disabled = true;
+                scopeSelect.disabled = true;
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        company_id: selectedCompanyId,
+                        scope_type: selectedScope
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            appendMessage('system', 'Błąd: ' + data.error);
+                        } else {
+                            appendMessage('system', data.answer);
+                        }
+                    })
+                    .catch(error => {
+                        appendMessage('system', 'Wystąpił problem z połączeniem z modułem AI.');
+                    })
+                    .finally(() => {
+                        chatLoading.classList.add('hidden');
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                        companySelect.disabled = false;
+                        scopeSelect.disabled = false;
+                        userInput.focus();
+                    });
+            });
+        });
+    </script>
+{% endblock %}

@@ -3,46 +3,46 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Importuj dane sprzedanej energii</h1>
+    <div class="container mt-5">
+        <h1>Importuj dane sprzedanej energii</h1>
 
-    {% include 'messages.html' %}
+        {% include 'messages.html' %}
 
-    {% if not confirm %}
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+        {% if not confirm %}
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                <div class="mb-4">
-                    <label class="form-label">{{ form.file.label }}</label>
-                    {{ form.file|add_class:"form-control" }}
-                    {% if form.file.errors %}
-                        <div class="invalid-feedback d-block">{{ form.file.errors }}</div>
-                    {% endif %}
-                    <div class="form-text mt-2">
-                        Obsługiwane pliki: <strong>.xlsx</strong>
-                    </div>
+                        <div class="mb-4">
+                            <label class="form-label">{{ form.file.label }}</label>
+                            {{ form.file|add_class:"form-control" }}
+                            {% if form.file.errors %}
+                                <div class="invalid-feedback d-block">{{ form.file.errors }}</div>
+                            {% endif %}
+                            <div class="form-text mt-2">
+                                Obsługiwane pliki: <strong>.xlsx</strong>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Przeanalizuj plik</button>
+                        <a href="{% url 'energy_sold_list' %}" class="btn btn-secondary">Anuluj</a>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary">Przeanalizuj plik</button>
-                <a href="{% url 'energy_sold_list' %}" class="btn btn-secondary">Anuluj</a>
+            </div>
+        {% endif %}
+
+        {% if confirm %}
+            <div class="alert alert-info">
+                <strong>Znaleziono {{ records_count }} rekordów</strong>
+                <p>Czy chcesz je zaimportować do bazy danych?</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="confirm" value="true">
+                <button type="submit" class="btn btn-success btn-lg">Tak, importuj dane</button>
+                <a href="{% url 'energy_sold_import' %}" class="btn btn-secondary btn-lg">Wróć i wybierz inny plik</a>
             </form>
-        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
-    {% if confirm %}
-    <div class="alert alert-info">
-        <strong>Znaleziono {{ records_count }} rekordów</strong>
-        <p>Czy chcesz je zaimportować do bazy danych?</p>
-    </div>
-
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="confirm" value="true">
-        <button type="submit" class="btn btn-success btn-lg">Tak, importuj dane</button>
-        <a href="{% url 'energy_sold_import' %}" class="btn btn-secondary btn-lg">Wróć i wybierz inny plik</a>
-    </form>
-    {% endif %}
-</div>
 {% endblock %}
