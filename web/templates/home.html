@@ -1,236 +1,234 @@
-{% extends "base.html" %}
-{% block title %}Panel startowy — Emission Impossible{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Panel startowy — Emission
+Impossible{% endblock %} {% block content %}
 
 <!-- ===================== -->
 <!-- PAGE TITLE -->
 <!-- ===================== -->
-    <div class="mb-12">
-      <div class="flex items-center gap-3 mb-1">
-        <div
-          style="
-                 width: 4px;
-                 height: 32px;
-                 background: #c8f535;
-                 border-radius: 999px;
-                "
-        ></div>
-        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-          Panel startowy
-        </h1>
-      </div>
-      <p class="font-mono text-sm text-text-muted ml-4">
-        Wybierz moduł, aby rozpocząć pracę.
-      </p>
-    </div>
+<div class="mb-12">
+  <div class="flex items-center gap-3 mb-1">
+    <div
+      style="
+        width: 4px;
+        height: 32px;
+        background: #c8f535;
+        border-radius: 999px;
+      "
+    ></div>
+    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+      Panel startowy
+    </h1>
+  </div>
+  <p class="font-mono text-sm text-text-muted ml-4">
+    Wybierz moduł, aby rozpocząć pracę.
+  </p>
+</div>
 
 <!-- ===================== -->
 <!-- MAIN TILES GRID -->
 <!-- ===================== -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 max-w-4xl mx-auto w-full">
   <!-- Raporty -->
-      <a href="{% url 'reports:ghg-report' %}" class="flex flex-col items-center gap-4 group">
-        <div
-          class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-          style="
-                 background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                 box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                "
-        >
-          <span
-            class="material-symbols-outlined"
-            style="
-                   font-size: 56px;
-                   color: #1a4a52;
-                   font-variation-settings: &quot;FILL&quot; 1;
-                  "
-          >book_2</span
-            >
-          </div>
-          <span
-            class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-          >Raporty</span
-            >
-          </a>
+  <a href="{% url 'reports:ghg-report' %}" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >book_2</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Raporty</span
+    >
+  </a>
 
   <!-- Przedsiębiorstwo -->
-          <a
-            href="{% url 'companies:companies-list' %}"
-            class="flex flex-col items-center gap-4 group"
-          >
-            <div
-              class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-              style="
-                     background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                    "
-            >
-              <span
-                class="material-symbols-outlined"
-                style="
-                       font-size: 56px;
-                       color: #1a4a52;
-                       font-variation-settings: &quot;FILL&quot; 1;
-                      "
-              >business</span
-                >
-              </div>
-              <span
-                class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-              >Przedsiębiorstwo</span
-                >
-              </a>
+  <a
+    href="{% url 'companies:companies-list' %}"
+    class="flex flex-col items-center gap-4 group"
+  >
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >business</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Przedsiębiorstwo</span
+    >
+  </a>
 
   <!-- Wskaźniki Emisji -->
-              <a href="{% url 'emissions:factor-list' %}" class="flex flex-col items-center gap-4 group">
-                <div
-                  class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                  style="
-                         background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                        "
-                >
-                  <span
-                    class="material-symbols-outlined"
-                    style="
-                           font-size: 56px;
-                           color: #1a4a52;
-                           font-variation-settings: &quot;FILL&quot; 1;
-                          "
-                  >pie_chart</span
-                    >
-                  </div>
-                  <span
-                    class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                  >Wskaźniki Emisji</span
-                    >
-                  </a>
+  <a href="{% url 'emissions:factor-list' %}" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >pie_chart</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Wskaźniki Emisji</span
+    >
+  </a>
 
   <!-- Przeliczniki -->
-                  <a href="#" class="flex flex-col items-center gap-4 group">
-                    <div
-                      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                      style="
-                             background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                            "
-                    >
-                      <span
-                        class="material-symbols-outlined"
-                        style="
-                               font-size: 56px;
-                               color: #1a4a52;
-                               font-variation-settings: &quot;FILL&quot; 1;
-                              "
-                      >bar_chart</span
-                        >
-                      </div>
-                      <span
-                        class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                      >Przeliczniki</span
-                        >
-                      </a>
+  <a href="#" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >bar_chart</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Przeliczniki</span
+    >
+  </a>
 
   <!-- Dane emisji -->
-                      <a href="#" class="flex flex-col items-center gap-4 group">
-                        <div
-                          class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                          style="
-                                 background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                 box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                "
-                        >
-                          <span
-                            class="material-symbols-outlined"
-                            style="
-                                   font-size: 56px;
-                                   color: #1a4a52;
-                                   font-variation-settings: &quot;FILL&quot; 1;
-                                  "
-                          >task</span
-                            >
-                          </div>
-                          <span
-                            class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                          >Dane emisji</span
-                            >
-                          </a>
+  <!-- <a href="#" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >task</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Dane emisji</span
+    >
+  </a> -->
 
   <!-- Cele i symulacje -->
-                          <a href="#" class="flex flex-col items-center gap-4 group">
-                            <div
-                              class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                              style="
-                                     background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                    "
-                            >
-                              <span
-                                class="material-symbols-outlined"
-                                style="
-                                       font-size: 56px;
-                                       color: #1a4a52;
-                                       font-variation-settings: &quot;FILL&quot; 1;
-                                      "
-                              >local_fire_department</span
-                                >
-                              </div>
-                              <span
-                                class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                              >Cele i symulacje</span
-                                >
-                              </a>
+  <a href="{% url 'what_if:reduction-target-list' %}" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >local_fire_department</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Cele i symulacje</span
+    >
+  </a>
 
   <!-- Narzędzia -->
-                              <a href="#" class="flex flex-col items-center gap-4 group">
-                                <div
-                                  class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                                  style="
-                                         background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                        "
-                                >
-                                  <span
-                                    class="material-symbols-outlined"
-                                    style="
-                                           font-size: 56px;
-                                           color: #1a4a52;
-                                           font-variation-settings: &quot;FILL&quot; 1;
-                                          "
-                                  >key</span
-                                    >
-                                  </div>
-                                  <span
-                                    class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                                  >Narzędzia</span
-                                    >
-                                  </a>
+  <!-- <a href="#" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >key</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Narzędzia</span
+    >
+  </a> -->
 
   <!-- Użytkownicy -->
-                                  <a href="#" class="flex flex-col items-center gap-4 group">
-                                    <div
-                                      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                                      style="
-                                             background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                            "
-                                    >
-                                      <span
-                                        class="material-symbols-outlined"
-                                        style="
-                                               font-size: 56px;
-                                               color: #1a4a52;
-                                               font-variation-settings: &quot;FILL&quot; 1;
-                                              "
-                                      >group</span
-                                        >
-                                      </div>
-                                      <span
-                                        class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                                      >Użytkownicy</span
-                                        >
-                                      </a>
+  <a href="#" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >group</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Użytkownicy</span
+    >
+  </a>
 
   <!-- AI Asystent ESG -->
                                       <a href="{% url 'ai_services:global_assistant' %}" class="flex flex-col items-center gap-4 group">
@@ -258,29 +256,29 @@
                                           </a>
 
   <!-- Komunikacja e-mail -->
-                                          <a href="#" class="flex flex-col items-center gap-4 group">
-                                            <div
-                                              class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                                              style="
-                                                     background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                                     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                                    "
-                                            >
-                                              <span
-                                                class="material-symbols-outlined"
-                                                style="
-                                                       font-size: 56px;
-                                                       color: #1a4a52;
-                                                       font-variation-settings: &quot;FILL&quot; 1;
-                                                      "
-                                              >mail</span
-                                                >
-                                              </div>
-                                              <span
-                                                class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
-                                              >Komunikacja e-mail</span
-                                                >
-                                              </a>
-                                            </div>
+  <a href="#" class="flex flex-col items-center gap-4 group">
+    <div
+      class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
+      style="
+        background: linear-gradient(145deg, #b8ece6, #5bc4be);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="
+          font-size: 56px;
+          color: #1a4a52;
+          font-variation-settings: &quot;FILL&quot; 1;
+        "
+        >mail</span
+      >
+    </div>
+    <span
+      class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide"
+      >Komunikacja e-mail</span
+    >
+  </a>
+</class=>
 
-  {% endblock %}
+{% endblock %}

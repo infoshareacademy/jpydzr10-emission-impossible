@@ -55,7 +55,7 @@ class CompaniesCreateView(LoginRequiredMixin, CreateView):
     form_class = CompaniesForm
     template_name = "companies/companies_form.html"
     required_permission = "save"
-    success_url = reverse_lazy("companies-list")
+    success_url = reverse_lazy("companies:companies-list")
 
     def form_valid(self, form):
         messages.success(self.request, "Pomyślnie dodano nową spółkę.")
@@ -68,6 +68,7 @@ class CompaniesUpdateView(LoginRequiredMixin, UpdateView):
     form_class = CompaniesForm
     template_name = "companies/companies_detail.html"
     required_permission = "save"
+    success_url = reverse_lazy("companies:companies-list")
 
     def form_valid(self, form):
         messages.success(self.request, "Zmiany zostały zapisane.")

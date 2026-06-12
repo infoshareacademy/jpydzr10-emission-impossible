@@ -1,626 +1,627 @@
 {% extends "base.html" %} {% block title %}Kalkulator Emisji — Emission
-  Impossible{% endblock %} {% block content %}
+Impossible{% endblock %} {% block content %}
 
 <!-- Back link -->
-    <div class="mb-8">
-      <a
-        href="{% url 'companies:companies-list' %}"
-        style="
-               font-family: &quot;Roboto Mono&quot;, monospace;
-               font-size: 12px;
-               letter-spacing: 0.1em;
-               color: #7ab5ae;
-               text-transform: uppercase;
-               text-decoration: none;
-               display: inline-flex;
-               align-items: center;
-               gap: 6px;
-              "
-      >
-        <span class="material-symbols-outlined" style="font-size: 16px"
-        >arrow_back</span
-          >
-          Wróć do listy firm
-        </a>
-      </div>
+<div class="mb-8">
+  <a
+    href="{% url 'companies:companies-list' %}"
+    style="
+      font-family: &quot;Roboto Mono&quot;, monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: #7ab5ae;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    "
+  >
+    <span class="material-symbols-outlined" style="font-size: 16px"
+      >arrow_back</span
+    >
+    Wróć do listy firm
+  </a>
+</div>
 
 <!-- Page title -->
-      <div class="mb-10">
-        <div class="flex items-center gap-3 mb-1">
-          <div
-            style="
-                   width: 4px;
-                   height: 32px;
-                   background: #c8f535;
-                   border-radius: 999px;
-                  "
-          ></div>
-          <h1
-            style="
-                   font-family: &quot;Inter&quot;, sans-serif;
-                   font-size: 36px;
-                   font-weight: 700;
-                   color: #e8f4f0;
-                   letter-spacing: 0.04em;
-                  "
-          >
-            Kalkulator Emisji
-          </h1>
-        </div>
-        <p
-          style="
-                 font-family: &quot;Roboto Mono&quot;, monospace;
-                 font-size: 13px;
-                 color: #7ab5ae;
-                 letter-spacing: 0.04em;
-                 margin-left: 16px;
-                "
-        >
-          Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla
-          wybranej firmy.
-        </p>
-      </div>
+<div class="mb-10">
+  <div class="flex items-center gap-3 mb-1">
+    <div
+      style="
+        width: 4px;
+        height: 32px;
+        background: #c8f535;
+        border-radius: 999px;
+      "
+    ></div>
+    <h1
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: #e8f4f0;
+        letter-spacing: 0.04em;
+      "
+    >
+      Kalkulator Emisji
+    </h1>
+  </div>
+  <p
+    style="
+      font-family: &quot;Roboto Mono&quot;, monospace;
+      font-size: 13px;
+      color: #7ab5ae;
+      letter-spacing: 0.04em;
+      margin-left: 16px;
+    "
+  >
+    Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla
+    wybranej firmy.
+  </p>
+</div>
 
 <!-- SCOPE 1 -->
-      <section class="mb-12">
-        <div class="flex items-center gap-3 mb-6">
-          <span
-            style="
-                   font-family: &quot;Roboto Mono&quot;, monospace;
-                   font-size: 11px;
-                   letter-spacing: 0.12em;
-                   text-transform: uppercase;
-                   padding: 3px 10px;
-                   border-radius: 4px;
-                   background: rgba(200, 245, 53, 0.12);
-                   color: #c8f535;
-                   border: 1px solid rgba(200, 245, 53, 0.3);
-                  "
-          >Zakres 1</span
-            >
-            <span
-              style="
-                     font-family: &quot;Inter&quot;, sans-serif;
-                     font-weight: 600;
-                     font-size: 20px;
-                     color: #e8f4f0;
-                     letter-spacing: 0.06em;
-                     text-transform: uppercase;
-                    "
-            >Emisje bezpośrednie</span
-              >
-            </div>
+<section class="mb-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      style="
+        font-family: &quot;Roboto Mono&quot;, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 4px;
+        background: rgba(200, 245, 53, 0.12);
+        color: #c8f535;
+        border: 1px solid rgba(200, 245, 53, 0.3);
+      "
+      >Zakres 1</span
+    >
+    <span
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: #e8f4f0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      "
+      >Emisje bezpośrednie</span
+    >
+  </div>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-              <a
-                href="{% url 'emissions:stationarycombustion-list' company.pk %}"
-                class="flex flex-col items-center"
-                style="text-decoration: none"
-              >
-                <div
-                  style="
-                         width: 100%;
-                         aspect-ratio: 1;
-                         background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                         border-radius: 14px;
-                         display: flex;
-                         align-items: center;
-                         justify-content: center;
-                         transition:
-                         transform 0.18s,
-                         box-shadow 0.18s;
-                         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                        "
-                  onmouseover="
-                               this.style.transform = 'translateY(-3px) scale(1.02)';
-                               this.style.boxShadow =
-                               '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                              "
-                  onmouseout="
-                              this.style.transform = '';
-                              this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                             "
-                >
-                  <span
-                    class="material-symbols-outlined"
-                    style="
-                           font-size: 52px;
-                           color: #1a4a52;
-                           font-variation-settings: &quot;FILL&quot; 1;
-                          "
-                  >factory</span
-                    >
-                  </div>
-                  <span
-                    style="
-                           font-family: &quot;Roboto Mono&quot;, monospace;
-                           font-size: 13px;
-                           color: #e8f4f0;
-                           text-align: center;
-                           margin-top: 10px;
-                          "
-                  >Spalanie stacjonarne</span
-                    >
-                    <span
-                      style="
-                             font-family: &quot;Roboto Mono&quot;, monospace;
-                             font-size: 10px;
-                             color: #4a7a74;
-                             text-align: center;
-                             margin-top: 3px;
-                            "
-                    >Kotły, piece, generatory</span
-                      >
-                    </a>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <a
+      href="{% url 'emissions:stationarycombustion-list' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >factory</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Spalanie stacjonarne</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Kotły, piece, generatory</span
+      >
+    </a>
 
-                    <a
-                      href="{% url 'emissions:mobile-add' company.pk %}"
-                      class="flex flex-col items-center"
-                      style="text-decoration: none"
-                    >
-                      <div
-                        style="
-                               width: 100%;
-                               aspect-ratio: 1;
-                               background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                               border-radius: 14px;
-                               display: flex;
-                               align-items: center;
-                               justify-content: center;
-                               transition:
-                               transform 0.18s,
-                               box-shadow 0.18s;
-                               box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                              "
-                        onmouseover="
-                                     this.style.transform = 'translateY(-3px) scale(1.02)';
-                                     this.style.boxShadow =
-                                     '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                    "
-                        onmouseout="
-                                    this.style.transform = '';
-                                    this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                   "
-                      >
-                        <span
-                          class="material-symbols-outlined"
-                          style="
-                                 font-size: 52px;
-                                 color: #1a4a52;
-                                 font-variation-settings: &quot;FILL&quot; 1;
-                                "
-                        >local_shipping</span
-                          >
-                        </div>
-                        <span
-                          style="
-                                 font-family: &quot;Roboto Mono&quot;, monospace;
-                                 font-size: 13px;
-                                 color: #e8f4f0;
-                                 text-align: center;
-                                 margin-top: 10px;
-                                "
-                        >Spalanie mobilne</span
-                          >
-                          <span
-                            style="
-                                   font-family: &quot;Roboto Mono&quot;, monospace;
-                                   font-size: 10px;
-                                   color: #4a7a74;
-                                   text-align: center;
-                                   margin-top: 3px;
-                                  "
-                          >Pojazdy, flota transportowa</span
-                            >
-                          </a>
+    <a
+      href="{% url 'emissions:mobilecombustion-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >local_shipping</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Spalanie mobilne</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Pojazdy, flota transportowa</span
+      >
+    </a>
 
-                          <a
-                            href="{% url 'emissions:process-add' company.pk %}"
-                            class="flex flex-col items-center"
-                            style="text-decoration: none"
-                          >
-                            <div
-                              style="
-                                     width: 100%;
-                                     aspect-ratio: 1;
-                                     background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                     border-radius: 14px;
-                                     display: flex;
-                                     align-items: center;
-                                     justify-content: center;
-                                     transition:
-                                     transform 0.18s,
-                                     box-shadow 0.18s;
-                                     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                    "
-                              onmouseover="
-                                           this.style.transform = 'translateY(-3px) scale(1.02)';
-                                           this.style.boxShadow =
-                                           '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                          "
-                              onmouseout="
-                                          this.style.transform = '';
-                                          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                         "
-                            >
-                              <span
-                                class="material-symbols-outlined"
-                                style="
-                                       font-size: 52px;
-                                       color: #1a4a52;
-                                       font-variation-settings: &quot;FILL&quot; 1;
-                                      "
-                              >science</span
-                                >
-                              </div>
-                              <span
-                                style="
-                                       font-family: &quot;Roboto Mono&quot;, monospace;
-                                       font-size: 13px;
-                                       color: #e8f4f0;
-                                       text-align: center;
-                                       margin-top: 10px;
-                                      "
-                              >Emisje procesowe</span
-                                >
-                                <span
-                                  style="
-                                         font-family: &quot;Roboto Mono&quot;, monospace;
-                                         font-size: 10px;
-                                         color: #4a7a74;
-                                         text-align: center;
-                                         margin-top: 3px;
-                                        "
-                                >Procesy technologiczne</span
-                                  >
-                                </a>
+    <a
+      href="{% url 'emissions:processemission-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >science</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Emisje procesowe</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Procesy technologiczne</span
+      >
+    </a>
 
-                                <a
-                                  href="{% url 'emissions:fugitive-add' company.pk %}"
-                                  class="flex flex-col items-center"
-                                  style="text-decoration: none"
-                                >
-                                  <div
-                                    style="
-                                           width: 100%;
-                                           aspect-ratio: 1;
-                                           background: linear-gradient(145deg, #b8ece6, #5bc4be);
-                                           border-radius: 14px;
-                                           display: flex;
-                                           align-items: center;
-                                           justify-content: center;
-                                           transition:
-                                           transform 0.18s,
-                                           box-shadow 0.18s;
-                                           box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                          "
-                                    onmouseover="
-                                                 this.style.transform = 'translateY(-3px) scale(1.02)';
-                                                 this.style.boxShadow =
-                                                 '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                                "
-                                    onmouseout="
-                                                this.style.transform = '';
-                                                this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                               "
-                                  >
-                                    <span
-                                      class="material-symbols-outlined"
-                                      style="
-                                             font-size: 52px;
-                                             color: #1a4a52;
-                                             font-variation-settings: &quot;FILL&quot; 1;
-                                            "
-                                    >air</span
-                                      >
-                                    </div>
-                                    <span
-                                      style="
-                                             font-family: &quot;Roboto Mono&quot;, monospace;
-                                             font-size: 13px;
-                                             color: #e8f4f0;
-                                             text-align: center;
-                                             margin-top: 10px;
-                                            "
-                                    >Emisje niezorganizowane</span
-                                      >
-                                      <span
-                                        style="
-                                               font-family: &quot;Roboto Mono&quot;, monospace;
-                                               font-size: 10px;
-                                               color: #4a7a74;
-                                               text-align: center;
-                                               margin-top: 3px;
-                                              "
-                                      >Wycieki czynników chłodniczych</span
-                                        >
-                                      </a>
-                                    </div>
-                                  </section>
+    <a
+      href="{% url 'emissions:fugitiveemission-add' company.pk %}"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #b8ece6, #5bc4be);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >air</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Emisje niezorganizowane</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Wycieki czynników chłodniczych</span
+      >
+    </a>
+  </div>
+</section>
 
-                                  <hr
-                                    style="
-                                           border: none;
-                                           border-top: 1px dashed rgba(42, 63, 74, 0.8);
-                                           margin-bottom: 3rem;
-                                          "
-                                  />
+<hr
+  style="
+    border: none;
+    border-top: 1px dashed rgba(42, 63, 74, 0.8);
+    margin-bottom: 3rem;
+  "
+/>
 
 <!-- SCOPE 2 -->
-                                  <section class="mb-12">
-                                    <div class="flex items-center gap-3 mb-6">
-                                      <span
-                                        style="
-                                               font-family: &quot;Roboto Mono&quot;, monospace;
-                                               font-size: 11px;
-                                               letter-spacing: 0.12em;
-                                               text-transform: uppercase;
-                                               padding: 3px 10px;
-                                               border-radius: 4px;
-                                               background: rgba(100, 200, 240, 0.12);
-                                               color: #6ac8e8;
-                                               border: 1px solid rgba(100, 200, 240, 0.3);
-                                              "
-                                      >Zakres 2</span
-                                        >
-                                        <span
-                                          style="
-                                                 font-family: &quot;Inter&quot;, sans-serif;
-                                                 font-weight: 600;
-                                                 font-size: 20px;
-                                                 color: #e8f4f0;
-                                                 letter-spacing: 0.06em;
-                                                 text-transform: uppercase;
-                                                "
-                                        >Emisje pośrednie energetyczne</span
-                                          >
-                                        </div>
+<section class="mb-12">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      style="
+        font-family: &quot;Roboto Mono&quot;, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 10px;
+        border-radius: 4px;
+        background: linear-gradient(145deg, #4db8b0, #2a8a84);
+        color: #6ac8e8;
+        border: 1px solid rgba(100, 200, 240, 0.3);
+      "
+      >Zakres 2</span
+    >
+    <span
+      style="
+        font-family: &quot;Inter&quot;, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: #e8f4f0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      "
+      >Emisje pośrednie energetyczne</span
+    >
+  </div>
 
-                                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                                          <a
-                                            href="#"
-                                            class="flex flex-col items-center"
-                                            style="text-decoration: none"
-                                          >
-                                            <div
-                                              style="
-                                                     width: 100%;
-                                                     aspect-ratio: 1;
-                                                     background: linear-gradient(145deg, #c2eef8, #52b8dc);
-                                                     border-radius: 14px;
-                                                     display: flex;
-                                                     align-items: center;
-                                                     justify-content: center;
-                                                     transition:
-                                                     transform 0.18s,
-                                                     box-shadow 0.18s;
-                                                     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                                    "
-                                              onmouseover="
-                                                           this.style.transform = 'translateY(-3px) scale(1.02)';
-                                                           this.style.boxShadow =
-                                                           '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                                          "
-                                              onmouseout="
-                                                          this.style.transform = '';
-                                                          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                                         "
-                                            >
-                                              <span
-                                                class="material-symbols-outlined"
-                                                style="
-                                                       font-size: 52px;
-                                                       color: #1a4a52;
-                                                       font-variation-settings: &quot;FILL&quot; 1;
-                                                      "
-                                              >electric_bolt</span
-                                                >
-                                              </div>
-                                              <span
-                                                style="
-                                                       font-family: &quot;Roboto Mono&quot;, monospace;
-                                                       font-size: 13px;
-                                                       color: #e8f4f0;
-                                                       text-align: center;
-                                                       margin-top: 10px;
-                                                      "
-                                              >Zakupiona energia</span
-                                                >
-                                                <span
-                                                  style="
-                                                         font-family: &quot;Roboto Mono&quot;, monospace;
-                                                         font-size: 10px;
-                                                         color: #4a7a74;
-                                                         text-align: center;
-                                                         margin-top: 3px;
-                                                        "
-                                                >Energia z sieci zewnętrznej</span
-                                                  >
-                                                </a>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #f4ffff, #b5ffff);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >electric_bolt</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Zakupiona energia</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Energia z sieci zewnętrznej</span
+      >
+    </a>
 
-                                                <a
-                                                  href="#"
-                                                  class="flex flex-col items-center"
-                                                  style="text-decoration: none"
-                                                >
-                                                  <div
-                                                    style="
-                                                           width: 100%;
-                                                           aspect-ratio: 1;
-                                                           background: linear-gradient(145deg, #c2eef8, #52b8dc);
-                                                           border-radius: 14px;
-                                                           display: flex;
-                                                           align-items: center;
-                                                           justify-content: center;
-                                                           transition:
-                                                           transform 0.18s,
-                                                           box-shadow 0.18s;
-                                                           box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                                          "
-                                                    onmouseover="
-                                                                 this.style.transform = 'translateY(-3px) scale(1.02)';
-                                                                 this.style.boxShadow =
-                                                                 '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                                                "
-                                                    onmouseout="
-                                                                this.style.transform = '';
-                                                                this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                                               "
-                                                  >
-                                                    <span
-                                                      class="material-symbols-outlined"
-                                                      style="
-                                                             font-size: 52px;
-                                                             color: #1a4a52;
-                                                             font-variation-settings: &quot;FILL&quot; 1;
-                                                            "
-                                                    >solar_power</span
-                                                      >
-                                                    </div>
-                                                    <span
-                                                      style="
-                                                             font-family: &quot;Roboto Mono&quot;, monospace;
-                                                             font-size: 13px;
-                                                             color: #e8f4f0;
-                                                             text-align: center;
-                                                             margin-top: 10px;
-                                                            "
-                                                    >Wyprodukowana</span
-                                                      >
-                                                      <span
-                                                        style="
-                                                               font-family: &quot;Roboto Mono&quot;, monospace;
-                                                               font-size: 10px;
-                                                               color: #4a7a74;
-                                                               text-align: center;
-                                                               margin-top: 3px;
-                                                              "
-                                                      >Fotowoltaika, własne źródła</span
-                                                        >
-                                                      </a>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #f4ffff, #b5ffff);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >solar_power</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Wyprodukowana</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Fotowoltaika, własne źródła</span
+      >
+    </a>
 
-                                                      <a
-                                                        href="#"
-                                                        class="flex flex-col items-center"
-                                                        style="text-decoration: none"
-                                                      >
-                                                        <div
-                                                          style="
-                                                                 width: 100%;
-                                                                 aspect-ratio: 1;
-                                                                 background: linear-gradient(145deg, #c2eef8, #52b8dc);
-                                                                 border-radius: 14px;
-                                                                 display: flex;
-                                                                 align-items: center;
-                                                                 justify-content: center;
-                                                                 transition:
-                                                                 transform 0.18s,
-                                                                 box-shadow 0.18s;
-                                                                 box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                                                "
-                                                          onmouseover="
-                                                                       this.style.transform = 'translateY(-3px) scale(1.02)';
-                                                                       this.style.boxShadow =
-                                                                       '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                                                      "
-                                                          onmouseout="
-                                                                      this.style.transform = '';
-                                                                      this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                                                     "
-                                                        >
-                                                          <span
-                                                            class="material-symbols-outlined"
-                                                            style="
-                                                                   font-size: 52px;
-                                                                   color: #1a4a52;
-                                                                   font-variation-settings: &quot;FILL&quot; 1;
-                                                                  "
-                                                          >outbound</span
-                                                            >
-                                                          </div>
-                                                          <span
-                                                            style="
-                                                                   font-family: &quot;Roboto Mono&quot;, monospace;
-                                                                   font-size: 13px;
-                                                                   color: #e8f4f0;
-                                                                   text-align: center;
-                                                                   margin-top: 10px;
-                                                                  "
-                                                          >Sprzedana energia</span
-                                                            >
-                                                            <span
-                                                              style="
-                                                                     font-family: &quot;Roboto Mono&quot;, monospace;
-                                                                     font-size: 10px;
-                                                                     color: #4a7a74;
-                                                                     text-align: center;
-                                                                     margin-top: 3px;
-                                                                    "
-                                                            >Odprzedaż nadwyżek do sieci</span
-                                                              >
-                                                            </a>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #f4ffff, #b5ffff);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+          "
+          >outbound</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Sprzedana energia</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Odprzedaż nadwyżek do sieci</span
+      >
+    </a>
 
-                                                            <a
-                                                              href="#"
-                                                              class="flex flex-col items-center"
-                                                              style="text-decoration: none"
-                                                            >
-                                                              <div
-                                                                style="
-                                                                       width: 100%;
-                                                                       aspect-ratio: 1;
-                                                                       background: linear-gradient(145deg, #c2eef8, #52b8dc);
-                                                                       border-radius: 14px;
-                                                                       display: flex;
-                                                                       align-items: center;
-                                                                       justify-content: center;
-                                                                       transition:
-                                                                       transform 0.18s,
-                                                                       box-shadow 0.18s;
-                                                                       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                                                                      "
-                                                                onmouseover="
-                                                                             this.style.transform = 'translateY(-3px) scale(1.02)';
-                                                                             this.style.boxShadow =
-                                                                             '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-                                                                            "
-                                                                onmouseout="
-                                                                            this.style.transform = '';
-                                                                            this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-                                                                           "
-                                                              >
-                                                                <span
-                                                                  class="material-symbols-outlined"
-                                                                  style="
-                                                                         font-size: 52px;
-                                                                         color: #1a4a52;
-                                                                         font-variation-settings: &quot;FILL&quot; 1;
-                                                                        "
-                                                                >analytics</span
-                                                                  >
-                                                                </div>
-                                                                <span
-                                                                  style="
-                                                                         font-family: &quot;Roboto Mono&quot;, monospace;
-                                                                         font-size: 13px;
-                                                                         color: #e8f4f0;
-                                                                         text-align: center;
-                                                                         margin-top: 10px;
-                                                                        "
-                                                                >Całkowite zużycie</span
-                                                                  >
-                                                                  <span
-                                                                    style="
-                                                                           font-family: &quot;Roboto Mono&quot;, monospace;
-                                                                           font-size: 10px;
-                                                                           color: #4a7a74;
-                                                                           text-align: center;
-                                                                           margin-top: 3px;
-                                                                          "
-                                                                  >Zbiorcze raportowanie</span
-                                                                    >
-                                                                  </a>
-                                                                </div>
-                                                              </section>
+    <a
+      href="#"
+      class="flex flex-col items-center"
+      style="text-decoration: none"
+    >
+      <div
+        style="
+          width: 100%;
+          aspect-ratio: 1;
+          background: linear-gradient(145deg, #f4ffff, #92f5f5);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition:
+            transform 0.18s,
+            box-shadow 0.18s;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        "
+        onmouseover="
+          this.style.transform = 'translateY(-3px) scale(1.02)';
+          this.style.boxShadow =
+            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
+        "
+        onmouseout="
+          this.style.transform = '';
+          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="
+            font-size: 52px;
+            color: #1a4a52;
+            font-variation-settings: &quot;FILL&quot; 1;
+            filter: drop-shadow(0 2.27px 4.1px rgba(0, 0, 0, 0.25));
+          "
+          >analytics</span
+        >
+      </div>
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 13px;
+          color: #e8f4f0;
+          text-align: center;
+          margin-top: 10px;
+        "
+        >Całkowite zużycie</span
+      >
+      <span
+        style="
+          font-family: &quot;Roboto Mono&quot;, monospace;
+          font-size: 10px;
+          color: #4a7a74;
+          text-align: center;
+          margin-top: 3px;
+        "
+        >Zbiorcze raportowanie</span
+      >
+    </a>
+  </div>
+</section>
 
-  {% endblock %}
+{% endblock %}

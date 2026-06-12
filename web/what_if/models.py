@@ -4,6 +4,13 @@ from django.db import models
 
 # Create your models here.
 class ReductionTarget(models.Model):
+    SCOPE_CHOICES = [
+        ("Scope 1", "Zakres 1 (Emisje bezpośrednie)"),
+        ("Scope 2", "Zakres 2 (Emisje pośrednie energetyczne)"),
+        # ("Scope 3", "Zakres 3 (Inne emisje pośrednie)"),
+        ("1+2", "Zakres 1 + Zakres 2"),
+        # ("1+2+3", "Wszystkie zakresy (1+2+3)"),
+    ]
     company = models.ForeignKey(
         Companies,
         on_delete=models.CASCADE,
@@ -14,7 +21,12 @@ class ReductionTarget(models.Model):
     base_year = models.PositiveIntegerField()
     target_year = models.PositiveIntegerField()
     reduction_pct = models.DecimalField(max_digits=5, decimal_places=2)
-    scope = models.CharField(max_length=10, default="1+2")
+    scope = models.CharField(
+        max_length=10,
+        choices=SCOPE_CHOICES,
+        default="1+2",
+        verbose_name="Zakres (Scope)",
+    )
 
     class Meta:
         db_table = "tbl_reduction_targets"

@@ -1,59 +1,97 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if form.instance.pk %}Edytuj spółkę{% else %}Dodaj nową spółkę{% endif %} - Panel</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>    <style>
-        body { font-family: 'Public Sans', sans-serif; background-color: #f0f2f5; }
-        .stepped-border {
-            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}Edytuj spółkę{% else %}Dodaj nową spółkę{% endif %} - Emission Impossible
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
+        .custom-form-container input,
+        .custom-form-container select,
+        .custom-form-container textarea {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid #2a3f4a !important;
+            border-radius: 8px !important;
+            color: #e8f4f0 !important;
+            font-family: "Roboto Mono", monospace !important;
+            font-size: 13px !important;
+            padding: 10px 14px !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            width: 100%;
+            outline: none !important;
         }
-        .material-symbols-outlined { text-transform: none !important; }
+        .custom-form-container input:focus,
+        .custom-form-container select:focus,
+        .custom-form-container textarea:focus {
+            border-color: rgba(200, 245, 53, 0.5) !important;
+            box-shadow: 0 0 0 2px rgba(200, 245, 53, 0.1) !important;
+        }
+        .custom-form-container select option {
+            background: #151c27;
+            color: #e8f4f0;
+        }
     </style>
-</head>
-<body class="p-4 md:p-8 flex justify-center items-start min-h-screen">
+{% endblock %}
 
-    <div class="max-w-3xl w-full bg-white border-2 border-black shadow-[6px_6px_0px_0px_#000] p-8">
+{% block content %}
+    <div class="max-w-4xl mx-auto">
 
-        <header class="mb-8 border-b-2 border-black pb-4">
-            <h2 class="text-3xl font-black text-black uppercase tracking-tighter flex items-center gap-3">
-                <span class="material-symbols-outlined text-4xl">domain_add</span>
-                {% if form.instance.pk %}
-                    Edytuj dane spółki
-                {% else %}
-                    Dodaj nową spółkę
-                {% endif %}
-            </h2>
-            <p class="text-gray-600 font-medium mt-2">Wypełnij poniższe dane ewidencyjne i adresowe, aby zarejestrować podmiot w systemie.</p>
-        </header>
-
-        <form method="post" action="" class="space-y-6">
-            {% csrf_token %}
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% for field in form %}
-                    <div class="flex flex-col gap-1 {% if field.name == 'name' or field.name == 'street' or field.name == 'mail' %}md:col-span-2{% endif %}">
-                        <label for="{{ field.id_for_label }}" class="font-bold text-sm uppercase text-gray-700 tracking-wide">
-                            {{ field.label }}
-                        </label>
-
-                        {{ field }}
-
-                        {% if field.errors %}
-                            <div class="bg-red-100 border-2 border-red-500 text-red-700 px-3 py-1 text-xs font-bold mt-1 shadow-[2px_2px_0px_0px_#ef4444]">
-                                {{ field.errors|striptags }}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-
-            <div class="flex gap-4 pt-6 mt-6 border-t-2 border-gray-200">
-                <a href="{% url 'companies:companies-list' %}" class="flex-1 py-3 bg-gray-200 text-black border-2 border-black font-bold uppercase tracking-wider text-center hover:bg-gray-300 transition-colors shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
-                    Anuluj
+    {# --- Nagłówek --- #}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <a href="{% url 'companies:companies-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+                    <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+                    Wróć do listy
                 </a>
+                <div class="flex items-center gap-3">
+                    <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
+                    <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">
+                        {% if form.instance.pk %}Edytuj spółkę: <span class="text-accent">{{ form.instance.name }}</span>{% else %}Dodaj nową spółkę{% endif %}
+                    </h1>
+                </div>
+            </div>
+        </div>
 
-                <button type="submit" class="flex-1 py-3 bg-[#A3E635] text-black border-2 border-black font-bold uppercase tracking-wider hover:bg-[#8cc62d] transition-colors shadow-[2px_2px_0px_0px_#000] hover
+    {# --- Karta z formularzem --- #}
+        <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
+            <form method="post" novalidate class="space-y-6">
+                {% csrf_token %}
+
+            {# Grupa pól w układzie siatki #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for field in form %}
+                        <div class="flex flex-col gap-2 {% if field.name == 'name' or field.name == 'street' or field.name == 'mail' %}md:col-span-2{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-widest text-text-muted">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                        {# Komunikaty o błędach walidacji pola #}
+                            {% if field.errors %}
+                                <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">error</span>
+                                    <span>{{ field.errors|striptags }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {# --- Sekcja przycisków akcji --- #}
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
+                    <a href="{% url 'companies:companies-list' %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
+                        Anuluj
+                    </a>
+
+                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all sm:w-36">
+                        Zapisz
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}

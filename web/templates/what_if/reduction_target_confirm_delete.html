@@ -1,46 +1,49 @@
-<!DOCTYPE html>
-<html lang="pl">
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Usuń Cel - Emission Impossible</title>
-        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
-        <style>
-            body { font-family: 'Inter', sans-serif; background-color: #f7faf6; }
-            .stepped-border { clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px); }
-        </style>
-    </head>
-    <body class="p-8 min-h-screen flex items-center justify-center">
+{% extends 'base.html' %}
+{% load static %}
 
-        <div class="max-w-xl w-full bg-white border-2 border-red-700 p-8 shadow-[6px_6px_0px_0px_#b91c1c] stepped-border">
+{% block title %}Usuń Cel - Emission Impossible{% endblock %}
 
-            <h1 class="text-3xl font-black uppercase tracking-tighter mb-4 text-red-700 border-b-2 border-red-700 pb-4">
+{% block content %}
+    <div class="max-w-xl mx-auto mt-12 md:mt-20">
+        <div class="bg-red-900/20 border border-red-500/50 rounded-2xl p-6 md:p-10 backdrop-blur-md text-center flex flex-col items-center shadow-xl">
+
+            <span class="material-symbols-outlined text-red-400 text-6xl mb-4">warning</span>
+
+            <h1 class="text-2xl font-heading font-bold text-red-400 uppercase mb-3 tracking-wide">
                 Potwierdź usunięcie
             </h1>
 
-            <p class="text-gray-800 font-bold mb-6">
+            <p class="text-text-muted mb-8 text-sm">
                 Czy na pewno chcesz usunąć poniższy cel redukcyjny? Ta operacja jest nieodwracalna.
             </p>
 
-            <div class="bg-red-50 p-4 border-2 border-red-200 mb-6 font-mono text-sm">
-                <strong>Cel:</strong> {{ object.target_name }}<br>
-                <strong>Zakres:</strong> {{ object.scope }}<br>
-                <strong>Redukcja:</strong> {{ object.reduction_pct }}%
+        {# Ramka z podsumowaniem usuwanego elementu #}
+            <div class="w-full bg-[rgba(255,255,255,0.03)] border border-border-subtle rounded-xl p-5 mb-10 text-left font-mono text-sm space-y-3">
+                <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Cel:</span>
+                    <span class="font-bold text-text-main text-right">{{ object.target_name }}</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Zakres:</span>
+                    <span class="font-bold text-text-main text-right">{{ object.scope }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Redukcja:</span>
+                    <span class="font-bold text-accent text-right">{{ object.reduction_pct }}%</span>
+                </div>
             </div>
 
-            <form method="post">
+        {# Przyciski akcji #}
+            <form method="post" class="flex flex-col sm:flex-row gap-4 w-full justify-center">
                 {% csrf_token %}
-                <div class="pt-2 flex justify-between items-center">
-                    <a href="{% url 'what_if:reduction-target-list' company_id=company_id %}" class="text-sm font-bold uppercase hover:underline text-gray-600">
-                        &larr; Anuluj
-                    </a>
-                    <button type="submit" class="px-6 py-2 bg-red-600 text-white border-2 border-red-900 font-bold uppercase tracking-wider text-sm shadow-[2px_2px_0px_0px_#7f1d1d] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all stepped-border">
-                        Tak, usuń cel
-                    </button>
-                </div>
+                <a href="{% url 'what_if:reduction-target-list' %}" class="px-6 py-3 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider hover:border-text-muted hover:text-text-main transition-colors flex-1 text-center flex justify-center items-center">
+                    Anuluj
+                </a>
+                <button type="submit" class="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/50 font-mono font-bold uppercase tracking-wider text-sm rounded-xl hover:bg-red-500 hover:text-white transition-all flex-1 text-center flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">delete_forever</span> Usuń Cel
+                </button>
             </form>
 
         </div>
-    </body>
-</html>
+    </div>
+{% endblock %}

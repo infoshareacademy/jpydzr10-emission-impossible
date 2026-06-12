@@ -1,126 +1,191 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Globalny Asystent ESG{% endblock %}
+{% block title %}Globalny Asystent ESG - Emission Impossible{% endblock %}
+
+{% block extra_head %}
+    <style>
+    /* Stylowanie dla selektorów (select) w pasku górnym */
+        .chat-select {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(200, 245, 53, 0.2) !important;
+            border-radius: 8px !important;
+            color: #e8f4f0 !important;
+            font-family: "Roboto Mono", monospace !important;
+            font-size: 13px !important;
+            padding: 8px 12px !important;
+            transition: border-color 0.2s !important;
+            outline: none !important;
+        }
+        .chat-select:focus {
+            border-color: rgba(200, 245, 53, 0.5) !important;
+        }
+        .chat-select option {
+            background: #151c27;
+            color: #e8f4f0;
+        }
+
+    /* Cyberpunkowy Scrollbar dla obszaru wiadomości */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: rgba(200, 245, 53, 0.2);
+            border-radius: 10px;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 245, 53, 0.4);
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
-    <div class="container mx-auto px-4 py-6 max-w-4xl">
-        <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Centralny Asystent AI</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Zadawaj pytania dotyczące śladu węglowego dowolnej spółki w systemie, do której masz dostęp.</p>
+    <div class="max-w-5xl mx-auto space-y-6">
+
+    {# --- Nagłówek --- #}
+        <div class="flex items-start gap-4 mb-8">
+            <div>
+                <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+                    <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+                    Wróć
+                </a>
+                <div class="flex items-center gap-3 mb-2">
+                    <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
+                    <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">Centralny Asystent AI</h1>
+                </div>
+                <p class="font-mono text-sm text-text-muted ml-4">
+                    Zadawaj pytania dotyczące śladu węglowego dowolnej spółki w systemie, do której masz dostęp.
+                </p>
+            </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
+    {# --- Główne okno chatu --- #}
+        <div class="bg-[rgba(17,23,32,0.6)] border border-border-subtle rounded-2xl flex flex-col h-[650px] shadow-xl backdrop-blur-md overflow-hidden">
 
-            <div class="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-6 items-start md:items-center rounded-t-lg">
-
-                <div class="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2 w-full md:w-auto">
-                    <label for="company-select" class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Podmiot:</label>
-                    <select id="company-select" class="w-full md:w-56 text-sm border-gray-300 dark:border-gray-600 rounded-md focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-white">
-                        <option value="" disabled selected>--- Wybierz z listy ---</option>
-                        {% for company in companies %}
-                            <option value="{{ company.id }}">{{ company.name }}</option>
-                        {% empty %}
-                            <option value="" disabled>Brak przypisanych spółek</option>
+            {% csrf_token %} {# Pasek konfiguracji #}
+            <div class="bg-[rgba(42,63,74,0.3)] border-b border-border-subtle p-5 rounded-t-2xl flex flex-wrap items-center justify-start gap-6">
+                <div class="flex items-center gap-3">
+                    <label for="company-select" class="font-mono text-xs uppercase tracking-widest text-text-muted">
+                        Spółka:
+                    </label>
+                    <select id="company-select" class="chat-select min-w-[200px]">
+                        <option value="ALL">Wszystkie moje spółki</option>
+                        {% for comp in companies %}
+                            <option value="{{ comp.id }}">{{ comp.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <div class="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2 w-full md:w-auto">
-                    <label for="scope-select" class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Zakres analizy:</label>
-                    <select id="scope-select" class="w-full md:w-64 text-sm border-gray-300 dark:border-gray-600 rounded-md focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-gray-700 dark:text-white">
-                        <option value="ALL" selected>Cały Ślad Węglowy (Wszystkie dane)</option>
-                        <option value="Z1">Zakres 1 (Emisje bezpośrednie)</option>
-                        <option value="Z2">Zakres 2 (Emisje pośrednie)</option>
+                <div class="flex items-center gap-3">
+                    <label for="scope-select" class="font-mono text-xs uppercase tracking-widest text-text-muted">
+                        Zakres:
+                    </label>
+                    <select id="scope-select" class="chat-select min-w-[180px]">
+                        <option value="ALL">Całość (Scope 1, 2, 3)</option>
+                        <option value="SCOPE_1">Tylko Scope 1</option>
+                        <option value="SCOPE_2">Tylko Scope 2</option>
+                        <option value="SCOPE_3">Tylko Scope 3</option>
                     </select>
                 </div>
             </div>
 
-            <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
-                <div class="flex items-start space-x-3 max-w-3xl">
-                    <div class="bg-emerald-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">AI</div>
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-gray-800 dark:text-gray-200 text-sm shadow-sm leading-relaxed">
-                        Dzień dobry. Wybierz spółkę z listy powyżej oraz określ zakres merytoryczny, a następnie zadaj mi pytanie dotyczące zweryfikowanych danych emisyjnych.
+        {# Obszar wiadomości #}
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 chat-scroll">
+            {# Wiadomość powitalna od systemu #}
+                <div class="flex flex-col items-start">
+                    <span class="font-mono text-[10px] text-text-muted ml-2 mb-1 uppercase tracking-widest">System AI</span>
+                    <div class="bg-[rgba(42,63,74,0.4)] border border-border-subtle text-text-main rounded-2xl rounded-tl-sm px-5 py-4 max-w-[85%] font-mono text-sm leading-relaxed shadow-sm">
+                        Cześć! Jestem Twoim wirtualnym asystentem ESG. Wybierz spółkę z menu na górze i zadaj mi pytanie dotyczące emisji, wskaźników lub celów redukcyjnych.
                     </div>
                 </div>
             </div>
 
-            <div id="chat-loading" class="hidden px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center space-x-2">
-                <span>Bielik przetwarza bazę danych i generuje analitykę...</span>
+        {# Indykator ładowania (domyślnie ukryty) #}
+            <div id="chat-loading" class="hidden px-8 py-3 border-t border-border-subtle bg-[rgba(0,0,0,0.1)]">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent animate-spin text-[16px]">hourglass_empty</span>
+                    <span class="font-mono text-[10px] text-accent uppercase tracking-widest animate-pulse">Asystent generuje odpowiedź...</span>
+                </div>
             </div>
 
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-lg">
-                <form id="chat-form" class="flex space-x-3">
-                    <input type="text" id="user-input" placeholder="Np. Zrób podsumowanie emisji dla wybranego zakresu..."
-                           class="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400" autocomplete="off" required>
-                    <button type="submit" id="send-btn" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-md text-sm transition-colors duration-200">
-                        Zapytaj
+        {# Pasek wprowadzania wiadomości #}
+            <div class="bg-[rgba(42,63,74,0.3)] border-t border-border-subtle p-4 rounded-b-2xl">
+                <form id="chat-form" class="flex items-center gap-3">
+                    <input type="text" id="user-input" placeholder="Napisz pytanie... (np. Jakie były emisje Scope 1 w 2024?)" autocomplete="off"
+                           class="flex-1 bg-[rgba(255,255,255,0.04)] border border-[rgba(200,245,53,0.2)] rounded-xl px-5 py-3.5 text-text-main font-mono text-sm focus:outline-none focus:border-accent transition-colors">
+
+                    <button type="submit" id="send-btn" class="px-6 py-3.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[20px]">send</span> Wyślij
                     </button>
                 </form>
             </div>
-        </div>
-    </div>
 
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatForm = document.getElementById('chat-form');
             const userInput = document.getElementById('user-input');
-            const companySelect = document.getElementById('company-select');
-            const scopeSelect = document.getElementById('scope-select');
-            const chatWindow = document.getElementById('chat-window');
+            const chatMessages = document.getElementById('chat-messages');
             const chatLoading = document.getElementById('chat-loading');
             const sendBtn = document.getElementById('send-btn');
+            const companySelect = document.getElementById('company-select');
+            const scopeSelect = document.getElementById('scope-select');
 
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            const csrftoken = getCookie('csrftoken');
+        // Pobieranie tokena CSRF ukrytego przez tag Django
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             function appendMessage(role, text) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex items-start space-x-3 max-w-3xl mb-4 ' + (role === 'user' ? ' justify-end ml-auto space-x-reverse' : '');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col ' + (role === 'user' ? 'items-end' : 'items-start');
 
-                const avatar = role === 'user' ?
-                '<div class="bg-gray-700 dark:bg-gray-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">JA</div>' :
-                    '<div class="bg-emerald-600 text-white p-2 rounded-lg text-sm font-bold shadow-sm">AI</div>';
+                const label = document.createElement('span');
+                label.className = 'font-mono text-[10px] text-text-muted mb-1 uppercase tracking-widest ' + (role === 'user' ? 'mr-2' : 'ml-2');
+                label.textContent = role === 'user' ? 'Ty' : 'System AI';
 
-                const bubbleClass = role === 'user' ?
-                'bg-emerald-50 dark:bg-emerald-900 text-gray-800 dark:text-emerald-50 border border-emerald-200 dark:border-emerald-800' :
-                    'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200';
+                const bubble = document.createElement('div');
+                bubble.className = 'px-5 py-4 max-w-[85%] font-mono text-sm leading-relaxed shadow-sm ';
 
-                messageDiv.innerHTML = `
-                ${avatar}
-                <div class="${bubbleClass} rounded-lg p-3 text-sm shadow-sm whitespace-pre-wrap leading-relaxed">${text}</div>
-            `;
-                chatWindow.appendChild(messageDiv);
-                chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+                if (role === 'user') {
+                // Kolor użytkownika - akcent limonkowy
+                    bubble.className += 'bg-[rgba(200,245,53,0.15)] border border-[rgba(200,245,53,0.3)] text-text-main rounded-2xl rounded-tr-sm';
+                } else {
+                // Kolor AI - neutralny ciemny
+                    bubble.className += 'bg-[rgba(42,63,74,0.4)] border border-border-subtle text-text-main rounded-2xl rounded-tl-sm';
+                    text = text.replace(/\n/g, '<br>');
+                }
+
+                bubble.innerHTML = text;
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(bubble);
+                chatMessages.appendChild(wrapper);
+
+            // Auto scroll do dołu po dodaniu nowej wiadomości
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
             chatForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+
                 const question = userInput.value.trim();
+                if (!question) return;
+
                 const selectedCompanyId = companySelect.value;
                 const selectedScope = scopeSelect.value;
 
-                if (!question) return;
-                if (!selectedCompanyId) {
-                    appendMessage('system', 'System: Przed zadaniem pytania musisz wybrać podmiot z listy.');
-                    return;
-                }
-
+            // Dodaj wiadomość użytkownika do okna
                 appendMessage('user', question);
                 userInput.value = '';
 
+            // Wyświetl wskaźnik ładowania i zablokuj kontrolki
                 chatLoading.classList.remove('hidden');
                 userInput.disabled = true;
                 sendBtn.disabled = true;
@@ -131,7 +196,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
+                        'X-CSRFToken': csrfToken
                     },
                     body: JSON.stringify({
                         question: question,
@@ -142,21 +207,24 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
-                            appendMessage('system', 'Błąd: ' + data.error);
+                            appendMessage('system', '<span class="text-red-400">Błąd:</span> ' + data.error);
                         } else {
                             appendMessage('system', data.answer);
                         }
                     })
                     .catch(error => {
-                        appendMessage('system', 'Wystąpił problem z połączeniem z modułem AI.');
+                        appendMessage('system', '<span class="text-red-400">Wystąpił problem z połączeniem z modułem AI.</span>');
                     })
                     .finally(() => {
+                // Ukryj ładowanie i odblokuj interfejs
                         chatLoading.classList.add('hidden');
                         userInput.disabled = false;
                         sendBtn.disabled = false;
                         companySelect.disabled = false;
                         scopeSelect.disabled = false;
                         userInput.focus();
+
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
                     });
             });
         });
