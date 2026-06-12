@@ -11,39 +11,24 @@
     <body>
         <div class="container mt-4">
 
-    <!-- Komunikaty -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'success' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>{{ title }}</h1>
-                <a href="{% url 'energy_consumption_add' %}" class="btn btn-success btn-lg">
-                    <i class="bi bi-plus-circle"></i> Dodaj nowy rekord
-                </a>
-            </div>
-
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>{{ title }}</h1>
                 <div class="d-flex gap-2">
-                    <a href="{% url 'energy_consumption_add' %}" class="btn btn-success">
+                    <a href="{% url add_url_name %}" class="btn btn-success">
                         <i class="bi bi-plus-circle"></i> Dodaj nowy rekord
                     </a>
-                    <a href="{% url 'energy_consumption_template' %}" class="btn btn-outline-primary">
+
+                    <a href="{% url template_url_name %}" class="btn btn-outline-primary">
                         <i class="bi bi-download"></i> Pobierz szablon
                     </a>
-                    <a href="{% url 'energy_consumption_import' %}" class="btn btn-primary">
+
+                    <a href="{% url import_url_name %}" class="btn btn-primary">
                         <i class="bi bi-upload"></i> Importuj dane
                     </a>
                 </div>
             </div>
 
-    <!-- Filtrowanie -->
+            <!-- Filtrowanie -->
             <form method="get" class="row g-3 mb-4">
                 <div class="col-md-4">
                     <input type="text" name="company" class="form-control"
@@ -62,7 +47,7 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a href="{% url 'energy_consumption_list' %}"
+                    <a href="{% url list_url_name %}"
                        class="btn btn-secondary w-100">
                         <i class="bi bi-x-circle"></i> Wyczyść
                     </a>
@@ -97,14 +82,8 @@
                                 {{ record.emission_tco2eq|floatformat:2|default:"—" }} t
                             </td>
                             <td>
-                                <a href="{% url 'energy_consumption_edit' record.id %}"
-                                   class="btn btn-sm btn-warning me-1">
-                                    Edytuj
-                                </a>
-                                <a href="{% url 'energy_consumption_delete' record.id %}"
-                                   class="btn btn-sm btn-danger">
-                                    Usuń
-                                </a>
+                                <a href="{% url edit_url_name record.id %}" class="btn btn-sm btn-warning me-1">Edytuj</a>
+                                <a href="{% url delete_url_name record.id %}" class="btn btn-sm btn-danger">Usuń</a>
                             </td>
                         </tr>
                     {% empty %}

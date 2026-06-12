@@ -150,6 +150,34 @@ class EnergyConsumption(ActivityRecord):
         verbose_name = "Zużycie energii"
         verbose_name_plural = "Zużycie energii"
 
+    def save(self, *args, **kwargs):
+        # 1. Mapujemy ("tłumaczymy") nazwy z formularza na nazwy wskaźników z bazy CSV
+        # Jeśli typ energii zawiera frazę "Energia elektryczna", używamy wskaźnika "Energia elektryczna"
+        factor_name_in_db = self.energy_type
+        if "Energia elektryczna" in self.energy_type:
+            factor_name_in_db = "Energia elektryczna"
+        elif "Energia cieplna" in self.energy_type:
+            factor_name_in_db = "Energia cieplna"
+
+        # 2. Szukamy odpowiedniego wskaźnika w bazie danych dla danego roku i kraju
+        from emissions.models import EmissionFactor  # import wewnątrz metody, aby uniknąć circular import
+
+        factor_obj = EmissionFactor.objects.filter(
+            year=self.year,
+            country=self.company.country,
+            factor_name=factor_name_in_db
+        ).first()
+
+        # 3. Jeśli znaleźliśmy wskaźnik, wykonujemy mnożenie
+        if factor_obj:
+            # Zakładam, że pole z ilością w ActivityRecord nazywa się 'amount'
+            self.emission_tco2eq = float(self.amount) * float(factor_obj.factor)
+        else:
+            self.emission_tco2eq = 0.0  # Jeśli brak wskaźnika, dajemy 0 zamiast None
+
+        # 4. Uruchamiamy oryginalny zapis z klasy bazowej
+        super().save(*args, **kwargs)
+
 
 class EnergyPurchased(ActivityRecord):
     energy_type = models.CharField(max_length=100)
