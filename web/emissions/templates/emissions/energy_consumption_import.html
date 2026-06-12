@@ -25,7 +25,7 @@
                     {% endif %}
                 </div>
                 <button type="submit" class="btn btn-primary">Wczytaj plik</button>
-                <a href="{% url 'energy_consumption_list' %}" class="btn btn-secondary">Anuluj</a>
+                <a href="{% url 'emissions:energy_consumption_list' %}" class="btn btn-secondary">Anuluj</a>
             </form>
         {% endif %}
 
@@ -39,7 +39,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="confirm" value="true">
                 <button type="submit" class="btn btn-success">Potwierdź import</button>
-                <a href="{% url 'energy_consumption_import' %}" class="btn btn-secondary">Wróć</a>
+                <a href="{% url 'emissions:energy_consumption_import' %}" class="btn btn-secondary">Wróć</a>
             </form>
         {% endif %}
 
