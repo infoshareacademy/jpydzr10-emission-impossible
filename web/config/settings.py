@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "what_if.apps.WhatIfConfig",
     "tailwind",
     "theme",
+    "widget_tweaks",
 ]
 
 SITE_ID = 1

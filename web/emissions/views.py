@@ -48,7 +48,7 @@ from .models import (
 )
 
 
-class Scope2CreateMixin(LoginRequiredMixin, FormView):
+class Scope2CreateMixin(FormView):
     """
     Wspólna logika dla wszystkich widoków dodawania i aktualizacji z Zakresu 2.
     Automatycznie oblicza emisję przy zapisie.
@@ -60,19 +60,28 @@ class Scope2CreateMixin(LoginRequiredMixin, FormView):
         instance = form.save(commit=False)
         is_new = instance.pk is None
 
+        # Jeśli edycja — zachowaj stare wartości emisji i wskaźników
         if not is_new:
             try:
                 db_instance = self.model.objects.get(pk=instance.pk)
-                for field_name in ['calculated_emission_tco2eq', 'applied_factor_value']:
+                for field_name in [
+                    'calculated_emission_tco2eq',
+                    'applied_factor_value',
+                    'applied_factor_unit',
+                    'applied_converter_value',
+                    'applied_converter_unit',
+                ]:
                     setattr(instance, field_name, getattr(db_instance, field_name, None))
             except self.model.DoesNotExist:
                 pass
 
+        # Track użytkownika
         if is_new:
             instance.created_by = self.request.user
 
         instance.updated_by = self.request.user
 
+        # Oblicz emisję
         try:
             calculate_record_emissions(instance)
         except ValidationError as e:
@@ -92,7 +101,7 @@ class Scope2CreateMixin(LoginRequiredMixin, FormView):
         return context
 
 
-class Scope2ListMixin(LoginRequiredMixin, ListView):
+class Scope2ListMixin(ListView):
     """
     Uniwersalny widok listy dla wszystkich kategorii Scope 2.
     Obsługuje paginację, filtrowanie, sortowanie i eksport.
@@ -103,7 +112,7 @@ class Scope2ListMixin(LoginRequiredMixin, ListView):
     default_sort = "-year"
 
     def get_queryset(self):
-        qs = self.model.objects.all().order_by(self.default_sort)
+        qs = self.model.objects.all().select_related('company').order_by(self.default_sort)
 
         self.current_sort = self.request.GET.get('sort', self.default_sort)
         self.current_year = self.request.GET.get('year', '')
@@ -162,13 +171,15 @@ class Scope2ListMixin(LoginRequiredMixin, ListView):
         wb.save(response)
         return response
 
-class Scope2DeleteMixin(LoginRequiredMixin, DeleteView):
+
+class Scope2DeleteMixin(DeleteView):
     """Wspólna logika dla usuwania rekordów z Zakresu 2."""
 
     def delete(self, request, *args, **kwargs):
+        model_verbose = self.model._meta.verbose_name
         messages.success(
             self.request,
-            f"Pomyślnie usunięto wpis z: {self.model._meta.verbose_name}"
+            f"Pomyślnie usunięto wpis z: {model_verbose}"
         )
         return super().delete(request, *args, **kwargs)
 
@@ -713,7 +724,7 @@ class EmissionFactorDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class EnergyConsumptionTemplateDownloadView(LoginRequiredMixin, View):
+class EnergyConsumptionTemplateDownloadView(View):
     """Pobiera szablon XLSX do wgrania danych."""
 
     def get(self, request):
@@ -732,7 +743,7 @@ class EnergyConsumptionTemplateDownloadView(LoginRequiredMixin, View):
         return response
 
 
-class EnergyConsumptionImportView(LoginRequiredMixin, FormView):
+class EnergyConsumptionImportView(FormView):
     """Widok importu danych z pliku XLSX."""
 
     template_name = 'emissions/energy_consumption_import.html'
@@ -807,7 +818,7 @@ class EnergyConsumptionImportView(LoginRequiredMixin, FormView):
 
 # ===== ENERGY PURCHASED IMPORT =====
 
-class EnergyPurchasedTemplateDownloadView(LoginRequiredMixin, View):
+class EnergyPurchasedTemplateDownloadView(View):
     """Pobiera szablon XLSX dla zakupionej energii."""
 
     def get(self, request):
@@ -826,7 +837,7 @@ class EnergyPurchasedTemplateDownloadView(LoginRequiredMixin, View):
         return response
 
 
-class EnergyPurchasedImportView(LoginRequiredMixin, FormView):
+class EnergyPurchasedImportView(FormView):
     """Widok importu danych zakupionej energii."""
 
     template_name = 'emissions/energy_purchased_import.html'
@@ -894,7 +905,7 @@ class EnergyPurchasedImportView(LoginRequiredMixin, FormView):
 
 # ===== ENERGY PRODUCED IMPORT =====
 
-class EnergyProducedTemplateDownloadView(LoginRequiredMixin, View):
+class EnergyProducedTemplateDownloadView(View):
     """Pobiera szablon XLSX dla wyprodukowanej energii."""
 
     def get(self, request):
@@ -913,7 +924,7 @@ class EnergyProducedTemplateDownloadView(LoginRequiredMixin, View):
         return response
 
 
-class EnergyProducedImportView(LoginRequiredMixin, FormView):
+class EnergyProducedImportView(FormView):
     """Widok importu danych wyprodukowanej energii."""
 
     template_name = 'emissions/energy_produced_import.html'
@@ -981,7 +992,7 @@ class EnergyProducedImportView(LoginRequiredMixin, FormView):
 
 # ===== ENERGY SOLD IMPORT =====
 
-class EnergySoldTemplateDownloadView(LoginRequiredMixin, View):
+class EnergySoldTemplateDownloadView(View):
     """Pobiera szablon XLSX dla sprzedanej energii."""
 
     def get(self, request):
@@ -1000,7 +1011,7 @@ class EnergySoldTemplateDownloadView(LoginRequiredMixin, View):
         return response
 
 
-class EnergySoldImportView(LoginRequiredMixin, FormView):
+class EnergySoldImportView(FormView):
     """Widok importu danych sprzedanej energii."""
 
     template_name = 'emissions/energy_sold_import.html'
