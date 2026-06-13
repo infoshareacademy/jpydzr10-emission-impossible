@@ -49,4 +49,21 @@ urlpatterns = [
         auth_views.LogoutView.as_view(template_name="accounts/logged_out.html"),
         name="logout",
     ),
+    path(
+        "users/",
+        views.CompanyUsersListView.as_view(),
+        name="company-users-list",
+    ),
+    # Odpięcie użytkownika od spółki (POST)
+    path(
+        "permisions/<int:pk>/usun/",
+        views.RemoveUserFromCompanyView.as_view(),
+        name="permission-remove",
+    ),
+    # Dezaktywacja konta (POST)
+    path(
+        "users/<int:pk>/dezaktywuj/",
+        views.DeactivateUserView.as_view(),
+        name="user-deactivate",
+    ),
 ]

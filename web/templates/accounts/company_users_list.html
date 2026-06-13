@@ -1,0 +1,569 @@
+{% extends "base.html" %}
+{% block title %}Użytkownicy i uprawnienia — Emission Impossible{% endblock %}
+
+{% block extra_head %}
+<style>
+  .role-badge-admin    { background: rgba(200,245,53,.18); color:#c8f535; border:1px solid rgba(200,245,53,.4); }
+  .role-badge-audytor  { background: rgba(100,200,240,.18); color:#6ac8e8; border:1px solid rgba(100,200,240,.35); }
+  .role-badge-default  { background: rgba(122,181,174,.12); color:#7ab5ae; border:1px solid rgba(122,181,174,.3); }
+
+  .admin-card { background:rgba(200,245,53,.06); border:1px solid rgba(200,245,53,.25); border-radius:10px; }
+  .admin-card:hover { background:rgba(200,245,53,.1); }
+
+  .company-card { background:rgba(255,255,255,.03); border:1px solid rgba(122,181,174,.15); border-radius:12px; overflow:hidden; }
+
+  .user-row { border-top:1px solid rgba(122,181,174,.1); transition:background .15s; }
+  .user-row:hover { background:rgba(255,255,255,.04); }
+
+  .avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center;
+            justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; }
+  .avatar-admin   { background:rgba(200,245,53,.2); color:#c8f535; border:1px solid rgba(200,245,53,.4); }
+  .avatar-audytor { background:rgba(100,200,240,.18); color:#6ac8e8; border:1px solid rgba(100,200,240,.3); }
+  .avatar-default { background:rgba(122,181,174,.15); color:#7ab5ae; border:1px solid rgba(122,181,174,.25); }
+
+  .perm-yes { color:#c8f535; }
+  .perm-no  { color:rgba(122,181,174,.35); }
+
+  .inactive-row { opacity:.45; }
+  .inactive-badge { background:rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.3);
+                    font-size:9px; padding:1px 6px; border-radius:3px; font-weight:700;
+                    text-transform:uppercase; letter-spacing:.06em; }
+
+  #confirm-modal { display:none; position:fixed; inset:0; z-index:100;
+                   background:rgba(0,0,0,.7); align-items:center; justify-content:center; }
+  #confirm-modal.show { display:flex; }
+  .modal-box { background:#1a2533; border:2px solid rgba(239,68,68,.6);
+               border-radius:12px; padding:2rem; max-width:440px; width:100%; margin:1rem;
+               box-shadow:0 20px 60px rgba(0,0,0,.6); }
+
+  .search-hidden { display:none !important; }
+
+  .stat-chip { background:rgba(255,255,255,.06); border:1px solid rgba(122,181,174,.2);
+               border-radius:999px; padding:3px 12px; font-size:12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <div class="flex items-start gap-3 mb-5">
+      <span class="material-symbols-outlined text-red-400 flex-shrink-0" style="font-size:28px">warning</span>
+      <div>
+        <h3 id="modal-title" class="font-heading font-bold text-lg text-text-main mb-1">
+          Potwierdź operację
+        </h3>
+        <p id="modal-message" class="font-mono text-sm text-text-muted leading-relaxed"></p>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <form id="modal-form" method="post">
+        {% csrf_token %}
+        <button type="submit"
+                class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm
+                       rounded transition-colors border border-red-500">
+          Tak, wykonaj
+        </button>
+      </form>
+      <button onclick="closeModal()"
+              class="px-5 py-2 font-bold text-sm text-text-muted hover:text-text-main
+                     border border-border-subtle rounded transition-colors">
+        Anuluj
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="mb-8">
+  <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px;height:32px;background:#c8f535;border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+          Użytkownicy i uprawnienia
+        </h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4">
+        Zarządzanie dostępem do spółek w systemie Emission Impossible.
+      </p>
+    </div>
+
+    {# Statystyki + przycisk admina #}
+    <div class="flex flex-col items-end gap-3">
+      <div class="flex flex-wrap gap-2">
+        <span class="stat-chip font-mono text-text-muted">
+          <span class="text-text-main font-bold">{{ total_companies }}</span> spółek
+        </span>
+        <span class="stat-chip font-mono text-text-muted">
+          <span class="text-text-main font-bold">{{ total_users }}</span> użytkowników
+        </span>
+        <span class="stat-chip font-mono text-text-muted">
+          <span style="color:#c8f535;" class="font-bold">{{ admin_count }}</span> adminów
+        </span>
+      </div>
+      {% if is_admin %}
+      <a href="/admin/auth/user/add/"
+         class="inline-flex items-center gap-2 px-4 py-2 font-mono font-bold text-sm
+                text-black rounded transition-colors"
+         style="background:#c8f535; border:1px solid rgba(200,245,53,.4);">
+        <span class="material-symbols-outlined text-[18px]">person_add</span>
+        Utwórz nowego użytkownika
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Pasek wyszukiwania #}
+  <div class="mt-5 ml-4">
+    <div class="relative max-w-sm">
+      <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted"
+            style="left:12px;font-size:18px;">search</span>
+      <input id="global-search" type="text" placeholder="Szukaj użytkownika lub spółki..."
+             class="w-full py-2 pl-10 pr-4 font-mono text-sm text-text-main rounded-lg
+                    focus:outline-none focus:ring-2"
+             style="background:rgba(255,255,255,.07);border:1px solid rgba(122,181,174,.25);
+                    --tw-ring-color:rgba(200,245,53,.4);">
+    </div>
+  </div>
+</div>
+
+<section class="mb-10" id="section-admins">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="material-symbols-outlined" style="font-size:20px;color:#c8f535;">shield_person</span>
+    <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">
+      Administratorzy systemu
+    </h2>
+    <span class="font-mono text-xs text-text-muted px-2 py-0.5 rounded-full"
+          style="background:rgba(200,245,53,.1);border:1px solid rgba(200,245,53,.2);">
+      Pełny dostęp do wszystkich danych
+    </span>
+  </div>
+
+  {% if admins %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    {% for admin in admins %}
+    <div class="admin-card p-4 flex items-center gap-3 transition-colors">
+      {# Avatar z inicjałem #}
+      <div class="avatar avatar-admin text-lg flex-shrink-0">
+        {{ admin.username|first|upper }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-0.5">
+          <span class="font-mono font-bold text-sm text-text-main truncate">
+            {{ admin.get_full_name|default:admin.username }}
+          </span>
+          <span class="role-badge-admin text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded">
+            admin
+          </span>
+        </div>
+        <p class="font-mono text-xs text-text-muted truncate">@{{ admin.username }}</p>
+        {% if admin.email %}
+        <a href="mailto:{{ admin.email }}"
+           class="font-mono text-xs hover:underline mt-0.5 inline-flex items-center gap-1"
+           style="color:#7ab5ae;">
+          <span class="material-symbols-outlined" style="font-size:12px">mail</span>
+          {{ admin.email }}
+        </a>
+        {% else %}
+        <span class="font-mono text-xs text-text-muted opacity-40">brak adresu e-mail</span>
+        {% endif %}
+      </div>
+      {% if is_admin %}
+      <a href="/admin/auth/user/{{ admin.pk }}/change/"
+         class="flex-shrink-0 text-text-muted hover:text-text-main transition-colors"
+         title="Edytuj administratora">
+        <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="font-mono text-sm text-text-muted italic">
+    Brak zdefiniowanych administratorów systemu.
+  </p>
+  {% endif %}
+</section>
+
+<div style="height:1px;background:linear-gradient(to right,rgba(122,181,174,.3),transparent);margin-bottom:2.5rem;"></div>
+
+<section>
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">
+      {% if is_admin %}Wszystkie spółki{% else %}Twoje spółki{% endif %}
+    </h2>
+    {% if not is_admin %}
+    <p class="font-mono text-xs text-text-muted">
+      <span class="material-symbols-outlined align-middle" style="font-size:13px">info</span>
+      Widzisz tylko spółki, do których masz przypisany dostęp.
+    </p>
+    {% endif %}
+  </div>
+
+  {% if company_data %}
+
+  <div class="space-y-5" id="companies-list">
+  {% for item in company_data %}
+  <div class="company-card searchable-company"
+       data-company="{{ item.company.name|lower }}">
+
+    {# Nagłówek spółki #}
+    <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+         style="border-bottom:1px solid rgba(122,181,174,.12);">
+      <div class="flex items-center gap-3">
+        {# Logo-placeholder z inicjałami #}
+        <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-content font-black text-sm"
+             style="background:rgba(42,63,74,.8);border:1px solid rgba(122,181,174,.25);
+                    display:flex;align-items:center;justify-content:center;color:#7ab5ae;">
+          {{ item.company.name|first|upper }}
+        </div>
+        <div>
+          <h3 class="font-heading font-bold text-lg text-text-main leading-tight">
+            {{ item.company.name }}
+          </h3>
+          <div class="flex items-center gap-2 mt-0.5">
+            {% if item.company.city %}
+            <span class="font-mono text-xs text-text-muted flex items-center gap-1">
+              <span class="material-symbols-outlined" style="font-size:12px">location_on</span>
+              {{ item.company.city }}{% if item.company.country %}, {{ item.company.country }}{% endif %}
+            </span>
+            {% endif %}
+            <span class="font-mono text-xs text-text-muted">·</span>
+            <span class="font-mono text-xs text-text-muted">
+              NIP: {{ item.company.nip|default:"—" }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {# Przyciski akcji (admin) + licznik #}
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <span class="font-mono text-xs text-text-muted stat-chip">
+          <span class="material-symbols-outlined align-middle" style="font-size:13px">group</span>
+          {{ item.user_count }} {% if item.user_count == 1 %}użytkownik{% else %}użytkowników{% endif %}
+        </span>
+        {% if is_admin %}
+        <a href="/admin/accounts/usercompanypermission/add/?company={{ item.company.pk }}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono font-bold text-xs
+                  rounded transition-all"
+           style="background:rgba(200,245,53,.1);color:#c8f535;border:1px solid rgba(200,245,53,.3);"
+           title="Przypisz istniejącego użytkownika do tej spółki">
+          <span class="material-symbols-outlined" style="font-size:14px">person_add</span>
+          Przypisz użytkownika
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Tabela użytkowników #}
+    {% if item.permissions %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(122,181,174,.1);">
+            <th class="px-5 py-3 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">
+              Użytkownik
+            </th>
+            <th class="px-4 py-3 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden md:table-cell">
+              Imię i nazwisko
+            </th>
+            <th class="px-4 py-3 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">
+              Rola
+            </th>
+            <th class="px-4 py-3 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden lg:table-cell">
+              E-mail
+            </th>
+            <th class="px-4 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted"
+                title="Uprawnienie do odczytu danych">
+              Odczyt
+            </th>
+            <th class="px-4 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted"
+                title="Uprawnienie do zapisu / edycji danych">
+              Zapis
+            </th>
+            {% if is_admin %}
+            <th class="px-4 py-3 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted w-32">
+              Akcje
+            </th>
+            {% endif %}
+          </tr>
+        </thead>
+<tbody>
+          {% for perm in item.permissions %}
+          {% with u=perm.user %}
+          <tr class="user-row searchable-user {% if not u.is_active %}inactive-row{% endif %}"
+              data-username="{{ u.username|lower }}"
+              data-fullname="{{ u.get_full_name|lower }}">
+
+            {# Kolumna: Login #}
+            <td class="px-5 py-3">
+              <div class="flex items-center gap-2.5">
+                {# Avatar #}
+                {% if u.role == 'audytor' %}
+                <div class="avatar avatar-audytor text-sm">{{ u.username|first|upper }}</div>
+                {% else %}
+                <div class="avatar avatar-default text-sm">{{ u.username|first|upper }}</div>
+                {% endif %}
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono font-bold text-sm text-text-main">
+                      @{{ u.username }}
+                    </span>
+                    {% if not u.is_active %}
+                    <span class="inactive-badge">nieaktywny</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            {# Kolumna: Imię i nazwisko #}
+            <td class="px-4 py-3 hidden md:table-cell">
+              <span class="font-mono text-sm text-text-muted">
+                {{ u.get_full_name|default:"—" }}
+              </span>
+            </td>
+
+            {# Kolumna: Rola #}
+            <td class="px-4 py-3">
+              {% if u.role == 'audytor' %}
+              <span class="role-badge-audytor font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+                audytor
+              </span>
+              {% else %}
+              <span class="role-badge-default font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+                {{ u.role|default:"użytkownik" }}
+              </span>
+              {% endif %}
+            </td>
+
+            {# Kolumna: E-mail #}
+            <td class="px-4 py-3 hidden lg:table-cell">
+              {% if u.email %}
+              <a href="mailto:{{ u.email }}"
+                 class="font-mono text-xs hover:underline flex items-center gap-1"
+                 style="color:#7ab5ae;">
+                <span class="material-symbols-outlined" style="font-size:13px">mail</span>
+                {{ u.email }}
+              </a>
+              {% else %}
+              <span class="font-mono text-xs text-text-muted opacity-40">—</span>
+              {% endif %}
+            </td>
+
+            {# Kolumna: Odczyt #}
+            <td class="px-4 py-3 text-center">
+              {% if perm.can_read %}
+              <span class="material-symbols-outlined perm-yes" style="font-size:20px"
+                    title="Może odczytywać dane">check_circle</span>
+              {% else %}
+              <span class="material-symbols-outlined perm-no" style="font-size:20px"
+                    title="Brak dostępu do odczytu">remove_circle</span>
+              {% endif %}
+            </td>
+
+            {# Kolumna: Zapis #}
+            <td class="px-4 py-3 text-center">
+              {% if perm.can_save %}
+              <span class="material-symbols-outlined perm-yes" style="font-size:20px"
+                    title="Może dodawać i edytować dane">check_circle</span>
+              {% else %}
+              <span class="material-symbols-outlined perm-no" style="font-size:20px"
+                    title="Brak uprawnienia do zapisu">remove_circle</span>
+              {% endif %}
+            </td>
+
+            {# Kolumna: Akcje (tylko admin) #}
+            {% if is_admin %}
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-center gap-1">
+                {# Edytuj uprawnienia dla tej spółki #}
+                <a href="/admin/accounts/usercompanypermission/{{ perm.pk }}/change/"
+                   class="inline-flex items-center justify-center w-7 h-7 rounded
+                          text-text-muted hover:text-text-main transition-colors"
+                   style="background:rgba(255,255,255,.05);border:1px solid rgba(122,181,174,.2);"
+                   title="Edytuj uprawnienia w tej spółce">
+                  <span class="material-symbols-outlined" style="font-size:15px">tune</span>
+                </a>
+
+                {# Edytuj profil użytkownika #}
+                <a href="/admin/auth/user/{{ u.pk }}/change/"
+                   class="inline-flex items-center justify-center w-7 h-7 rounded
+                          text-text-muted hover:text-text-main transition-colors"
+                   style="background:rgba(255,255,255,.05);border:1px solid rgba(122,181,174,.2);"
+                   title="Edytuj konto użytkownika">
+                  <span class="material-symbols-outlined" style="font-size:15px">manage_accounts</span>
+                </a>
+
+                {# Odepnij od spółki #}
+                <button
+                  onclick="openModal(
+                    'Odepnij użytkownika od spółki',
+                    'Czy na pewno odpiąć <strong>@{{ u.username }}</strong> od spółki <strong>{{ item.company.name }}</strong>? Użytkownik straci dostęp do tej spółki.',
+                    '{% url 'accounts:permission-remove' perm.pk %}'
+                  )"
+                  class="inline-flex items-center justify-center w-7 h-7 rounded
+                         text-text-muted transition-colors"
+                  style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);"
+                  title="Odepnij od tej spółki">
+                  <span class="material-symbols-outlined" style="font-size:15px;color:#f87171">link_off</span>
+                </button>
+
+                {# Dezaktywuj konto (tylko jeśli aktywny) #}
+                {% if u.is_active %}
+                <button
+                  onclick="openModal(
+                    'Dezaktywuj konto użytkownika',
+                    'Czy na pewno dezaktywować konto <strong>@{{ u.username }}</strong>? Użytkownik straci dostęp do całego systemu.',
+                    '{% url 'accounts:user-deactivate' u.pk %}'
+                  )"
+                  class="inline-flex items-center justify-center w-7 h-7 rounded
+                         text-text-muted transition-colors"
+                  style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);"
+                  title="Dezaktywuj konto">
+                  <span class="material-symbols-outlined" style="font-size:15px;color:#f87171">person_off</span>
+                </button>
+                {% endif %}
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if not is_admin %}
+    <div class="px-5 py-3 flex items-center gap-4 flex-wrap"
+         style="border-top:1px solid rgba(122,181,174,.08);">
+      <span class="font-mono text-[10px] text-text-muted flex items-center gap-1">
+        <span class="material-symbols-outlined perm-yes" style="font-size:13px">check_circle</span>
+        Uprawnienie aktywne
+      </span>
+      <span class="font-mono text-[10px] text-text-muted flex items-center gap-1">
+        <span class="material-symbols-outlined perm-no" style="font-size:13px">remove_circle</span>
+        Brak uprawnienia
+      </span>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="px-5 py-8 text-center">
+      <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted"
+            style="font-size:36px;opacity:.3;">group_off</span>
+      <p class="font-mono text-sm text-text-muted opacity-50">
+        Brak przypisanych użytkowników do tej spółki.
+      </p>
+      {% if is_admin %}
+      <a href="/admin/accounts/usercompanypermission/add/?company={{ item.company.pk }}"
+         class="mt-3 inline-flex items-center gap-1 font-mono text-xs hover:underline"
+         style="color:#c8f535;">
+        <span class="material-symbols-outlined" style="font-size:14px">person_add</span>
+        Przypisz pierwszego użytkownika
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+  </div>
+
+  <div id="no-results" class="hidden text-center py-12">
+    <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted"
+          style="font-size:40px;opacity:.25;">search_off</span>
+    <p class="font-mono text-sm text-text-muted opacity-50">
+      Brak wyników dla podanej frazy.
+    </p>
+  </div>
+
+  {% else %}
+  <div class="text-center py-16">
+    <span class="material-symbols-outlined block mx-auto mb-3 text-text-muted"
+          style="font-size:56px;opacity:.2;">domain_disabled</span>
+    <p class="font-mono text-base text-text-muted opacity-50 mb-2">
+      {% if is_admin %}
+        Brak spółek w systemie.
+      {% else %}
+        Nie masz przypisanego dostępu do żadnej spółki.
+      {% endif %}
+    </p>
+    {% if not is_admin %}
+    <p class="font-mono text-xs text-text-muted opacity-40">
+      Skontaktuj się z administratorem systemu w celu uzyskania dostępu.
+    </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const modal       = document.getElementById('confirm-modal');
+const modalMsg    = document.getElementById('modal-message');
+const modalTitle  = document.getElementById('modal-title');
+const modalForm   = document.getElementById('modal-form');
+
+function openModal(title, message, actionUrl) {
+  modalTitle.textContent = title;
+  modalMsg.innerHTML     = message;
+  modalForm.action       = actionUrl;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+modal.addEventListener('click', function(e) {
+  if (e.target === modal) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+const searchInput   = document.getElementById('global-search');
+const companyCards  = document.querySelectorAll('.searchable-company');
+const noResults     = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function() {
+  const query = this.value.trim().toLowerCase();
+  let anyVisible = false;
+
+  companyCards.forEach(function(card) {
+    const companyName = card.dataset.company || '';
+    const userRows    = card.querySelectorAll('.searchable-user');
+    let companyMatch  = companyName.includes(query);
+    let userMatch     = false;
+
+    userRows.forEach(function(row) {
+      const username = row.dataset.username || '';
+      const fullname = row.dataset.fullname || '';
+
+      if (!query || companyMatch || username.includes(query) || fullname.includes(query)) {
+        row.classList.remove('search-hidden');
+        userMatch = true;
+      } else {
+        row.classList.add('search-hidden');
+      }
+    });
+
+    if (!query || companyMatch || userMatch) {
+      card.classList.remove('search-hidden');
+      anyVisible = true;
+    } else {
+      card.classList.add('search-hidden');
+    }
+  });
+
+  noResults.classList.toggle('hidden', anyVisible || !query);
+});
+</script>
+{% endblock %}
