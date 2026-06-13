@@ -20,6 +20,7 @@ from django.views.generic import (
     TemplateView,
     UpdateView,
     View,
+    FormView,
 )
 
 from .forms import (
@@ -48,6 +49,7 @@ from .models import (
     ProcessEmission,
     StationaryCombustion,
 )
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Scope2CreateMixin(LoginRequiredMixin, FormView):
@@ -344,6 +346,11 @@ class EnergySoldUpdateView(Scope2CreateMixin, UpdateView):
 class EnergySoldDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergySold
     success_url = reverse_lazy("emissions:energy_sold_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["record"] = self.object
+        return context
 
 
 class Scope1CreateMixin(LoginRequiredMixin):
@@ -900,7 +907,7 @@ class EnergyConsumptionImportView(FormView):
 
             messages.success(
                 self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
             )
             return redirect(self.success_url)
 
@@ -918,23 +925,13 @@ class EnergyPurchasedTemplateDownloadView(View):
         ws = wb.active
         ws.title = "Zakupiona energia"
 
-        headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "trader",
-            "source",
-        ]
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'trader', 'source']
         ws.append(headers)
 
         response = HttpResponse(
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response["Content-Disposition"] = (
-            'attachment; filename="szablon_energia_zakupiona.xlsx"'
-        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_zakupiona.xlsx"'
         wb.save(response)
         return response
 
@@ -942,44 +939,33 @@ class EnergyPurchasedTemplateDownloadView(View):
 class EnergyPurchasedImportView(FormView):
     """Widok importu danych zakupionej energii."""
 
-    template_name = "emissions/energy_purchased_import.html"
+    template_name = 'emissions/energy_purchased_import.html'
     form_class = EnergyPurchasedImportForm
-    success_url = reverse_lazy("energy_purchased_list")
+    success_url = reverse_lazy('energy_purchased_list')
 
     def form_valid(self, form):
-        file = form.cleaned_data["file"]
+        file = form.cleaned_data['file']
 
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "trader",
-            "source",
-        ]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'trader', 'source']
 
         if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
             return self.form_invalid(form)
 
         records_count = ws.max_row - 1
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
+        context['records_count'] = records_count
+        context['confirm'] = True
 
-        if "confirm" in self.request.POST:
+        if 'confirm' in self.request.POST:
             imported = 0
             duplicates = 0
 
@@ -987,7 +973,9 @@ class EnergyPurchasedImportView(FormView):
                 year, company, energy_type, amount, unit, trader, source = row
 
                 exists = EnergyPurchased.objects.filter(
-                    year=year, company=company, energy_type=energy_type
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
                 ).exists()
 
                 if exists:
@@ -1001,13 +989,13 @@ class EnergyPurchasedImportView(FormView):
                     amount=amount,
                     unit=unit,
                     trader=trader,
-                    source=source,
+                    source=source
                 )
                 imported += 1
 
             messages.success(
                 self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
             )
             return redirect(self.success_url)
 
@@ -1025,23 +1013,13 @@ class EnergyProducedTemplateDownloadView(View):
         ws = wb.active
         ws.title = "Wyprodukowana energia"
 
-        headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "installation",
-            "source",
-        ]
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'installation', 'source']
         ws.append(headers)
 
         response = HttpResponse(
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response["Content-Disposition"] = (
-            'attachment; filename="szablon_energia_wyprodukowana.xlsx"'
-        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_wyprodukowana.xlsx"'
         wb.save(response)
         return response
 
@@ -1049,44 +1027,33 @@ class EnergyProducedTemplateDownloadView(View):
 class EnergyProducedImportView(FormView):
     """Widok importu danych wyprodukowanej energii."""
 
-    template_name = "emissions/energy_produced_import.html"
+    template_name = 'emissions/energy_produced_import.html'
     form_class = EnergyProducedImportForm
-    success_url = reverse_lazy("energy_produced_list")
+    success_url = reverse_lazy('energy_produced_list')
 
     def form_valid(self, form):
-        file = form.cleaned_data["file"]
+        file = form.cleaned_data['file']
 
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "installation",
-            "source",
-        ]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'installation', 'source']
 
         if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
             return self.form_invalid(form)
 
         records_count = ws.max_row - 1
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
+        context['records_count'] = records_count
+        context['confirm'] = True
 
-        if "confirm" in self.request.POST:
+        if 'confirm' in self.request.POST:
             imported = 0
             duplicates = 0
 
@@ -1094,7 +1061,9 @@ class EnergyProducedImportView(FormView):
                 year, company, energy_type, amount, unit, installation, source = row
 
                 exists = EnergyProduced.objects.filter(
-                    year=year, company=company, energy_type=energy_type
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
                 ).exists()
 
                 if exists:
@@ -1108,13 +1077,13 @@ class EnergyProducedImportView(FormView):
                     amount=amount,
                     unit=unit,
                     installation=installation,
-                    source=source,
+                    source=source
                 )
                 imported += 1
 
             messages.success(
                 self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
             )
             return redirect(self.success_url)
 
@@ -1132,23 +1101,13 @@ class EnergySoldTemplateDownloadView(View):
         ws = wb.active
         ws.title = "Sprzedana energia"
 
-        headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "customer",
-            "source",
-        ]
+        headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'customer', 'source']
         ws.append(headers)
 
         response = HttpResponse(
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response["Content-Disposition"] = (
-            'attachment; filename="szablon_energia_sprzedana.xlsx"'
-        )
+        response['Content-Disposition'] = 'attachment; filename="szablon_energia_sprzedana.xlsx"'
         wb.save(response)
         return response
 
@@ -1156,44 +1115,33 @@ class EnergySoldTemplateDownloadView(View):
 class EnergySoldImportView(FormView):
     """Widok importu danych sprzedanej energii."""
 
-    template_name = "emissions/energy_sold_import.html"
+    template_name = 'emissions/energy_sold_import.html'
     form_class = EnergySoldImportForm
-    success_url = reverse_lazy("energy_sold_list")
+    success_url = reverse_lazy('energy_sold_list')
 
     def form_valid(self, form):
-        file = form.cleaned_data["file"]
+        file = form.cleaned_data['file']
 
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            messages.error(self.request, f'Błąd wczytywania pliku: {e}')
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "customer",
-            "source",
-        ]
+        expected_headers = ['year', 'company', 'energy_type', 'amount', 'unit', 'customer', 'source']
 
         if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+            messages.error(self.request, f'Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}')
             return self.form_invalid(form)
 
         records_count = ws.max_row - 1
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
+        context['records_count'] = records_count
+        context['confirm'] = True
 
-        if "confirm" in self.request.POST:
+        if 'confirm' in self.request.POST:
             imported = 0
             duplicates = 0
 
@@ -1201,7 +1149,9 @@ class EnergySoldImportView(FormView):
                 year, company, energy_type, amount, unit, customer, source = row
 
                 exists = EnergySold.objects.filter(
-                    year=year, company=company, energy_type=energy_type
+                    year=year,
+                    company=company,
+                    energy_type=energy_type
                 ).exists()
 
                 if exists:
@@ -1215,13 +1165,13 @@ class EnergySoldImportView(FormView):
                     amount=amount,
                     unit=unit,
                     customer=customer,
-                    source=source,
+                    source=source
                 )
                 imported += 1
 
             messages.success(
                 self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
+                f'Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.'
             )
             return redirect(self.success_url)
 
