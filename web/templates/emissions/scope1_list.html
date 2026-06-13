@@ -53,14 +53,10 @@
     >
       <span class="material-symbols-outlined" style="font-size: 16px">download</span>
       Eksport
-    </a>
-    <button
-      type="button"
-      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main hover:border-text-muted transition-colors"
-    >
+    <a href="{% url import_url_name company.pk %}"
+      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main hover:border-text-muted transition-colors">
       <span class="material-symbols-outlined" style="font-size: 16px">upload</span>
       Import
-    </button>
     <a
       href="{% url add_url_name company.pk %}"
       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"

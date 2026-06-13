@@ -154,7 +154,7 @@ Impossible{% endblock %} {% block content %}
     </a>
 
     <a
-      href="{% url 'emissions:mobilecombustion-add' company.pk %}"
+      href="{% url 'emissions:mobilecombustion-list' company.pk %}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >
@@ -215,7 +215,7 @@ Impossible{% endblock %} {% block content %}
     </a>
 
     <a
-      href="{% url 'emissions:processemission-add' company.pk %}"
+      href="{% url 'emissions:processemission-list' company.pk %}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >
@@ -276,7 +276,7 @@ Impossible{% endblock %} {% block content %}
     </a>
 
     <a
-      href="{% url 'emissions:fugitiveemission-add' company.pk %}"
+      href="{% url 'emissions:fugitiveemission-list' company.pk %}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >

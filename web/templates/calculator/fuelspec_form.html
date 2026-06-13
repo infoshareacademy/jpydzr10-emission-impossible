@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Specyfikacja Fizykochemiczna - Emission Impossible{% endblock %}
+
+{% block content %}
+    <div class="max-w-2xl mx-auto space-y-8">
+
+        <div class="border-b border-border-subtle pb-4">
+            <h1 class="font-heading font-bold text-3xl text-text-main flex items-center gap-3">
+                <span class="material-symbols-outlined text-accent" style="font-size: 36px;">analytics</span>
+                >_ SPECYFIKACJA PARAMETRYCZNA PALIWA
+            </h1>
+            <p class="font-mono text-sm text-text-muted mt-2">Wprowadzanie gęstości oraz wartości opałowych dla dokładnych przeliczeń Scope 1.</p>
+        </div>
+
+        <div class="p-6 border border-border-subtle rounded-sm" style="background: rgba(42, 63, 74, 0.4);">
+            <form method="post" class="space-y-6 font-mono text-sm">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="p-3 bg-red-900/20 border border-red-500 text-red-400 rounded-sm text-xs mb-4">
+                        {% for error in form.non_field_errors %}
+                            <div>>_ WAŻNA WALIDACJA: {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4 border-b border-border-subtle/20">
+                    <div class="flex flex-col space-y-2">
+                        <label for="{{ form.fuel_type.id_for_label }}" class="text-text-muted text-xs uppercase tracking-wider font-bold">
+                            {{ form.fuel_type.label }}
+                        </label>
+                        {{ form.fuel_type }}
+                        {{ form.fuel_type.errors }}
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <label for="{{ form.supplier.id_for_label }}" class="text-text-muted text-xs uppercase tracking-wider font-bold">
+                            {{ form.supplier.label }}
+                        </label>
+                        {{ form.supplier }}
+                        {{ form.supplier.errors }}
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-accent text-xs font-bold uppercase tracking-widest border-l-2 border-accent pl-2 mb-4">Wskaźniki fizykochemiczne</h3>
+
+                    <div class="flex flex-col space-y-2">
+                        <label for="{{ form.density_kg_per_m3.id_for_label }}" class="text-text-muted text-xs uppercase tracking-wider font-bold">
+                            {{ form.density_kg_per_m3.label }}
+                        </label>
+                        {{ form.density_kg_per_m3 }}
+                        {{ form.density_kg_per_m3.errors }}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col space-y-2">
+                            <label for="{{ form.calorific_mj_per_kg.id_for_label }}" class="text-text-muted text-xs uppercase tracking-wider font-bold">
+                                {{ form.calorific_mj_per_kg.label }}
+                            </label>
+                            {{ form.calorific_mj_per_kg }}
+                            {{ form.calorific_mj_per_kg.errors }}
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label for="{{ form.calorific_mj_per_m3.id_for_label }}" class="text-text-muted text-xs uppercase tracking-wider font-bold">
+                                {{ form.calorific_mj_per_m3.label }}
+                            </label>
+                            {{ form.calorific_mj_per_m3 }}
+                            {{ form.calorific_mj_per_m3.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-[rgba(17,23,32,0.4)] border border-border-subtle/40 rounded-sm flex items-start gap-3 mt-4">
+                    <div class="mt-0.5">
+                        {{ form.is_default }}
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="{{ form.is_default.id_for_label }}" class="text-text-main text-sm font-bold cursor-pointer">
+                            {{ form.is_default.label }}
+                        </label>
+                        <span class="text-text-muted text-xs mt-1">
+                            Zaznaczenie tej opcji spowoduje automatyczne stosowanie tych przeliczników, jeśli dla wybranego paliwa nie wskazano konkretnego dostawcy w raporcie.
+                        </span>
+                        {{ form.is_default.errors }}
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-border-subtle/40 flex flex-col sm:flex-row gap-4 justify-end">
+                    <a href="{% url 'calculator:fuelspec_list' %}" class="px-4 py-2 text-text-muted border border-border-subtle hover:border-text-muted hover:text-text-main text-center transition-colors rounded-sm">
+                        [ Anuluj ]
+                    </a>
+                    <button type="submit" class="px-6 py-2 text-accent border border-accent/30 hover:border-accent hover:bg-accent/5 font-bold transition-all rounded-sm">
+                        [ Zaimplementuj specyfikację ]
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

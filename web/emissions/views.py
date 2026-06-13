@@ -1,4 +1,5 @@
 import re
+
 import openpyxl
 from calculator.calculation import calculate_record_emissions
 from companies.models import Companies
@@ -47,7 +48,6 @@ from .models import (
     ProcessEmission,
     StationaryCombustion,
 )
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Scope2CreateMixin(LoginRequiredMixin, FormView):
@@ -105,19 +105,17 @@ class Scope2CreateMixin(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-<<<<<<< HEAD
-        context["model_verbose_name"] = self.model._meta.verbose_name
-=======
 
         # Generuje nazwę snake_case z modelu
         model_name_camel = self.model.__name__
-        model_name_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', model_name_camel).lower()
+        model_name_snake = re.sub(r"(?<!^)(?=[A-Z])", "_", model_name_camel).lower()
 
-        context.update({
-            'model_verbose_name': self.model._meta.verbose_name,
-            'list_url_name': f'emissions:{model_name_snake}_list',  # Potrzebne do przycisku "Anuluj"
-        })
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+        context.update(
+            {
+                "model_verbose_name": self.model._meta.verbose_name,
+                "list_url_name": f"emissions:{model_name_snake}_list",  # Potrzebne do przycisku "Anuluj"
+            }
+        )
         return context
 
 
@@ -132,26 +130,16 @@ class Scope2ListMixin(ListView):
     default_sort = "-year"
 
     def get_queryset(self):
-<<<<<<< HEAD
-        qs = (
-            self.model.objects.all()
-            .select_related("company")
-            .order_by(self.default_sort)
-        )
-
-        self.current_sort = self.request.GET.get("sort", self.default_sort)
-        self.current_year = self.request.GET.get("year", "")
-        self.current_company = self.request.GET.get("company", "")
-=======
         # Pobieramy bazowy QuerySet z bazy danych
-        qs = self.model.objects.all().select_related('company')
+        qs = self.model.objects.all().select_related("company")
 
         # Pobieramy parametry z paska adresu (GET)
-        self.default_sort = "-year" if not hasattr(self, 'default_sort') else self.default_sort
-        self.current_sort = self.request.GET.get('sort', self.default_sort)
-        self.current_year = self.request.GET.get('year', '').strip()
-        self.current_company = self.request.GET.get('company', '').strip()
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+        self.default_sort = (
+            "-year" if not hasattr(self, "default_sort") else self.default_sort
+        )
+        self.current_sort = self.request.GET.get("sort", self.default_sort)
+        self.current_year = self.request.GET.get("year", "").strip()
+        self.current_company = self.request.GET.get("company", "").strip()
 
         # 1. Filtrowanie roku (jeśli wpisany)
         if self.current_year:
@@ -167,57 +155,42 @@ class Scope2ListMixin(ListView):
     def get_context_data(self, **kwargs):
         # 1. Pobieramy bazowy kontekst
         context = super().get_context_data(**kwargs)
-<<<<<<< HEAD
-        context.update(
-            {
-                "model_verbose_name": self.model._meta.verbose_name,
-                "model_verbose_name_plural": self.model._meta.verbose_name_plural,
-                "current_sort": self.current_sort,
-                "current_year": self.current_year,
-                "current_company": self.current_company,
-                "add_url_name": f"emissions:{self.model._meta.model_name}-add",
-                "edit_url_name": f"emissions:{self.model._meta.model_name}-edit",
-                "delete_url_name": f"emissions:{self.model._meta.model_name}-delete",
-            }
-        )
-=======
 
         # 2. Wyciągamy wartości filtrów
-        company_val = self.request.GET.get('company', '').strip()
-        year_val = self.request.GET.get('year', '').strip()
+        company_val = self.request.GET.get("company", "").strip()
+        year_val = self.request.GET.get("year", "").strip()
 
-        context['filter_company'] = company_val
-        context['filter_year'] = year_val
+        context["filter_company"] = company_val
+        context["filter_year"] = year_val
 
         # 3. Ustalamy rdzeń nazwy URL na podstawie modelu
         model_name = self.model.__name__
-        if model_name == 'EnergyConsumption':
+        if model_name == "EnergyConsumption":
             base_url = "energy_consumption"
-        elif model_name == 'EnergyPurchased':
+        elif model_name == "EnergyPurchased":
             base_url = "energy_purchased"
-        elif model_name == 'EnergyProduced':
+        elif model_name == "EnergyProduced":
             base_url = "energy_produced"
-        elif model_name == 'EnergySold':
+        elif model_name == "EnergySold":
             base_url = "energy_sold"
         else:
             base_url = self.model._meta.model_name
 
         # 4. NADPISUJEMY BEZWARUNKOWO – bez żadnych "if"
-        context['add_url_name'] = f"emissions:{base_url}_add"
-        context['template_url_name'] = f"emissions:{base_url}_template"
-        context['import_url_name'] = f"emissions:{base_url}_import"
-        context['list_url_name'] = f"emissions:{base_url}_list"
-        context['edit_url_name'] = f"emissions:{base_url}_edit"
-        context['delete_url_name'] = f"emissions:{base_url}_delete"
+        context["add_url_name"] = f"emissions:{base_url}_add"
+        context["template_url_name"] = f"emissions:{base_url}_template"
+        context["import_url_name"] = f"emissions:{base_url}_import"
+        context["list_url_name"] = f"emissions:{base_url}_list"
+        context["edit_url_name"] = f"emissions:{base_url}_edit"
+        context["delete_url_name"] = f"emissions:{base_url}_delete"
 
         # 5. Mapowanie na zmienną records dla pętli w HTML
-        context['records'] = context['object_list']
+        context["records"] = context["object_list"]
 
-        if context.get('is_paginated'):
-            paginator = context['paginator']
-            context['page_range'] = paginator.page_range
+        if context.get("is_paginated"):
+            paginator = context["paginator"]
+            context["page_range"] = paginator.page_range
 
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
         return context
 
     def get(self, request, *args, **kwargs):
@@ -277,31 +250,19 @@ class EnergyConsumptionListView(Scope2ListMixin):
 class EnergyConsumptionCreateView(Scope2CreateMixin, CreateView):
     model = EnergyConsumption
     form_class = EnergyConsumptionForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_consumption_list")
-=======
-    success_url = reverse_lazy('emissions:energy_consumption_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_consumption_list")
 
 
 class EnergyConsumptionUpdateView(Scope2CreateMixin, UpdateView):
     model = EnergyConsumption
     form_class = EnergyConsumptionForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_consumption_list")
-=======
-    success_url = reverse_lazy('emissions:energy_consumption_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_consumption_list")
 
 
 class EnergyConsumptionDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergyConsumption
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_consumption_list")
-=======
     template_name = "emissions/energy_consumption_confirm_delete.html"
-    success_url = reverse_lazy('emissions:energy_consumption_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_consumption_list")
 
 
 # ===== ENERGY PURCHASED =====
@@ -317,30 +278,18 @@ class EnergyPurchasedListView(Scope2ListMixin):
 class EnergyPurchasedCreateView(Scope2CreateMixin, CreateView):
     model = EnergyPurchased
     form_class = EnergyPurchasedForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_purchased_list")
-=======
-    success_url = reverse_lazy('emissions:energy_purchased_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_purchased_list")
 
 
 class EnergyPurchasedUpdateView(Scope2CreateMixin, UpdateView):
     model = EnergyPurchased
     form_class = EnergyPurchasedForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_purchased_list")
-=======
-    success_url = reverse_lazy('emissions:energy_purchased_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_purchased_list")
 
 
 class EnergyPurchasedDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergyPurchased
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_purchased_list")
-=======
-    success_url = reverse_lazy('emissions:energy_purchased_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_purchased_list")
 
 
 # ===== ENERGY PRODUCED =====
@@ -356,30 +305,18 @@ class EnergyProducedListView(Scope2ListMixin):
 class EnergyProducedCreateView(Scope2CreateMixin, CreateView):
     model = EnergyProduced
     form_class = EnergyProducedForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_produced_list")
-=======
-    success_url = reverse_lazy('emissions:energy_produced_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_produced_list")
 
 
 class EnergyProducedUpdateView(Scope2CreateMixin, UpdateView):
     model = EnergyProduced
     form_class = EnergyProducedForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_produced_list")
-=======
-    success_url = reverse_lazy('emissions:energy_produced_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_produced_list")
 
 
 class EnergyProducedDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergyProduced
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_produced_list")
-=======
-    success_url = reverse_lazy('emissions:energy_produced_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_produced_list")
 
 
 # ===== ENERGY SOLD =====
@@ -395,30 +332,18 @@ class EnergySoldListView(Scope2ListMixin):
 class EnergySoldCreateView(Scope2CreateMixin, CreateView):
     model = EnergySold
     form_class = EnergySoldForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_sold_list")
-=======
-    success_url = reverse_lazy('emissions:energy_sold_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_sold_list")
 
 
 class EnergySoldUpdateView(Scope2CreateMixin, UpdateView):
     model = EnergySold
     form_class = EnergySoldForm
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_sold_list")
-=======
-    success_url = reverse_lazy('emissions:energy_sold_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_sold_list")
 
 
 class EnergySoldDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergySold
-<<<<<<< HEAD
-    success_url = reverse_lazy("energy_sold_list")
-=======
-    success_url = reverse_lazy('emissions:energy_sold_list')
->>>>>>> d07e3738577a5e6ac6102e31c9bb8c21d90714b5
+    success_url = reverse_lazy("emissions:energy_sold_list")
 
 
 class Scope1CreateMixin(LoginRequiredMixin):
@@ -452,11 +377,11 @@ class Scope1CreateMixin(LoginRequiredMixin):
             try:
                 db_instance = self.model.objects.get(pk=instance.pk)
                 for field_name in (
-                        "calculated_emission_tco2eq",
-                        "applied_factor_value",
-                        "applied_factor_unit",
-                        "applied_converter_value",
-                        "applied_converter_unit",
+                    "calculated_emission_tco2eq",
+                    "applied_factor_value",
+                    "applied_factor_unit",
+                    "applied_converter_value",
+                    "applied_converter_unit",
                 ):
                     setattr(
                         instance, field_name, getattr(db_instance, field_name, None)
@@ -553,6 +478,8 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
                 "add_url_name": f"emissions:{self.model._meta.model_name}-add",
                 "edit_url_name": f"emissions:{self.model._meta.model_name}-edit",
                 "delete_url_name": f"emissions:{self.model._meta.model_name}-delete",
+                "import_url_name": f"emissions:{self.model._meta.model_name}-import",
+                "template_url_name": f"emissions:{self.model._meta.model_name}-template",
             }
         )
         query_params = self.request.GET.copy()
@@ -732,26 +659,26 @@ class EmissionFactorListView(LoginRequiredMixin, ListView):
 
         for model in [StationaryCombustion, MobileCombustion]:
             for year, factor_name in model.objects.values_list(
-                    "year", "fuel"
+                "year", "fuel"
             ).distinct():
                 if year and factor_name:
                     required.add((safe_int(year), str(factor_name).strip()))
 
         for year, factor_name in ProcessEmission.objects.values_list(
-                "year", "process"
+            "year", "process"
         ).distinct():
             if year and factor_name:
                 required.add((safe_int(year), str(factor_name).strip()))
 
         for year, factor_name in FugitiveEmission.objects.values_list(
-                "year", "product"
+            "year", "product"
         ).distinct():
             if year and factor_name:
                 required.add((safe_int(year), str(factor_name).strip()))
 
         for model in [EnergyConsumption, EnergyPurchased, EnergyProduced, EnergySold]:
             for year, factor_name in model.objects.values_list(
-                    "year", "energy_type"
+                "year", "energy_type"
             ).distinct():
                 if year and factor_name:
                     required.add((safe_int(year), str(factor_name).strip()))
@@ -773,8 +700,8 @@ class EmissionFactorListView(LoginRequiredMixin, ListView):
         self.show_missing = self.request.GET.get("status") == "missing"
 
         if self.show_missing and (
-                self.request.user.is_superuser
-                or getattr(self.request.user, "role", "") == "admin"
+            self.request.user.is_superuser
+            or getattr(self.request.user, "role", "") == "admin"
         ):
             missing_set = self.get_missing_factors()
             virtual_factors = []
@@ -783,8 +710,8 @@ class EmissionFactorListView(LoginRequiredMixin, ListView):
                 if self.current_year and str(year) != self.current_year:
                     continue
                 if (
-                        self.current_search
-                        and self.current_search.lower() not in name.lower()
+                    self.current_search
+                    and self.current_search.lower() not in name.lower()
                 ):
                     continue
 
@@ -810,8 +737,8 @@ class EmissionFactorListView(LoginRequiredMixin, ListView):
         context["current_search"] = self.current_search
         context["show_missing"] = self.show_missing
         context["is_admin"] = (
-                self.request.user.is_superuser
-                or getattr(self.request.user, "role", "") == "admin"
+            self.request.user.is_superuser
+            or getattr(self.request.user, "role", "") == "admin"
         )
 
         query_params = self.request.GET.copy()

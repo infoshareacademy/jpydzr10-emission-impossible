@@ -1,40 +1,114 @@
 from django.urls import path
-from . import views
 
-app_name = 'emissions'
+from . import views
+from . import views_import as import_views
+
+app_name = "emissions"
 
 urlpatterns = [
-    # Energy Consumption
-    path('energia/', views.EnergyConsumptionListView.as_view(), name='energy_consumption_list'),
-    path('energia/dodaj/', views.EnergyConsumptionCreateView.as_view(), name='energy_consumption_add'),
-    path('energia/edytuj/<int:pk>/', views.EnergyConsumptionUpdateView.as_view(), name='energy_consumption_edit'),
-    path('energia/usun/<int:pk>/', views.EnergyConsumptionDeleteView.as_view(), name='energy_consumption_delete'),
-
-    # Energy Purchased
-    path('energia-zakupiona/', views.EnergyPurchasedListView.as_view(), name='energy_purchased_list'),
-    path('energia-zakupiona/dodaj/', views.EnergyPurchasedCreateView.as_view(), name='energy_purchased_add'),
-    path('energia-zakupiona/edytuj/<int:pk>/', views.EnergyPurchasedUpdateView.as_view(), name='energy_purchased_edit'),
-    path('energia-zakupiona/usun/<int:pk>/', views.EnergyPurchasedDeleteView.as_view(), name='energy_purchased_delete'),
-
-    # Energy Produced
-    path('energia-wyprodukowana/', views.EnergyProducedListView.as_view(), name='energy_produced_list'),
-    path('energia-wyprodukowana/dodaj/', views.EnergyProducedCreateView.as_view(), name='energy_produced_add'),
-    path('energia-wyprodukowana/edytuj/<int:pk>/', views.EnergyProducedUpdateView.as_view(),
-         name='energy_produced_edit'),
-    path('energia-wyprodukowana/usun/<int:pk>/', views.EnergyProducedDeleteView.as_view(),
-         name='energy_produced_delete'),
-
-    # Energy Sold
-    path('energia-sprzedana/', views.EnergySoldListView.as_view(), name='energy_sold_list'),
-    path('energia-sprzedana/dodaj/', views.EnergySoldCreateView.as_view(), name='energy_sold_add'),
-    path('energia-sprzedana/edytuj/<int:pk>/', views.EnergySoldUpdateView.as_view(), name='energy_sold_edit'),
-    path('energia-sprzedana/usun/<int:pk>/', views.EnergySoldDeleteView.as_view(), name='energy_sold_delete'),
-
-    # DASHBOARD
+    # =========================================================================
+    # SCOPE 2 — Zużycie energii (Energy Consumption)
+    # =========================================================================
     path(
-        "<int:company_id>/dashboard/", views.DashboardView.as_view(), name="dashboard"
+        "energia/",
+        views.EnergyConsumptionListView.as_view(),
+        name="energy_consumption_list",
     ),
-    # SPALANIE STACJONARNE (Stationary Combustion)
+    path(
+        "energia/dodaj/",
+        views.EnergyConsumptionCreateView.as_view(),
+        name="energy_consumption_add",
+    ),
+    path(
+        "energia/edytuj/<int:pk>/",
+        views.EnergyConsumptionUpdateView.as_view(),
+        name="energy_consumption_edit",
+    ),
+    path(
+        "energia/usun/<int:pk>/",
+        views.EnergyConsumptionDeleteView.as_view(),
+        name="energy_consumption_delete",
+    ),
+    # =========================================================================
+    # SCOPE 2 — Zakupiona energia (Energy Purchased)
+    # =========================================================================
+    path(
+        "energia-zakupiona/",
+        views.EnergyPurchasedListView.as_view(),
+        name="energy_purchased_list",
+    ),
+    path(
+        "energia-zakupiona/dodaj/",
+        views.EnergyPurchasedCreateView.as_view(),
+        name="energy_purchased_add",
+    ),
+    path(
+        "energia-zakupiona/edytuj/<int:pk>/",
+        views.EnergyPurchasedUpdateView.as_view(),
+        name="energy_purchased_edit",
+    ),
+    path(
+        "energia-zakupiona/usun/<int:pk>/",
+        views.EnergyPurchasedDeleteView.as_view(),
+        name="energy_purchased_delete",
+    ),
+    # =========================================================================
+    # SCOPE 2 — Wyprodukowana energia (Energy Produced)
+    # =========================================================================
+    path(
+        "energia-wyprodukowana/",
+        views.EnergyProducedListView.as_view(),
+        name="energy_produced_list",
+    ),
+    path(
+        "energia-wyprodukowana/dodaj/",
+        views.EnergyProducedCreateView.as_view(),
+        name="energy_produced_add",
+    ),
+    path(
+        "energia-wyprodukowana/edytuj/<int:pk>/",
+        views.EnergyProducedUpdateView.as_view(),
+        name="energy_produced_edit",
+    ),
+    path(
+        "energia-wyprodukowana/usun/<int:pk>/",
+        views.EnergyProducedDeleteView.as_view(),
+        name="energy_produced_delete",
+    ),
+    # =========================================================================
+    # SCOPE 2 — Sprzedana energia (Energy Sold)
+    # =========================================================================
+    path(
+        "energia-sprzedana/",
+        views.EnergySoldListView.as_view(),
+        name="energy_sold_list",
+    ),
+    path(
+        "energia-sprzedana/dodaj/",
+        views.EnergySoldCreateView.as_view(),
+        name="energy_sold_add",
+    ),
+    path(
+        "energia-sprzedana/edytuj/<int:pk>/",
+        views.EnergySoldUpdateView.as_view(),
+        name="energy_sold_edit",
+    ),
+    path(
+        "energia-sprzedana/usun/<int:pk>/",
+        views.EnergySoldDeleteView.as_view(),
+        name="energy_sold_delete",
+    ),
+    # =========================================================================
+    # DASHBOARD
+    # =========================================================================
+    path(
+        "<int:company_id>/dashboard/",
+        views.DashboardView.as_view(),
+        name="dashboard",
+    ),
+    # =========================================================================
+    # SCOPE 1 — Spalanie stacjonarne (Stationary Combustion)
+    # =========================================================================
     path(
         "company/<int:company_id>/stationary/",
         views.StationaryCombustionListView.as_view(),
@@ -55,7 +129,20 @@ urlpatterns = [
         views.StationaryCombustionDeleteView.as_view(),
         name="stationarycombustion-delete",
     ),
-    # SPALANIE MOBILNE (Mobile Combustion)
+    # Szablon + Import — Spalanie stacjonarne
+    path(
+        "company/<int:company_id>/stationary/szablon/",
+        import_views.StationaryCombustionTemplateDownloadView.as_view(),
+        name="stationarycombustion-template",
+    ),
+    path(
+        "company/<int:company_id>/stationary/importuj/",
+        import_views.StationaryCombustionImportView.as_view(),
+        name="stationarycombustion-import",
+    ),
+    # =========================================================================
+    # SCOPE 1 — Spalanie mobilne (Mobile Combustion)
+    # =========================================================================
     path(
         "company/<int:company_id>/mobile/",
         views.MobileCombustionListView.as_view(),
@@ -76,7 +163,20 @@ urlpatterns = [
         views.MobileCombustionDeleteView.as_view(),
         name="mobilecombustion-delete",
     ),
-    # EMISJA PROCESOWA (Process Emission)
+    # Szablon + Import — Spalanie mobilne
+    path(
+        "company/<int:company_id>/mobile/szablon/",
+        import_views.MobileCombustionTemplateDownloadView.as_view(),
+        name="mobilecombustion-template",
+    ),
+    path(
+        "company/<int:company_id>/mobile/importuj/",
+        import_views.MobileCombustionImportView.as_view(),
+        name="mobilecombustion-import",
+    ),
+    # =========================================================================
+    # SCOPE 1 — Emisje procesowe (Process Emission)
+    # =========================================================================
     path(
         "company/<int:company_id>/process/",
         views.ProcessEmissionListView.as_view(),
@@ -97,7 +197,20 @@ urlpatterns = [
         views.ProcessEmissionDeleteView.as_view(),
         name="processemission-delete",
     ),
-    # EMISJA NIEZORGANIZOWANA (Fugitive Emission)
+    # Szablon + Import — Emisje procesowe
+    path(
+        "company/<int:company_id>/process/szablon/",
+        import_views.ProcessEmissionTemplateDownloadView.as_view(),
+        name="processemission-template",
+    ),
+    path(
+        "company/<int:company_id>/process/importuj/",
+        import_views.ProcessEmissionImportView.as_view(),
+        name="processemission-import",
+    ),
+    # =========================================================================
+    # SCOPE 1 — Emisje niezorganizowane (Fugitive Emission)
+    # =========================================================================
     path(
         "company/<int:company_id>/fugitive/",
         views.FugitiveEmissionListView.as_view(),
@@ -118,7 +231,20 @@ urlpatterns = [
         views.FugitiveEmissionDeleteView.as_view(),
         name="fugitiveemission-delete",
     ),
-    # --- SŁOWNIK WSKAŹNIKÓW EMISJI ---
+    # Szablon + Import — Emisje niezorganizowane
+    path(
+        "company/<int:company_id>/fugitive/szablon/",
+        import_views.FugitiveEmissionTemplateDownloadView.as_view(),
+        name="fugitiveemission-template",
+    ),
+    path(
+        "company/<int:company_id>/fugitive/importuj/",
+        import_views.FugitiveEmissionImportView.as_view(),
+        name="fugitiveemission-import",
+    ),
+    # =========================================================================
+    # SŁOWNIK — Wskaźniki emisji (Emission Factors)
+    # =========================================================================
     path("factors/", views.EmissionFactorListView.as_view(), name="factor-list"),
     path("factors/add/", views.EmissionFactorCreateView.as_view(), name="factor-add"),
     path(
@@ -131,20 +257,47 @@ urlpatterns = [
         views.EmissionFactorDeleteView.as_view(),
         name="factor-delete",
     ),
-
-    # Energy Consumption Import
-    path('energia/szablon/', views.EnergyConsumptionTemplateDownloadView.as_view(), name='energy_consumption_template'),
-    path('energia/importuj/', views.EnergyConsumptionImportView.as_view(), name='energy_consumption_import'),
-
-    # Energy Purchased Import
-    path('energia-zakupiona/szablon/', views.EnergyPurchasedTemplateDownloadView.as_view(), name='energy_purchased_template'),
-    path('energia-zakupiona/importuj/', views.EnergyPurchasedImportView.as_view(), name='energy_purchased_import'),
-
-    # Energy Produced Import
-    path('energia-wyprodukowana/szablon/', views.EnergyProducedTemplateDownloadView.as_view(), name='energy_produced_template'),
-    path('energia-wyprodukowana/importuj/', views.EnergyProducedImportView.as_view(), name='energy_produced_import'),
-
-    # Energy Sold Import
-    path('energia-sprzedana/szablon/', views.EnergySoldTemplateDownloadView.as_view(), name='energy_sold_template'),
-    path('energia-sprzedana/importuj/', views.EnergySoldImportView.as_view(), name='energy_sold_import'),
+    # =========================================================================
+    # SCOPE 2 — Import i szablony (istniejące)
+    # =========================================================================
+    path(
+        "energia/szablon/",
+        views.EnergyConsumptionTemplateDownloadView.as_view(),
+        name="energy_consumption_template",
+    ),
+    path(
+        "energia/importuj/",
+        views.EnergyConsumptionImportView.as_view(),
+        name="energy_consumption_import",
+    ),
+    path(
+        "energia-zakupiona/szablon/",
+        views.EnergyPurchasedTemplateDownloadView.as_view(),
+        name="energy_purchased_template",
+    ),
+    path(
+        "energia-zakupiona/importuj/",
+        views.EnergyPurchasedImportView.as_view(),
+        name="energy_purchased_import",
+    ),
+    path(
+        "energia-wyprodukowana/szablon/",
+        views.EnergyProducedTemplateDownloadView.as_view(),
+        name="energy_produced_template",
+    ),
+    path(
+        "energia-wyprodukowana/importuj/",
+        views.EnergyProducedImportView.as_view(),
+        name="energy_produced_import",
+    ),
+    path(
+        "energia-sprzedana/szablon/",
+        views.EnergySoldTemplateDownloadView.as_view(),
+        name="energy_sold_template",
+    ),
+    path(
+        "energia-sprzedana/importuj/",
+        views.EnergySoldImportView.as_view(),
+        name="energy_sold_import",
+    ),
 ]

@@ -106,7 +106,7 @@ Impossible{% endblock %} {% block content %}
   </a>
 
   <!-- Przeliczniki -->
-  <a href="#" class="flex flex-col items-center gap-4 group">
+  <a href="{% url 'calculator:dashboard' %}" class="flex flex-col items-center gap-4 group">
     <div
       class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
       style="
