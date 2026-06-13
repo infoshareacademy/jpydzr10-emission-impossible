@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "tailwind",
     "theme",
     "widget_tweaks",
+"communications.apps.CommunicationsConfig",
 ]
 
 SITE_ID = 1
