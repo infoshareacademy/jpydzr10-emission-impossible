@@ -1,4 +1,6 @@
 from core.views import HomeView
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -14,4 +16,4 @@ urlpatterns = [
     path("ai/", include("ai_services.urls")),
     path("calculator/", include("calculator.urls")),
     path("communications/", include("communications.urls")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
