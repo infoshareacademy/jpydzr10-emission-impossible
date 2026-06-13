@@ -54,13 +54,11 @@ urlpatterns = [
         views.CompanyUsersListView.as_view(),
         name="company-users-list",
     ),
-    # Odpięcie użytkownika od spółki (POST)
     path(
         "permisions/<int:pk>/usun/",
         views.RemoveUserFromCompanyView.as_view(),
         name="permission-remove",
     ),
-    # Dezaktywacja konta (POST)
     path(
         "users/<int:pk>/dezaktywuj/",
         views.DeactivateUserView.as_view(),

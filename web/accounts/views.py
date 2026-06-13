@@ -80,6 +80,7 @@ class ProfileEditView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 User = get_user_model()
 
+
 def _is_admin(user) -> bool:
     return user.is_superuser or getattr(user, "role", "") == "admin"
 

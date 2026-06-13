@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Nowe Zapytanie - Komunikacja{% endblock %}
+
+{% block content %}
+    <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+            <a href="{% url 'communications:thread_list' %}" class="flex items-center gap-2 text-text-muted hover:text-accent font-mono text-sm transition-colors mb-4">
+                <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span> Anuluj
+            </a>
+            <h1 class="text-3xl font-heading font-bold tracking-wide text-text-main">Nowe zapytanie</h1>
+            <p class="text-text-muted font-mono text-sm mt-1">Rozpocznij nowy wątek komunikacji dla wybranej spółki. System powiadomi odpowiednie osoby e-mailem.</p>
+        </div>
+
+        <div class="bg-[rgba(42,63,74,0.4)] border border-border-subtle rounded-xl p-8">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-xs font-mono text-text-muted mb-2 uppercase tracking-wider">Spółka</label>
+                        {{ form.company }}
+                        <p class="text-xs text-text-muted mt-1 opacity-70">Wybierz spółkę, której dotyczy problem.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-text-muted mb-2 uppercase tracking-wider">Kategoria</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-mono text-text-muted mb-2 uppercase tracking-wider">Temat zapytania</label>
+                    {{ form.subject }}
+                </div>
+
+                <div class="mb-8">
+                    <label class="block text-xs font-mono text-text-muted mb-2 uppercase tracking-wider">Treść wiadomości (Opis problemu)</label>
+                    {{ form.first_message }}
+                </div>
+
+                <div class="flex justify-end gap-4 border-t border-border-subtle pt-6">
+                    <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-accent text-bg rounded-xl font-bold font-mono text-sm uppercase tracking-wider hover:bg-[#a0d020] transition-colors shadow-[0_0_15px_rgba(200,245,53,0.2)]">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">send</span> Utwórz zgłoszenie
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

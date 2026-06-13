@@ -1,6 +1,9 @@
+import datetime
+
 from accounts.models import CustomUser
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -8,6 +11,16 @@ from django.views.generic import (
     DetailView,
     ListView,
     UpdateView,
+)
+from emissions.models import (
+    EnergyConsumption,
+    EnergyProduced,
+    EnergyPurchased,
+    EnergySold,
+    FugitiveEmission,
+    MobileCombustion,
+    ProcessEmission,
+    StationaryCombustion,
 )
 
 from companies.forms import CompaniesForm
@@ -41,6 +54,93 @@ class CompaniesListView(CompanyAccessMixin, ListView):
     model = Companies
     template_name = "companies/companies_list.html"
     context_object_name = "companies"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        # 1. Obsługa wyszukiwania tekstu
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(Q(name__icontains=query) | Q(nip__icontains=query))
+
+        try:
+            selected_year = int(
+                self.request.GET.get("year", datetime.datetime.now().year)
+            )
+        except ValueError:
+            selected_year = datetime.datetime.now().year
+
+        qs = qs.annotate(
+            has_stationary=Exists(
+                StationaryCombustion.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_mobile=Exists(
+                MobileCombustion.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_process=Exists(
+                ProcessEmission.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_fugitive=Exists(
+                FugitiveEmission.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_e_cons=Exists(
+                EnergyConsumption.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_e_purc=Exists(
+                EnergyPurchased.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_e_prod=Exists(
+                EnergyProduced.objects.filter(
+                    company=OuterRef("pk"), year=selected_year
+                )
+            ),
+            has_e_sold=Exists(
+                EnergySold.objects.filter(company=OuterRef("pk"), year=selected_year)
+            ),
+        )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        try:
+            selected_year = int(
+                self.request.GET.get("year", datetime.datetime.now().year)
+            )
+        except ValueError:
+            selected_year = datetime.datetime.now().year
+
+        context["selected_year"] = selected_year
+
+        for company in context["companies"]:
+            filled_tables = sum(
+                [
+                    company.has_stationary,
+                    company.has_mobile,
+                    company.has_process,
+                    company.has_fugitive,
+                    company.has_e_cons,
+                    company.has_e_purc,
+                    company.has_e_prod,
+                    company.has_e_sold,
+                ]
+            )
+            company.completion_percentage = int((filled_tables / 8) * 100)
+
+        return context
 
 
 class CompaniesDetailView(CompanyAccessMixin, DetailView):
