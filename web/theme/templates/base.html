@@ -29,6 +29,13 @@
       .dropdown-card:hover {
         background: rgba(42, 63, 74, 1);
       }
+
+      .admin-text { display: none; }
+.admin-icon { display: block; }
+@media (min-width: 768px) {
+  .admin-text { display: inline; }
+  .admin-icon { display: none; }
+}
     </style>
     {% block extra_head %}{% endblock %}
   </head>
@@ -43,7 +50,7 @@
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         <!-- Logo -->
-        <a href="{% url 'home' %}" class="mr-2">
+        <a href="{% url 'home' %}" class="mr-2 flex-shrink-0">
           <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px; padding:4px 0;"/>
         </a>
 
@@ -56,26 +63,26 @@
 
         <!-- Admin button -->
         {% if user.is_superuser or user.role == 'admin' %}
-        <a href="/admin/"
-          class="text-text-muted hover:text-accent transition-colors font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">
-          Panel Administratora
+        <a href="/admin/" class="text-text-muted hover:text-accent transition-colors" title="Panel Administratora">
+          <span class="admin-icon material-symbols-outlined" style="font-size:22px;">admin_panel_settings</span>
+          <span class="admin-text font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">Panel Administratora</span>
         </a>
         {% endif %}
 
         <!-- User -->
-       <div class="flex items-center gap-3">
-  <a href="{% url 'accounts:profile' %}"
-    style="width:36px; height:36px; border-radius:50%; border:1px solid rgba(200,245,53,0.3); overflow:hidden; display:flex; align-items:center; justify-content:center; background:#1d3a42;">
-    {% if user.avatar %}
-      <img src="{{ user.avatar.url }}" alt="avatar" style="width:100%; height:100%; object-fit:cover;"/>
-    {% else %}
-      <span class="material-symbols-outlined text-text-muted" style="font-size:20px; font-variation-settings:'FILL' 1;">account_circle</span>
-    {% endif %}
-  </a>
- <a href="{% url 'accounts:profile' %}" class="text-text-muted font-mono text-sm hover:text-text-main transition-colors">
-    {% if user.is_authenticated %}@{{ user.username }}{% else %}@Użytkownik{% endif %}
-  </a>
-</div>
+        <div class="flex items-center gap-3">
+          <a href="{% url 'accounts:profile' %}"
+            style="width:36px; height:36px; border-radius:50%; border:1px solid rgba(200,245,53,0.3); overflow:hidden; display:flex; align-items:center; justify-content:center; background:#1d3a42; flex-shrink:0;">
+            {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" alt="avatar" style="width:100%; height:100%; object-fit:cover;"/>
+            {% else %}
+              <span class="material-symbols-outlined text-text-muted" style="font-size:20px; font-variation-settings:'FILL' 1;">account_circle</span>
+            {% endif %}
+          </a>
+          <a href="{% url 'accounts:profile' %}" class="hidden md:block text-text-muted font-mono text-sm hover:text-text-main transition-colors">
+            {% if user.is_authenticated %}@{{ user.username }}{% else %}@Użytkownik{% endif %}
+          </a>
+        </div>
 
         <!-- Logout -->
         {% if user.is_authenticated %}
@@ -163,7 +170,7 @@
         <!-- Logo & copyright -->
         <div class="flex flex-col gap-3">
   <div>
-    <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px;"/>
+    <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px; width:120px; min-width:120px; padding:4px 0; object-fit:contain; object-position:left;"/>
   </div>
   <p class="font-mono text-xs text-text-muted">© 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.</p>
 </div>
