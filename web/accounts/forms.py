@@ -34,6 +34,9 @@ class UserProfileForm(forms.ModelForm):
             "phone_number": "Numer telefonu",
             "avatar": "Zdjęcie profilowe",
         }
+        widgets = {
+            "avatar": forms.FileInput(),
+        }
         help_texts = {
             "email": "Wymagany poprawny format adresu do powiadomień systemowych.",
         }
