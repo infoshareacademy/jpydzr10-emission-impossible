@@ -151,7 +151,7 @@
         {% endif %}
       </div>
       {% if is_admin %}
-      <a href="/admin/auth/user/{{ admin.pk }}/change/" class="flex-shrink-0 text-text-muted hover:text-text-main transition-colors" title="Edytuj">
+      <a href="/admin/accounts/customuser/{{ admin.pk }}/change/" class="flex-shrink-0 text-text-muted hover:text-text-main transition-colors" title="Edytuj">
         <span class="material-symbols-outlined" style="font-size:18px">edit</span>
       </a>
       {% endif %}
@@ -308,7 +308,7 @@
                     style="background:rgba(255,255,255,.05); border:1px solid #2a3f4a;">
                     <span class="material-symbols-outlined" style="font-size:15px">tune</span>
                   </a>
-                  <a href="/admin/auth/user/{{ u.pk }}/change/"
+                  <a href="/admin/accounts/customuser/{{ u.pk }}/change/"
                     class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-text-muted hover:text-text-main transition-colors"
                     style="background:rgba(255,255,255,.05); border:1px solid #2a3f4a;">
                     <span class="material-symbols-outlined" style="font-size:15px">manage_accounts</span>
