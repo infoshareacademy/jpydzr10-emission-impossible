@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView
 
 from .forms import FuelSpecForm, FuelTypeForm, SupplierForm
 from .models import FuelSpec, FuelType, Supplier
@@ -19,7 +19,7 @@ class FuelTypeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        form.instance.company = getattr(self.request.user, 'company', None)
+        form.instance.company = getattr(self.request.user, "company", None)
         return super().form_valid(form)
 
 
@@ -58,3 +58,9 @@ class ConvertersDashboardView(LoginRequiredMixin, TemplateView):
             .order_by("fuel_type__name")
         )
         return context
+
+
+class FuelSpecListView(LoginRequiredMixin, ListView):
+    model = FuelSpec
+    template_name = "calculator/fuelspec_list.html"
+    context_object_name = "fuel_specs"

@@ -3,8 +3,10 @@ from django.urls import path
 from .views import (
     ReductionTargetCreateView,
     ReductionTargetDeleteView,
+    ReductionTargetDetailView,
     ReductionTargetListView,
     ReductionTargetUpdateView,
+    SimulationDashboardView,
 )
 
 app_name = "what_if"
@@ -29,5 +31,15 @@ urlpatterns = [
         "reduction-targets/<int:pk>/delete/",
         ReductionTargetDeleteView.as_view(),
         name="reduction-target-delete",
+    ),
+    path(
+        "simulation/",
+        SimulationDashboardView.as_view(),
+        name="simulation",
+    ),
+    path(
+        "reduction-targets/<int:pk>/",
+        ReductionTargetDetailView.as_view(),
+        name="reduction-target-detail",
     ),
 ]
