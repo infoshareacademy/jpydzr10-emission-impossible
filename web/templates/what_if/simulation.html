@@ -1,307 +1,269 @@
 {% extends "base.html" %}
 
-{% block extra_head %}
-    <style>
-        .custom-input {
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(200, 245, 53, 0.2) !important;
-            border-radius: 8px !important;
-            color: #e8f4f0 !important;
-            font-family: "Roboto Mono", monospace !important;
-            padding: 10px 14px !important;
-            outline: none !important;
-            width: 100%;
-        }
-        .custom-input:focus { border-color: rgba(200, 245, 53, 0.5) !important; }
+{% block title %}Symulator What-If — Emission Impossible{% endblock %}
 
-        @media print {
-            @page {
-                size: landscape;
-                margin: 8mm;
-            }
-            .no-print, nav, footer, aside, .px-6.py-2.5.border, button[type="submit"] {
-                display: none !important;
-            }
-            body {
-                background-color: #0d131a !important;
-                color: #e8f4f0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .max-w-7xl {
-                max-width: 100% !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .bg-\[rgba\(42\,63\,74\,0\.3\)\] {
-                background-color: #16222f !important;
-                border: 1px solid rgba(200, 245, 53, 0.15) !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                margin-bottom: 1.5rem !important;
-            }
-            .custom-input, select, input {
-                background-color: rgba(255, 255, 255, 0.02) !important;
-                color: #e8f4f0 !important;
-                border: 1px solid rgba(200, 245, 53, 0.3) !important;
-            }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_head %}
+<style>
+  .custom-input {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: "Roboto Mono", monospace !important;
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    outline: none !important;
+    width: 100%;
+    transition: border-color 0.2s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237ab5ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 2.5rem !important;
+  }
+  input.custom-input {
+    background-image: none !important;
+    padding-right: 14px !important;
+  }
+  .custom-input:focus { border-color: rgba(200,245,53,0.5) !important; }
+  .custom-input option { background: #151c27; color: #e8f4f0; }
+
+  @media print {
+    @page { size: landscape; margin: 8mm; }
+    .no-print, nav, footer { display: none !important; }
+    body { background-color: #0d131a !important; color: #e8f4f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .max-w-7xl { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto space-y-6">
 
-    <div class="flex justify-between items-center no-print">
-        <a href="{% url 'what_if:reduction-target-list' %}" class="text-xs font-mono uppercase text-text-muted hover:text-accent transition-colors flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px]">arrow_back</span> Powrót do listy celów
-        </a>
-
-        {% if actual.total > 0 %}
-            <button type="button" onclick="window.print()" class="px-4 py-2 bg-[rgba(255,255,255,0.05)] border border-accent/30 text-accent font-mono text-xs uppercase rounded-lg hover:bg-accent hover:text-bg transition-all flex items-center gap-2 shadow-sm">
-                <span class="material-symbols-outlined text-sm">print</span> Zapisz całą stronę jako PDF
-            </button>
-        {% endif %}
-    </div>
-
-    <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg">
-
-        <div class="mb-4 border-b border-border-subtle pb-4 flex justify-between items-center">
-            <h2 class="text-xl font-heading font-bold text-text-main tracking-wide flex items-center gap-2">
-                <span class="material-symbols-outlined text-accent">science</span> Symulator Transformacji (What-If)
-            </h2>
-            <span class="hidden border border-accent/40 text-accent px-3 py-1 rounded font-mono text-xs uppercase font-bold tracking-widest">Dokument Symulacyjny</span>
-        </div>
-
-        {% if form.errors %}
-            <div class="bg-red-900/20 border border-red-500/30 rounded-xl p-4 mb-6 no-print">
-                <div class="flex items-center gap-2 text-red-400 font-bold mb-2 font-mono text-sm uppercase">
-                    <span class="material-symbols-outlined text-base">error</span>
-                    Odrzucono symulację - popraw poniższe błędy:
-                </div>
-                <ul class="list-disc list-inside text-xs font-mono text-red-300 space-y-1">
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        <form method="GET" action="{% url 'what_if:simulation' %}" class="space-y-6" novalidate>
-            <div class="w-full lg:w-1/3 flex flex-col gap-2">
-                <label class="font-mono text-xs uppercase tracking-widest text-text-muted">{{ form.company.label }}</label>
-                {{ form.company }}
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-4 bg-red-900/10 border border-red-500/20 rounded-xl space-y-4">
-                    <h3 class="font-mono text-sm uppercase text-red-400 font-bold mb-2">1. Co usuwamy z bilansu?</h3>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-mono text-xs uppercase text-text-muted">{{ form.current_factor.label }}</label>
-                        {{ form.current_factor }}
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-mono text-xs uppercase text-text-muted">{{ form.reduced_amount.label }}</label>
-                        {{ form.reduced_amount }}
-                        <span class="text-[10px] text-text-muted no-print">{{ form.reduced_amount.help_text }}</span>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-green-900/10 border border-green-500/20 rounded-xl space-y-4">
-                    <h3 class="font-mono text-sm uppercase text-green-400 font-bold mb-2">2. Czym to zastępujemy?</h3>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-mono text-xs uppercase text-text-muted">{{ form.new_factor.label }}</label>
-                        {{ form.new_factor }}
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-mono text-xs uppercase text-text-muted">{{ form.added_amount.label }}</label>
-                        {{ form.added_amount }}
-                        <span class="text-[10px] text-text-muted no-print">{{ form.added_amount.help_text }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between p-4 bg-[rgba(255,255,255,0.02)] border border-border-subtle rounded-xl">
-                <div class="text-sm font-mono text-text-muted uppercase">Szacowany wpływ na ślad węglowy:</div>
-                <div id="live-preview" class="text-xl font-heading font-bold text-text-main">-- tCO₂e</div>
-            </div>
-
-            <div class="flex justify-end gap-4 mt-2 no-print">
-                <a href="{% url 'what_if:simulation' %}" class="px-6 py-2.5 border border-border-subtle text-text-main font-mono text-sm rounded-xl hover:bg-[rgba(255,255,255,0.05)]">Resetuj</a>
-                <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl hover:brightness-110 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">play_arrow</span> Uruchom symulację
-                </button>
-            </div>
-        </form>
-    </div>
-
+  <!-- ===================== -->
+  <!-- HEADER -->
+  <!-- ===================== -->
+  <div class="flex justify-between items-center no-print">
+    <a href="{% url 'what_if:reduction-target-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Powrót do listy celów
+    </a>
     {% if actual.total > 0 %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <button type="button" onclick="window.print()"
+      class="inline-flex items-center gap-2 px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+      style="background:#1a4a52; border:1px solid #2a6a72;">
+      <span class="material-symbols-outlined" style="font-size:16px;">print</span> Zapisz jako PDF
+    </button>
+    {% endif %}
+  </div>
 
-        <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg flex flex-col justify-between space-y-6">
-            <div>
-                <h3 class="text-md font-mono uppercase tracking-wider text-text-muted mb-2">Rzeczywisty Stan (Przed zmianą)</h3>
-                <div class="text-3xl font-mono text-text-main mb-4">{{ actual.total|floatformat:2 }} <span class="text-sm text-text-muted">tCO₂e</span></div>
+  <!-- ===================== -->
+  <!-- SIMULATION FORM -->
+  <!-- ===================== -->
+  <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <div class="mb-6 pb-4 border-b border-border-subtle flex items-center gap-2">
+      <span class="material-symbols-outlined text-accent">science</span>
+      <h2 class="font-heading font-bold text-xl text-text-main tracking-wide">Symulator Transformacji (What-If)</h2>
+    </div>
 
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-[rgba(255,255,255,0.03)] border-b border-border-subtle font-mono text-xs uppercase tracking-widest text-text-muted">
-                        <tr>
-                            <th class="px-3 py-1.5 font-normal">Zakres funkcjonalny</th>
-                            <th class="px-3 py-1.5 font-normal text-right">Emisja (tCO₂e)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-xs font-sans text-text-main">
-                        {% for source_name, source_val in actual.sources.items %}
-                        <tr class="border-b border-border-subtle/50">
-                            <td class="px-3 py-2 text-text-muted">{{ source_name }}</td>
-                            <td class="px-3 py-2 text-right font-mono">{{ source_val|floatformat:2 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="border-t border-border-subtle/40 my-2"></div>
-
-            <div>
-                <h3 class="text-md font-mono uppercase tracking-wider text-accent mb-2">Szacowany Stan (Po zmianie)</h3>
-                {% if simulated %}
-                    <div class="text-3xl font-mono {% if simulated.difference < 0 %}text-green-400{% else %}text-red-400{% endif %} mb-2">
-                        {{ simulated.total|floatformat:2 }} <span class="text-sm text-text-muted">tCO₂e</span>
-                    </div>
-
-                    <div class="font-mono text-xs text-text-muted space-y-1.5 mt-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span>Wpływ netto na organizację:</span>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold {% if simulated.difference < 0 %}bg-green-900/40 text-green-400 border border-green-500/30{% else %}bg-red-900/40 text-red-400 border border-red-500/30{% endif %}">
-                                {% if simulated.difference > 0 %}+{% endif %}{{ simulated.difference|floatformat:2 }} tCO₂e
-                            </span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Zredukowano z bilansu ({{ simulated.current_factor_name }}):</span>
-                            <span class="text-red-400 font-bold">-{{ simulated.emission_reduced|floatformat:2 }} tCO₂e</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Wprowadzono ekwiwalentnie ({{ simulated.new_factor_name }}):</span>
-                            <span class="text-green-400 font-bold">+{{ simulated.emission_added|floatformat:2 }} tCO₂e</span>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="text-text-muted text-xs font-mono uppercase">Uruchom symulację, aby zobaczyć wyliczenia.</div>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg flex flex-col justify-between">
-            <h3 class="text-lg font-heading font-bold text-text-main mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-accent">bar_chart</span> Wizualizacja Różnicy Emisji
-            </h3>
-            {% if simulated %}
-                <div class="w-full flex-grow h-[320px] relative">
-                    <canvas id="comparisonChart"></canvas>
-                </div>
-            {% endif %}
-        </div>
+    {% if form.errors %}
+    <div class="rounded-xl border border-red-500/30 p-4 mb-6 no-print" style="background:rgba(239,68,68,0.1);">
+      <div class="flex items-center gap-2 text-red-400 font-mono text-sm font-bold uppercase mb-2">
+        <span class="material-symbols-outlined" style="font-size:18px;">error</span> Błędy symulacji
+      </div>
+      <ul class="list-disc list-inside font-mono text-xs text-red-300 space-y-1">
+        {% for field in form %}{% for error in field.errors %}<li><strong>{{ field.label }}:</strong> {{ error }}</li>{% endfor %}{% endfor %}
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
     </div>
     {% endif %}
+
+    <form method="GET" action="{% url 'what_if:simulation' %}" class="space-y-6" novalidate>
+
+      <div class="w-full lg:w-1/3 flex flex-col gap-2">
+        <label class="font-mono text-xs uppercase tracking-wider text-text-muted">{{ form.company.label }}</label>
+        {{ form.company }}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-xl border border-red-500/20 p-5 space-y-4" style="background:rgba(239,68,68,0.05);">
+          <h3 class="font-mono text-sm uppercase text-red-400 font-bold">1. Co usuwamy z bilansu?</h3>
+          <div class="flex flex-col gap-2">
+            <label class="font-mono text-xs uppercase text-text-muted">{{ form.current_factor.label }}</label>
+            {{ form.current_factor }}
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="font-mono text-xs uppercase text-text-muted">{{ form.reduced_amount.label }}</label>
+            {{ form.reduced_amount }}
+            <span class="font-mono text-[10px] text-text-muted no-print">{{ form.reduced_amount.help_text }}</span>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-green-500/20 p-5 space-y-4" style="background:rgba(74,222,128,0.05);">
+          <h3 class="font-mono text-sm uppercase text-green-400 font-bold">2. Czym to zastępujemy?</h3>
+          <div class="flex flex-col gap-2">
+            <label class="font-mono text-xs uppercase text-text-muted">{{ form.new_factor.label }}</label>
+            {{ form.new_factor }}
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="font-mono text-xs uppercase text-text-muted">{{ form.added_amount.label }}</label>
+            {{ form.added_amount }}
+            <span class="font-mono text-[10px] text-text-muted no-print">{{ form.added_amount.help_text }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between p-4 rounded-xl border border-border-subtle" style="background:rgba(255,255,255,0.02);">
+        <div class="font-mono text-sm text-text-muted uppercase">Szacowany wpływ na ślad węglowy:</div>
+        <div id="live-preview" class="font-heading font-bold text-xl text-text-main">-- tCO₂e</div>
+      </div>
+
+      <div class="flex justify-end gap-4 no-print">
+        <a href="{% url 'what_if:simulation' %}"
+          class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
+          Resetuj
+        </a>
+        <button type="submit"
+          class="inline-flex items-center gap-2 px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          <span class="material-symbols-outlined" style="font-size:16px;">play_arrow</span> Uruchom symulację
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===================== -->
+  <!-- RESULTS -->
+  <!-- ===================== -->
+  {% if actual.total > 0 %}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-between space-y-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <div>
+        <h3 class="font-mono text-sm uppercase tracking-wider text-text-muted mb-2">Rzeczywisty Stan (Przed zmianą)</h3>
+        <div class="text-3xl font-mono text-text-main mb-4">{{ actual.total|floatformat:2 }} <span class="text-sm text-text-muted">tCO₂e</span></div>
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-border-subtle">
+              <th class="px-3 py-2 font-mono text-xs uppercase tracking-widest text-text-muted font-normal">Zakres</th>
+              <th class="px-3 py-2 font-mono text-xs uppercase tracking-widest text-text-muted font-normal text-right">Emisja (tCO₂e)</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono text-xs text-text-main">
+            {% for source_name, source_val in actual.sources.items %}
+            <tr class="border-b border-border-subtle">
+              <td class="px-3 py-2 text-text-muted">{{ source_name }}</td>
+              <td class="px-3 py-2 text-right">{{ source_val|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="border-t border-border-subtle pt-4">
+        <h3 class="font-mono text-sm uppercase tracking-wider text-accent mb-2">Szacowany Stan (Po zmianie)</h3>
+        {% if simulated %}
+        <div class="text-3xl font-mono {% if simulated.difference < 0 %}text-green-400{% else %}text-red-400{% endif %} mb-3">
+          {{ simulated.total|floatformat:2 }} <span class="text-sm text-text-muted">tCO₂e</span>
+        </div>
+        <div class="font-mono text-xs text-text-muted space-y-2">
+          <div class="flex items-center gap-2">
+            <span>Wpływ netto:</span>
+            <span class="px-2 py-0.5 rounded font-bold {% if simulated.difference < 0 %}text-green-400{% else %}text-red-400{% endif %}" style="background:rgba(255,255,255,0.05); border:1px solid #2a3f4a;">
+              {% if simulated.difference > 0 %}+{% endif %}{{ simulated.difference|floatformat:2 }} tCO₂e
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span>Zredukowano ({{ simulated.current_factor_name }}):</span>
+            <span class="text-red-400 font-bold">-{{ simulated.emission_reduced|floatformat:2 }} tCO₂e</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Wprowadzono ({{ simulated.new_factor_name }}):</span>
+            <span class="text-green-400 font-bold">+{{ simulated.emission_added|floatformat:2 }} tCO₂e</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="font-mono text-xs text-text-muted uppercase">Uruchom symulację, aby zobaczyć wyliczenia.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-border-subtle p-6 flex flex-col" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <h3 class="font-heading font-bold text-lg text-text-main mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">bar_chart</span> Wizualizacja Różnicy Emisji
+      </h3>
+      {% if simulated %}
+      <div class="w-full flex-1 h-80 relative">
+        <canvas id="comparisonChart"></canvas>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endif %}
+
 </div>
 
 {% if simulated %}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('comparisonChart').getContext('2d');
-        const actualValue = {{ actual.total|stringformat:"f" }};
-        const simulatedValue = {{ simulated.total|stringformat:"f" }};
-        const simColor = simulatedValue < actualValue ? 'rgba(74, 222, 128, 0.8)' : 'rgba(248, 113, 113, 0.8)';
-        const simBorder = simulatedValue < actualValue ? 'rgba(74, 222, 128, 1)' : 'rgba(248, 113, 113, 1)';
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Rzeczywiste (Przed)', 'Symulowane (Po)'],
-                datasets: [{
-                    label: 'Emisja tCO₂e',
-                    data: [actualValue, simulatedValue],
-                    backgroundColor: ['rgba(200, 245, 53, 0.8)', simColor],
-                    borderColor: ['rgba(200, 245, 53, 1)', simBorder],
-                    borderWidth: 1,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8b9bb4', font: { family: 'Roboto Mono' } } },
-                    x: { grid: { display: false }, ticks: { color: '#e8f4f0', font: { family: 'Roboto Mono' } } }
-                }
-            }
-        });
+  document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const actualValue = {{ actual.total|stringformat:"f" }};
+    const simulatedValue = {{ simulated.total|stringformat:"f" }};
+    const simColor = simulatedValue < actualValue ? 'rgba(74,222,128,0.8)' : 'rgba(248,113,113,0.8)';
+    const simBorder = simulatedValue < actualValue ? 'rgba(74,222,128,1)' : 'rgba(248,113,113,1)';
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Rzeczywiste (Przed)', 'Symulowane (Po)'],
+        datasets: [{ label: 'Emisja tCO₂e', data: [actualValue, simulatedValue], backgroundColor: ['rgba(200,245,53,0.8)', simColor], borderColor: ['rgba(200,245,53,1)', simBorder], borderWidth: 1, borderRadius: 6 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b9bb4', font: { family: 'Roboto Mono' } } },
+          x: { grid: { display: false }, ticks: { color: '#e8f4f0', font: { family: 'Roboto Mono' } } }
+        }
+      }
     });
+  });
 </script>
 {% endif %}
 
 <script>
-    document.querySelectorAll('input, select').forEach(el => el.classList.add('custom-input'));
+  document.querySelectorAll('input, select').forEach(el => el.classList.add('custom-input'));
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const factorValues = {{ factors_json|safe }};
-        const currentFactorSelect = document.getElementById('id_current_factor');
-        const reducedAmountInput = document.getElementById('id_reduced_amount');
-        const newFactorSelect = document.getElementById('id_new_factor');
-        const addedAmountInput = document.getElementById('id_added_amount');
-        const previewEl = document.getElementById('live-preview');
+  document.addEventListener("DOMContentLoaded", function() {
+    const factorValues = {{ factors_json|safe }};
+    const currentFactorSelect = document.getElementById('id_current_factor');
+    const reducedAmountInput = document.getElementById('id_reduced_amount');
+    const newFactorSelect = document.getElementById('id_new_factor');
+    const addedAmountInput = document.getElementById('id_added_amount');
+    const previewEl = document.getElementById('live-preview');
 
-        function calculateLivePreview() {
-            const currentVal = currentFactorSelect.value;
-            const newVal = newFactorSelect.value;
+    function calculateLivePreview() {
+      const currentVal = currentFactorSelect.value;
+      const newVal = newFactorSelect.value;
+      const cleanNum = val => { if(!val) return 0; return parseFloat(val.toString().replace(',', '.')) || 0; };
+      const currentF = parseFloat(factorValues[currentVal]) || 0;
+      const currentA = cleanNum(reducedAmountInput.value);
+      const newF = parseFloat(factorValues[newVal]) || 0;
+      const newA = cleanNum(addedAmountInput.value);
+      if (currentVal && newVal && (currentA > 0 || newA > 0)) {
+        const diff = (newA * newF) - (currentA * currentF);
+        if (diff > 0) previewEl.innerHTML = `<span class="text-red-400">+${diff.toFixed(3)} tCO₂e (Wzrost emisji)</span>`;
+        else if (diff < 0) previewEl.innerHTML = `<span class="text-green-400">${diff.toFixed(3)} tCO₂e (Oszczędność emisyjna)</span>`;
+        else previewEl.innerHTML = `<span class="text-text-main">0.000 tCO₂e (Bilans neutralny)</span>`;
+      } else { previewEl.innerText = "-- tCO₂e"; }
+    }
 
-            const cleanNum = val => {
-                if(!val) return 0;
-                return parseFloat(val.toString().replace(',', '.')) || 0;
-            };
-
-            const currentF = parseFloat(factorValues[currentVal]) || 0;
-            const currentA = cleanNum(reducedAmountInput.value);
-            const newF = parseFloat(factorValues[newVal]) || 0;
-            const newA = cleanNum(addedAmountInput.value);
-
-            if (currentVal && newVal && (currentA > 0 || newA > 0)) {
-                const diff = (newA * newF) - (currentA * currentF);
-                if (diff > 0) {
-                    previewEl.innerHTML = `<span class="text-red-400">+${diff.toFixed(3)} tCO₂e (Wzrost emisji)</span>`;
-                } else if (diff < 0) {
-                    previewEl.innerHTML = `<span class="text-green-400">${diff.toFixed(3)} tCO₂e (Oszczędność emisyjna)</span>`;
-                } else {
-                    previewEl.innerHTML = `<span class="text-text-main">0.000 tCO₂e (Bilans neutralny)</span>`;
-                }
-            } else {
-                previewEl.innerText = "-- tCO₂e";
-            }
-        }
-
-        [currentFactorSelect, reducedAmountInput, newFactorSelect, addedAmountInput].forEach(el => {
-            if(el) {
-                el.addEventListener('input', calculateLivePreview);
-                el.addEventListener('change', calculateLivePreview);
-            }
-        });
-
-        calculateLivePreview();
+    [currentFactorSelect, reducedAmountInput, newFactorSelect, addedAmountInput].forEach(el => {
+      if(el) { el.addEventListener('input', calculateLivePreview); el.addEventListener('change', calculateLivePreview); }
     });
+    calculateLivePreview();
+  });
 </script>
 {% endblock %}
