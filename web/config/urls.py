@@ -1,4 +1,4 @@
-from core.views import HomeView
+from core.views import HomeView, PrivacyPolicyView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -16,4 +16,5 @@ urlpatterns = [
     path("ai/", include("ai_services.urls")),
     path("calculator/", include("calculator.urls")),
     path("communications/", include("communications.urls")),
+    path("privacy/", PrivacyPolicyView.as_view(), name="privacy-policy"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

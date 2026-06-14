@@ -7,7 +7,7 @@
 <style>
   nav, footer { display: none !important; }
 
-  .login-bg {
+.login-bg {
     background-image: url("{% static 'images/login-bg.png' %}");
     background-size: cover;
     background-position: center bottom;
@@ -15,35 +15,68 @@
     background-color: #51a49a;
   }
 
-  .login-input {
+ .login-input {
     background: rgba(255,255,255,0.8) !important;
-    border: 1px solid rgba(255,255,255,0.6) !important;
+    border: 1px solid rgba(200,245,53,0.4) !important;
     border-radius: 12px !important;
     color: #1a4a52 !important;
     font-family: 'Inter', sans-serif !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    box-shadow: 0 0 8px rgba(200,245,53,0.15) !important;
+  }
+  .login-input:hover {
+    border-color: rgba(200,245,53,0.7) !important;
+    box-shadow: 0 0 16px rgba(200,245,53,0.3) !important;
   }
   .login-input:focus {
     outline: none !important;
-    border-color: rgba(200,245,53,0.6) !important;
-    box-shadow: 0 0 0 3px rgba(200,245,53,0.15) !important;
+    border-color: rgba(200,245,53,1) !important;
+    box-shadow: 0 0 20px rgba(200,245,53,0.4) !important;
+  }
+
+  input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    border: 1px solid rgba(26,74,82,0.5) !important;
+    border-radius: 4px !important;
+    background: rgba(255,255,255,0.6) !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.2s !important;
+  }
+  input[type="checkbox"]:checked {
+    background: #1a4a52 !important;
+    border-color: #1a4a52 !important;
+  }
+  input[type="checkbox"]:checked::after {
+    content: '✓' !important;
+    position: absolute !important;
+    color: white !important;
+    font-size: 11px !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="fixed inset-0 flex flex-col items-center justify-center login-bg p-4">
+<!-- Logo top left -->
+<div class="fixed z-50" style="top: 50px; left: 50px;">
+  <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:90px;"/>
+</div>
+
+<div class="fixed inset-0 flex items-center justify-center login-bg p-4">
+
   <div class="w-full max-w-xl flex flex-col gap-4 items-center">
 
-    <!-- Logo -->
-    <div class="flex flex-col gap-1">
-      <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:90px;"/>
-      <p class="font-mono text-xs" style="color:rgba(255,255,255,0.6); letter-spacing:0.1em;">
-        kalkulator śladów węglowych &nbsp;|&nbsp; v1.0
-      </p>
-    </div>
+    <!-- Login panel -->
 
     <!-- Login panel -->
-    <div class="w-full bg-white/20 backdrop-blur-md border border-white/30 rounded-[28px] p-8 md:p-10 shadow-2xl">
+    <div class="w-full border rounded-[28px] p-8 md:p-10 shadow-2xl"
+      style="background:rgba(255,255,255,0.45); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-color:rgba(255,255,255,0.6);">
 
       <h2 class="text-2xl font-semibold text-center mb-8 tracking-wide" style="color:#1a4a52;">
         Zaloguj się do systemu
@@ -92,8 +125,10 @@
         <!-- Submit -->
         <div class="pt-2">
           <button type="submit"
-            class="w-full font-medium py-3.5 rounded-full transition-all duration-200 shadow-md tracking-wide text-sm text-white"
-            style="background:#1a4a52;">
+            class="w-full font-medium py-3.5 rounded-full transition-all duration-200 shadow-md tracking-wide text-sm text-white cursor-pointer"
+            style="background:#1a4a52; hover:background:#2a6a72;"
+            onmouseover="this.style.background='#235a63'; this.style.boxShadow='0 4px 12px rgba(26,74,82,0.3)';"
+            onmouseout="this.style.background='#1a4a52'; this.style.boxShadow='';">
             Zaloguj się
           </button>
         </div>
@@ -103,9 +138,9 @@
 
       <!-- Footer links -->
       <div class="flex justify-center items-center gap-6 mt-6 text-xs font-medium" style="color:rgba(26,74,82,0.8);">
-        <a href="#" class="hover:underline">Polityka prywatności</a>
+        <a href="{% url 'privacy-policy' %}" class="hover:underline">Polityka prywatności</a>
         <span style="color:rgba(255,255,255,0.4);">|</span>
-        <a href="#" class="hover:underline">Kontakt z administratorem</a>
+        <a href="mailto:admin@emissionimpossible.pl" class="hover:underline">Kontakt z administratorem</a>
       </div>
 
     </div>
