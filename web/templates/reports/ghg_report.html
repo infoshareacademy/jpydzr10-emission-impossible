@@ -254,40 +254,82 @@
     }
   });
 
-  const ctxDonut = document.getElementById('donutChart').getContext('2d');
-  const s1Current = chartData.s1[chartData.s1.length - 1];
-  const s2Current = chartData.s2[chartData.s2.length - 1];
-  const donutTotal = s1Current + s2Current;
+const ctxDonut = document.getElementById('donutChart').getContext('2d');
+    const s1Current = chartData.s1[chartData.s1.length - 1];
+    const s2Current = chartData.s2[chartData.s2.length - 1];
+    const donutTotal = s1Current + s2Current;
+    const dynamicCenterHtmlPlugin = {
+        id: 'dynamicCenterHtml',
+        afterDraw: (chart) => {
+            let visibleTotal = 0;
+            chart.data.datasets[0].data.forEach((val, index) => {
+                if (chart.getDataVisibility(index)) {
+                    visibleTotal += parseFloat(val);
+                }
+            });
 
-  const donutChart = new Chart(ctxDonut, {
-    type: 'doughnut',
-    data: { labels: ['Zakres 1', 'Zakres 2'], datasets: [{ data: [s1Current, s2Current], backgroundColor: [colorZ1, colorZ2], borderWidth: 0, hoverOffset: 4 }] },
-    options: {
-      cutout: '75%',
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 } },
-        tooltip: {
-          backgroundColor: 'rgba(17,23,32,0.9)', titleFont: { family: 'Roboto Mono' }, bodyFont: { family: 'Roboto Mono' },
-          borderColor: 'rgba(200,245,53,0.3)', borderWidth: 1,
-          callbacks: { label: function(context) { const val = context.raw; const pct = donutTotal > 0 ? ((val / donutTotal) * 100).toFixed(1) : 0; return context.label + ': ' + val + ' tCO₂e (' + pct + '%)'; } }
+            chart.visibleTotal = visibleTotal;
+
+            if (!chart.getActiveElements() || chart.getActiveElements().length === 0) {
+                document.getElementById('donut-center-val').innerText = visibleTotal.toFixed(2);
+                document.getElementById('donut-center-lbl').innerText = 'Suma tCO₂e';
+            }
         }
-      },
-      onHover: (event, chartElement) => {
-        const valEl = document.getElementById('donut-center-val');
-        const lblEl = document.getElementById('donut-center-lbl');
-        if (chartElement.length > 0) {
-          const index = chartElement[0].index;
-          const val = donutChart.data.datasets[0].data[index];
-          const pct = donutTotal > 0 ? ((val / donutTotal) * 100).toFixed(1) : 0;
-          valEl.innerText = pct + '%';
-          lblEl.innerText = donutChart.data.labels[index];
-        } else {
-          valEl.innerText = donutTotal.toFixed(2);
-          lblEl.innerText = 'Suma tCO₂e';
-        }
-      }
-    }
-  });
+    };
+
+    const donutChart = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+            labels: ['Zakres 1', 'Zakres 2'],
+            datasets: [{
+                data: [s1Current, s2Current],
+                backgroundColor: [colorZ1, colorZ2],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            cutout: '75%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 23, 32, 0.9)',
+                    titleFont: { family: 'Roboto Mono' },
+                    bodyFont: { family: 'Roboto Mono' },
+                    borderColor: 'rgba(200, 245, 53, 0.3)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.raw;
+                            const currentTotal = donutChart.visibleTotal !== undefined ? donutChart.visibleTotal : donutTotal;
+                            const pct = currentTotal > 0 ? ((val / currentTotal) * 100).toFixed(1) : 0;
+                            return context.label + ': ' + val + ' tCO₂e (' + pct + '%)';
+                        }
+                    }
+                }
+            },
+            onHover: (event, chartElement) => {
+                const valEl = document.getElementById('donut-center-val');
+                const lblEl = document.getElementById('donut-center-lbl');
+                const currentTotal = donutChart.visibleTotal !== undefined ? donutChart.visibleTotal : donutTotal;
+
+                if (chartElement.length > 0) {
+                    const index = chartElement[0].index;
+                    const val = donutChart.data.datasets[0].data[index];
+                    const pct = currentTotal > 0 ? ((val / currentTotal) * 100).toFixed(1) : 0;
+                    valEl.innerText = pct + '%';
+                    lblEl.innerText = donutChart.data.labels[index];
+                } else {
+                    valEl.innerText = currentTotal.toFixed(2);
+                    lblEl.innerText = 'Suma tCO₂e';
+                }
+            }
+        },
+        plugins: [dynamicCenterHtmlPlugin]
+    });
 
   function downloadPDF() {
     const element = document.getElementById('pdf-content');
