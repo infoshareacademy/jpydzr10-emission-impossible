@@ -39,7 +39,7 @@ class CalculationEngineTests(TestCase):
         # 2. Wskaźniki emisji (EmissionFactors)
         EmissionFactor.objects.create(
             factor_name="Gaz ziemny",
-            country="PL",
+            country=cls.country,
             year=2024,
             factor=Decimal("0.20"),
             unit_factor="tCO2e/MWh",  # Prosty wskaźnik
@@ -47,20 +47,28 @@ class CalculationEngineTests(TestCase):
 
         EmissionFactor.objects.create(
             factor_name="Węgiel kamienny",
-            country="PL",
+            country=cls.country,
             year=2024,
             factor=Decimal("95.00"),
             unit_factor="kgCO2e/GJ",  # Złożony wskaźnik (wymaga przelicznika z masy na energię)
         )
 
         # 3. Typy Paliw i Parametry Fizyczne (FuelSpec)
-        fuel_coal = FuelType.objects.create(
+        cls.fuel_coal = FuelType.objects.create(
+
             name="Węgiel kamienny", symbol="WEG", category="solid"
         )
+        cls.fuel_gas = FuelType.objects.create(
+            name="Gaz ziemny", symbol="GAZ", category="gas"
+        )
+        cls.fuel_wood = FuelType.objects.create(
+            name="Drewno opałowe", symbol="DREW", category="solid"
+        )
+
 
         # Definiujemy wartość opałową dla węgla (25 MJ/kg, co matematycznie równe jest 25 GJ/t)
         FuelSpec.objects.create(
-            fuel_type=fuel_coal,
+            fuel_type=cls.fuel_coal,
             is_default=True,
             calorific_mj_per_kg=25.0,
             density_kg_per_m3=800.0,
@@ -74,7 +82,7 @@ class CalculationEngineTests(TestCase):
         record = StationaryCombustion(
             company=self.company,
             year=2024,
-            fuel="Gaz ziemny",
+            fuel=self.fuel_gas,
             amount=Decimal("100.0"),
             unit="MWh",  # Zgodne z tCO2e/MWh
         )
@@ -98,7 +106,7 @@ class CalculationEngineTests(TestCase):
         record = StationaryCombustion(
             company=self.company,
             year=2024,
-            fuel="Gaz ziemny",
+            fuel=self.fuel_gas,
             amount=Decimal("5000.0"),
             unit="kWh",
         )
@@ -120,7 +128,7 @@ class CalculationEngineTests(TestCase):
         record = StationaryCombustion(
             company=self.company,
             year=2024,
-            fuel="Węgiel kamienny",
+            fuel=self.fuel_coal,
             amount=Decimal("10.0"),
             unit="t",
         )
@@ -151,6 +159,7 @@ class CalculationEngineTests(TestCase):
         # Dla testu stwórzmy paliwo bez zdefiniowanego FuelSpec
         EmissionFactor.objects.create(
             factor_name="Drewno opałowe",
+            country=self.country,
             year=2024,
             factor=Decimal("100"),
             unit_factor="kgCO2e/GJ",
@@ -159,7 +168,7 @@ class CalculationEngineTests(TestCase):
         record = StationaryCombustion(
             company=self.company,
             year=2024,
-            fuel="Drewno opałowe",
+            fuel=self.fuel_wood,
             amount=Decimal("5.0"),
             unit="t",
         )
