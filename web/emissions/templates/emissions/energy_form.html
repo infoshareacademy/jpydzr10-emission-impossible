@@ -1,36 +1,85 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load widget_tweaks %}
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — Emission Impossible{% endblock %}
+
+{% block extra_head %}
+<style>
+  input, select, textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    width: 100%;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237ab5ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 2.5rem !important;
+  }
+  input[type="text"], input[type="number"], input[type="date"] {
+    background-image: none !important;
+    padding-right: 14px !important;
+  }
+  input:focus, select:focus, textarea:focus { border-color: rgba(200,245,53,0.5) !important; }
+  select option { background: #151c27; color: #e8f4f0; }
+</style>
+{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-6">
-                <h1 class="mb-4 text-center">{{ title }}</h1>
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            {{ field.label_tag }}
-                            {{ field|add_class:"form-control" }}
-                            {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback d-block">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <div class="d-flex gap-2 justify-content-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg px-4">
-                            <i class="bi bi-save"></i> Zapisz
-                        </button>
-                        <a href="{% url 'emissions:energy_consumption_list' %}" class="btn btn-secondary btn-lg px-4">
-                            <i class="bi bi-arrow-left"></i> Anuluj
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="max-w-3xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="mb-8">
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
+    </a>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ title }}</h1>
     </div>
+    <p class="font-mono text-sm text-text-muted ml-4 mt-3">Wprowadź dane dotyczące energii.</p>
+  </div>
+
+  <!-- FORM -->
+  <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {% for field in form %}
+        <div class="{% if field.name == 'source' or field.name == 'notes' %}md:col-span-2{% endif %}">
+          <label for="{{ field.id_for_label }}" class="block font-mono text-xs text-text-muted mb-2 uppercase tracking-wider">
+            {{ field.label }}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+          <p class="font-mono text-xs text-text-muted mt-1 opacity-70">{{ field.help_text }}</p>
+          {% endif %}
+          {% if field.errors %}
+          <p class="font-mono text-xs text-red-400 mt-1">{{ field.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="flex justify-end gap-4 border-t border-border-subtle pt-6">
+        <a href="javascript:history.back()"
+          class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
+          Anuluj
+        </a>
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          <span class="material-symbols-outlined" style="font-size:18px;">save</span> Zapisz
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
