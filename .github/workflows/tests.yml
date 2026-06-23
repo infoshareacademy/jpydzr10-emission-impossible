@@ -29,7 +29,6 @@ jobs:
 
       - name: Uruchomienie testów integracyjnych (Django)
         env:
-          DJANGO_SETTINGS_MODULE: "web.confing.settings"
           SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
           DEBUG: "True"
         run: |
