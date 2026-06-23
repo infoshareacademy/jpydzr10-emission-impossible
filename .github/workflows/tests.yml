@@ -24,5 +24,12 @@ jobs:
       - name: Instalacja zależności
         run: uv sync
 
-      - name: Uruchomienie testów
+      - name: Uruchomienie testów niezależnych (pytest)
         run: uv run pytest tests/ -v --tb=short
+
+      - name: Uruchomienie testów integracyjnych (Django)
+        env:
+          DJANGO_SETTINGS_MODULE: "web.confing.settings"
+          SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+          DEBUG: "True"
+        run: uv run python manage.py test
