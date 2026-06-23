@@ -9,6 +9,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: emission_db
+          POSTGRES_USER: emission_user
+          POSTGRES_PASSWORD: emission_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout kodu
         uses: actions/checkout@v4
@@ -28,9 +43,13 @@ jobs:
         run: uv run pytest tests/ -v --tb=short
 
       - name: Uruchomienie testów integracyjnych (Django)
-        env:
-          SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
-          DEBUG: "True"
         run: |
           cd web
+          echo "SECRET_KEY=testowy-klucz-do-ci-cd-123456" > .env
+          echo "DEBUG=True" >> .env
+          echo "DB_NAME=emission_db" >> .env
+          echo "DB_USER=emission_user" >> .env
+          echo "DB_PASSWORD=emission_pass" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=5432" >> .env
           uv run python manage.py test
