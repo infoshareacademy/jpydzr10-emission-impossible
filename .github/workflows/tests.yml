@@ -32,4 +32,6 @@ jobs:
           DJANGO_SETTINGS_MODULE: "web.confing.settings"
           SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
           DEBUG: "True"
-        run: uv run python manage.py test
+        run: |
+          cd web
+          uv run python manage.py test
