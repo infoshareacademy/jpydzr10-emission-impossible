@@ -15,6 +15,7 @@ def enable_audit_for_table(table_name: str) -> None:
     with connection.cursor() as cursor:
         cursor.execute(sql)
 
+
 def disable_audit_for_table(table_name: str) -> None:
     """
     Usuwa trigger audytowy z wybranej tabeli.
