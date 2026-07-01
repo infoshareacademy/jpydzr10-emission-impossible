@@ -24,19 +24,3 @@ class CoreModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
-
-
-class ChangeLog(models.Model):
-    id_rejestr_zmian = models.AutoField(primary_key=True)
-    login = models.CharField(max_length=100)
-    date_change = models.DateTimeField()
-    table_name = models.CharField(max_length=200)
-    record_id = models.CharField(max_length=50)
-    change_type = models.CharField(max_length=10)
-    previous_data = models.TextField(blank=True, null=True)
-    actual_data = models.TextField(blank=True, null=True)
-
-    class Meta:
-        db_table = "tbl_change_log"
-        verbose_name = "Log zmian"
-        verbose_name_plural = "Logi zmian"
