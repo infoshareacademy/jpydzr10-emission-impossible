@@ -12,11 +12,16 @@ import csv
 import os
 from decimal import Decimal, InvalidOperation
 from typing import Optional
+
+from openpyxl import load_workbook
 from pydantic import ValidationError
 
 from app.application.class_models import (
-    StationaryCombustion, MobileCombustion, FugitiveEmission,
-    ProcessEmission, EnergyConsumption,
+    EnergyConsumption,
+    FugitiveEmission,
+    MobileCombustion,
+    ProcessEmission,
+    StationaryCombustion,
 )
 
 TABLE_MODELS = {
@@ -28,17 +33,6 @@ TABLE_MODELS = {
 }
 
 SKIP_FIELDS = {"id"}
-
-def _read_csv_rows(file_path: str) -> list[dict]:
-    """Wczytuje wiersze z pliku CSV."""
-    rows = []
-    with open(file_path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f, delimiter=_detect_delimiter(file_path))
-        for row in reader:
-            cleaned = {k.strip(): v.strip() if isinstance(v, str) else v
-                       for k, v in row.items() if k}
-            rows.append(cleaned)
-    return rows
 
 
 def _detect_delimiter(file_path: str) -> str:
@@ -52,15 +46,32 @@ def _detect_delimiter(file_path: str) -> str:
     return ","
 
 
+def _read_csv_rows(file_path: str) -> list[dict]:
+    """Wczytuje wiersze z pliku CSV."""
+    rows = []
+    with open(file_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f, delimiter=_detect_delimiter(file_path))
+        for row in reader:
+            # Zabezpieczenie przed wartościami None w przypadku nierównych kolumn
+            cleaned = {k.strip(): v.strip() if isinstance(v, str) else v
+                       for k, v in row.items() if k}
+            rows.append(cleaned)
+    return rows
+
+
 def _read_excel_rows(file_path: str, sheet_name: Optional[str] = None) -> list[dict]:
     """Wczytuje wiersze z pliku Excel (.xlsx)."""
-    from openpyxl import load_workbook
-
     wb = load_workbook(file_path, read_only=True, data_only=True)
     ws = wb[sheet_name] if sheet_name else wb.active
 
     rows_iter = ws.iter_rows(values_only=True)
-    headers = [str(h).strip() if h else "" for h in next(rows_iter)]
+
+    # POPRAWKA: Zabezpieczenie przed pustym plikiem Excel
+    try:
+        headers = [str(h).strip() if h else "" for h in next(rows_iter)]
+    except StopIteration:
+        wb.close()
+        return []
 
     rows = []
     for row_values in rows_iter:
@@ -94,7 +105,7 @@ def bulk_import(file_path: str, repo_name: str, repo,
     Args:
         file_path: ścieżka do pliku .csv lub .xlsx
         repo_name: nazwa repozytorium (klucz z TABLE_MODELS)
-        repo: obiekt CsvRepository do zapisu
+        repo: obiekt Repository do zapisu
         sheet_name: nazwa arkusza (tylko dla Excel)
 
     Returns:
@@ -108,6 +119,7 @@ def bulk_import(file_path: str, repo_name: str, repo,
 
     model_class = TABLE_MODELS[repo_name]
     ext = os.path.splitext(file_path)[1].lower()
+
     if ext in (".xlsx", ".xls"):
         raw_rows = _read_excel_rows(file_path, sheet_name)
     elif ext == ".csv":
@@ -121,6 +133,8 @@ def bulk_import(file_path: str, repo_name: str, repo,
 
     for row_num, raw_row in enumerate(raw_rows, start=2):
         row = {k: _parse_value(v) for k, v in raw_row.items() if k.lower() not in SKIP_FIELDS}
+
+        # Próba rzutowania pól numerycznych na Decimal, aby uniknąć błędów Pydantic przy stringach
         for field in ("amount", "emission_tco2eq", "factor"):
             if field in row and row[field] is not None:
                 try:

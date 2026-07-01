@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Baza Przeliczników i Wskaźników — Emission Impossible{% endblock %}
+
+{% block content %}
+  <div class="space-y-8">
+
+  <!-- ===================== -->
+  <!-- HEADER -->
+  <!-- ===================== -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+          <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Baza Przeliczników</h1>
+        </div>
+        <p class="font-mono text-sm text-text-muted mt-3">Zarządzanie nośnikami energii, dostawcami oraz parametrami fizykochemicznymi dla Scope 1.</p>
+      </div>
+      <a href="{% url 'calculator:fuelspec_add' %}"
+         class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors flex-shrink-0"
+         style="background:#1a4a52; border:1px solid #2a6a72;">
+        <span class="material-symbols-outlined" style="font-size:16px;">add</span> Nowa Specyfikacja
+      </a>
+    </div>
+
+  <!-- ===================== -->
+  <!-- FUEL SPECS TABLE -->
+  <!-- ===================== -->
+    <div class="rounded-2xl border border-border-subtle overflow-hidden"
+         style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <div class="px-6 py-4 border-b border-border-subtle flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent" style="font-size:18px;">analytics</span>
+        <h2 class="font-mono text-sm text-text-main uppercase tracking-wider">Aktywne parametry paliw</h2>
+      </div>
+
+      {% if fuel_specs %}
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-border-subtle">
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">Typ paliwa</th>
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">Dostawca</th>
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Gęstość (kg/m³)</th>
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Wartość opałowa (MJ/kg)</th>
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Wartość opałowa (MJ/m³)</th>
+                <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for spec in fuel_specs %}
+                <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
+                  <td class="px-6 py-4 font-mono font-bold text-text-main">
+                    {{ spec.fuel_type.name }} <span class="text-text-muted font-normal">({{ spec.fuel_type.symbol }})</span>
+                  </td>
+                  <td class="px-6 py-4 font-mono text-sm text-text-muted">
+                    {% if spec.supplier %}{{ spec.supplier.name }}{% else %}<span class="text-accent/70">&lt;DOMYŚLNY&gt;</span>{% endif %}
+                  </td>
+                  <td class="px-6 py-4 font-mono text-sm text-text-main text-right">{{ spec.density_kg_per_m3|default:"—" }}</td>
+                  <td class="px-6 py-4 font-mono text-sm text-text-main text-right">{{ spec.calorific_mj_per_kg|default:"—" }}</td>
+                  <td class="px-6 py-4 font-mono text-sm text-text-main text-right">{{ spec.calorific_mj_per_m3|default:"—" }}</td>
+                  <td class="px-6 py-4 text-center">
+                    {% if spec.is_default %}
+                      <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">DOMYŚLNA</span>
+                    {% else %}
+                      <span class="font-mono text-xs text-text-muted">DEDYKOWANA</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="font-mono text-sm text-text-muted text-center py-10 px-5">Brak zdefiniowanych specyfikacji. Kliknij przycisk powyżej, aby dodać pierwszą.</p>
+      {% endif %}
+    </div>
+
+  <!-- ===================== -->
+  <!-- FUEL TYPES & SUPPLIERS -->
+  <!-- ===================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Fuel types -->
+      <div class="rounded-2xl border border-border-subtle overflow-hidden"
+           style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
+          <h2 class="font-mono text-sm text-text-main uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-text-muted" style="font-size:18px;">local_gas_station</span> Nośniki energii
+          </h2>
+          <a href="{% url 'calculator:fueltype_add' %}" class="font-mono text-xs text-accent hover:underline">+ Dodaj</a>
+        </div>
+        <div class="p-4 space-y-2 max-h-64 overflow-y-auto">
+          {% for type in fuel_types %}
+            <div class="px-4 py-2.5 rounded-xl border border-border-subtle flex justify-between items-center font-mono text-xs"
+                 style="background:rgba(255,255,255,0.03);">
+              <span class="text-text-main font-bold">{{ type.name }} <code class="text-text-muted font-normal">[{{ type.symbol }}]</code></span>
+              <span class="font-mono text-xs px-2 py-0.5 rounded" style="background:rgba(42,63,74,0.5); color:#7ab5ae;">{{ type.get_category_display|default:type.category }}</span>
+            </div>
+          {% empty %}
+            <p class="text-text-muted text-xs text-center py-4">Brak zarejestrowanych typów paliw.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    <!-- Suppliers -->
+      <div class="rounded-2xl border border-border-subtle overflow-hidden"
+           style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
+          <h2 class="font-mono text-sm text-text-main uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-text-muted" style="font-size:18px;">handshake</span> Zarejestrowani Dostawcy
+          </h2>
+          <a href="{% url 'calculator:supplier_add' %}" class="font-mono text-xs text-accent hover:underline">+ Dodaj</a>
+        </div>
+        <div class="p-4 space-y-2 max-h-64 overflow-y-auto">
+          {% for supplier in suppliers %}
+            <div class="px-4 py-2.5 rounded-xl border border-border-subtle flex items-center font-mono text-xs text-text-main"
+                 style="background:rgba(255,255,255,0.03);">
+              <span class="material-symbols-outlined text-text-muted mr-2" style="font-size:14px;">domain</span>
+              {{ supplier.name }}
+            </div>
+          {% empty %}
+            <p class="text-text-muted text-xs text-center py-4">Brak zarejestrowanych dostawców.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

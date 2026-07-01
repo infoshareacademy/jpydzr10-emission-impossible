@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <a href="{% url 'what_if:reduction-target-list' %}" class="text-xs font-mono uppercase text-text-muted hover:text-accent transition-colors flex items-center gap-1 mb-2">
+                <span class="material-symbols-outlined text-[14px]">arrow_back</span> Powrót do listy celów
+            </a>
+            <h2 class="text-2xl font-heading font-bold text-text-main">
+                Cel: <span class="text-accent">{{ target.target_name }}</span>
+            </h2>
+            <div class="mt-2 flex gap-4 font-mono text-sm text-text-muted">
+                <span>Spółka: <strong>{{ target.company.name }}</strong></span>
+                <span>Zakres: <strong>{{ target.get_scope_display }}</strong></span>
+            </div>
+        </div>
+
+        <div class="bg-[rgba(255,255,255,0.03)] border border-border-subtle rounded-xl p-4 min-w-[260px]">
+            <p class="text-xs font-mono uppercase text-text-muted mb-1 text-center">Założona Redukcja: <span class="text-accent font-bold">-{{ target.reduction_pct }}%</span></p>
+            <div class="mt-2 pt-2 border-t border-border-subtle/50 text-xs font-mono space-y-1.5">
+                <div class="flex justify-between gap-4">
+                    <span class="text-text-muted">Rok bazowy ({{ target.base_year }}):</span>
+                    <span class="text-text-main font-bold">{{ base_emission_value|floatformat:2 }} tCO₂e</span>
+                </div>
+                <div class="flex justify-between gap-4">
+                    <span class="text-text-muted">Cel na rok ({{ target.target_year }}):</span>
+                    <span class="text-accent font-bold">max {{ target_emission_value|floatformat:2 }} tCO₂e</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg">
+        <h3 class="text-lg font-heading font-bold text-text-main mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-accent">show_chart</span>
+            Trajektoria realizacji ścieżki dekarbonizacji
+        </h3>
+
+        <div class="w-full h-[400px] relative">
+            <canvas id="realizationChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('realizationChart').getContext('2d');
+        const years = {{ chart_years|safe }};
+        const actualEmissions = {{ chart_actual|safe }};
+        const targetLine = {{ chart_target_line|safe }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Rzeczywiste wykonanie (Suma roczna tCO₂e)',
+                        data: actualEmissions,
+                        borderColor: 'rgba(200, 245, 53, 1)',
+                        backgroundColor: 'rgba(200, 245, 53, 0.05)',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(200, 245, 53, 1)',
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Modelowa ścieżka redukcji',
+                        data: targetLine,
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        borderWidth: 2,
+                        borderDash: [6, 6],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#e8f4f0', font: { family: 'Roboto Mono' } } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#8b9bb4', font: { family: 'Roboto Mono' } },
+                        title: { display: true, text: 'Wielkość emisji [tCO₂eq]', color: '#8b9bb4', font: { family: 'Roboto Mono' } }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                        ticks: { color: '#e8f4f0', font: { family: 'Roboto Mono' } }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

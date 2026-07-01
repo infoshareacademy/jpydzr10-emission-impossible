@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Usuń Cel - Emission Impossible{% endblock %}
+
+{% block content %}
+    <div class="max-w-xl mx-auto mt-12 md:mt-20">
+        <div class="bg-red-900/20 border border-red-500/50 rounded-2xl p-6 md:p-10 backdrop-blur-md text-center flex flex-col items-center shadow-xl">
+
+            <span class="material-symbols-outlined text-red-400 text-6xl mb-4">warning</span>
+
+            <h1 class="text-2xl font-heading font-bold text-red-400 uppercase mb-3 tracking-wide">
+                Potwierdź usunięcie
+            </h1>
+
+            <p class="text-text-muted mb-8 text-sm">
+                Czy na pewno chcesz usunąć poniższy cel redukcyjny? Ta operacja jest nieodwracalna.
+            </p>
+
+        {# Ramka z podsumowaniem usuwanego elementu #}
+            <div class="w-full bg-[rgba(255,255,255,0.03)] border border-border-subtle rounded-xl p-5 mb-10 text-left font-mono text-sm space-y-3">
+                <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Cel:</span>
+                    <span class="font-bold text-text-main text-right">{{ object.target_name }}</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.05)] pb-2">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Zakres:</span>
+                    <span class="font-bold text-text-main text-right">{{ object.scope }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-text-muted uppercase tracking-widest text-xs">Redukcja:</span>
+                    <span class="font-bold text-accent text-right">{{ object.reduction_pct }}%</span>
+                </div>
+            </div>
+
+        {# Przyciski akcji #}
+            <form method="post" class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                {% csrf_token %}
+                <a href="{% url 'what_if:reduction-target-list' %}" class="px-6 py-3 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider hover:border-text-muted hover:text-text-main transition-colors flex-1 text-center flex justify-center items-center">
+                    Anuluj
+                </a>
+                <button type="submit" class="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/50 font-mono font-bold uppercase tracking-wider text-sm rounded-xl hover:bg-red-500 hover:text-white transition-all flex-1 text-center flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">delete_forever</span> Usuń Cel
+                </button>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Komunikacja — Emission Impossible{% endblock %}
+
+{% block content %}
+
+<!-- ===================== -->
+<!-- HEADER -->
+<!-- ===================== -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+  <div>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Centrum Komunikacji</h1>
+    </div>
+    <p class="font-mono text-sm text-text-muted ml-4 mt-3">Zarządzaj pytaniami i wątkami dotyczącymi danych emisyjnych.</p>
+  </div>
+  <a href="{% url 'communications:thread_create' %}"
+    class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
+    style="background:#1a4a52; border:1px solid #2a6a72;">
+    <span class="material-symbols-outlined" style="font-size:18px;">add_comment</span>
+    Nowe zapytanie
+  </a>
+</div>
+
+<!-- ===================== -->
+<!-- FILTERS -->
+<!-- ===================== -->
+<div class="rounded-2xl border border-border-subtle p-5 mb-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+    <div>
+      <label class="block font-mono text-xs text-text-muted mb-1 uppercase tracking-wider">Temat</label>
+      <input type="text" name="q" value="{{ filters.q }}"
+        class="w-full rounded-xl font-mono text-sm text-text-main p-2.5 focus:outline-none mt-2"
+        style="background:rgba(255,255,255,0.04); border:1px solid #2a3f4a; color:#e8f4f0;">
+    </div>
+    <div>
+      <label class="block font-mono text-xs text-text-muted mb-1 uppercase tracking-wider">Spółka</label>
+      <select name="company" class="w-full rounded-xl font-mono text-sm p-2.5 focus:outline-none mt-2"
+        style="background:rgba(255,255,255,0.04); border:1px solid #2a3f4a; color:#e8f4f0;">
+        <option value="">Wszystkie</option>
+        {% for comp in available_companies %}
+        <option value="{{ comp.id }}" {% if filters.company == comp.id|stringformat:"s" %}selected{% endif %}>{{ comp.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="block font-mono text-xs text-text-muted mb-1 uppercase tracking-wider">Status</label>
+      <select name="status" class="w-full rounded-xl font-mono text-sm p-2.5 focus:outline-none mt-2"
+        style="background:rgba(255,255,255,0.04); border:1px solid #2a3f4a; color:#e8f4f0;">
+        <option value="">Wszystkie</option>
+        <option value="open" {% if filters.status == "open" %}selected{% endif %}>Otwarte</option>
+        <option value="closed" {% if filters.status == "closed" %}selected{% endif %}>Rozwiązane</option>
+      </select>
+    </div>
+    <div>
+      <label class="block font-mono text-xs text-text-muted mb-1 uppercase tracking-wider">Autor</label>
+      <select name="author" class="w-full rounded-xl font-mono text-sm p-2.5 focus:outline-none mt-2"
+        style="background:rgba(255,255,255,0.04); border:1px solid #2a3f4a; color:#e8f4f0;">
+        <option value="">Wszyscy</option>
+        {% for a in available_authors %}
+        <option value="{{ a.id }}" {% if filters.author == a.id|stringformat:"s" %}selected{% endif %}>{{ a.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button type="submit"
+        class="w-full px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider rounded-xl text-white transition-colors mt-2"
+        style="background:#1a4a52; border:1px solid #2a6a72;">
+        Filtruj
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- ===================== -->
+<!-- TABLE -->
+<!-- ===================== -->
+<div class="rounded-2xl border border-border-subtle overflow-hidden"
+  style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+  <tr>
+    <th class="pt-6 pb-6 px-6 font-mono text-xs text-text-muted uppercase tracking-widest border-b border-border-subtle">Status</th>
+    <th class="pt-6 pb-6 px-6 font-mono text-xs text-text-muted uppercase tracking-widest border-b border-border-subtle">Temat</th>
+    <th class="pt-6 pb-6 px-6 font-mono text-xs text-text-muted uppercase tracking-widest border-b border-border-subtle">Spółka</th>
+    <th class="pt-6 pb-6 px-6 font-mono text-xs text-text-muted uppercase tracking-widest border-b border-border-subtle">Autor</th>
+    <th class="pt-6 pb-6 px-6 font-mono text-xs text-text-muted uppercase tracking-widest border-b border-border-subtle text-right">Data</th>
+  </tr>
+</thead>
+      <tbody>
+        {% for thread in threads %}
+        <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors cursor-pointer"
+          onclick="window.location='{% url 'communications:thread_detail' thread.id %}'">
+          <td class="py-4 px-6">
+            {% if thread.status == 'open' %}
+            <span class="inline-flex items-center gap-1 font-mono text-xs px-2 py-1 rounded"
+              style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">
+              <span class="material-symbols-outlined" style="font-size:14px;">radio_button_checked</span> Otwarte
+            </span>
+            {% else %}
+            <span class="inline-flex items-center gap-1 font-mono text-xs px-2 py-1 rounded"
+              style="background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);">
+              <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> Zamknięte
+            </span>
+            {% endif %}
+          </td>
+          <td class="py-4 px-6">
+            <span class="font-mono text-sm text-text-main block">{{ thread.subject }}</span>
+            <span class="font-mono text-xs text-text-muted">{{ thread.get_category_display }}</span>
+          </td>
+          <td class="py-4 px-6 font-mono text-sm text-text-main">{{ thread.company.name }}</td>
+          <td class="py-4 px-6 font-mono text-sm text-text-muted">@{{ thread.author.username }}</td>
+          <td class="py-4 px-6 font-mono text-sm text-text-muted text-right">{{ thread.created_at|date:"d.m.Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="py-12 px-6 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+            Brak danych spełniających kryteria.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
