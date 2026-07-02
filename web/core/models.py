@@ -24,3 +24,23 @@ class CoreModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+
+
+class UserPageView(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="page_views"
+    )
+    view_name = models.CharField(max_length=255)
+    url_path = models.CharField(max_length=255)
+    visit_count = models.PositiveIntegerField(default=1)
+    last_visited = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "user_page_views"
+        unique_together = ("user", "view_name")
+        indexes = [
+            models.Index(fields=["user", "-visit_count"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.view_name} ({self.visit_count})"

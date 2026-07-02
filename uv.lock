@@ -583,6 +583,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-simple-history"
+version = "3.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/75/658d2e0ba3f51c0774cc7c71d2879e3260880d441406bba4bab64d70a4de/django_simple_history-3.12.0.tar.gz", hash = "sha256:4cc363c6c806834f32c9d19c9db2d97165f379f41e581c39fb7dbac9e4c20c11", size = 235106, upload-time = "2026-06-22T13:16:23.766Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d8/8e/af1d95934a9bec0f9127a9ca9599ea33aee7f57afb4ea56018e13ae70018/django_simple_history-3.12.0-py3-none-any.whl", hash = "sha256:371878332fb3c00556c69d61e563daf042c34aef6cee6839123b391e2d0efa40", size = 81883, upload-time = "2026-06-22T13:16:22.391Z" },
+]
+
+[[package]]
 name = "django-tailwind"
 version = "4.4.2"
 source = { registry = "https://pypi.org/simple" }
@@ -783,6 +795,7 @@ dependencies = [
     { name = "django" },
     { name = "django-crum" },
     { name = "django-ratelimit" },
+    { name = "django-simple-history" },
     { name = "django-tailwind" },
     { name = "django-widget-tweaks" },
     { name = "djhtml" },
@@ -810,6 +823,7 @@ requires-dist = [
     { name = "django", specifier = ">=6.0.4" },
     { name = "django-crum", specifier = ">=0.7.9" },
     { name = "django-ratelimit", specifier = ">=4.1.0" },
+    { name = "django-simple-history", specifier = ">=3.12.0" },
     { name = "django-tailwind", specifier = ">=4.4.2" },
     { name = "django-widget-tweaks", specifier = ">=1.5.1" },
     { name = "djhtml", specifier = ">=3.0.11" },

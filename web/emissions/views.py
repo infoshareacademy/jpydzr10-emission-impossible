@@ -3,6 +3,7 @@ import re
 import openpyxl
 from calculator.calculation import calculate_record_emissions
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -20,7 +21,6 @@ from django.views.generic import (
     TemplateView,
     UpdateView,
     View,
-    FormView,
 )
 
 from .forms import (
@@ -49,7 +49,6 @@ from .models import (
     ProcessEmission,
     StationaryCombustion,
 )
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Scope2CreateMixin(LoginRequiredMixin, FormView):

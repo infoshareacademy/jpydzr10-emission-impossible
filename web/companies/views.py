@@ -1,6 +1,7 @@
 import datetime
 
 from accounts.models import CustomUser
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Exists, OuterRef, Q
@@ -50,10 +51,11 @@ class CompanyAccessMixin:
             ).distinct()
 
 
-class CompaniesListView(CompanyAccessMixin, ListView):
+class CompaniesListView(PageViewTrackerMixin, CompanyAccessMixin, ListView):
     model = Companies
     template_name = "companies/companies_list.html"
     context_object_name = "companies"
+    tracked_view_name = "Lista Firm"
 
     def get_queryset(self):
         qs = super().get_queryset()

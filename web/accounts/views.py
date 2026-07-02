@@ -1,4 +1,5 @@
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,8 +13,9 @@ from .forms import DeleteAccountForm, UserProfileForm
 from .models import UserCompanyPermission
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
+    tracked_view_name = "Profil"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
