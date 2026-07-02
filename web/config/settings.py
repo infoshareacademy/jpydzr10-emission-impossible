@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "communications.apps.CommunicationsConfig",
     "audit.apps.AuditConfig",
+    "workflow.apps.WorkflowConfig",
 ]
 
 SITE_ID = 1
