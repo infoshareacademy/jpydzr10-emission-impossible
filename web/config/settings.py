@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "theme",
     "widget_tweaks",
     "communications.apps.CommunicationsConfig",
+    "django_encrypted_model_fields",
 ]
 
 SITE_ID = 1
@@ -151,3 +152,6 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Domyślny adres nadawcy (zapobiega oznaczaniu jako spam przy niezgodności nagłówków)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Klucz szyfrowania dla django-encrypted-model-fields
+FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY")
