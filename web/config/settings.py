@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     "theme",
     "widget_tweaks",
     "communications.apps.CommunicationsConfig",
-    "django_encrypted_model_fields",
+    "audit.apps.AuditConfig",
+    "encrypted_model_fields",
 ]
 
 SITE_ID = 1
@@ -67,6 +68,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "audit.middleware.DatabaseUserAuditMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "crum.CurrentRequestUserMiddleware",
@@ -137,7 +139,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 TAILWIND_APP_NAME = "theme"
 
@@ -153,5 +155,8 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 # Domyślny adres nadawcy (zapobiega oznaczaniu jako spam przy niezgodności nagłówków)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Klucz szyfrowania dla django-encrypted-model-fields
-FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY")
+FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY")

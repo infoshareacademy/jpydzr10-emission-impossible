@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Konfiguracja 2FA{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <h1 class="font-heading font-bold text-3xl text-text-main">Konfiguracja 2FA</h1>
+  <p class="font-mono text-sm text-text-muted mt-2">Zeskanuj kod QR w aplikacji Google Authenticator lub Microsoft Authenticator.</p>
+</div>
+<div class="flex flex-col items-center gap-6">
+  <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR kod 2FA" class="rounded-xl" style="width:250px;height:250px;"/>
+  <a href="{% url 'accounts:2fa-verify' %}" class="px-6 py-3 bg-accent text-black font-mono font-bold rounded-xl hover:opacity-90 transition">
+    Mam już kod — weryfikuj
+  </a>
+</div>
+{% endblock %}

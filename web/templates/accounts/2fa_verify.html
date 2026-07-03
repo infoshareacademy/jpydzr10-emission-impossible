@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} Weryfikacja 2FA {% endblock %}
+{% block content %}
+<div class="mb-8">
+  <h1 class="font-heading font-bold text-3xl text-text-main">Weryfikacja 2FA</h1>
+  <p class="font-mono text-sm text-text-muted mt-2">Wpisz 6-cyfrowy kod z appliance authenticator.</p>
+</div>
+<form method="post" class="flex flex-col gap-4 max-w-sm">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="px-6 py-3 bg-accent text-black font-mono font-bold rounded-xl hover:opacity-90 transition">
+    Weryfikuj
+  </button>
+</form>
+{% endblock %}

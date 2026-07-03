@@ -11,6 +11,13 @@ from django.views.generic import FormView, TemplateView, UpdateView, View
 from .forms import DeleteAccountForm, UserProfileForm
 from .models import UserCompanyPermission
 
+import io
+import pyotp
+import qrcode
+import base64
+from django.utils import timezone
+from .models import TOTPDevice
+
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
@@ -211,3 +218,54 @@ class DeactivateUserView(LoginRequiredMixin, View):
             f"Konto użytkownika '{target_user.username}' zostało dezaktywowane.",
         )
         return redirect("accounts:company-users-list")
+
+class TwoFactorSetupView(LoginRequiredMixin, TemplateView):
+    """Widok konfiguracji 2FA — generuje QR kod."""
+    template_name = "accounts/2fa_setup.html"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        device, created = TOTPDevice.objects.get_or_create(
+            user=user,
+            name="Default",
+            defaults={"secret": pyotp.random_base32(), "is_active": False},
+        )
+        totp = pyotp.TOTP(device.secret)
+        uri = totp.provisioning_uri(
+            name=user.email or user.username,
+            issuer_name="Emission Impossible",
+        )
+        qr = qrcode.make(uri)
+        buffer = io.BytesIO()
+        qr.save(buffer, format="PNG")
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+        return self.render_to_response({"qr_base64": qr_base64, "device": device})
+
+
+class TwoFactorVerifyView(LoginRequiredMixin, FormView):
+    """Widok weryfikacji tokenu 2FA."""
+    template_name = "accounts/2fa_verify.html"
+    success_url = reverse_lazy("home")
+
+    def get_form_class(self):
+        from django import forms
+        class TOTPForm(forms.Form):
+            token = forms.CharField(max_length=6, label="Kod 2FA")
+        return TOTPForm
+
+    def form_valid(self, form):
+        token = form.cleaned_data["token"]
+        try:
+            device = TOTPDevice.objects.get(user=self.request.user, name="Default")
+            totp = pyotp.TOTP(device.secret)
+            if totp.verify(token):
+                device.confirmed = True
+                device.is_active = True
+                device.last_used = timezone.now()
+                device.save()
+                messages.success(self.request, "2FA zostało aktywowane!")
+                return super().form_valid(form)
+        except TOTPDevice.DoesNotExist:
+            pass
+        messages.error(self.request, "Nieprawidłowy kod. Spróbuj ponownie.")
+        return self.form_invalid(form)

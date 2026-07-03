@@ -64,4 +64,12 @@ urlpatterns = [
         views.DeactivateUserView.as_view(),
         name="user-deactivate",
     ),
+    path(
+        "2fa/setup/",
+        views.TwoFactorSetupView.as_view(),
+        name="2fa-setup"),
+    path(
+        "2fa/verify/",
+        views.TwoFactorVerifyView.as_view(),
+        name="2fa-verify"),
 ]
