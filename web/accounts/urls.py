@@ -9,7 +9,7 @@ app_name = "accounts"
 urlpatterns = [
     path(
         "login/",
-        auth_views.LoginView.as_view(template_name="registration/login.html"),
+        views.CustomLoginView.as_view(),
         name="login",
     ),
     path(
@@ -64,12 +64,6 @@ urlpatterns = [
         views.DeactivateUserView.as_view(),
         name="user-deactivate",
     ),
-    path(
-        "2fa/setup/",
-        views.TwoFactorSetupView.as_view(),
-        name="2fa-setup"),
-    path(
-        "2fa/verify/",
-        views.TwoFactorVerifyView.as_view(),
-        name="2fa-verify"),
+    path("2fa/setup/", views.TwoFactorSetupView.as_view(), name="2fa-setup"),
+    path("2fa/verify/", views.TwoFactorVerifyView.as_view(), name="2fa-verify"),
 ]

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %} Weryfikacja 2FA {% endblock %}
+{% block title %}Weryfikacja dwuetapowa{% endblock %}
 {% block content %}
 <div class="mb-8">
-  <h1 class="font-heading font-bold text-3xl text-text-main">Weryfikacja 2FA</h1>
-  <p class="font-mono text-sm text-text-muted mt-2">Wpisz 6-cyfrowy kod z appliance authenticator.</p>
+  <h1 class="font-heading font-bold text-3xl text-text-main">Weryfikacja dwuetapowa</h1>
+  <p class="font-mono text-sm text-text-muted mt-2">Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej.</p>
 </div>
 <form method="post" class="flex flex-col gap-4 max-w-sm">
   {% csrf_token %}
@@ -12,4 +12,10 @@
     Weryfikuj
   </button>
 </form>
+<div class="mt-6">
+  <p class="font-mono text-sm text-text-muted">Nie masz jeszcze skonfigurowanej aplikacji?</p>
+  <a href="{% url 'accounts:2fa-setup' %}" class="font-mono text-sm text-accent hover:underline">
+    Skonfiguruj 2FA i pobierz kod QR →
+  </a>
+</div>
 {% endblock %}

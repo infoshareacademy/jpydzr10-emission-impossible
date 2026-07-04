@@ -1,20 +1,20 @@
 from companies.models import Companies
 from django.contrib import messages
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model, logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, UpdateView, View
-
 from .forms import DeleteAccountForm, UserProfileForm
 from .models import UserCompanyPermission
-
 import io
 import pyotp
 import qrcode
 import base64
+import time
 from django.utils import timezone
 from .models import TOTPDevice
 
@@ -242,30 +242,84 @@ class TwoFactorSetupView(LoginRequiredMixin, TemplateView):
         return self.render_to_response({"qr_base64": qr_base64, "device": device})
 
 
-class TwoFactorVerifyView(LoginRequiredMixin, FormView):
-    """Widok weryfikacji tokenu 2FA."""
+class TwoFactorVerifyView(FormView):
+    """Widok weryfikacji tokenu 2FA po logowaniu."""
     template_name = "accounts/2fa_verify.html"
-    success_url = reverse_lazy("home")
 
     def get_form_class(self):
         from django import forms
         class TOTPForm(forms.Form):
-            token = forms.CharField(max_length=6, label="Kod 2FA")
+            token = forms.CharField(
+                max_length=6,
+                label="Kod 2FA",
+                widget=forms.TextInput(attrs={
+                    'autofocus': True,
+                    'placeholder': '000000',
+                    'inputmode': 'numeric',
+                })
+            )
         return TOTPForm
+
+    def dispatch(self, request, *args, **kwargs):
+        # Sprawdza czy sesja 2FA jest ważna (max 5 minut)
+        user_id = request.session.get('2fa_user_id')
+        timestamp = request.session.get('2fa_timestamp', 0)
+        if not user_id or (int(time.time()) - timestamp) > 300:
+            messages.error(request, "Sesja wygasła. Zaloguj się ponownie.")
+            return redirect('accounts:login')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         token = form.cleaned_data["token"]
+        user_id = self.request.session.get('2fa_user_id')
+
         try:
-            device = TOTPDevice.objects.get(user=self.request.user, name="Default")
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user = User.objects.get(pk=user_id)
+            device = TOTPDevice.objects.get(
+                user=user, is_active=True, confirmed=True
+            )
             totp = pyotp.TOTP(device.secret)
             if totp.verify(token):
-                device.confirmed = True
-                device.is_active = True
                 device.last_used = timezone.now()
-                device.save()
-                messages.success(self.request, "2FA zostało aktywowane!")
-                return super().form_valid(form)
-        except TOTPDevice.DoesNotExist:
+                device.save(update_fields=["last_used"])
+                # Wyczyść sesję 2FA
+                del self.request.session['2fa_user_id']
+                del self.request.session['2fa_timestamp']
+                # Loguje usera
+                login(self.request, user,
+                      backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(self.request, "Zalogowano pomyślnie!")
+                # Przekieruje na next lub home
+                next_url = self.request.session.pop('2fa_next', None)
+                return redirect(next_url or 'home')
+        except (TOTPDevice.DoesNotExist, Exception):
             pass
+
         messages.error(self.request, "Nieprawidłowy kod. Spróbuj ponownie.")
         return self.form_invalid(form)
+
+class CustomLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def form_valid(self, form):
+        user = form.get_user()
+        has_2fa = TOTPDevice.objects.filter(
+            user=user, is_active=True, confirmed=True
+        ).exists()
+
+        if has_2fa:
+            # Przygotowuje sesję do 2FA
+            self.request.session['2fa_user_id'] = user.pk
+            self.request.session['2fa_timestamp'] = int(time.time())
+
+            # Zapamiętuje next URL
+            if self.request.GET.get('next'):
+                self.request.session['2fa_next'] = self.request.GET.get('next')
+
+            return redirect('accounts:2fa-verify')
+
+        # Normalne logowanie bez 2FA
+        login(self.request, user)
+        return redirect(self.get_success_url())
