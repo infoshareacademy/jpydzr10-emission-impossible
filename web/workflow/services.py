@@ -71,3 +71,38 @@ def return_report_to_user(envelope: CompanyReportEnvelope) -> Task:
         task.assigned_to.add(*permitted_users)
 
     return task
+
+
+@transaction.atomic
+def finalize_envelope_review(envelope: CompanyReportEnvelope) -> str:
+    """
+    Sprawdza statusy wszystkich rekordów spółki dla danego okresu.
+    - Jeśli są jakiekolwiek rekordy REJECTED -> cofa kopertę do RETURNED i tworzy Task.
+    - Jeśli wszystkie rekordy są APPROVED -> zamyka kopertę jako APPROVED (twarda blokada).
+    """
+    has_rejected = False
+    has_pending = False
+
+    for model in apps.get_models():
+        if issubclass(model, WorkflowStatusMixin) and hasattr(model, 'company'):
+            queryset = model.objects.filter(company=envelope.company)
+            if hasattr(model, 'year'):
+                queryset = queryset.filter(year=envelope.period.year)
+            elif hasattr(model, 'date'):
+                queryset = queryset.filter(date__year=envelope.period.year)
+
+            if queryset.filter(workflow_status=WorkflowStatusMixin.RecordStatus.REJECTED).exists():
+                has_rejected = True
+            if queryset.filter(workflow_status=WorkflowStatusMixin.RecordStatus.PENDING).exists():
+                has_pending = True
+
+    if has_pending:
+        raise ValueError("Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie PENDING.")
+
+    if has_rejected:
+        return_report_to_user(envelope)
+        return "RETURNED"
+    else:
+        envelope.status = CompanyReportEnvelope.Status.APPROVED
+        envelope.save(update_fields=['status'])
+        return "APPROVED"
