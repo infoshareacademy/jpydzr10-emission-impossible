@@ -98,6 +98,9 @@ class StationaryCombustion(ActivityRecord, WorkflowStatusMixin):
     installation = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
 
+    def __str__(self):
+        return f"Spalanie: {self.fuel} ({self.amount} jednostek)"
+
     class Meta:
         db_table = "tbl_stationary_combustion"
         verbose_name = "Spalanie stacjonarne"
