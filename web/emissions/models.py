@@ -22,24 +22,10 @@ class BaseRecord(CoreModel):
         abstract = True
 
 
-class RecordStatus(models.TextChoices):
-    DRAFT = "DRAFT", _("Roboczy")
-    PENDING = "PENDING", _("Do akceptacji")
-    APPROVED = "APPROVED", _("Zatwierdzony")
-    VERIFIED = "VERIFIED", _("Zweryfikowany")
-    REJECTED = "REJECTED", _("Odrzucony")
-
-
 class ActivityRecord(BaseRecord):
     amount = models.DecimalField(max_digits=12, decimal_places=3)
     unit = models.CharField(max_length=20)
     source = models.CharField(max_length=200, blank=True, null=True)
-    status = models.CharField(
-        max_length=20,
-        choices=RecordStatus.choices,
-        default=RecordStatus.DRAFT,
-        verbose_name=_("Status"),
-    )
     emission_tco2eq = models.DecimalField(
         max_digits=12,
         decimal_places=3,

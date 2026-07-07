@@ -13,9 +13,9 @@ from emissions.models import (
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,
-    RecordStatus,
     StationaryCombustion,
 )
+from workflow.models import WorkflowStatusMixin
 
 from ai_services.models import AIChatSession
 
@@ -33,7 +33,10 @@ class BielikESGService:
         """
         Buduje precyzyjny kontekst emisyjny filtrując dane po Zakresie 1, Zakresie 2 lub Całym CF.
         """
-        valid_statuses = [RecordStatus.APPROVED, RecordStatus.VERIFIED]
+        valid_statuses = [
+            WorkflowStatusMixin.RecordStatus.APPROVED,
+            WorkflowStatusMixin.RecordStatus.VERIFIED,
+        ]
         base_filter = {"company": company, "status__in": valid_statuses}
         if year:
             base_filter["year"] = year

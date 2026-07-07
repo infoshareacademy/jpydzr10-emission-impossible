@@ -42,9 +42,12 @@
         style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"
       ></div>
       <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-        {{ model_verbose_name_plural }}
+        {{ company.name }}
       </h1>
     </div>
+    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+        {{ model_verbose_name_plural }}
+      </h1>
   </div>
   <div class="flex gap-3">
     <a
@@ -178,9 +181,18 @@
           <td class="px-5 py-4">
             <span
               class="font-mono text-xs px-2 py-1 rounded"
-              style="{% if obj.status == 'APPROVED' %}background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);{% elif obj.status == 'DRAFT' %}background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);{% elif obj.status == 'VERIFIED' %}background:rgba(147,197,253,0.15); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);{% else %}background:rgba(253,224,71,0.15); color:#fde047; border:1px solid rgba(253,224,71,0.3);{% endif %}"
+              style="{% if obj.workflow_status == 'APPROVED' %}
+                  background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);
+                {% elif obj.workflow_status == 'PENDING' %}
+                  background:rgba(147,197,253,0.15); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);
+                {% elif obj.workflow_status == 'REJECTED' %}
+                  background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);
+                {% else %}
+                  background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);
+                {% endif %}
+              "
             >
-              {{ obj.get_status_display }}
+              {{ obj.get_workflow_status_display }}
             </span>
           </td>
           <td class="px-5 py-4 text-center">

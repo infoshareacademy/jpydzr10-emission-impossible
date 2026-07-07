@@ -10,16 +10,16 @@ from emissions.models import (
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,
-    RecordStatus,
     StationaryCombustion,
 )
+from workflow.models import WorkflowStatusMixin
 
 EMISSION_FIELDS = {
     "calculated": "calculated_emission_tco2eq",
     "declared": "emission_tco2eq",
 }
 
-DEFAULT_STATUSES = [choice[0] for choice in RecordStatus.choices]
+DEFAULT_STATUSES = [choice[0] for choice in WorkflowStatusMixin.RecordStatus.choices]
 
 
 class GHGReportView(LoginRequiredMixin, TemplateView):
@@ -77,7 +77,9 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
         emission_field = EMISSION_FIELDS[emission_source]
 
         if "statuses" in self.request.GET:
-            valid_statuses = [choice[0] for choice in RecordStatus.choices]
+            valid_statuses = [
+                choice[0] for choice in WorkflowStatusMixin.RecordStatus.choices
+            ]
             selected_statuses = [
                 s for s in self.request.GET.getlist("statuses") if s in valid_statuses
             ]
@@ -144,7 +146,7 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
                 "compare_year": compare_year,
                 "emission_source": emission_source,
                 "selected_statuses": selected_statuses,
-                "all_statuses": RecordStatus.choices,
+                "all_statuses": WorkflowStatusMixin.RecordStatus.choices,
                 "s1_current": round(s1_current, 2),
                 "s2_current": round(s2_current, 2),
                 "total_current": round(total_current, 2),

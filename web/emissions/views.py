@@ -502,7 +502,7 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
         if self.current_year:
             qs = qs.filter(year=self.current_year)
         if self.current_status:
-            qs = qs.filter(status=self.current_status)
+            qs = qs.filter(workflow_status=self.current_status)
         if self.current_search and self.search_fields:
 
             search_query = Q()
@@ -515,8 +515,8 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         status_choices = (
-            getattr(self.model._meta.get_field("status"), "choices", [])
-            if hasattr(self.model, "status")
+            getattr(self.model._meta.get_field("workflow_status"), "choices", [])
+            if hasattr(self.model, "workflow_status")
             else []
         )
         context.update(
