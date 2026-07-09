@@ -3,15 +3,13 @@ import re
 import openpyxl
 from calculator.calculation import calculate_record_emissions
 from companies.models import Companies
-from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import (
@@ -24,7 +22,7 @@ from django.views.generic import (
     View,
 )
 from workflow.mixins import ReportLockMixin
-from workflow.models import RecordComment
+from workflow.models import RecordComment, WorkflowStatusMixin
 
 from .forms import (
     EmissionFactorForm,
@@ -427,13 +425,14 @@ class Scope1CreateMixin(LoginRequiredMixin):
                 self.request, f"Zapisano rekord, ale nie wyliczono emisji. Powód: {e}"
             )
 
-        # --- LOGIKA WORKFLOW: Zmiana statusu na DRAFT przy edycji ---
         if not is_new and hasattr(instance, "workflow_status"):
-            instance.workflow_status = "DRAFT"
+            if instance.workflow_status == WorkflowStatusMixin.RecordStatus.REJECTED:
+                instance.workflow_status = WorkflowStatusMixin.RecordStatus.PENDING
+            else:
+                instance.workflow_status = WorkflowStatusMixin.RecordStatus.DRAFT
 
         instance.save()
 
-        # --- LOGIKA WORKFLOW: Obsługa odpowiedzi na komentarz ---
         user_reply = self.request.POST.get("user_reply", "").strip()
         if not is_new and user_reply:
             ctype = ContentType.objects.get_for_model(self.model)
@@ -471,7 +470,7 @@ class Scope1CreateMixin(LoginRequiredMixin):
                 .first()
             )
             context["admin_comment"] = comment
-            print(f"\n[DEBUG WORKFLOW] Otwarto formularz edycji:")
+            print("\n[DEBUG WORKFLOW] Otwarto formularz edycji:")
             print(f" -> Model: {ctype} | ID rekordu: {self.object.pk}")
             print(f" -> Zwrócony komentarz z bazy: {comment}\n")
 
@@ -504,7 +503,6 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
         if self.current_status:
             qs = qs.filter(workflow_status=self.current_status)
         if self.current_search and self.search_fields:
-
             search_query = Q()
             for field in self.search_fields:
                 search_query |= Q(**{f"{field}__icontains": self.current_search})
@@ -534,6 +532,8 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
                 "delete_url_name": f"emissions:{self.model._meta.model_name}-delete",
                 "import_url_name": f"emissions:{self.model._meta.model_name}-import",
                 "template_url_name": f"emissions:{self.model._meta.model_name}-template",
+                "app_label": self.model._meta.app_label,
+                "model_name": self.model._meta.model_name,
             }
         )
         query_params = self.request.GET.copy()
@@ -966,7 +966,7 @@ class EnergyConsumptionImportView(FormView):
         ]
 
         if headers != expected_headers:
-            messages.error(self.request, f"Niepoprawna struktura pliku.")
+            messages.error(self.request, "Niepoprawna struktura pliku.")
             return self.form_invalid(form)
 
         records_count = ws.max_row - 1

@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+{% load workflow_tags %}
 
 {% block title %}Panel startowy | Emission Impossible{% endblock %}
 
 {% block content %}
     <div class="mb-10">
-        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Witaj, {{ request.user.username|default:"Użytkowniku" }}!</h1>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+            Witaj, {{ request.user.username|default:"Użytkowniku" }}!
+        </h1>
         <p class="font-mono text-sm text-text-muted mt-2">ESG Dashboard: Podsumowanie i przegląd Twoich zadań</p>
     </div>
 
@@ -13,28 +16,54 @@
         <div class="lg:col-span-2 flex flex-col gap-4">
             <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Oczekujące Zadania</h2>
 
-            {% if pending_tasks %}
-                {% for task in pending_tasks %}
-                    <div class="bg-[#13383e]/40 border border-[#1a4a52] rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-[#13383e]/60 transition-colors backdrop-blur-sm">
-                        <div>
-                            <div class="flex items-center gap-3 mb-2">
-                                <h3 class="font-bold text-text-main text-lg">{{ task.title }}</h3>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-900/40 text-red-400 border border-red-500/30">
-                                    Wymaga poprawy
-                                </span>
+            {% if tasks %}
+                {% for task in tasks %}
+                    <div class="mb-6 bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-lg font-bold text-text-main">{{ task.title }}</h2>
+                                <p class="text-sm text-text-muted mt-1">{{ task.description }}</p>
+                                {% if task.deadline %}
+                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">Termin: {{ task.deadline|date:"d.m.Y" }}</p>
+                                {% endif %}
                             </div>
-                            <p class="font-mono text-sm text-gray-400 mb-1">
-                                <span class="text-text-muted">Uwaga:</span> {{ task.comment_text|truncatechars:80 }}
-                            </p>
-                            <p class="font-mono text-xs text-text-muted">
-                                Spółka: {{ task.company_name }} | Model: {{ task.model_name }}
-                            </p>
+                            <button
+                                onclick="toggleTaskDetails(this, 'task_details_{{ task.id }}')"
+                                class="text-xs font-bold font-mono text-accent hover:text-white transition-colors uppercase"
+                            >
+                                ZWIŃ/ROZWIŃ LISTĘ
+                            </button>
                         </div>
 
-                        <a href="{{ task.edit_url }}" class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-[#c8f535] px-5 py-2.5 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md">
-                            <span>Popraw wpis</span>
-                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                        </a>
+                        {% get_grouped_rejected_records task as grouped_records %}
+
+                        <div id="task_details_{{ task.id }}" class="mt-6 space-y-4">
+                            {% for category, data in grouped_records.items %}
+                                <div class="p-4 bg-black/20 border border-border-subtle rounded-xl">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="font-bold text-sm text-text-main">{{ category }}</span>
+                                        <div class="flex items-center gap-3">
+                                            <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">
+                                                {{ data.count }}
+                                            </span>
+                                            <a href="{{ data.list_url }}" class="text-xs font-mono bg-[#c8f535] text-[#1a4a52] px-3 py-1.5 rounded-md hover:bg-[#b5e02b] transition-colors font-bold shadow-sm">
+                                                Szczegóły
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2">
+                                        {% for item in data.items %}
+                                            <li class="flex justify-between items-center bg-[#111720] p-3 rounded-lg border border-border-subtle hover:border-yellow-500/30 transition-colors">
+                                                <span class="text-xs text-text-muted font-mono truncate mr-2">{{ item.str }}</span>
+                                                <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">Edytuj</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% empty %}
+                                <p class="text-xs text-text-muted italic">Brak odrzuconych rekordów w tej kategorii.</p>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -54,7 +83,8 @@
                 <a href="{% url 'reports:ghg-report' %}" class="flex flex-col items-center gap-3 group">
                     <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_rgba(91,196,190,0.3)]"
                          style="background:linear-gradient(145deg, #b8ece6, #5bc4be);">
-                        <span class="material-symbols-outlined" style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">book_2</span>
+                        <span class="material-symbols-outlined"
+                              style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">book_2</span>
                     </div>
                     <span class="font-mono text-xs font-bold text-text-muted group-hover:text-text-main transition-colors tracking-wide text-center">Raporty</span>
                 </a>
@@ -62,7 +92,8 @@
                 <a href="{% url 'emissions:factor-list' %}" class="flex flex-col items-center gap-3 group">
                     <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_rgba(91,196,190,0.3)]"
                          style="background:linear-gradient(145deg, #b8ece6, #5bc4be);">
-                        <span class="material-symbols-outlined" style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">pie_chart</span>
+                        <span class="material-symbols-outlined"
+                              style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">pie_chart</span>
                     </div>
                     <span class="font-mono text-xs font-bold text-text-muted group-hover:text-text-main transition-colors tracking-wide text-center">Wskaźniki Emisji</span>
                 </a>
@@ -70,7 +101,8 @@
                 <a href="{% url 'ai_services:global_assistant' %}" class="flex flex-col items-center gap-3 group">
                     <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_rgba(91,196,190,0.3)]"
                          style="background:linear-gradient(145deg, #b8ece6, #5bc4be);">
-                        <span class="material-symbols-outlined" style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">auto_awesome</span>
+                        <span class="material-symbols-outlined"
+                              style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">auto_awesome</span>
                     </div>
                     <span class="font-mono text-xs font-bold text-text-muted group-hover:text-text-main transition-colors tracking-wide text-center">AI Asystent</span>
                 </a>
@@ -78,11 +110,21 @@
                 <a href="{% url 'communications:thread_list' %}" class="flex flex-col items-center gap-3 group">
                     <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_rgba(91,196,190,0.3)]"
                          style="background:linear-gradient(145deg, #b8ece6, #5bc4be);">
-                        <span class="material-symbols-outlined" style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">mail</span>
+                        <span class="material-symbols-outlined"
+                              style="font-size:48px; color:#1a4a52; font-variation-settings:'FILL' 1;">mail</span>
                     </div>
                     <span class="font-mono text-xs font-bold text-text-muted group-hover:text-text-main transition-colors tracking-wide text-center">Komunikacja</span>
                 </a>
             </div>
         </div>
     </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script>
+        function toggleTaskDetails(btn, id) {
+            const container = document.getElementById(id);
+            container.classList.toggle('hidden');
+            btn.innerText = container.classList.contains('hidden') ? 'POKAŻ LISTĘ' : 'ZWIŃ LISTĘ';
+        }
+    </script>
 {% endblock %}

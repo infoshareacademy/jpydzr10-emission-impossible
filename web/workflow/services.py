@@ -2,10 +2,11 @@ from accounts.models import UserCompanyPermission
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.urls import reverse
 
 from workflow.models import WorkflowStatusMixin
 
-from .models import CompanyReportEnvelope, RecordComment, ReportingPeriod, Task
+from .models import CompanyReportEnvelope, RecordComment, Task
 
 
 @transaction.atomic
@@ -112,3 +113,46 @@ def finalize_envelope_review(envelope: CompanyReportEnvelope) -> str:
         envelope.status = CompanyReportEnvelope.Status.APPROVED
         envelope.save(update_fields=["status"])
         return "APPROVED"
+
+
+@transaction.atomic
+def request_record_clarification(
+    record: WorkflowStatusMixin, admin_user, message: str, deadline: str = None
+) -> Task:
+    if not message.strip():
+        raise ValueError("Uwaga nie może być pusta.")
+
+    record.workflow_status = WorkflowStatusMixin.RecordStatus.REJECTED
+    record.save(update_fields=["workflow_status"])
+    ctype = ContentType.objects.get_for_model(record)
+    RecordComment.objects.create(
+        author=admin_user, content_type=ctype, object_id=record.pk, text=message
+    )
+
+    task_title = (
+        f"Wymagane wyjaśnienie: {ctype.name.title()} dla spółki {record.company.name}"
+    )
+    task, created = Task.objects.get_or_create(
+        company=record.company,
+        task_type=Task.TaskType.CORRECTION,
+        is_completed=False,
+        defaults={
+            "title": task_title,
+            "description": "Administrator dodał uwagi do rekordu w celu ponownej weryfikacji.",
+            "deadline": deadline or None,
+        },
+    )
+
+    if not created and deadline:
+        task.deadline = deadline
+        task.save(update_fields=["deadline"])
+
+    permitted_users_ids = list(
+        UserCompanyPermission.objects.filter(company=record.company).values_list(
+            "user_id", flat=True
+        )
+    )
+    if permitted_users_ids:
+        task.assigned_to.add(*permitted_users_ids)
+
+    return task

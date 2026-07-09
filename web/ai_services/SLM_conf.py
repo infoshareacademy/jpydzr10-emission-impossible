@@ -3,13 +3,10 @@ import logging
 
 import ollama
 from companies.models import Companies
-from django.core.exceptions import PermissionDenied
 from django.db.models import Sum
 from emissions.models import (
     EnergyConsumption,
-    EnergyProduced,
     EnergyPurchased,
-    EnergySold,
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,

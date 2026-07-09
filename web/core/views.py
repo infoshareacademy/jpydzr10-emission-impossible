@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import TemplateView
-from workflow.models import RecordComment
+from workflow.models import Task
 
 from core.models import UserPageView
 
@@ -12,75 +11,19 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
 
-        if self.request.user.is_authenticated:
-            # 1. Ulubione skróty użytkownika
+        if user.is_authenticated:
             context["favorite_shortcuts"] = UserPageView.objects.filter(
-                user=self.request.user
+                user=user
             ).order_by("-visit_count")[:5]
 
-            # 2. Oczekujące zadania (Odrzucone rekordy do poprawy)
-            pending_tasks = []
-
-            # Pobieramy nierozwiązane komentarze (możesz w przyszłości dodać filtr
-            # po spółkach, do których konkretny user ma uprawnienia)
-            unresolved_comments = RecordComment.objects.filter(
-                is_resolved=False
-            ).prefetch_related("content_object")
-
-            for comment in unresolved_comments:
-                record = comment.content_object
-                if not record:
-                    continue
-
-                model_class = record.__class__
-                model_name = model_class._meta.model_name
-                app_label = model_class._meta.app_label
-
-                # Generowanie linku do edycji rekordu (z uwzględnieniem Scope 1 i Scope 2)
-                try:
-                    if app_label == "emissions":
-                        if model_name in [
-                            "stationarycombustion",
-                            "mobilecombustion",
-                            "processemission",
-                            "fugitiveemission",
-                        ]:
-                            edit_url = reverse(
-                                f"emissions:{model_name}-edit",
-                                kwargs={
-                                    "company_id": record.company_id,
-                                    "pk": record.pk,
-                                },
-                            )
-                        else:
-                            edit_url = reverse(
-                                f"emissions:{model_name}_edit", kwargs={"pk": record.pk}
-                            )
-                    else:
-                        edit_url = "#"
-                except Exception:
-                    edit_url = "#"
-
-                pending_tasks.append(
-                    {
-                        "title": f"Odrzucono: {model_class._meta.verbose_name}",
-                        "comment_text": comment.text,
-                        "company_name": (
-                            record.company.name
-                            if hasattr(record, "company")
-                            else "Brak danych"
-                        ),
-                        "model_name": str(record),
-                        "edit_url": edit_url,
-                    }
+            if user.is_staff or user.is_superuser:
+                context["tasks"] = Task.objects.filter(is_completed=False)
+            else:
+                context["tasks"] = Task.objects.filter(
+                    assigned_to=user, is_completed=False
                 )
-
-            context["pending_tasks"] = pending_tasks
-
-        else:
-            context["favorite_shortcuts"] = None
-            context["pending_tasks"] = []
 
         return context
 

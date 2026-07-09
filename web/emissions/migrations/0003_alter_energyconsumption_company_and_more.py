@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("companies", "0002_alter_companies_nip"),
         ("emissions", "0002_energyconsumption_energyproduced_energypurchased_and_more"),

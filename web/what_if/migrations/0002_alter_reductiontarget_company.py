@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("companies", "0002_alter_companies_nip"),
         ("what_if", "0001_initial"),

@@ -30,3 +30,5 @@ dependencies = [
     "redis>=7.4.0",
     "ruff>=0.15.6",
 ]
+[tool.black]
+target-version = ['py312']

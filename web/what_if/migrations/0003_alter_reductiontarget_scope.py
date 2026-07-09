@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("what_if", "0002_alter_reductiontarget_company"),
     ]

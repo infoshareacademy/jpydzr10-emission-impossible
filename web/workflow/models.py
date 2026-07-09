@@ -74,3 +74,13 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     deadline = models.DateField(null=True, blank=True)
     is_completed = models.BooleanField(default=False)
+
+
+@property
+def app_label(self):
+    return self._meta.app_label
+
+
+@property
+def model_name(self):
+    return self._meta.model_name

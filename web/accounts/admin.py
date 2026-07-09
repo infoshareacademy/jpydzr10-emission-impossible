@@ -7,7 +7,7 @@ from .models import CustomUser, UserCompanyPermission
 
 class UserCompanyPermissionInline(admin.TabularInline):
     model = UserCompanyPermission
-    fk_name = 'user'
+    fk_name = "user"
     extra = 1
 
 

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import RecordClarificationView
 
 app_name = "workflow"
 
@@ -20,5 +21,10 @@ urlpatterns = [
         "admin/review/<int:pk>/finalize/",
         views.AdminFinalizeReviewView.as_view(),
         name="finalize",
+    ),
+    path(
+        "admin/clarify/<str:app_label>/<str:model_name>/<int:pk>/",
+        RecordClarificationView.as_view(),
+        name="record_clarify",
     ),
 ]

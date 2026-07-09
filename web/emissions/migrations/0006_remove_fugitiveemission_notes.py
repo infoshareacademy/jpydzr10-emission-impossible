@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("emissions", "0005_delete_changelog_delete_reductiontarget_and_more"),
     ]

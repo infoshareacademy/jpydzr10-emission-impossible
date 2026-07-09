@@ -49,7 +49,6 @@ SQL_DROP_TRIGGER_FUNC = "DROP FUNCTION IF EXISTS audit_trigger_func;"
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0001_initial"),
     ]

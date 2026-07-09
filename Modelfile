@@ -1,0 +1,1 @@
+FROM speakleash/bielik-11b-v2.2-instruct:q4_k_m

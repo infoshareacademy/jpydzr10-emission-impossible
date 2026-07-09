@@ -8,7 +8,11 @@ from django.views.generic import DetailView, ListView, View
 from workflow.models import WorkflowStatusMixin
 
 from .models import CompanyReportEnvelope
-from .services import finalize_envelope_review, review_single_record
+from .services import (
+    finalize_envelope_review,
+    request_record_clarification,
+    review_single_record,
+)
 
 
 class AdminRequiredMixin(UserPassesTestMixin):
@@ -171,3 +175,37 @@ class AdminFinalizeReviewView(LoginRequiredMixin, AdminRequiredMixin, View):
             return JsonResponse({"status": "success", "result": result})
         except ValueError as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
+class RecordClarificationView(LoginRequiredMixin, AdminRequiredMixin, View):
+    """
+    Endpoint POST dla admina do dodawania uwag (żądań wyjaśnienia) do konkretnego rekordu.
+    """
+
+    def post(self, request, app_label, model_name, pk):
+        try:
+            model = apps.get_model(app_label, model_name)
+        except LookupError:
+            return JsonResponse(
+                {"status": "error", "message": "Nieznany model danych."}, status=404
+            )
+
+        record = get_object_or_404(model, pk=pk)
+        message = request.POST.get("message", "").strip()
+        deadline = request.POST.get("deadline", "").strip()
+
+        try:
+            request_record_clarification(record, request.user, message, deadline)
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "message": "Uwaga została wysłana do użytkownika.",
+                }
+            )
+        except ValueError as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse(
+                {"status": "error", "message": "Wystąpił błąd krytyczny serwera."},
+                status=500,
+            )

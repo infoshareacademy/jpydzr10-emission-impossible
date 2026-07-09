@@ -268,8 +268,7 @@ class BaseScope1Importer:
             return ""
         if len(text) > max_len:
             row.add_error(
-                f"Pole '{label}' jest za długie "
-                f"({len(text)} znaków, max: {max_len})."
+                f"Pole '{label}' jest za długie ({len(text)} znaków, max: {max_len})."
             )
             return None
         return text

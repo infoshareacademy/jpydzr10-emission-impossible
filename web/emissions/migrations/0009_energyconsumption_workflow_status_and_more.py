@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("emissions", "0008_alter_emissionfactor_country_and_more"),
     ]
