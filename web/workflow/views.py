@@ -1,14 +1,17 @@
 from django.apps import apps
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
-from django.views.generic import DetailView, ListView, View
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DetailView, ListView, View
 
 from workflow.models import WorkflowStatusMixin
 
-from .models import CompanyReportEnvelope
+from .forms import ReportingPeriodForm
+from .models import CompanyReportEnvelope, ReportingPeriod
 from .services import (
+    bulk_approve_company_records,
     finalize_envelope_review,
     request_record_clarification,
     review_single_record,
@@ -22,6 +25,39 @@ class AdminRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and (
             self.request.user.is_staff or self.request.user.is_superuser
         )
+
+
+class ReportingPeriodListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    """Lista wszystkich okresów raportowych"""
+
+    model = ReportingPeriod
+    template_name = "workflow/reporting_period_list.html"
+    context_object_name = "periods"
+    ordering = ["-year"]
+
+
+class ReportingPeriodCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    """Tworzenie nowego okresu raportowego"""
+
+    model = ReportingPeriod
+    form_class = ReportingPeriodForm
+    template_name = "workflow/reporting_period_form.html"
+    success_url = reverse_lazy("workflow:period_list")
+
+    def form_valid(self, form):
+        generate_envelopes = self.request.POST.get("generate_envelopes") == "true"
+
+        response = super().form_valid(form)
+
+        if generate_envelopes:
+            messages.success(
+                self.request,
+                f"Utworzono okres {self.object.year} i wygenerowano zadania dla spółek.",
+            )
+        else:
+            messages.success(self.request, f"Utworzono pusty okres {self.object.year}.")
+
+        return response
 
 
 class AdminEnvelopeListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
@@ -209,3 +245,19 @@ class RecordClarificationView(LoginRequiredMixin, AdminRequiredMixin, View):
                 {"status": "error", "message": "Wystąpił błąd krytyczny serwera."},
                 status=500,
             )
+
+
+class AdminBulkApproveView(LoginRequiredMixin, AdminRequiredMixin, View):
+    def post(self, request, envelope_id):
+        envelope = get_object_or_404(CompanyReportEnvelope, pk=envelope_id)
+
+        if envelope.status == CompanyReportEnvelope.Status.APPROVED:
+            return JsonResponse(
+                {"status": "error", "message": "Raport już zatwierdzony"}, status=400
+            )
+
+        try:
+            count = bulk_approve_company_records(envelope)
+            return JsonResponse({"status": "success", "count": count})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)

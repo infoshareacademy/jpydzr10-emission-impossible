@@ -1,10 +1,11 @@
 from accounts.models import UserCompanyPermission
+from companies.models import Companies
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.urls import reverse
 
-from workflow.models import WorkflowStatusMixin
+from workflow.models import ReportingPeriod, WorkflowStatusMixin
 
 from .models import CompanyReportEnvelope, RecordComment, Task
 
@@ -157,6 +158,7 @@ def request_record_clarification(
 
     return task
 
+
 @transaction.atomic
 def bulk_approve_company_records(envelope: CompanyReportEnvelope) -> int:
     """
@@ -172,7 +174,7 @@ def bulk_approve_company_records(envelope: CompanyReportEnvelope) -> int:
             queryset = model.objects.filter(
                 company=envelope.company,
                 workflow_status=WorkflowStatusMixin.RecordStatus.PENDING,
-            ) 
+            )
 
             if hasattr(model, "year"):
                 queryset = queryset.filter(year=envelope.period.year)
@@ -184,3 +186,58 @@ def bulk_approve_company_records(envelope: CompanyReportEnvelope) -> int:
             )
 
     return count
+
+
+@transaction.atomic
+def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
+    """
+    Wydajna funkcja bulk-insert generująca koperty i zadania startowe
+    dla wszystkich aktywnych spółek w systemie.
+    """
+    # Pobieramy wszystkie spółki (warto dodać filtr is_active=True jeśli taki masz w modelu Companies)
+    companies = Companies.objects.all()
+    existing_envelopes = set(
+        CompanyReportEnvelope.objects.filter(period=period).values_list(
+            "company_id", flat=True
+        )
+    )
+
+    envelopes_to_create = []
+    tasks_to_create = []
+
+    task_title = f"Uruchomiono proces zbierania danych za okres {period.year}"
+
+    for company in companies:
+        if company.id not in existing_envelopes:
+            envelopes_to_create.append(
+                CompanyReportEnvelope(
+                    period=period,
+                    company=company,
+                    status=CompanyReportEnvelope.Status.OPEN,
+                )
+            )
+            tasks_to_create.append(
+                Task(
+                    company=company,
+                    task_type=Task.TaskType.DATA_ENTRY,
+                    title=task_title,
+                    description=f"Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za rok {period.year} do wskazanego terminu.",
+                    deadline=period.deadline,
+                    is_completed=False,
+                )
+            )
+    CompanyReportEnvelope.objects.bulk_create(envelopes_to_create)
+    created_tasks = Task.objects.bulk_create(tasks_to_create)
+    company_users_qs = UserCompanyPermission.objects.filter(
+        company__in=companies
+    ).values_list("company_id", "user_id")
+    company_to_users = {}
+    for cid, uid in company_users_qs:
+        company_to_users.setdefault(cid, []).append(uid)
+
+    for task in created_tasks:
+        uids = company_to_users.get(task.company_id, [])
+        if uids:
+            task.assigned_to.add(*uids)
+
+    return len(envelopes_to_create)

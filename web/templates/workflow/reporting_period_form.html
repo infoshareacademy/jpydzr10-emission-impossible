@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Nowy Okres Raportowy | Emission Impossible{% endblock %}
+
+{% block content %}
+    <div class="max-w-2xl mx-auto">
+        <div class="flex items-center gap-3 mb-8">
+            <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+            <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">Utwórz Okres Raportowy</h1>
+        </div>
+
+        <form id="periodForm" method="post" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 backdrop-blur-sm shadow-xl">
+            {% csrf_token %}
+        <!-- Ukryte pole na flagę -->
+            <input type="hidden" name="generate_envelopes" id="generateEnvelopesInput" value="false">
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Rok raportowy</label>
+                    {{ form.year }}
+                </div>
+
+                <div>
+                    <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Termin wykonania (Deadline)</label>
+                    {{ form.deadline }}
+                    <p class="text-xs font-mono text-text-muted mt-1 opacity-70">Ten termin zostanie przypisany do zadań (Tasków) użytkowników.</p>
+                </div>
+
+                <div class="flex items-center gap-3 mt-4 bg-white/5 p-4 rounded-xl border border-[#1a4a52]">
+                    {{ form.is_active }}
+                    <label class="font-mono text-sm text-text-main font-bold cursor-pointer">Oznacz jako aktywny (widoczny w systemie)</label>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-4 border-t border-[#1a4a52] pt-6">
+                <a href="{% url 'workflow:period_list' %}" class="px-6 py-2.5 rounded-xl font-mono text-sm font-bold text-text-muted border border-[#1a4a52] hover:text-text-main hover:bg-[#1a4a52]/50 transition-colors">
+                    Anuluj
+                </a>
+                <button type="button" onclick="handleFormSubmit()" class="px-6 py-2.5 rounded-xl font-mono text-sm font-bold bg-[#c8f535] text-[#1a4a52] hover:bg-[#b5e02b] transition-all shadow-sm">
+                    Zapisz okres
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        function handleFormSubmit() {
+            const userWantsEnvelopes = confirm(
+                "Czy chcesz natychmiast przypisać wszystkie spółki do tego okresu i otworzyć im raporty?\n\n" +
+                "Kliknięcie 'OK' wygeneruje zadania dla wszystkich użytkowników.\n" +
+                "Kliknięcie 'Anuluj' tylko utworzy pusty okres w systemie."
+            );
+
+            if (userWantsEnvelopes) {
+                document.getElementById('generateEnvelopesInput').value = "true";
+            }
+
+    // Blokada przycisku przed podwójnym wysłaniem
+            const btn = document.querySelector('button[type="button"]');
+            btn.disabled = true;
+            btn.innerText = 'Przetwarzanie...';
+
+            document.getElementById('periodForm').submit();
+        }
+    </script>
+{% endblock %}
