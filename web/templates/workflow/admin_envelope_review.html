@@ -14,9 +14,10 @@
       <p class="font-mono text-sm text-text-muted ml-4">Rok raportowy: {{ envelope.period.year }}</p>
     </div>
 
-    <button id="finalizeBtn" data-id="{{ envelope.pk }}" class="inline-flex items-center gap-2 rounded-lg bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md">
+    <button onclick="bulkApprove({{ envelope.pk }})" class="inline-flex items-center gap-2 rounded-lg bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md"
+      {% if envelope.status != 'IN_REVIEW' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
       <span class="material-symbols-outlined text-[20px]">task_alt</span>
-      Sfinalizuj i Zamknij
+      ZAAKCEPTUJ WSZYSTKIE REKORDY
     </button>
   </div>
 
@@ -196,5 +197,23 @@
         }
       });
     });
+
+    function bulkApprove(envelopeId) {
+      if (!confirm("Czy na pewno chcesz zaakceptować wszystkie rekordy w tym raporcie?")) return;
+
+      fetch(`/workflow/admin/envelope/${envelopeId}/bulk-approve/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": '{{ csrf_token }}' }
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === "success") {
+            alert("Zaakceptowano " + data.count + " rekordów.");
+            window.location.reload();
+          } else {
+            alert("Błąd: " + data.message);
+          }
+        });
+    }
   </script>
 {% endblock %}

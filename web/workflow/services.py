@@ -156,3 +156,31 @@ def request_record_clarification(
         task.assigned_to.add(*permitted_users_ids)
 
     return task
+
+@transaction.atomic
+def bulk_approve_company_records(envelope: CompanyReportEnvelope) -> int:
+    """
+    Zbiorczo zatwierdza wszystkie rekordy spółki dla danego okresu.
+    Zwraca liczbę zaktualizowanych rekordów.
+    """
+    if envelope.status == CompanyReportEnvelope.Status.APPROVED:
+        raise ValueError("Raport jest już zatwierdzony.")
+
+    count = 0
+    for model in apps.get_models():
+        if issubclass(model, WorkflowStatusMixin) and hasattr(model, "company"):
+            queryset = model.objects.filter(
+                company=envelope.company,
+                workflow_status=WorkflowStatusMixin.RecordStatus.PENDING,
+            ) 
+
+            if hasattr(model, "year"):
+                queryset = queryset.filter(year=envelope.period.year)
+            elif hasattr(model, "date"):
+                queryset = queryset.filter(date__year=envelope.period.year)
+
+            count += queryset.update(
+                workflow_status=WorkflowStatusMixin.RecordStatus.APPROVED
+            )
+
+    return count
