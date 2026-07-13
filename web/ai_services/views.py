@@ -1,6 +1,7 @@
 import json
 
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -8,11 +9,11 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
 from django_ratelimit.decorators import ratelimit
 
-from .models import AIChatMessage, AIChatSession  # <--- IMPORT NOWYCH MODELI
+from .models import AIChatMessage, AIChatSession
 from .SLM_conf import BielikESGService
 
 
-class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
+class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
     template_name = "ai_services/global_chat.html"
 
     @method_decorator(ensure_csrf_cookie)

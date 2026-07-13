@@ -2,6 +2,7 @@ import json
 from decimal import Decimal
 
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
@@ -29,7 +30,7 @@ from .forms import ReductionTargetForm, SimulationForm
 from .models import ReductionTarget
 
 
-class ReductionTargetListView(LoginRequiredMixin, ListView):
+class ReductionTargetListView(PageViewTrackerMixin, LoginRequiredMixin, ListView):
     """Widok listy celów redukcyjnych z wbudowanym filtrem wyboru spółki."""
 
     model = ReductionTarget
