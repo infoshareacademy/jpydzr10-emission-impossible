@@ -1,3 +1,4 @@
+from companies.models import Companies
 from django.core.exceptions import PermissionDenied
 
 from .models import CompanyReportEnvelope, ReportingPeriod
@@ -15,19 +16,26 @@ class ReportLockMixin:
             company = self._get_target_company()
             active_period = ReportingPeriod.objects.filter(is_active=True).first()
 
-            if company and active_period:
-                envelope = CompanyReportEnvelope.objects.filter(
-                    company=company, period=active_period
-                ).first()
+            if not active_period and not request.user.is_staff:
+                raise PermissionDenied(
+                    "Obecnie nie ma aktywnego okresu raportowego. Dodawanie i edycja danych są zablokowane."
+                )
 
-                if envelope and envelope.status in [
-                    CompanyReportEnvelope.Status.IN_REVIEW,
-                    CompanyReportEnvelope.Status.APPROVED,
-                ]:
-                    raise PermissionDenied(
-                        "Edycja jest zablokowana. Raport dla tej spółki został "
-                        "przekazany do weryfikacji lub jest już zatwierdzony."
-                    )
+            if active_period:
+                company = self._get_target_company()
+                if company:
+                    envelope = CompanyReportEnvelope.objects.filter(
+                        company=company, period=active_period
+                    ).first()
+
+                    if envelope and envelope.status in [
+                        CompanyReportEnvelope.Status.IN_REVIEW,
+                        CompanyReportEnvelope.Status.APPROVED,
+                    ]:
+                        raise PermissionDenied(
+                            "Edycja jest zablokowana. Raport dla tej spółki został "
+                            "przekazany do weryfikacji lub jest już zatwierdzony."
+                        )
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -41,7 +49,6 @@ class ReportLockMixin:
                 pass
 
         if self.request.method == "POST" and "company" in self.request.POST:
-            from companies.models import Companies
 
             return Companies.objects.filter(id=self.request.POST.get("company")).first()
 

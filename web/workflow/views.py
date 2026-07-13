@@ -13,6 +13,7 @@ from .models import CompanyReportEnvelope, ReportingPeriod
 from .services import (
     bulk_approve_company_records,
     finalize_envelope_review,
+    generate_envelopes_and_tasks_for_period,
     request_record_clarification,
     review_single_record,
 )
@@ -50,6 +51,7 @@ class ReportingPeriodCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateVi
         response = super().form_valid(form)
 
         if generate_envelopes:
+            count = generate_envelopes_and_tasks_for_period(self.object)
             messages.success(
                 self.request,
                 f"Utworzono okres {self.object.year} i wygenerowano zadania dla spółek.",

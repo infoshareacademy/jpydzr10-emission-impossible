@@ -194,8 +194,7 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
     Wydajna funkcja bulk-insert generująca koperty i zadania startowe
     dla wszystkich aktywnych spółek w systemie.
     """
-    # Pobieramy wszystkie spółki (warto dodać filtr is_active=True jeśli taki masz w modelu Companies)
-    companies = Companies.objects.all()
+    companies = Companies.objects.filter(is_active=True)
     existing_envelopes = set(
         CompanyReportEnvelope.objects.filter(period=period).values_list(
             "company_id", flat=True
@@ -226,6 +225,9 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
                     is_completed=False,
                 )
             )
+    if not envelopes_to_create:
+        return 0
+
     CompanyReportEnvelope.objects.bulk_create(envelopes_to_create)
     created_tasks = Task.objects.bulk_create(tasks_to_create)
     company_users_qs = UserCompanyPermission.objects.filter(

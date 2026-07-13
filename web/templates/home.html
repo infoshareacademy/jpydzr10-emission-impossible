@@ -16,53 +16,77 @@
         <div class="lg:col-span-2 flex flex-col gap-4">
             <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Oczekujące Zadania</h2>
 
-            {% if tasks %}
-                {% for task in tasks %}
+            {% if grouped_tasks %}
+                {% for group in grouped_tasks %}
                     <div class="mb-6 bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl backdrop-blur-sm">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h2 class="text-lg font-bold text-text-main">{{ task.title }}</h2>
-                                <p class="text-sm text-text-muted mt-1">{{ task.description }}</p>
-                                {% if task.deadline %}
-                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">Termin: {{ task.deadline|date:"d.m.Y" }}</p>
+                                <h2 class="text-lg font-bold text-text-main">{{ group.title }}</h2>
+                                <p class="text-sm text-text-muted mt-1">{{ group.description }}</p>
+                                {% if group.deadline %}
+                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">Termin: {{ group.deadline|date:"d.m.Y" }}</p>
                                 {% endif %}
                             </div>
                             <button
-                                onclick="toggleTaskDetails(this, 'task_details_{{ task.id }}')"
+                                onclick="toggleTaskDetails(this, 'task_details_{{ forloop.counter }}')"
                                 class="text-xs font-bold font-mono text-accent hover:text-white transition-colors uppercase"
                             >
                                 ZWIŃ/ROZWIŃ LISTĘ
                             </button>
                         </div>
 
-                        {% get_grouped_rejected_records task as grouped_records %}
-
-                        <div id="task_details_{{ task.id }}" class="mt-6 space-y-4">
-                            {% for category, data in grouped_records.items %}
-                                <div class="p-4 bg-black/20 border border-border-subtle rounded-xl">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <span class="font-bold text-sm text-text-main">{{ category }}</span>
-                                        <div class="flex items-center gap-3">
-                                            <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">
-                                                {{ data.count }}
-                                            </span>
-                                            <a href="{{ data.list_url }}" class="text-xs font-mono bg-[#c8f535] text-[#1a4a52] px-3 py-1.5 rounded-md hover:bg-[#b5e02b] transition-colors font-bold shadow-sm">
-                                                Szczegóły
-                                            </a>
-                                        </div>
-                                    </div>
+                        <div id="task_details_{{ forloop.counter }}" class="mt-6 space-y-4">
+                            {% if group.tasks|length > 1 %}
+                                <div class="p-4 bg-black/20 border border-border-subtle rounded-xl mb-4">
+                                    <span class="font-bold text-sm text-text-main mb-3 block">Dotyczy spółek ({{ group.tasks|length }}):</span>
                                     <ul class="space-y-2">
-                                        {% for item in data.items %}
-                                            <li class="flex justify-between items-center bg-[#111720] p-3 rounded-lg border border-border-subtle hover:border-yellow-500/30 transition-colors">
-                                                <span class="text-xs text-text-muted font-mono truncate mr-2">{{ item.str }}</span>
-                                                <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">Edytuj</a>
+                                        {% for task in group.tasks %}
+                                            <li class="flex items-center bg-[#111720] p-3 rounded-lg border border-border-subtle">
+                                                <span class="material-symbols-outlined text-accent text-sm mr-2">business</span>
+                                                <span class="text-xs text-text-main font-mono">{{ task.company.name }}</span>
                                             </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
-                            {% empty %}
-                                <p class="text-xs text-text-muted italic">Brak odrzuconych rekordów w tej kategorii.</p>
+                            {% endif %}
+                            {% for task in group.tasks %}
+                                {% get_grouped_rejected_records task as grouped_records %}
+
+                                {% if grouped_records %}
+                                    {% if group.tasks|length > 1 %}
+                                        <p class="text-xs font-bold text-text-muted mt-4 mb-2 uppercase tracking-wider">Szczegóły dla: {{ task.company.name }}</p>
+                                    {% endif %}
+
+                                    {% for category, data in grouped_records.items %}
+                                        <div class="p-4 bg-black/20 border border-border-subtle rounded-xl">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <span class="font-bold text-sm text-text-main">{{ category }}</span>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">
+                                                        {{ data.count }}
+                                                    </span>
+                                                    <a href="{{ data.list_url }}" class="text-xs font-mono bg-[#c8f535] text-[#1a4a52] px-3 py-1.5 rounded-md hover:bg-[#b5e02b] transition-colors font-bold shadow-sm">
+                                                        Szczegóły
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <ul class="space-y-2">
+                                                {% for item in data.items %}
+                                                    <li class="flex justify-between items-center bg-[#111720] p-3 rounded-lg border border-border-subtle hover:border-yellow-500/30 transition-colors">
+                                                        <span class="text-xs text-text-muted font-mono truncate mr-2">{{ item.str }}</span>
+                                                        <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">Edytuj</a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% if group.tasks|length == 1 %}
+                                        <p class="text-xs text-text-muted italic">Brak odrzuconych rekordów w tej kategorii.</p>
+                                    {% endif %}
+                                {% endif %}
                             {% endfor %}
+
                         </div>
                     </div>
                 {% endfor %}
