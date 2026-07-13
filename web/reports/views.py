@@ -2,6 +2,7 @@ import json
 
 from accounts.models import UserCompanyPermission
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.views.generic import TemplateView
@@ -22,7 +23,7 @@ EMISSION_FIELDS = {
 DEFAULT_STATUSES = [choice[0] for choice in WorkflowStatusMixin.RecordStatus.choices]
 
 
-class GHGReportView(LoginRequiredMixin, TemplateView):
+class GHGReportView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
     template_name = "reports/ghg_report.html"
 
     def get_accessible_companies(self):

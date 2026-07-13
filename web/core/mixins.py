@@ -28,3 +28,4 @@ class PageViewTrackerMixin:
             UserPageView.objects.filter(pk=obj.pk).update(
                 visit_count=F("visit_count") + 1, url_path=request.path
             )
+

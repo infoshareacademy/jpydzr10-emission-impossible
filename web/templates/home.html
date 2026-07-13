@@ -10,7 +10,51 @@
         </h1>
         <p class="font-mono text-sm text-text-muted mt-2">ESG Dashboard: Podsumowanie i przegląd Twoich zadań</p>
     </div>
+    <div class="mt-12">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="font-heading font-bold text-2xl text-text-main">Cele Redukcyjne</h2>
+            <select id="targetSelector" onchange="scrollToTarget(this.value)"
+                    class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg px-4 py-2 outline-none">
+                {% for target in reduction_targets %}
+                    <option value="target-{{ target.id }}">{{ target.target_name }} ({{ target.company.name }})</option>
+                {% endfor %}
+            </select>
+        </div>
 
+        <div id="carousel" class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory scroll-smooth">
+            {% for target in reduction_targets %}
+                <div id="target-{{ target.id }}" class="min-w-[400px] snap-center bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl relative">
+            <!-- 3 kropeczki (menu) -->
+                    <a href="{% url 'what_if:reduction-target-detail' target.id %}" class="absolute top-4 right-4 text-text-muted hover:text-white">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </a>
+
+            <!-- Status bar -->
+                    <div class="w-full h-2 rounded-full mb-4 bg-gray-700">
+                        <div class="h-full rounded-full {% if target.chart_data.status_color == 'green' %}bg-green-500{% elif target.chart_data.status_color == 'yellow' %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: 70%;"></div>
+                    </div>
+
+                    <h3 class="font-bold text-lg text-text-main mb-1">{{ target.target_name }}</h3>
+                    <p class="text-xs text-text-muted mb-4">{{ target.company.name }}</p>
+
+                    <div class="h-48 w-full relative">
+                        <canvas id="chart-{{ target.id }}"></canvas>
+                    </div>
+
+                    <div class="flex justify-between items-end mt-4">
+                        <div class="text-left">
+                            <p class="text-xs text-text-muted">Emisja (obecna):</p>
+                            <p class="font-mono text-lg text-text-main">{{ target.chart_data.current_emission|floatformat:1 }} t</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-text-muted">Cel ({{ target.target_year }}):</p>
+                            <p class="font-mono text-lg text-accent">{{ target.chart_data.target_emission|floatformat:1 }} t</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto w-full">
 
         <div class="lg:col-span-2 flex flex-col gap-4">
@@ -126,5 +170,29 @@
             container.classList.toggle('hidden');
             btn.innerText = container.classList.contains('hidden') ? 'POKAŻ LISTĘ' : 'ZWIŃ LISTĘ';
         }
+        function scrollToTarget(id) {
+    const element = document.getElementById(id);
+    element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+}
+        document.addEventListener('DOMContentLoaded', function() {
+        {% for target in reduction_targets %}
+        new Chart(document.getElementById('chart-{{ target.id }}'), {
+            type: 'bar',
+            data: {
+                labels: {{ target.chart_data.years|safe }},
+                datasets: [
+                    { label: 'Scope 1', data: {{ target.chart_data.s1|safe }}, backgroundColor: '#c8f535', stack: 'stack1' },
+                    { label: 'Scope 2', data: {{ target.chart_data.s2|safe }}, backgroundColor: '#2dd4bf', stack: 'stack1' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { stacked: true, ticks: { color: '#9ca3af' } }, y: { stacked: true, ticks: { color: '#9ca3af' } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+        {% endfor %}
+});
     </script>
+
 {% endblock %}

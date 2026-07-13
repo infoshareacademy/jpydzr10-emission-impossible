@@ -2,7 +2,6 @@ from companies.models import Companies
 from django.db import models
 
 
-# Create your models here.
 class ReductionTarget(models.Model):
     SCOPE_CHOICES = [
         ("Scope 1", "Zakres 1 (Emisje bezpośrednie)"),
