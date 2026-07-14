@@ -5,6 +5,7 @@ from companies.models import Companies
 from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -64,8 +65,12 @@ class ReductionTargetListView(PageViewTrackerMixin, LoginRequiredMixin, ListView
 
         allowed_companies = self.get_allowed_companies()
         self.company = get_object_or_404(allowed_companies, pk=company_id)
-        return ReductionTarget.objects.filter(company=self.company).order_by(
-            "target_year"
+
+        # Zabezpieczenie przed N+1 przez dołączenie relacji 'goal' i 'company'
+        return (
+            ReductionTarget.objects.filter(company=self.company)
+            .select_related("company", "goal")
+            .order_by("goal__target_year")
         )
 
     def get_context_data(self, **kwargs):
@@ -86,6 +91,12 @@ class ReductionTargetMixin(LoginRequiredMixin):
     model = ReductionTarget
     form_class = ReductionTargetForm
     template_name = "what_if/reduction_target_form.html"
+
+    def get_form_kwargs(self):
+        """Wstrzykuje aktywną spółkę do formularza, aby przefiltrować listę celów."""
+        kwargs = super().get_form_kwargs()
+        kwargs["company"] = getattr(self, "company", None)
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("what_if:reduction-target-list")
@@ -116,13 +127,22 @@ class ReductionTargetMixin(LoginRequiredMixin):
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.company = self.company
+
+        if (
+            ReductionTarget.objects.filter(company=self.company, goal=instance.goal)
+            .exclude(pk=instance.pk)
+            .exists()
+        ):
+            form.add_error("goal", "Ten cel został już przypisany do wybranej spółki.")
+            return self.form_invalid(form)
+
         is_new = instance.pk is None
         instance.save()
 
-        action_text = "dodano nowy" if is_new else "zaktualizowano"
+        action_text = "przypisano" if is_new else "zaktualizowano przypisanie"
         messages.success(
             self.request,
-            f"Pomyślnie {action_text} cel redukcyjny: {instance.target_name} dla {self.company.name}",
+            f"Pomyślnie {action_text} cel redukcyjny: {instance.goal.name} dla {self.company.name}",
         )
         return HttpResponseRedirect(self.get_success_url())
 
@@ -248,32 +268,55 @@ class ReductionTargetDetailView(LoginRequiredMixin, DetailView):
         target = self.object
 
         years = list(range(target.base_year, target.target_year + 1))
+        qs_filters = {"company": target.company, "year__in": years}
+
+        def get_yearly_totals(model_class):
+            qs = (
+                model_class.objects.filter(**qs_filters)
+                .values("year")
+                .annotate(t=Sum("emission_tco2eq"))
+            )
+            return {item["year"]: item["t"] or Decimal("0.0") for item in qs}
+
+        mob_totals = (
+            get_yearly_totals(MobileCombustion)
+            if target.scope in ["Scope 1", "1+2"]
+            else {}
+        )
+        stat_totals = (
+            get_yearly_totals(StationaryCombustion)
+            if target.scope in ["Scope 1", "1+2"]
+            else {}
+        )
+        proc_totals = (
+            get_yearly_totals(ProcessEmission)
+            if target.scope in ["Scope 1", "1+2"]
+            else {}
+        )
+        fug_totals = (
+            get_yearly_totals(FugitiveEmission)
+            if target.scope in ["Scope 1", "1+2"]
+            else {}
+        )
+        e_totals = (
+            get_yearly_totals(EnergyConsumption)
+            if target.scope in ["Scope 2", "1+2"]
+            else {}
+        )
+
         actual_emissions_by_year = []
 
         for y in years:
             total_y = Decimal("0.0")
-            qs_filters = {"company": target.company, "year": y}
 
             if target.scope in ["Scope 1", "1+2"]:
-                mob_sum = MobileCombustion.objects.filter(**qs_filters).aggregate(
-                    t=Sum("emission_tco2eq")
-                )["t"] or Decimal("0")
-                stat_sum = StationaryCombustion.objects.filter(**qs_filters).aggregate(
-                    t=Sum("emission_tco2eq")
-                )["t"] or Decimal("0")
-                proc_sum = ProcessEmission.objects.filter(**qs_filters).aggregate(
-                    t=Sum("emission_tco2eq")
-                )["t"] or Decimal("0")
-                fug_sum = FugitiveEmission.objects.filter(**qs_filters).aggregate(
-                    t=Sum("emission_tco2eq")
-                )["t"] or Decimal("0")
-                total_y += mob_sum + stat_sum + proc_sum + fug_sum
+                total_y += mob_totals.get(y, Decimal("0.0"))
+                total_y += stat_totals.get(y, Decimal("0.0"))
+                total_y += proc_totals.get(y, Decimal("0.0"))
+                total_y += fug_totals.get(y, Decimal("0.0"))
 
             if target.scope in ["Scope 2", "1+2"]:
-                e_sum = EnergyConsumption.objects.filter(**qs_filters).aggregate(
-                    t=Sum("emission_tco2eq")
-                )["t"] or Decimal("0")
-                total_y += e_sum
+                total_y += e_totals.get(y, Decimal("0.0"))
 
             actual_emissions_by_year.append(float(total_y))
 

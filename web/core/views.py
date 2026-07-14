@@ -101,7 +101,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
         targets = ReductionTarget.objects.filter(
             company__in=allowed_companies
-        ).select_related("company")
+        ).select_related("company", "goal")
 
         # Przygotowanie danych dla każdego celu
         for target in targets:
