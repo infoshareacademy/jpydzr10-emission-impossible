@@ -13,6 +13,10 @@ class ReportingPeriod(models.Model):
     class Meta:
         db_table = "workflow_reporting_period"
 
+    def __str__(self):
+        status = " (Aktywny)" if self.is_active else ""
+        return f"Okres raportowy: {self.year}{status}"
+
 
 class CompanyReportEnvelope(models.Model):
     class Status(models.TextChoices):
@@ -30,6 +34,9 @@ class CompanyReportEnvelope(models.Model):
     class Meta:
         db_table = "workflow_company_envelope"
         unique_together = ("period", "company")
+
+    def __str__(self):
+        return f"{self.company} | {self.period.year} - {self.get_status_display()}"
 
 
 class WorkflowStatusMixin(models.Model):
@@ -49,6 +56,14 @@ class WorkflowStatusMixin(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def app_label(self):
+        return self._meta.app_label
+
+    @property
+    def model_name(self):
+        return self._meta.model_name
+
 
 class RecordComment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -59,6 +74,10 @@ class RecordComment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_resolved = models.BooleanField(default=False)
 
+def __str__(self):
+    truncated_text = f"{self.text[:30]}..." if len(self.text) > 30 else self.text
+    resolved_mark = " [Rozwiązany]" if self.is_resolved else ""
+    return f"{self.author} ({self.created_at.strftime('%Y-%m-%d')}): {truncated_text}{resolved_mark}"
 
 class Task(models.Model):
     class TaskType(models.TextChoices):
@@ -75,12 +94,6 @@ class Task(models.Model):
     deadline = models.DateField(null=True, blank=True)
     is_completed = models.BooleanField(default=False)
 
-
-@property
-def app_label(self):
-    return self._meta.app_label
-
-
-@property
-def model_name(self):
-    return self._meta.model_name
+    def __str__(self):
+        status_icon = "✅" if self.is_completed else "⏳"
+        return f"{status_icon} {self.title} | {self.company}"
