@@ -222,8 +222,8 @@
               {% if request.user.is_staff or request.user.is_superuser %}
               <button
                 type="button"
-                onclick="openClarificationModal('{{ app_label }}', '{{ model_name }}', '{{ obj.pk }}')"
-                class="p-1.5 rounded-lg border border-yellow-500/30 text-yellow-500 hover:text-yellow-400 transition-colors"
+                data-url="{% url 'workflow:record_clarify' app_label=obj.app_label model_name=obj.model_name pk=obj.pk %}"
+                class="js-open-clarification p-1.5 rounded-lg border border-yellow-500/30 text-yellow-500 hover:text-yellow-400 transition-colors"
                 title="Zgłoś uwagi"
               >
                 <span class="material-symbols-outlined" style="font-size: 16px">chat_bubble</span>
@@ -289,9 +289,7 @@
                   </p>
 
                   <!-- Ukryte pola na dane rekordu -->
-                  <input type="hidden" id="modalAppLabel" name="app_label">
-                  <input type="hidden" id="modalModelName" name="model_name">
-                  <input type="hidden" id="modalRecordPk" name="pk">
+                  <input type="hidden" id="modalSubmitUrl" name="submit_url">
 
                   <textarea
                     id="modalMessage"
@@ -344,77 +342,83 @@
 
 {% block extra_scripts %}
 <script>
-  const modal = document.getElementById('clarificationModal');
-  const form = document.getElementById('clarificationForm');
-  const submitBtn = document.getElementById('submitClarificationBtn');
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('clarificationModal');
+    const form = document.getElementById('clarificationForm');
+    const submitBtn = document.getElementById('submitClarificationBtn');
 
-  function openClarificationModal(appLabel, modelName, pk) {
-    document.getElementById('modalAppLabel').value = appLabel;
-    document.getElementById('modalModelName').value = modelName;
-    document.getElementById('modalRecordPk').value = pk;
+    // 1. Otwieranie modala (Event Delegation)
+    document.body.addEventListener('click', function(e) {
+      const btn = e.target.closest('.js-open-clarification');
+      if (!btn) return;
 
-    document.getElementById('modalMessage').value = '';
-    document.getElementById('modalDeadline').value = ''
+      // Pobieramy wygenerowany w Django URL i wrzucamy do hidden inputa
+      document.getElementById('modalSubmitUrl').value = btn.dataset.url;
 
-    modal.classList.remove('hidden');
-    document.getElementById('modalMessage').focus();
-  }
+      document.getElementById('modalMessage').value = '';
+      document.getElementById('modalDeadline').value = '';
 
-  function closeClarificationModal() {
-    modal.classList.add('hidden');
-  }
+      modal.classList.remove('hidden');
+      document.getElementById('modalMessage').focus();
+    });
 
-  function submitClarification(event) {
-    event.preventDefault();
+    // 2. Zamykanie modala
+    function closeClarificationModal() {
+      modal.classList.add('hidden');
+    }
 
-    const appLabel = document.getElementById('modalAppLabel').value;
-    const modelName = document.getElementById('modalModelName').value;
-    const pk = document.getElementById('modalRecordPk').value;
-    const message = document.getElementById('modalMessage').value;
-    const deadline = document.getElementById('modalDeadline').value;
-    const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal.children[0]) closeClarificationModal();
+    });
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size: 16px">sync</span> Wysyłanie...';
-
-    fetch(`/workflow/admin/clarify/${appLabel}/${modelName}/${pk}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": csrfToken
-      },
-      body: new URLSearchParams({ message: message, deadline: deadline })    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "success") {
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
         closeClarificationModal();
-        window.location.reload();
-      } else {
-        alert(`Błąd: ${data.message}`);
+      }
+    });
+
+    // 3. Wysyłanie formularza
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      // Odczytujemy bezpieczny URL z ukrytego pola
+      const targetUrl = document.getElementById('modalSubmitUrl').value;
+      const message = document.getElementById('modalMessage').value;
+      const deadline = document.getElementById('modalDeadline').value;
+      const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size: 16px">sync</span> Wysyłanie...';
+
+      try {
+        const response = await fetch(targetUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+          },
+          body: new URLSearchParams({ message: message, deadline: deadline })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+          closeClarificationModal();
+          window.location.reload();
+        } else {
+          alert(`Błąd: ${data.message}`);
+          resetSubmitButton();
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Wystąpił błąd krytyczny podczas łączenia z serwerem.");
         resetSubmitButton();
       }
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Wystąpił błąd krytyczny podczas łączenia z serwerem.");
-      resetSubmitButton();
     });
-  }
 
-  function resetSubmitButton() {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Wyślij uwagi';
-  }
-
-  modal.addEventListener('click', function(event) {
-    if (event.target === modal.children[0]) {
-      closeClarificationModal();
-    }
-  });
-
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
-      closeClarificationModal();
+    function resetSubmitButton() {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Wyślij uwagi';
     }
   });
 </script>
