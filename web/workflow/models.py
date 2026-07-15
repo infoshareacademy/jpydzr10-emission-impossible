@@ -64,6 +64,24 @@ class WorkflowStatusMixin(models.Model):
     def model_name(self):
         return self._meta.model_name
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_workflow_status = self.workflow_status
+
+    def save(self, *args, **kwargs):
+        status_changed_to_pending = (
+            self.workflow_status == self.RecordStatus.PENDING
+            and self._initial_workflow_status != self.RecordStatus.PENDING
+        )
+
+        super().save(*args, **kwargs)
+
+        if status_changed_to_pending:
+            from workflow.services import create_admin_task_for_pending_record
+
+            create_admin_task_for_pending_record(self)
+
+        self._initial_workflow_status = self.workflow_status
 
 class RecordComment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

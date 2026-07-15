@@ -1,6 +1,7 @@
 from accounts.models import UserCompanyPermission
 from companies.models import Companies
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.urls import reverse
@@ -243,3 +244,34 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
             task.assigned_to.add(*uids)
 
     return len(envelopes_to_create)
+
+@transaction.atomic
+def create_admin_task_for_pending_record(record: WorkflowStatusMixin) -> Task:
+    """
+    Tworzy zadanie (Task) dla administratorów weryfikujących rekord.
+    Wywoływane automatycznie przy zmianie statusu rekordu na PENDING.
+    """
+    ctype = ContentType.objects.get_for_model(record)
+
+    task_title = f"Weryfikacja rekordu: {ctype.name.title()} | {record.company.name}"
+
+    task = Task.objects.create(
+        company=record.company,
+        task_type=Task.TaskType.CUSTOM,
+        title=task_title,
+        description=(
+            f"Użytkownik zmienił status rekordu (ID: {record.pk}) na Oczekujący. "
+            f"Wymagana weryfikacja poprawności danych."
+        ),
+        is_completed=False,
+    )
+
+    User = get_user_model()
+    admin_users_ids = User.objects.filter(is_staff=True, is_active=True).values_list(
+        "id", flat=True
+    )
+
+    if admin_users_ids:
+        task.assigned_to.add(*admin_users_ids)
+
+    return task
