@@ -35,7 +35,7 @@ class GHGReportView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
         )
         return Companies.objects.filter(id__in=perm_company_ids).order_by("name")
 
-    def get_emissions_for_scope(self, company_ids, year, statuses, emission_field):
+    def get_emissions_for_scope(self, company_ids, year, selected_statuses, emission_field):
         s1_total = 0
         for model in [
             StationaryCombustion,
@@ -46,14 +46,14 @@ class GHGReportView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
             result = model.objects.filter(
                 company_id__in=company_ids,
                 year=year,
-                status__in=statuses,
+                workflow_status__in=selected_statuses,
             ).aggregate(total=Sum(emission_field))
             s1_total += result["total"] or 0
 
         s2_result = EnergyConsumption.objects.filter(
             company_id__in=company_ids,
             year=year,
-            status__in=statuses,
+            workflow_status__in=selected_statuses,
         ).aggregate(total=Sum(emission_field))
         s2_total = s2_result["total"] or 0
 

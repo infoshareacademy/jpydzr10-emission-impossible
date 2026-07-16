@@ -8,6 +8,9 @@
     {% tailwind_css %}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       .material-symbols-outlined {
         font-family: "Material Symbols Outlined" !important;
@@ -44,13 +47,15 @@ select {
     {% block extra_head %}{% endblock %}
   </head>
 
-  <body class="min-h-screen bg-bg text-text-main">
+  <body class="min-h-screen bg-bg text-text-main" hx-boost="true">
 
     <!-- ===================== -->
     <!-- NAVBAR -->
     <!-- ===================== -->
     <nav class="sticky top-0 z-30 relative border-b border-border-subtle"
-      style="background: rgba(17, 23, 32, 0.85); backdrop-filter: blur(8px);">
+      style="background: rgba(17, 23, 32, 0.85); backdrop-filter: blur(8px);"
+      x-data="{ open: false }"
+         @click.outside="open = false">
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         <!-- Logo -->
@@ -59,15 +64,15 @@ select {
         </a>
 
         <!-- Burger button -->
-        <button id="burger" class="text-text-muted hover:text-accent transition-colors p-2">
-          <span id="burger-icon" class="material-symbols-outlined">menu</span>
+        <button @click="open = !open" class="text-text-muted hover:text-accent transition-colors p-2">
+          <span class="material-symbols-outlined" x-text="open ? 'close' : 'menu'">menu</span>
         </button>
 
         <div class="flex-1"></div>
 
         <!-- Admin button -->
         {% if user.is_superuser or user.role == 'admin' %}
-        <a href="/admin/" class="text-text-muted hover:text-accent transition-colors" title="Panel Administratora">
+        <a href="/admin/" hx-boost="false" class="text-text-muted hover:text-accent transition-colors" title="Panel Administratora">
           <span class="admin-icon material-symbols-outlined" style="font-size:22px;">admin_panel_settings</span>
           <span class="admin-text font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">Panel Administratora</span>
         </a>
@@ -109,9 +114,15 @@ select {
       <!-- ===================== -->
       <!-- DROPDOWN MENU -->
       <!-- ===================== -->
-      <div id="dropdown"
-        class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden transition-all duration-300"
-        style="max-height:0; background:rgba(17,23,32,0.95); backdrop-filter:blur(8px);">
+      <div x-show="open"
+           x-transition:enter="transition-all ease-out duration-300"
+           x-transition:enter-start="max-h-0 opacity-0"
+           x-transition:enter-end="max-h-[500px] opacity-100"
+           x-transition:leave="transition-all ease-in duration-200"
+           x-transition:leave-start="max-h-[500px] opacity-100"
+           x-transition:leave-end="max-h-0 opacity-0"
+           class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden"
+           style="background:rgba(17,23,32,0.95); backdrop-filter:blur(8px); display: none;">
         <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
 
           <a href="{% url 'reports:ghg-report' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
@@ -208,32 +219,33 @@ select {
     </footer>
 
     {% block extra_scripts %}{% endblock %}
-
-    <!-- ===================== -->
-    <!-- DROPDOWN JAVASCRIPT -->
-    <!-- ===================== -->
-    <script>
-      const dropdown = document.getElementById("dropdown");
-      const burger = document.getElementById("burger");
-      const burgerIcon = document.getElementById("burger-icon");
-      let isOpen = false;
-      burger.addEventListener("click", () => {
-        isOpen = !isOpen;
-        if (isOpen) {
-          dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-          burgerIcon.textContent = "close";
-        } else {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-        }
-      });
-      document.addEventListener("click", (e) => {
-        if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-          isOpen = false;
-        }
-      });
+<script>
+      // document.addEventListener("click", (e) => {
+      //   const burgerBtn = e.target.closest("#burger");
+      //   const dropdown = document.getElementById("dropdown");
+      //   const burgerIcon = document.getElementById("burger-icon");
+      //
+      //   if (!dropdown || !burgerIcon) return;
+      //
+      //   if (burgerBtn) {
+      //     const isOpen = dropdown.style.maxHeight && dropdown.style.maxHeight !== "0px";
+      //
+      //     if (!isOpen) {
+      //       dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+      //       burgerIcon.textContent = "close";
+      //     } else {
+      //       dropdown.style.maxHeight = "0";
+      //       burgerIcon.textContent = "menu";
+      //     }
+      //     return;
+      //   }
+      //
+      //   if (!dropdown.contains(e.target)) {
+      //     dropdown.style.maxHeight = "0";
+      //     burgerIcon.textContent = "menu";
+      //   }
+      // });
     </script>
+  {% include 'ai_services/components/floating_chat.html' %}
   </body>
 </html>

@@ -1,0 +1,265 @@
+<!-- ai_services/templates/ai_services/components/floating_chat.html -->
+{% load static %}
+
+<!-- Pływający kontener -->
+<div id="bielik-widget-container" hx-preserve="true" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+
+    <<!-- Główne okno czatu (domyślnie ukryte) -->
+    <div id="bielik-chat-window"
+         class="hidden pointer-events-auto w-[380px] h-[550px] mb-4 border border-border-subtle rounded-2xl flex-col shadow-2xl overflow-hidden transition-all duration-300 transform translate-y-4 opacity-0"
+         style="background: rgba(17,23,32,0.95); backdrop-filter: blur(12px);">
+
+        <!-- ZABLOKOWANY NAGŁÓWEK (shrink-0) -->
+        <div class="border-b border-[#2a3f4a] p-4 flex flex-col gap-3 shrink-0" style="background:rgba(42,63,74,0.4);">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-[#c8f535] animate-pulse"></div>
+                    <span class="font-heading font-bold text-sm text-text-main">AI Asystent ESG (Bielik)</span>
+                </div>
+                <button id="bielik-reset-btn" class="text-xs font-mono text-text-muted hover:text-red-400 transition-colors" title="Wyczyść historię">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                </button>
+            </div>
+
+            <div class="flex gap-2">
+                <select id="bielik-company-select" class="bg-[#111720] border border-[#2a3f4a] text-text-main text-[11px] rounded flex-1 px-2 py-1 outline-none font-mono">
+                    <option value="">Wybierz spółkę...</option>
+                    {% for comp in global_companies %}
+                        <option value="{{ comp.id }}">{{ comp.name }}</option>
+                    {% endfor %}
+                </select>
+                <select id="bielik-scope-select" class="bg-[#111720] border border-[#2a3f4a] text-text-main text-[11px] rounded flex-1 px-2 py-1 outline-none font-mono">
+                    <option value="ALL">Całość</option>
+                    <option value="SCOPE_1">Scope 1</option>
+                    <option value="SCOPE_2">Scope 2</option>
+                    <option value="SCOPE_3">Scope 3</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- PRZESTRZEŃ WIADOMOŚCI (min-h-0 pozwala na prawidłowe działanie overflow-y-auto) -->
+        <div id="bielik-chat-messages" class="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-4" style="scrollbar-width: thin; scrollbar-color: rgba(200,245,53,0.3) rgba(255,255,255,0.02);">
+            <!-- Generowane dynamicznie przez JS -->
+        </div>
+
+        <!-- ZABLOKOWANY WSKAŹNIK ŁADOWANIA (shrink-0) -->
+        <div id="bielik-chat-loading" class="hidden px-4 py-2 border-t border-[#2a3f4a] shrink-0" style="background:rgba(0,0,0,0.2);">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#c8f535] animate-spin" style="font-size:14px;">hourglass_empty</span>
+                <span class="font-mono text-[10px] text-[#c8f535] uppercase tracking-widest animate-pulse">Bielik analizuje...</span>
+            </div>
+        </div>
+
+        <!-- ZABLOKOWANY INPUT (shrink-0) -->
+        <div class="border-t border-[#2a3f4a] p-3 shrink-0" style="background:rgba(42,63,74,0.4);">
+            <form id="bielik-chat-form" class="flex items-center gap-2">
+                <input type="text" id="bielik-user-input" placeholder="Zadaj pytanie..." autocomplete="off"
+                       class="flex-1 rounded-lg px-3 py-2 font-mono text-xs text-text-main focus:outline-none transition-colors border border-[#2a3f4a]"
+                       style="background:rgba(255,255,255,0.04);">
+                <button type="submit" id="bielik-send-btn" class="p-2 rounded-lg text-[#1a4a52] bg-[#c8f535] hover:bg-[#b5e02b] transition-colors disabled:opacity-50">
+                    <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Pływający Przycisk Wywołujący -->
+    <button id="bielik-toggle-btn" class="pointer-events-auto relative flex items-center justify-center w-14 h-14 rounded-full shadow-2xl transition-transform hover:scale-110"
+            style="background: #111720; border: 2px solid #c8f535;">
+        <!-- Wykorzystanie dostarczonego logo -->
+        <img src="{% static 'images/bielik-logo.png' %}" alt="Bielik AI" class="w-8 h-8 object-contain">
+        <!-- Badge powiadomienia (opcjonalnie) -->
+        <span class="absolute top-0 right-0 w-3 h-3 bg-[#c8f535] border-2 border-[#111720] rounded-full"></span>
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('bielik-widget-container');
+        const toggleBtn = document.getElementById('bielik-toggle-btn');
+        const chatWindow = document.getElementById('bielik-chat-window');
+        const chatForm = document.getElementById('bielik-chat-form');
+        const inputField = document.getElementById('bielik-user-input');
+        const messagesContainer = document.getElementById('bielik-chat-messages');
+        const loadingIndicator = document.getElementById('bielik-chat-loading');
+        const companySelect = document.getElementById('bielik-company-select');
+        const scopeSelect = document.getElementById('bielik-scope-select');
+        const resetBtn = document.getElementById('bielik-reset-btn');
+        const sendBtn = document.getElementById('bielik-send-btn');
+
+        let pollingInterval = null;
+
+        const getCSRFToken = () => {
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookieValue ? cookieValue.split('=')[1] : '';
+        };
+
+        let chatHistory = JSON.parse(sessionStorage.getItem('bielik_chat_history') || '[]');
+        let isOpen = sessionStorage.getItem('bielik_chat_open') === 'true';
+
+        companySelect.value = sessionStorage.getItem('bielik_company') || '';
+        scopeSelect.value = sessionStorage.getItem('bielik_scope') || 'ALL';
+
+        companySelect.addEventListener('change', (e) => sessionStorage.setItem('bielik_company', e.target.value));
+        scopeSelect.addEventListener('change', (e) => sessionStorage.setItem('bielik_scope', e.target.value));
+
+        // Bezpieczne renderowanie (odporne na undefined)
+        const renderMessage = (role, text) => {
+            const safeText = text || '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex flex-col ' + (role === 'user' ? 'items-end' : 'items-start');
+
+            const label = document.createElement('span');
+            label.className = 'font-mono text-[9px] text-gray-500 mb-1 uppercase tracking-widest ' + (role === 'user' ? 'mr-1' : 'ml-1');
+            label.textContent = role === 'user' ? 'Ty' : 'Bielik AI';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'px-3 py-2 max-w-[90%] font-mono text-xs leading-relaxed ';
+
+            if (role === 'user') {
+                bubble.style = 'background:rgba(200,245,53,0.12); border:1px solid rgba(200,245,53,0.3); color:#e8f4f0; border-radius:12px; border-top-right-radius:2px;';
+                bubble.innerHTML = safeText;
+            } else {
+                bubble.style = 'background:rgba(42,63,74,0.4); border:1px solid #2a3f4a; color:#e8f4f0; border-radius:12px; border-top-left-radius:2px;';
+                bubble.innerHTML = safeText.replace(/\n/g, '<br>');
+            }
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(bubble);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        };
+
+        const initHistory = () => {
+            messagesContainer.innerHTML = '';
+            if (chatHistory.length === 0) {
+                renderMessage('system', 'Witaj! Jestem asystentem ESG. Wybierz spółkę i zadaj pytanie.');
+            } else {
+                chatHistory.forEach(msg => renderMessage(msg.role, msg.text));
+            }
+        };
+
+        const toggleChat = (forceState = null) => {
+            isOpen = forceState !== null ? forceState : !isOpen;
+            sessionStorage.setItem('bielik_chat_open', isOpen);
+
+            if (isOpen) {
+                chatWindow.classList.remove('hidden');
+                setTimeout(() => chatWindow.classList.remove('translate-y-4', 'opacity-0'), 10);
+                inputField.focus();
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } else {
+                chatWindow.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => chatWindow.classList.add('hidden'), 300);
+            }
+        };
+
+        toggleBtn.addEventListener('click', () => toggleChat());
+
+        resetBtn.addEventListener('click', () => {
+            chatHistory = [];
+            sessionStorage.removeItem('bielik_chat_history');
+            sessionStorage.removeItem('bielik_task_id');
+            if (pollingInterval) clearInterval(pollingInterval);
+            initHistory();
+        });
+
+        // 1. MECHANIZM ASYNCHRONICZNEGO ODPYTYWANIA (POLLING)
+        const pollTaskStatus = async (taskId) => {
+            try {
+                // Wywołanie widoku AITaskStatusView
+                const response = await fetch(`/ai/status/${taskId}/`);
+                const data = await response.json();
+
+                // Jeśli Celery skończyło (SUCCESS):
+                if (data.status === 'SUCCESS') {
+                    clearInterval(pollingInterval);
+                    sessionStorage.removeItem('bielik_task_id');
+
+                    const replyText = data.answer || '<span style="color:#f87171;">Zadanie ukończone, brak danych.</span>';
+                    renderMessage('system', replyText);
+
+                    chatHistory.push({ role: 'system', text: replyText });
+                    sessionStorage.setItem('bielik_chat_history', JSON.stringify(chatHistory));
+
+                    inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = false;
+                    loadingIndicator.classList.add('hidden');
+                    inputField.focus();
+                }
+                // Jeśli Celery wybuchło:
+                else if (data.status === 'FAILURE') {
+                    clearInterval(pollingInterval);
+                    sessionStorage.removeItem('bielik_task_id');
+                    renderMessage('system', '<span style="color:#f87171;">Błąd po stronie serwera AI.</span>');
+                    inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = false;
+                    loadingIndicator.classList.add('hidden');
+                }
+            } catch (error) {
+                // Błąd sieci/uwierzytelnienia podczas odpytywania
+                clearInterval(pollingInterval);
+                loadingIndicator.classList.add('hidden');
+                inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = false;
+                renderMessage('system', '<span style="color:#f87171;">Utracono połączenie z backendem podczas oczekiwania.</span>');
+            }
+        };
+
+        // 2. ODTWARZANIE STANU PO ODŚWIEŻENIU F5
+        const activeTaskId = sessionStorage.getItem('bielik_task_id');
+        if (activeTaskId) {
+            inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            // Zaczynamy polling porzuconego zadania co 2 sekundy
+            pollingInterval = setInterval(() => pollTaskStatus(activeTaskId), 2000);
+        }
+
+        // 3. WYSYŁKA NOWEGO PYTANIA
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = inputField.value.trim();
+            const compId = companySelect.value;
+            const scope = scopeSelect.value;
+
+            if (!question) return;
+            if (!compId) {
+                renderMessage('system', '<span style="color:#f87171;">Błąd: Musisz najpierw wybrać spółkę z listy.</span>');
+                return;
+            }
+
+            renderMessage('user', question);
+            chatHistory.push({ role: 'user', text: question });
+            sessionStorage.setItem('bielik_chat_history', JSON.stringify(chatHistory));
+
+            inputField.value = '';
+            inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                // Wywołanie widoku GlobalAIAssistantView
+                const response = await fetch("{% url 'ai_services:global_assistant' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                    body: JSON.stringify({ question: question, company_id: compId, scope_type: scope })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    renderMessage('system', `<span style="color:#f87171;">Błąd: ${data.error}</span>`);
+                    inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = false;
+                    loadingIndicator.classList.add('hidden');
+                } else if (data.task_id) {
+                    // SUKCES! Dostaliśmy Task ID, wpisujemy do pamięci i odpalamy Polling
+                    sessionStorage.setItem('bielik_task_id', data.task_id);
+                    pollingInterval = setInterval(() => pollTaskStatus(data.task_id), 2000);
+                }
+
+            } catch (error) {
+                renderMessage('system', '<span style="color:#f87171;">Błąd w sieci (nie dotarło do serwera).</span>');
+                inputField.disabled = sendBtn.disabled = companySelect.disabled = scopeSelect.disabled = false;
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        initHistory();
+        if (isOpen) toggleChat(true);
+    });
+</script>

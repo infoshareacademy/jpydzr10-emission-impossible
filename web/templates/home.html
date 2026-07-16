@@ -189,19 +189,13 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Ładowanie Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
-    // --- 1. LOGIKA BEZPIECZNEJ KARUZELI ---
+(function() {
     const carousel = document.getElementById('carousel');
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');
 
     if (carousel && btnPrev && btnNext) {
-        // Obliczamy przesunięcie bazujące na szerokości pierwszego elementu w karuzeli + Tailwind gap-6 (24px)
         const getScrollAmount = () => {
             const firstCard = carousel.children[0];
             return firstCard ? firstCard.offsetWidth + 24 : 350;
@@ -217,26 +211,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const updateButtons = () => {
             const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
-
-            // Dezaktywacja lewego przycisku z małym marginesem tolerancji
             btnPrev.disabled = carousel.scrollLeft <= 2;
-            // Dezaktywacja prawego przycisku
             btnNext.disabled = carousel.scrollLeft >= maxScrollLeft - 2;
         };
 
-        // Nasłuchujemy przewijania oraz zmiany rozmiaru okna
         carousel.addEventListener('scroll', updateButtons);
         window.addEventListener('resize', updateButtons);
-
-        // Wstępna konfiguracja przycisków
         setTimeout(updateButtons, 100);
     }
 
     // --- 2. INICJALIZACJA CHART.JS ---
     {% for target in reduction_targets %}
     (function() {
-        const ctx = document.getElementById('chart-{{ target.id }}');
+        const canvasId = 'chart-{{ target.id }}';
+        const ctx = document.getElementById(canvasId);
         if (!ctx) return;
+
+        // EKSTERMINACJA ZOMBIE CHART:
+        // Pobieramy instancję wykresu z pamięci RAM i niszczymy ją, jeśli istnieje.
+        const existingChart = Chart.getChart(canvasId);
+        if (existingChart) {
+            existingChart.destroy();
+        }
 
         new Chart(ctx, {
             type: 'bar',
@@ -284,20 +280,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     })();
     {% endfor %}
-});
+})();
 
-// Funkcje pomocnicze UI
-function toggleTaskDetails(btn, id) {
+window.toggleTaskDetails = function(btn, id) {
     const container = document.getElementById(id);
     container.classList.toggle('hidden');
     btn.innerText = container.classList.contains('hidden') ? 'POKAŻ LISTĘ' : 'ZWIŃ LISTĘ';
-}
+};
 
-function scrollToTarget(id) {
+window.scrollToTarget = function(id) {
     const element = document.getElementById(id);
     if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
-}
+};
 </script>
 {% endblock %}

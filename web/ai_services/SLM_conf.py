@@ -32,9 +32,8 @@ class BielikESGService:
         """
         valid_statuses = [
             WorkflowStatusMixin.RecordStatus.APPROVED,
-            WorkflowStatusMixin.RecordStatus.VERIFIED,
         ]
-        base_filter = {"company": company, "status__in": valid_statuses}
+        base_filter = {"company": company, "workflow_status__in": valid_statuses}
         if year:
             base_filter["year"] = year
 

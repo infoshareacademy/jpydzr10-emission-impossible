@@ -4,7 +4,6 @@
 {% block title %}Raport GHG — Emission Impossible{% endblock %}
 
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   select, input[type="number"] {
@@ -219,42 +218,50 @@
 
 {% block extra_scripts %}
 <script>
-  const chartData = {{ chart_data_json|safe }};
-  const colorZ1 = '#c8f535';
-  const colorZ2 = '#2dd4bf';
-  const gridColor = 'rgba(255, 255, 255, 0.1)';
-  const textColor = '#9ca3af';
+(function() {
+    const chartData = {{ chart_data_json|safe }};
+    const colorZ1 = '#c8f535';
+    const colorZ2 = '#2dd4bf';
+    const gridColor = 'rgba(255, 255, 255, 0.1)';
+    const textColor = '#9ca3af';
+    const barCanvasId = 'stackedBarChart';
+    const donutCanvasId = 'donutChart';
 
-  const ctxBar = document.getElementById('stackedBarChart').getContext('2d');
-  new Chart(ctxBar, {
-    type: 'bar',
-    data: {
-      labels: chartData.years,
-      datasets: [
-        { label: 'Zakres 1', data: chartData.s1, backgroundColor: colorZ1, borderRadius: 4, stack: 'stack', order: 2 },
-        { label: 'Zakres 2', data: chartData.s2, backgroundColor: colorZ2, borderRadius: 4, stack: 'stack', order: 2 },
-        { label: 'Trend łączny', data: chartData.s1.map((v, i) => +(v + chartData.s2[i]).toFixed(2)), type: 'line', borderColor: '#ffffff', borderWidth: 2, borderDash: [6, 3], pointBackgroundColor: '#ffffff', pointRadius: 4, fill: false, tension: 0.3, order: 1 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' } } },
-        y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' }, callback: val => val.toLocaleString('pl-PL') + ' t' } }
-      },
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 } },
-        tooltip: {
-          backgroundColor: 'rgba(17,23,32,0.9)', titleFont: { family: 'Roboto Mono' }, bodyFont: { family: 'Roboto Mono' },
-          borderColor: 'rgba(200,245,53,0.3)', borderWidth: 1,
-          callbacks: { footer: function(tooltipItems) { const bars = tooltipItems.filter(i => i.dataset.type !== 'line'); const sum = bars.reduce((acc, i) => acc + i.parsed.y, 0); return 'Suma: ' + sum.toLocaleString('pl-PL', {maximumFractionDigits: 2}) + ' tCO₂e'; } }
+    const existingBarChart = Chart.getChart(barCanvasId);
+    if (existingBarChart) existingBarChart.destroy();
+
+    const existingDonutChart = Chart.getChart(donutCanvasId);
+    if (existingDonutChart) existingDonutChart.destroy();
+    const ctxBar = document.getElementById(barCanvasId).getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: chartData.years,
+            datasets: [
+                { label: 'Zakres 1', data: chartData.s1, backgroundColor: colorZ1, borderRadius: 4, stack: 'stack', order: 2 },
+                { label: 'Zakres 2', data: chartData.s2, backgroundColor: colorZ2, borderRadius: 4, stack: 'stack', order: 2 },
+                { label: 'Trend Łączny', data: chartData.s1.map((v, i) => +(v + chartData.s2[i]).toFixed(2)), type: 'line', borderColor: '#ffffff', borderWidth: 2, borderDash: [6, 3], pointBackgroundColor: '#ffffff', pointRadius: 4, fill: false, tension: 0.3, order: 1 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' } } },
+                y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' }, callback: val => val.toLocaleString('pl-PL') + ' t' } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 } },
+                tooltip: {
+                    backgroundColor: 'rgba(17,23,32,0.9)', titleFont: { family: 'Roboto Mono' }, bodyFont: { family: 'Roboto Mono' },
+                    borderColor: 'rgba(200,245,53,0.3)', borderWidth: 1,
+                    callbacks: { footer: function(tooltipItems) { const bars = tooltipItems.filter(i => i.dataset.type !== 'line'); const sum = bars.reduce((acc, i) => acc + i.parsed.y, 0); return 'Suma: ' + sum.toLocaleString('pl-PL', {maximumFractionDigits: 2}) + ' tCO2e'; } }
+                }
+            }
         }
-      }
-    }
-  });
+    });
 
-const ctxDonut = document.getElementById('donutChart').getContext('2d');
+    const ctxDonut = document.getElementById('donutChart').getContext('2d');
     const s1Current = chartData.s1[chartData.s1.length - 1];
     const s2Current = chartData.s2[chartData.s2.length - 1];
     const donutTotal = s1Current + s2Current;
@@ -272,7 +279,7 @@ const ctxDonut = document.getElementById('donutChart').getContext('2d');
 
             if (!chart.getActiveElements() || chart.getActiveElements().length === 0) {
                 document.getElementById('donut-center-val').innerText = visibleTotal.toFixed(2);
-                document.getElementById('donut-center-lbl').innerText = 'Suma tCO₂e';
+                document.getElementById('donut-center-lbl').innerText = 'Suma tCO2e';
             }
         }
     };
@@ -306,7 +313,7 @@ const ctxDonut = document.getElementById('donutChart').getContext('2d');
                             const val = context.raw;
                             const currentTotal = donutChart.visibleTotal !== undefined ? donutChart.visibleTotal : donutTotal;
                             const pct = currentTotal > 0 ? ((val / currentTotal) * 100).toFixed(1) : 0;
-                            return context.label + ': ' + val + ' tCO₂e (' + pct + '%)';
+                            return context.label + ': ' + val + ' tCO2e (' + pct + '%)';
                         }
                     }
                 }
@@ -324,39 +331,41 @@ const ctxDonut = document.getElementById('donutChart').getContext('2d');
                     lblEl.innerText = donutChart.data.labels[index];
                 } else {
                     valEl.innerText = currentTotal.toFixed(2);
-                    lblEl.innerText = 'Suma tCO₂e';
+                    lblEl.innerText = 'Suma tCO2e';
                 }
             }
         },
         plugins: [dynamicCenterHtmlPlugin]
     });
 
-  function downloadPDF() {
-    const element = document.getElementById('pdf-content');
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: 'Raport_GHG_{{ selected_year }}.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#111720' },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    // Przekazanie metody do zakresu globalnego window, aby przycisk w HTML to "widział"
+    window.downloadPDF = function() {
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: 'Raport_GHG_{{ selected_year }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#111720' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = false; instance.update(); });
+        html2pdf().set(opt).from(element).save().then(() => { Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = true; }); });
     };
-    Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = false; instance.update(); });
-    html2pdf().set(opt).from(element).save().then(() => { Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = true; }); });
-  }
 
-  document.querySelectorAll('input[name="statuses"]').forEach(function(cb) {
-    cb.addEventListener('change', function() {
-      const label = this.closest('label');
-      if (this.checked) {
-        label.style.background = 'rgba(200,245,53,0.12)';
-        label.classList.add('border-accent', 'text-accent');
-        label.classList.remove('border-border-subtle', 'text-text-muted');
-      } else {
-        label.style.background = 'transparent';
-        label.classList.remove('border-accent', 'text-accent');
-        label.classList.add('border-border-subtle', 'text-text-muted');
-      }
+    document.querySelectorAll('input[name="statuses"]').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            const label = this.closest('label');
+            if (this.checked) {
+                label.style.background = 'rgba(200,245,53,0.12)';
+                label.classList.add('border-accent', 'text-accent');
+                label.classList.remove('border-border-subtle', 'text-text-muted');
+            } else {
+                label.style.background = 'transparent';
+                label.classList.remove('border-accent', 'text-accent');
+                label.classList.add('border-border-subtle', 'text-text-muted');
+            }
+        });
     });
-  });
+})();
 </script>
 {% endblock %}

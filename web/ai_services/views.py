@@ -1,16 +1,18 @@
 import json
 
+from celery.result import AsyncResult
 from companies.models import Companies
 from core.mixins import PageViewTrackerMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
 from django_ratelimit.decorators import ratelimit
 
 from .models import AIChatMessage, AIChatSession
-from .SLM_conf import BielikESGService
+from .tasks import process_ai_chat_message
 
 
 class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
@@ -24,7 +26,6 @@ class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateVi
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # Filtrowanie spółek dla dropdowna
         if user.role == "admin" or user.is_superuser:
             context["companies"] = Companies.objects.all().order_by("name")
         else:
@@ -68,7 +69,6 @@ class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateVi
 
         user = request.user
 
-        # 1. WERYFIKACJA UPRAWNIEŃ DO SPÓŁKI
         if user.role == "admin" or user.is_superuser:
             company = Companies.objects.filter(id=company_id).first()
         else:
@@ -87,27 +87,27 @@ class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateVi
                 {"error": "Brak uprawnień lub spółka nie istnieje."}, status=403
             )
 
-        # 2. POBRANIE LUB UTWORZENIE SESJI (Pamięć bazy danych)
-        # Dzięki get_or_create system automatycznie powiąże rozmowę z konkretną spółką i zakresem
         session, created = AIChatSession.objects.get_or_create(
             user=user, company=company, scope_type=scope_type, is_active=True
         )
 
-        # 3. ZAPIS PYTANIA UŻYTKOWNIKA DO BAZY
         AIChatMessage.objects.create(
             session=session, role=AIChatMessage.Role.USER, content=question
         )
 
-        # 4. WYSŁANIE DANYCH DO AI (Przekazujemy cały obiekt sesji)
-        ai_service = BielikESGService()
-        answer = ai_service.generate_response(session, question)
+        task = process_ai_chat_message.delay(session.id, question)
 
-        # 5. ZAPIS ODPOWIEDZI AI DO BAZY (Tylko jeśli odpowiedź była poprawna)
-        if not answer.startswith("Wystąpił błąd") and not answer.startswith(
-            "Silnik AI"
-        ):
-            AIChatMessage.objects.create(
-                session=session, role=AIChatMessage.Role.ASSISTANT, content=answer
-            )
+        return JsonResponse({"task_id": task.id, "status": "processing"})
 
-        return JsonResponse({"answer": answer})
+
+class AITaskStatusView(LoginRequiredMixin, View):
+    """Lekki endpoint do odpytywania o status zadania w Celery."""
+
+    def get(self, request, task_id):
+        task_result = AsyncResult(task_id)
+
+        response_data = {
+            "status": task_result.state,
+            "answer": task_result.result if task_result.ready() else None,
+        }
+        return JsonResponse(response_data)
