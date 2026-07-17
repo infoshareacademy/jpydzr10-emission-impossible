@@ -723,6 +723,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-modeltranslation"
+version = "0.20.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d1/db/a0c18e3053c97176a195ee05891ad2e673c531eba612c8aa09b51333d634/django_modeltranslation-0.20.3.tar.gz", hash = "sha256:53f5e33927b99e184f3100c965c45f306f370b7086c6b34e35468800be0916ea", size = 82061, upload-time = "2026-04-14T05:20:06.561Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/40/addb85c32031945ebed0545842fffbd9a5604fdc16bd684583e538137cbd/django_modeltranslation-0.20.3-py3-none-any.whl", hash = "sha256:0e1aaf77ce3dcf80c7ec67a6d67821635d07f4849c90363bc0afedb237b014f0", size = 98703, upload-time = "2026-04-14T05:20:04.394Z" },
+]
+
+[[package]]
 name = "django-ratelimit"
 version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -745,15 +758,15 @@ wheels = [
 
 [[package]]
 name = "django-tailwind"
-version = "4.5.0"
+version = "4.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
     { name = "pytailwindcss" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/52/a87b0d08fd786f3f4bd7686edc0d3ae5cd1906d087cf8e2c2ef8157b07d7/django_tailwind-4.5.0.tar.gz", hash = "sha256:c4b40820663ac3932f6951b82b91e3773361a46d9bde972bc8a338eee3c5d045", size = 13966, upload-time = "2026-06-12T13:25:57.638Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/21/86fda52a8d0f8d2f31d32982ee4d9cc4f29c868dbeb52412e430d083d126/django_tailwind-4.4.2.tar.gz", hash = "sha256:b3a3eb2d22cbb8c17565898fb68ccedcf806542b04fe4107bdfec7035d582819", size = 13965, upload-time = "2025-12-05T18:23:41.028Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/09/32/ffb8c8f6e86d06912d3afe4800e72a5045d21916171b36e256c07f87cc91/django_tailwind-4.5.0-py3-none-any.whl", hash = "sha256:618314751e867e8871b1e06ed98c0b8beb762ac9b431f739647ad4d82ab8b125", size = 23363, upload-time = "2026-06-12T13:25:56.472Z" },
+    { url = "https://files.pythonhosted.org/packages/02/ed/85113d22ab4268600542152bc4b5512abb1204552b90e04848ebc496aa5c/django_tailwind-4.4.2-py3-none-any.whl", hash = "sha256:0e4a2836cb36e8952700457d049fadb8743583017cef80fa3a374f8597c289f4", size = 23358, upload-time = "2025-12-05T18:23:39.462Z" },
 ]
 
 [[package]]
@@ -1072,6 +1085,7 @@ dependencies = [
     { name = "django" },
     { name = "django-crum" },
     { name = "django-email-users" },
+    { name = "django-modeltranslation" },
     { name = "django-ratelimit" },
     { name = "django-simple-history" },
     { name = "django-tailwind" },
@@ -1092,7 +1106,6 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "redis" },
     { name = "ruff" },
-    { name = "tailwind" },
 ]
 
 [package.metadata]
@@ -1104,9 +1117,10 @@ requires-dist = [
     { name = "django", specifier = ">=6.0.4" },
     { name = "django-crum", specifier = ">=0.7.9" },
     { name = "django-email-users", specifier = ">=2.1.0" },
+    { name = "django-modeltranslation", specifier = ">=0.20.3" },
     { name = "django-ratelimit", specifier = ">=4.1.0" },
     { name = "django-simple-history", specifier = ">=3.12.0" },
-    { name = "django-tailwind", specifier = ">=4.5.0" },
+    { name = "django-tailwind", specifier = "==4.4.2" },
     { name = "django-widget-tweaks", specifier = ">=1.5.1" },
     { name = "djhtml", specifier = ">=3.0.11" },
     { name = "fpdf2", specifier = ">=2.8.7" },
@@ -1124,7 +1138,6 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "redis", specifier = ">=7.4.0" },
     { name = "ruff", specifier = ">=0.15.6" },
-    { name = "tailwind", specifier = "==3.1.5b0" },
 ]
 
 [[package]]
@@ -2348,18 +2361,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/90/76/437d71068094df0726366574cf3432a4ed754217b436eb7429415cf2d480/sqlparse-0.5.5.tar.gz", hash = "sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e", size = 120815, upload-time = "2025-12-19T07:17:45.073Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/49/4b/359f28a903c13438ef59ebeee215fb25da53066db67b305c125f1c6d2a25/sqlparse-0.5.5-py3-none-any.whl", hash = "sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba", size = 46138, upload-time = "2025-12-19T07:17:46.573Z" },
-]
-
-[[package]]
-name = "tailwind"
-version = "3.1.5b0"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/c6/a265bf8cea8d8c17e4e721abe3d99cece6b515f0c8d8320b1af2ead8d347/tailwind-3.1.5b0-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:6baf950e4487794df56db3c2f749d2d35c91e9ac54cacd82220d91a199b19c40", size = 19496122, upload-time = "2022-07-09T16:00:05.894Z" },
-    { url = "https://files.pythonhosted.org/packages/d8/73/b27d2bfddb40f24df0e4db6aa81eeeb480b0b41d034129b50d62d1fe527f/tailwind-3.1.5b0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:0934b76c6afb45e0601a4acc4ef7d57701249978c53d6ccff4ea0c85263369cf", size = 17805712, upload-time = "2022-07-09T16:00:09.928Z" },
-    { url = "https://files.pythonhosted.org/packages/39/55/0891c7e8374fac43b59431b2635987b7742ed24f20d7eadf879b44d058f6/tailwind-3.1.5b0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:97974629edd0ce595794fdb40d3318c259e7992d67461949cb5687d1ab9faf48", size = 16196897, upload-time = "2022-07-09T16:00:13.536Z" },
-    { url = "https://files.pythonhosted.org/packages/46/15/e17a4b708d615ce6e6c36783a698f5e75c92edb73c75453a1dadc81ecddb/tailwind-3.1.5b0-py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f61e4a1dd2d43076af818fa8281f2624a34c3d4d8aed2045538f03cfdfde438a", size = 17622295, upload-time = "2022-07-09T16:00:16.887Z" },
-    { url = "https://files.pythonhosted.org/packages/58/da/70fa56d15df78bd07905c9e48dad7c27aba9c07a177e1c92a39d1fd53361/tailwind-3.1.5b0-py3-none-win_amd64.whl", hash = "sha256:96fcb172730926c48c5a6e35d614259b00e35c89805932e0b671239504d13acb", size = 15922905, upload-time = "2022-07-09T16:00:20.381Z" },
 ]
 
 [[package]]
