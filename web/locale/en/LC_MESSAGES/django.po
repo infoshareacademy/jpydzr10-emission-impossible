@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Emission Impossible\n"
+"POT-Creation-Date: 2026-07-17 20:53+0000\n"
+"PO-Revision-Date: 2026-07-17 20:53+0000\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: emissions/forms.py:62 emissions/forms.py:121 emissions/forms.py:167
+#: emissions/forms.py:213
+msgid "Rok"
+msgstr "Year"
+
+#: emissions/forms.py:63 emissions/forms.py:122 emissions/forms.py:168
+#: emissions/forms.py:214
+msgid "Firma"
+msgstr "Company"
+
+#: emissions/forms.py:64
+msgid "Źródło energii"
+msgstr "Energy source"
+
+#: emissions/forms.py:65 emissions/forms.py:123 emissions/forms.py:169
+#: emissions/forms.py:215
+msgid "Typ energii"
+msgstr "Energy type"
+
+#: emissions/forms.py:66 emissions/forms.py:124 emissions/forms.py:170
+#: emissions/forms.py:216
+msgid "Ilość"
+msgstr "Amount"
+
+#: emissions/forms.py:67 emissions/forms.py:125 emissions/forms.py:171
+#: emissions/forms.py:217
+msgid "Jednostka"
+msgstr "Unit"
+
+#: emissions/forms.py:68 emissions/forms.py:127 emissions/forms.py:173
+#: emissions/forms.py:219
+msgid "Źródło danych"
+msgstr "Data source"
+
+#: emissions/forms.py:78 emissions/forms.py:137 emissions/forms.py:183
+#: emissions/forms.py:233
+#, python-format
+msgid "Rok musi być między 2010 a %(current_year)s."
+msgstr "Year must be between 2010 and %(current_year)s."
+
+#: emissions/forms.py:88 emissions/forms.py:147 emissions/forms.py:193
+msgid "Ilość musi być większa od zera."
+msgstr "Amount must be greater than zero."
+
+#: emissions/forms.py:126
+msgid "Dostawca"
+msgstr "Supplier"
+
+#: emissions/forms.py:172
+msgid "Instalacja"
+msgstr "Installation"
+
+#: emissions/forms.py:218
+msgid "Odbiorca"
+msgstr "Recipient"
+
+#: emissions/forms.py:346 emissions/forms.py:365 emissions/forms.py:384
+#: emissions/forms.py:403
+msgid "Wybierz plik XLSX"
+msgstr "Select XLSX file"
+
+#: emissions/forms.py:347 emissions/forms.py:366 emissions/forms.py:385
+#: emissions/forms.py:404
+msgid "Maksymalny rozmiar: 5MB"
+msgstr "Maximum size: 5MB"
+
+#: emissions/forms.py:355 emissions/forms.py:374 emissions/forms.py:393
+#: emissions/forms.py:412
+msgid "Obsługiwany jest tylko format .xlsx"
+msgstr "Only .xlsx format is supported"
+
+#: emissions/forms.py:357 emissions/forms.py:376 emissions/forms.py:395
+#: emissions/forms.py:414
+msgid "Plik jest za duży (max 5MB)"
+msgstr "File is too large (max 5MB)"
+
+#: emissions/models.py:34
+msgid "Emisja zadeklarowana"
+msgstr "Declared emission"
+
+#: emissions/models.py:42
+msgid "Emisja (Wyliczona przez system)"
+msgstr "Emission (Calculated by system)"
+
+#: emissions/models.py:50
+msgid "Użyty wskaźnik (Wartość)"
+msgstr "Used indicator (Value)"
+
+#: emissions/models.py:56
+msgid "Użyty wskaźnik (Jednostka)"
+msgstr "Used indicator (Unit)"
+
+#: emissions/models.py:63
+msgid "Użyty przelicznik jednostek (Wartość)"
+msgstr "Used unit converter (Value)"
+
+#: emissions/models.py:70
+msgid "Użyty przelicznik jednostek (Jednostka)"
+msgstr "Used unit converter (Value)"
+
+#: emissions/models.py:82 emissions/models.py:102
+msgid "Paliwo"
+msgstr "Fuel"
+
+#: emissions/models.py:196
+msgid "Kraj"
+msgstr ""
+
+#: emissions/views.py:248
+msgid "Zużycie energii"
+msgstr "Energy consumption"
+
+#: emissions/views.py:281
+msgid "Zakupiona energia"
+msgstr "Purchased energy"
+
+#: emissions/views.py:313
+msgid "Wyprodukowana energia"
+msgstr "Produced energy"
+
+#: emissions/views.py:345
+msgid "Sprzedana energia"
+msgstr "Sold energy"
+
+#: theme/templates/base.html:56 theme/templates/base.html:58
+msgid "Panel Administratora"
+msgstr "Admin Panel"
+
+#: theme/templates/base.html:72
+msgid "Użytkownik"
+msgstr "User"
+
+#: theme/templates/base.html:100
+msgid "Wyloguj"
+msgstr "Log out"
+
+#: theme/templates/base.html:117 theme/templates/base.html:182
+msgid "Raporty"
+msgstr "Reports"
+
+#: theme/templates/base.html:122 theme/templates/base.html:183
+msgid "Przedsiębiorstwo"
+msgstr "Company"
+
+#: theme/templates/base.html:127 theme/templates/base.html:184
+msgid "Wskaźniki Emisji"
+msgstr "Emission Factors"
+
+#: theme/templates/base.html:132 theme/templates/base.html:185
+msgid "Przeliczniki"
+msgstr "Converters"
+
+#: theme/templates/base.html:137 theme/templates/base.html:190
+msgid "Cele i symulacje"
+msgstr "Goals & Simulations"
+
+#: theme/templates/base.html:142 theme/templates/base.html:191
+msgid "Użytkownicy"
+msgstr "Users"
+
+#: theme/templates/base.html:147 theme/templates/base.html:192
+msgid "AI Asystent ESG"
+msgstr "AI ESG Assistant"
+
+#: theme/templates/base.html:152 theme/templates/base.html:193
+msgid "Komunikacja e-mail"
+msgstr "Email Communication"
+
+#: theme/templates/base.html:158
+msgid "Audyt i Weryfikacja"
+msgstr "Audit & Verification"
+
+#: theme/templates/base.html:177
+msgid "Wszelkie prawa zastrzeżone."
+msgstr "All rights reserved."
+
+#: theme/templates/base.html:181
+msgid "Nawigacja"
+msgstr "Navigation"
+
+#: theme/templates/base.html:189
+msgid "Więcej"
+msgstr "More"
