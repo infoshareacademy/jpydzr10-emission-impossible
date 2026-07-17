@@ -1,19 +1,19 @@
 {% extends "base.html" %}
-{% load workflow_tags %}
+{% load workflow_tags i18n %}
 
-{% block title %}Panel startowy | Emission Impossible{% endblock %}
+{% block title %}{% trans "Panel startowy" %} | Emission Impossible{% endblock %}
 
 {% block content %}
     <div class="mb-10">
         <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-            Witaj, {{ request.user.username|default:"Użytkowniku" }}!
+            {% trans "Witaj" %}, {{ request.user.username|default:"Użytkowniku" }}!
         </h1>
-        <p class="font-mono text-sm text-text-muted mt-2">ESG Dashboard: Podsumowanie i przegląd Twoich zadań</p>
+        <p class="font-mono text-sm text-text-muted mt-2">{% trans "ESG Dashboard: Podsumowanie i przegląd Twoich zadań" %}</p>
     </div>
 
-    <div class="mt-12 px-2 md:px-8"> <!-- Zwiększony margines na przyciski -->
+    <div class="mt-12 px-2 md:px-8">
         <div class="flex justify-between items-end mb-6">
-            <h2 class="font-heading font-bold text-2xl text-text-main">Cele Redukcyjne</h2>
+            <h2 class="font-heading font-bold text-2xl text-text-main">{% trans "Cele Redukcyjne" %}</h2>
             <select id="targetSelector" onchange="scrollToTarget(this.value)"
                     class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg px-4 py-2 outline-none">
                 {% for target in reduction_targets %}
@@ -22,51 +22,36 @@
             </select>
         </div>
 
-        <!-- Bezpieczna Karuzela (Vanilla JS + Tailwind) -->
         <div class="relative w-full">
-
-            <!-- Przycisk w lewo -->
             <button id="btnPrev" class="absolute -left-4 md:-left-8 top-1/2 -translate-y-1/2 z-20 bg-[#111720] border-2 border-[#1a4a52] text-text-main hover:text-[#c8f535] hover:border-[#c8f535] w-12 h-12 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex">
                 <span class="material-symbols-outlined font-bold">chevron_left</span>
             </button>
 
-            <!-- Kontener z ukrytym paskiem przewijania -->
             <div id="carousel" class="flex overflow-x-auto gap-6 pb-6 w-full scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
-                <style>
-                    #carousel::-webkit-scrollbar { display: none; }
-                </style>
+                <style>#carousel::-webkit-scrollbar { display: none; }</style>
 
                 {% for target in reduction_targets %}
-                <!-- KARTA ESG (Dokładne wymiary dla 1/2/3 kolumn na różnych ekranach) -->
                 <div id="target-{{ target.id }}" class="flex-none w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] h-full bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl relative flex flex-col justify-between min-h-[380px]">
-
-                    <!-- Menu -->
                     <a href="{% url 'what_if:reduction-target-detail' target.id %}" class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors">
                         <span class="material-symbols-outlined">more_vert</span>
                     </a>
-
                     <div>
-                        <!-- Status bar -->
                         <div class="w-full h-1.5 rounded-full mb-4 bg-[#111720] overflow-hidden">
                             <div class="h-full rounded-full transition-all duration-500 {% if target.chart_data.status_color == 'green' %}bg-[#c8f535]{% elif target.chart_data.status_color == 'yellow' %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: 70%;"></div>
                         </div>
                         <h3 class="font-bold text-lg text-text-main mb-1 truncate pr-6">{{ target.target_name }}</h3>
                         <p class="text-xs text-text-muted mb-4 truncate">{{ target.company.name }}</p>
                     </div>
-
-                    <!-- Kontener wykresu Chart.js -->
                     <div class="h-40 w-full relative mb-4">
                         <canvas id="chart-{{ target.id }}"></canvas>
                     </div>
-
-                    <!-- Stopka karty -->
                     <div class="flex justify-between items-end mt-auto pt-4 border-t border-[#1a4a52]/50">
                         <div class="text-left">
-                            <p class="text-xs text-text-muted mb-1">Emisja (obecna):</p>
+                            <p class="text-xs text-text-muted mb-1">{% trans "Emisja (obecna):" %}</p>
                             <p class="font-mono text-base font-bold text-text-main">{{ target.chart_data.current_emission|floatformat:1 }} t</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs text-text-muted mb-1">Cel ({{ target.target_year }}):</p>
+                            <p class="text-xs text-text-muted mb-1">{% trans "Cel" %} ({{ target.target_year }}):</p>
                             <p class="font-mono text-base font-bold text-[#c8f535]">{{ target.chart_data.target_emission|floatformat:1 }} t</p>
                         </div>
                     </div>
@@ -74,17 +59,15 @@
                 {% endfor %}
             </div>
 
-            <!-- Przycisk w prawo -->
             <button id="btnNext" class="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 z-20 bg-[#111720] border-2 border-[#1a4a52] text-text-main hover:text-[#c8f535] hover:border-[#c8f535] w-12 h-12 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex">
                 <span class="material-symbols-outlined font-bold">chevron_right</span>
             </button>
         </div>
     </div>
 
-    <!-- Poniżej: Lista oczekujących zadań i Ulubione (bez zmian strukturalnych) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto w-full mt-12">
         <div class="lg:col-span-2 flex flex-col gap-4">
-            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Oczekujące Zadania</h2>
+            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">{% trans "Oczekujące Zadania" %}</h2>
 
             {% if grouped_tasks %}
                 {% for group in grouped_tasks %}
@@ -94,21 +77,19 @@
                                 <h2 class="text-lg font-bold text-text-main">{{ group.title }}</h2>
                                 <p class="text-sm text-text-muted mt-1">{{ group.description }}</p>
                                 {% if group.deadline %}
-                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">Termin: {{ group.deadline|date:"d.m.Y" }}</p>
+                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">{% trans "Termin" %}: {{ group.deadline|date:"d.m.Y" }}</p>
                                 {% endif %}
                             </div>
-                            <button
-                                onclick="toggleTaskDetails(this, 'task_details_{{ forloop.counter }}')"
-                                class="text-xs font-bold font-mono text-accent hover:text-white transition-colors uppercase"
-                            >
-                                ZWIŃ/ROZWIŃ LISTĘ
+                            <button onclick="toggleTaskDetails(this, 'task_details_{{ forloop.counter }}')"
+                                class="text-xs font-bold font-mono text-accent hover:text-white transition-colors uppercase">
+                                {% trans "ZWIŃ/ROZWIŃ LISTĘ" %}
                             </button>
                         </div>
 
                         <div id="task_details_{{ forloop.counter }}" class="mt-6 space-y-4">
                             {% if group.tasks|length > 1 %}
                                 <div class="p-4 bg-black/20 border border-border-subtle rounded-xl mb-4">
-                                    <span class="font-bold text-sm text-text-main mb-3 block">Dotyczy spółek ({{ group.tasks|length }}):</span>
+                                    <span class="font-bold text-sm text-text-main mb-3 block">{% trans "Dotyczy spółek" %} ({{ group.tasks|length }}):</span>
                                     <ul class="space-y-2">
                                         {% for task in group.tasks %}
                                             <li class="flex items-center bg-[#111720] p-3 rounded-lg border border-border-subtle">
@@ -121,22 +102,18 @@
                             {% endif %}
                             {% for task in group.tasks %}
                                 {% get_grouped_rejected_records task as grouped_records %}
-
                                 {% if grouped_records %}
                                     {% if group.tasks|length > 1 %}
-                                        <p class="text-xs font-bold text-text-muted mt-4 mb-2 uppercase tracking-wider">Szczegóły dla: {{ task.company.name }}</p>
+                                        <p class="text-xs font-bold text-text-muted mt-4 mb-2 uppercase tracking-wider">{% trans "Szczegóły dla" %}: {{ task.company.name }}</p>
                                     {% endif %}
-
                                     {% for category, data in grouped_records.items %}
                                         <div class="p-4 bg-black/20 border border-border-subtle rounded-xl">
                                             <div class="flex justify-between items-center mb-3">
                                                 <span class="font-bold text-sm text-text-main">{{ category }}</span>
                                                 <div class="flex items-center gap-3">
-                                                    <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">
-                                                        {{ data.count }}
-                                                    </span>
+                                                    <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">{{ data.count }}</span>
                                                     <a href="{{ data.list_url }}" class="text-xs font-mono bg-[#c8f535] text-[#1a4a52] px-3 py-1.5 rounded-md hover:bg-[#b5e02b] transition-colors font-bold shadow-sm">
-                                                        Szczegóły
+                                                        {% trans "Szczegóły" %}
                                                     </a>
                                                 </div>
                                             </div>
@@ -144,7 +121,7 @@
                                                 {% for item in data.items %}
                                                     <li class="flex justify-between items-center bg-[#111720] p-3 rounded-lg border border-border-subtle hover:border-yellow-500/30 transition-colors">
                                                         <span class="text-xs text-text-muted font-mono truncate mr-2">{{ item.str }}</span>
-                                                        <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">Edytuj</a>
+                                                        <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">{% trans "Edytuj" %}</a>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
@@ -152,7 +129,7 @@
                                     {% endfor %}
                                 {% else %}
                                     {% if group.tasks|length == 1 %}
-                                        <p class="text-xs text-text-muted italic">Brak odrzuconych rekordów w tej kategorii.</p>
+                                        <p class="text-xs text-text-muted italic">{% trans "Brak odrzuconych rekordów w tej kategorii." %}</p>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
@@ -162,26 +139,23 @@
             {% else %}
                 <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 flex flex-col items-center justify-center text-center">
                     <span class="material-symbols-outlined text-5xl text-[#5bc4be] mb-3">task_alt</span>
-                    <h3 class="font-bold text-text-main text-lg">Wszystko gotowe!</h3>
-                    <p class="font-mono text-sm text-text-muted">Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania.</p>
+                    <h3 class="font-bold text-text-main text-lg">{% trans "Wszystko gotowe!" %}</h3>
+                    <p class="font-mono text-sm text-text-muted">{% trans "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania." %}</p>
                 </div>
             {% endif %}
         </div>
 
         <div class="flex flex-col gap-4">
-            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Ulubione Akcje</h2>
-
+            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">{% trans "Ulubione Akcje" %}</h2>
             <div class="grid grid-cols-2 gap-4">
                 {% for shortcut in favorite_shortcuts %}
                     <a href="{{ shortcut.url }}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
                         <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
                               style="font-size:42px; font-variation-settings:'FILL' 1;">{{ shortcut.icon }}</span>
-                        <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">
-                            {{ shortcut.title }}
-                        </span>
+                        <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">{{ shortcut.title }}</span>
                     </a>
                 {% empty %}
-                    <p class="col-span-2 text-xs text-text-muted font-mono text-center">Brak ulubionych akcji.</p>
+                    <p class="col-span-2 text-xs text-text-muted font-mono text-center">{% trans "Brak ulubionych akcji." %}</p>
                 {% endfor %}
             </div>
         </div>
@@ -189,115 +163,62 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Ładowanie Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-    // --- 1. LOGIKA BEZPIECZNEJ KARUZELI ---
     const carousel = document.getElementById('carousel');
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');
 
     if (carousel && btnPrev && btnNext) {
-        // Obliczamy przesunięcie bazujące na szerokości pierwszego elementu w karuzeli + Tailwind gap-6 (24px)
         const getScrollAmount = () => {
             const firstCard = carousel.children[0];
             return firstCard ? firstCard.offsetWidth + 24 : 350;
         };
-
-        btnPrev.addEventListener('click', () => {
-            carousel.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
-        });
-
-        btnNext.addEventListener('click', () => {
-            carousel.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
-        });
-
+        btnPrev.addEventListener('click', () => { carousel.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); });
+        btnNext.addEventListener('click', () => { carousel.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }); });
         const updateButtons = () => {
             const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
-
-            // Dezaktywacja lewego przycisku z małym marginesem tolerancji
             btnPrev.disabled = carousel.scrollLeft <= 2;
-            // Dezaktywacja prawego przycisku
             btnNext.disabled = carousel.scrollLeft >= maxScrollLeft - 2;
         };
-
-        // Nasłuchujemy przewijania oraz zmiany rozmiaru okna
         carousel.addEventListener('scroll', updateButtons);
         window.addEventListener('resize', updateButtons);
-
-        // Wstępna konfiguracja przycisków
         setTimeout(updateButtons, 100);
     }
 
-    // --- 2. INICJALIZACJA CHART.JS ---
     {% for target in reduction_targets %}
     (function() {
         const ctx = document.getElementById('chart-{{ target.id }}');
         if (!ctx) return;
-
         new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: {{ target.chart_data.years|safe }},
                 datasets: [
-                    {
-                        label: 'Zakres 1',
-                        data: {{ target.chart_data.s1|safe }},
-                        backgroundColor: '#c8f535',
-                        stack: 'stack1',
-                        borderRadius: 4,
-                        borderSkipped: false
-                    },
-                    {
-                        label: 'Zakres 2',
-                        data: {{ target.chart_data.s2|safe }},
-                        backgroundColor: '#5bc4be',
-                        stack: 'stack1',
-                        borderRadius: 4,
-                        borderSkipped: false
-                    }
+                    { label: '{% trans "Zakres 1" %}', data: {{ target.chart_data.s1|safe }}, backgroundColor: '#c8f535', stack: 'stack1', borderRadius: 4, borderSkipped: false },
+                    { label: '{% trans "Zakres 2" %}', data: {{ target.chart_data.s2|safe }}, backgroundColor: '#5bc4be', stack: 'stack1', borderRadius: 4, borderSkipped: false }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#111720',
-                        titleColor: '#9ca3af',
-                        bodyColor: '#ffffff',
-                        borderColor: '#1a4a52',
-                        borderWidth: 1,
-                        padding: 10,
-                        boxPadding: 4
-                    }
-                },
-                scales: {
-                    x: { stacked: true, display: false },
-                    y: { stacked: true, display: false, beginAtZero: true }
-                }
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#111720', titleColor: '#9ca3af', bodyColor: '#ffffff', borderColor: '#1a4a52', borderWidth: 1, padding: 10, boxPadding: 4 } },
+                scales: { x: { stacked: true, display: false }, y: { stacked: true, display: false, beginAtZero: true } }
             }
         });
     })();
     {% endfor %}
 });
 
-// Funkcje pomocnicze UI
 function toggleTaskDetails(btn, id) {
     const container = document.getElementById(id);
     container.classList.toggle('hidden');
-    btn.innerText = container.classList.contains('hidden') ? 'POKAŻ LISTĘ' : 'ZWIŃ LISTĘ';
+    btn.innerText = container.classList.contains('hidden') ? '{% trans "POKAŻ LISTĘ" %}' : '{% trans "ZWIŃ LISTĘ" %}';
 }
 
 function scrollToTarget(id) {
     const element = document.getElementById(id);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }
 </script>
 {% endblock %}

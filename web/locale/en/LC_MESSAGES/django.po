@@ -1,19 +1,60 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Emission Impossible - English translations
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Emission Impossible\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-17 21:12+0000\n"
-"PO-Revision-Date: 2026-07-17 20:53+0000\n"
+"POT-Creation-Date: 2026-07-17 21:34+0000\n"
+"PO-Revision-Date: 2026-07-17 21:23+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/registry.py:4 theme/templates/base.html:117
+#: theme/templates/base.html:182
+msgid "Raporty"
+msgstr "Reports"
+
+#: core/registry.py:7 theme/templates/base.html:122
+#: theme/templates/base.html:183
+msgid "Przedsiębiorstwo"
+msgstr "Company"
+
+#: core/registry.py:12 theme/templates/base.html:127
+#: theme/templates/base.html:184
+msgid "Wskaźniki Emisji"
+msgstr "Emission Factors"
+
+#: core/registry.py:15 theme/templates/base.html:132
+#: theme/templates/base.html:185
+msgid "Przeliczniki"
+msgstr "Converters"
+
+#: core/registry.py:18 theme/templates/base.html:137
+#: theme/templates/base.html:190
+msgid "Cele i symulacje"
+msgstr "Goals & Simulations"
+
+#: core/registry.py:23 theme/templates/base.html:142
+#: theme/templates/base.html:191
+msgid "Użytkownicy"
+msgstr "Users"
+
+#: core/registry.py:28 theme/templates/base.html:147
+#: theme/templates/base.html:192
+msgid "AI Asystent ESG"
+msgstr "AI ESG Assistant"
+
+#: core/registry.py:33 theme/templates/base.html:152
+#: theme/templates/base.html:193
+msgid "Komunikacja e-mail"
+msgstr "Email Communication"
+
+#: core/registry.py:38 theme/templates/base.html:158
+msgid "Audyt i Weryfikacja"
+msgstr "Audit & Verification"
 
 #: emissions/forms.py:62 emissions/forms.py:121 emissions/forms.py:167
 #: emissions/forms.py:213
@@ -113,7 +154,7 @@ msgstr "Used unit converter (Value)"
 
 #: emissions/models.py:70
 msgid "Użyty przelicznik jednostek (Jednostka)"
-msgstr "Used unit converter (Value)"
+msgstr "Used unit converter (Unit)"
 
 #: emissions/models.py:82 emissions/models.py:102
 msgid "Paliwo"
@@ -121,7 +162,7 @@ msgstr "Fuel"
 
 #: emissions/models.py:196
 msgid "Kraj"
-msgstr ""
+msgstr "Country"
 
 #: emissions/views.py:248
 msgid "Zużycie energii"
@@ -139,29 +180,125 @@ msgstr "Produced energy"
 msgid "Sprzedana energia"
 msgstr "Sold energy"
 
-msgid "Zaloguj się do systemu"
-msgstr "Log in to the system"
+#: templates/home.html:4
+msgid "Panel startowy"
+msgstr "Dashboard"
 
-msgid "Nazwa użytkownika lub hasło są nieprawidłowe."
-msgstr "Invalid username or password."
+#: templates/home.html:9
+msgid "Witaj"
+msgstr "Welcome"
 
-msgid "Hasło"
-msgstr "Password"
+#: templates/home.html:11
+msgid "ESG Dashboard: Podsumowanie i przegląd Twoich zadań"
+msgstr "ESG Dashboard: Summary and overview of your tasks"
 
-msgid "Zapomniałeś hasła?"
-msgstr "Forgot your password?"
+#: templates/home.html:16
+msgid "Cele Redukcyjne"
+msgstr "Reduction Targets"
 
-msgid "Zapamiętaj mnie"
-msgstr "Remember me"
+#: templates/home.html:50
+msgid "Emisja (obecna):"
+msgstr "Current emission:"
 
+#: templates/home.html:54
+msgid "Cel"
+msgstr "Target"
+
+#: templates/home.html:70
+msgid "Oczekujące Zadania"
+msgstr "Pending Tasks"
+
+#: templates/home.html:80
+msgid "Termin"
+msgstr "Deadline"
+
+#: templates/home.html:85
+msgid "ZWIŃ/ROZWIŃ LISTĘ"
+msgstr "COLLAPSE/EXPAND LIST"
+
+#: templates/home.html:92
+msgid "Dotyczy spółek"
+msgstr "Applies to companies"
+
+#: templates/home.html:107
+msgid "Szczegóły dla"
+msgstr "Details for"
+
+#: templates/home.html:116
+msgid "Szczegóły"
+msgstr "Details"
+
+#: templates/home.html:124
+msgid "Edytuj"
+msgstr "Edit"
+
+#: templates/home.html:132
+msgid "Brak odrzuconych rekordów w tej kategorii."
+msgstr "No rejected records in this category."
+
+#: templates/home.html:142
+msgid "Wszystko gotowe!"
+msgstr "All done!"
+
+#: templates/home.html:143
+msgid "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania."
+msgstr "You currently have no rejected records or tasks to complete."
+
+#: templates/home.html:149
+msgid "Ulubione Akcje"
+msgstr "Favourite Actions"
+
+#: templates/home.html:158
+msgid "Brak ulubionych akcji."
+msgstr "No favourite actions."
+
+#: templates/home.html:199
+msgid "Zakres 1"
+msgstr "Scope 1"
+
+#: templates/home.html:200
+msgid "Zakres 2"
+msgstr "Scope 2"
+
+#: templates/home.html:216
+msgid "POKAŻ LISTĘ"
+msgstr "SHOW LIST"
+
+#: templates/home.html:216
+msgid "ZWIŃ LISTĘ"
+msgstr "COLLAPSE LIST"
+
+#: templates/registration/login.html:4 templates/registration/login.html:124
 msgid "Zaloguj się"
 msgstr "Log in"
 
+#: templates/registration/login.html:78
+msgid "Zaloguj się do systemu"
+msgstr "Log in to the system"
+
+#: templates/registration/login.html:86
+msgid "Nazwa użytkownika lub hasło są nieprawidłowe."
+msgstr "Invalid username or password."
+
+#: templates/registration/login.html:100
+msgid "Hasło"
+msgstr "Password"
+
+#: templates/registration/login.html:102
+msgid "Zapomniałeś hasła?"
+msgstr "Forgot your password?"
+
+#: templates/registration/login.html:114
+msgid "Zapamiętaj mnie"
+msgstr "Remember me"
+
+#: templates/registration/login.html:133
 msgid "Polityka prywatności"
 msgstr "Privacy policy"
 
+#: templates/registration/login.html:135
 msgid "Kontakt z administratorem"
-msgstr "Admin Panel"
+msgstr "Contact administrator"
 
 #: theme/templates/base.html:56 theme/templates/base.html:58
 msgid "Panel Administratora"
@@ -174,42 +311,6 @@ msgstr "User"
 #: theme/templates/base.html:100
 msgid "Wyloguj"
 msgstr "Log out"
-
-#: theme/templates/base.html:117 theme/templates/base.html:182
-msgid "Raporty"
-msgstr "Reports"
-
-#: theme/templates/base.html:122 theme/templates/base.html:183
-msgid "Przedsiębiorstwo"
-msgstr "Company"
-
-#: theme/templates/base.html:127 theme/templates/base.html:184
-msgid "Wskaźniki Emisji"
-msgstr "Emission Factors"
-
-#: theme/templates/base.html:132 theme/templates/base.html:185
-msgid "Przeliczniki"
-msgstr "Converters"
-
-#: theme/templates/base.html:137 theme/templates/base.html:190
-msgid "Cele i symulacje"
-msgstr "Goals & Simulations"
-
-#: theme/templates/base.html:142 theme/templates/base.html:191
-msgid "Użytkownicy"
-msgstr "Users"
-
-#: theme/templates/base.html:147 theme/templates/base.html:192
-msgid "AI Asystent ESG"
-msgstr "AI ESG Assistant"
-
-#: theme/templates/base.html:152 theme/templates/base.html:193
-msgid "Komunikacja e-mail"
-msgstr "Email Communication"
-
-#: theme/templates/base.html:158
-msgid "Audyt i Weryfikacja"
-msgstr "Audit & Verification"
 
 #: theme/templates/base.html:177
 msgid "Wszelkie prawa zastrzeżone."
