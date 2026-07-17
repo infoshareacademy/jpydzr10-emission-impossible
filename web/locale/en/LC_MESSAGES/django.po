@@ -6,13 +6,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Emission Impossible\n"
-"POT-Creation-Date: 2026-07-17 20:53+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-17 21:12+0000\n"
 "PO-Revision-Date: 2026-07-17 20:53+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: emissions/forms.py:62 emissions/forms.py:121 emissions/forms.py:167
 #: emissions/forms.py:213
 msgid "Rok"
@@ -136,6 +138,30 @@ msgstr "Produced energy"
 #: emissions/views.py:345
 msgid "Sprzedana energia"
 msgstr "Sold energy"
+
+msgid "Zaloguj się do systemu"
+msgstr "Log in to the system"
+
+msgid "Nazwa użytkownika lub hasło są nieprawidłowe."
+msgstr "Invalid username or password."
+
+msgid "Hasło"
+msgstr "Password"
+
+msgid "Zapomniałeś hasła?"
+msgstr "Forgot your password?"
+
+msgid "Zapamiętaj mnie"
+msgstr "Remember me"
+
+msgid "Zaloguj się"
+msgstr "Log in"
+
+msgid "Polityka prywatności"
+msgstr "Privacy policy"
+
+msgid "Kontakt z administratorem"
+msgstr "Admin Panel"
 
 #: theme/templates/base.html:56 theme/templates/base.html:58
 msgid "Panel Administratora"
