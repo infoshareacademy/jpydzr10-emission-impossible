@@ -1,5 +1,7 @@
-{% extends "base.html" %}
-{% block title %}Użytkownicy i uprawnienia — Emission Impossible{% endblock %}
+ {% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Użytkownicy i uprawnienia" %} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -37,7 +39,6 @@
                box-shadow:0 20px 60px rgba(0,0,0,.6); }
 
   .search-hidden { display:none !important; }
-
   .stat-chip { background:rgba(17,23,32,0.6); border:1px solid #2a3f4a;
                border-radius:999px; padding:4px 12px; font-size:12px; }
 </style>
@@ -51,7 +52,7 @@
     <div class="flex items-start gap-3 mb-5">
       <span class="material-symbols-outlined text-red-400 flex-shrink-0" style="font-size:28px">warning</span>
       <div>
-        <h3 id="modal-title" class="font-heading font-bold text-lg text-text-main mb-1">Potwierdź operację</h3>
+        <h3 id="modal-title" class="font-heading font-bold text-lg text-text-main mb-1">{% trans "Potwierdź operację" %}</h3>
         <p id="modal-message" class="font-mono text-sm text-text-muted leading-relaxed"></p>
       </div>
     </div>
@@ -60,74 +61,64 @@
         {% csrf_token %}
         <button type="submit" class="px-5 py-2 font-bold text-sm rounded-xl text-white transition-colors"
           style="background:#dc2626; border:1px solid rgba(239,68,68,0.5);">
-          Tak, wykonaj
+          {% trans "Tak, wykonaj" %}
         </button>
       </form>
       <button onclick="closeModal()"
         class="px-5 py-2 font-mono font-bold text-sm text-text-muted hover:text-text-main border border-border-subtle rounded-xl transition-colors">
-        Anuluj
+        {% trans "Anuluj" %}
       </button>
     </div>
   </div>
 </div>
 
-<!-- ===================== -->
 <!-- HEADER -->
-<!-- ===================== -->
 <div class="mb-8 space-y-4">
-
-  <!-- Title row -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div class="flex items-center gap-3">
       <div style="width:4px;height:32px;background:#c8f535;border-radius:999px;"></div>
-      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Użytkownicy i uprawnienia</h1>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{% trans "Użytkownicy i uprawnienia" %}</h1>
     </div>
     {% if is_admin %}
     <a href="/admin/accounts/customuser/add/"
       class="inline-flex items-center gap-2 px-4 py-2.5 font-mono font-bold text-sm rounded-xl text-white transition-colors flex-shrink-0"
       style="background:#1a4a52; border:1px solid #2a6a72;">
       <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
-      Utwórz nowego użytkownika
+      {% trans "Utwórz nowego użytkownika" %}
     </a>
     {% endif %}
   </div>
 
-  <!-- Subtitle -->
-  <p class="font-mono text-sm text-text-muted">Zarządzanie dostępem do spółek w systemie Emission Impossible.</p>
+  <p class="font-mono text-sm text-text-muted">{% trans "Zarządzanie dostępem do spółek w systemie Emission Impossible." %}</p>
 
-  <!-- Stats -->
   <div class="flex flex-wrap gap-2">
     <span class="stat-chip font-mono text-text-muted">
-      <span class="text-text-main font-bold">{{ total_companies }}</span> spółek
+      <span class="text-text-main font-bold">{{ total_companies }}</span> {% trans "spółek" %}
     </span>
     <span class="stat-chip font-mono text-text-muted">
-      <span class="text-text-main font-bold">{{ total_users }}</span> użytkowników
+      <span class="text-text-main font-bold">{{ total_users }}</span> {% trans "użytkowników" %}
     </span>
     <span class="stat-chip font-mono text-text-muted">
-      <span style="color:#c8f535;" class="font-bold">{{ admin_count }}</span> adminów
+      <span style="color:#c8f535;" class="font-bold">{{ admin_count }}</span> {% trans "adminów" %}
     </span>
   </div>
 
-  <!-- Search -->
   <div class="relative max-w-sm">
     <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left:12px;font-size:18px;">search</span>
-    <input id="global-search" type="text" placeholder="Szukaj użytkownika lub spółki..."
+    <input id="global-search" type="text" placeholder="{% trans 'Szukaj użytkownika lub spółki...' %}"
       class="w-full py-2.5 pl-10 pr-4 font-mono text-sm text-text-main rounded-xl focus:outline-none"
       style="background:rgba(255,255,255,.06); border:1px solid #2a3f4a;">
   </div>
-
 </div>
 
-<!-- ===================== -->
 <!-- ADMINS -->
-<!-- ===================== -->
 <section class="mb-10" id="section-admins">
   <div class="flex items-center gap-3 mb-4">
     <span class="material-symbols-outlined" style="font-size:20px;color:#c8f535;">shield_person</span>
-    <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">Administratorzy systemu</h2>
+    <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">{% trans "Administratorzy systemu" %}</h2>
     <span class="font-mono text-xs text-text-muted px-3 py-1 rounded-full"
       style="background:rgba(17,23,32,0.6); border:1px solid #2a3f4a;">
-      Pełny dostęp do wszystkich danych
+      {% trans "Pełny dostęp do wszystkich danych" %}
     </span>
   </div>
 
@@ -147,11 +138,11 @@
           <span class="material-symbols-outlined" style="font-size:12px">mail</span>{{ admin.email }}
         </a>
         {% else %}
-        <span class="font-mono text-xs text-text-muted opacity-40">brak adresu e-mail</span>
+        <span class="font-mono text-xs text-text-muted opacity-40">{% trans "brak adresu e-mail" %}</span>
         {% endif %}
       </div>
       {% if is_admin %}
-      <a href="/admin/accounts/customuser/{{ admin.pk }}/change/" class="flex-shrink-0 text-text-muted hover:text-text-main transition-colors" title="Edytuj">
+      <a href="/admin/accounts/customuser/{{ admin.pk }}/change/" class="flex-shrink-0 text-text-muted hover:text-text-main transition-colors" title="{% trans 'Edytuj' %}">
         <span class="material-symbols-outlined" style="font-size:18px">edit</span>
       </a>
       {% endif %}
@@ -159,24 +150,22 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="font-mono text-sm text-text-muted italic">Brak zdefiniowanych administratorów systemu.</p>
+  <p class="font-mono text-sm text-text-muted italic">{% trans "Brak zdefiniowanych administratorów systemu." %}</p>
   {% endif %}
 </section>
 
 <div style="height:1px;background:linear-gradient(to right,rgba(122,181,174,.3),transparent);margin-bottom:2.5rem;"></div>
 
-<!-- ===================== -->
 <!-- COMPANIES -->
-<!-- ===================== -->
 <section>
   <div class="flex items-center justify-between mb-5">
     <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">
-      {% if is_admin %}Wszystkie spółki{% else %}Twoje spółki{% endif %}
+      {% if is_admin %}{% trans "Wszystkie spółki" %}{% else %}{% trans "Twoje spółki" %}{% endif %}
     </h2>
     {% if not is_admin %}
     <p class="font-mono text-xs text-text-muted">
       <span class="material-symbols-outlined align-middle" style="font-size:13px">info</span>
-      Widzisz tylko spółki, do których masz przypisany dostęp.
+      {% trans "Widzisz tylko spółki, do których masz przypisany dostęp." %}
     </p>
     {% endif %}
   </div>
@@ -186,7 +175,6 @@
     {% for item in company_data %}
     <div class="company-card searchable-company" data-company="{{ item.company.name|lower }}">
 
-      <!-- Company header -->
       <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style="border-bottom:1px solid #2a3f4a;">
         <div class="flex items-center gap-3">
@@ -212,33 +200,32 @@
         <div class="flex items-center gap-3 flex-shrink-0">
           <span class="font-mono text-xs text-text-muted stat-chip">
             <span class="material-symbols-outlined align-middle" style="font-size:13px">group</span>
-            {{ item.user_count }} {% if item.user_count == 1 %}użytkownik{% else %}użytkowników{% endif %}
+            {{ item.user_count }} {% trans "użytkowników" %}
           </span>
           {% if is_admin %}
           <a href="/admin/accounts/usercompanypermission/add/?company={{ item.company.pk }}"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono font-bold text-xs rounded-xl transition-all text-white"
             style="background:#1a4a52; border:1px solid #2a6a72;">
             <span class="material-symbols-outlined" style="font-size:14px">person_add</span>
-            Przypisz użytkownika
+            {% trans "Przypisz użytkownika" %}
           </a>
           {% endif %}
         </div>
       </div>
 
-      <!-- Users table -->
       {% if item.permissions %}
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
             <tr style="border-bottom:1px solid #2a3f4a;">
-              <th class="px-5 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">Użytkownik</th>
-              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden md:table-cell">Imię i nazwisko</th>
-              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">Rola</th>
-              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden lg:table-cell">E-mail</th>
-              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">Odczyt</th>
-              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">Zapis</th>
+              <th class="px-5 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">{% trans "Użytkownik" %}</th>
+              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden md:table-cell">{% trans "Imię i nazwisko" %}</th>
+              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">{% trans "Rola" %}</th>
+              <th class="px-4 py-4 text-left font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted hidden lg:table-cell">{% trans "E-mail" %}</th>
+              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">{% trans "Odczyt" %}</th>
+              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted">{% trans "Zapis" %}</th>
               {% if is_admin %}
-              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted w-32">Akcje</th>
+              <th class="px-4 py-4 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted w-32">{% trans "Akcje" %}</th>
               {% endif %}
             </tr>
           </thead>
@@ -257,7 +244,7 @@
                   {% endif %}
                   <div class="flex items-center gap-2">
                     <span class="font-mono font-bold text-sm text-text-main">@{{ u.username }}</span>
-                    {% if not u.is_active %}<span class="inactive-badge">nieaktywny</span>{% endif %}
+                    {% if not u.is_active %}<span class="inactive-badge">{% trans "nieaktywny" %}</span>{% endif %}
                   </div>
                 </div>
               </td>
@@ -313,13 +300,13 @@
                     style="background:rgba(255,255,255,.05); border:1px solid #2a3f4a;">
                     <span class="material-symbols-outlined" style="font-size:15px">manage_accounts</span>
                   </a>
-                  <button onclick="openModal('Odepnij użytkownika od spółki','Czy na pewno odpiąć <strong>@{{ u.username }}</strong> od spółki <strong>{{ item.company.name }}</strong>?','{% url 'accounts:permission-remove' perm.pk %}')"
+                  <button onclick="openModal('{% trans "Odepnij użytkownika od spółki" %}','{% trans "Czy na pewno odpiąć" %} <strong>@{{ u.username }}</strong> {% trans "od spółki" %} <strong>{{ item.company.name }}</strong>?','{% url "accounts:permission-remove" perm.pk %}')"
                     class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-text-muted transition-colors"
                     style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);">
                     <span class="material-symbols-outlined" style="font-size:15px;color:#f87171">link_off</span>
                   </button>
                   {% if u.is_active %}
-                  <button onclick="openModal('Dezaktywuj konto użytkownika','Czy na pewno dezaktywować konto <strong>@{{ u.username }}</strong>?','{% url 'accounts:user-deactivate' u.pk %}')"
+                  <button onclick="openModal('{% trans "Dezaktywuj konto użytkownika" %}','{% trans "Czy na pewno dezaktywować konto" %} <strong>@{{ u.username }}</strong>?','{% url "accounts:user-deactivate" u.pk %}')"
                     class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-text-muted transition-colors"
                     style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);">
                     <span class="material-symbols-outlined" style="font-size:15px;color:#f87171">person_off</span>
@@ -339,12 +326,12 @@
       {% else %}
       <div class="px-5 py-8 text-center">
         <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted" style="font-size:36px;opacity:.3;">group_off</span>
-        <p class="font-mono text-sm text-text-muted opacity-50">Brak przypisanych użytkowników do tej spółki.</p>
+        <p class="font-mono text-sm text-text-muted opacity-50">{% trans "Brak przypisanych użytkowników do tej spółki." %}</p>
         {% if is_admin %}
         <a href="/admin/accounts/usercompanypermission/add/?company={{ item.company.pk }}"
           class="mt-3 inline-flex items-center gap-1 font-mono text-xs hover:underline" style="color:#c8f535;">
           <span class="material-symbols-outlined" style="font-size:14px">person_add</span>
-          Przypisz pierwszego użytkownika
+          {% trans "Przypisz pierwszego użytkownika" %}
         </a>
         {% endif %}
       </div>
@@ -356,17 +343,17 @@
 
   <div id="no-results" class="hidden text-center py-12">
     <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted" style="font-size:40px;opacity:.25;">search_off</span>
-    <p class="font-mono text-sm text-text-muted opacity-50">Brak wyników dla podanej frazy.</p>
+    <p class="font-mono text-sm text-text-muted opacity-50">{% trans "Brak wyników dla podanej frazy." %}</p>
   </div>
 
   {% else %}
   <div class="text-center py-16">
     <span class="material-symbols-outlined block mx-auto mb-3 text-text-muted" style="font-size:56px;opacity:.2;">domain_disabled</span>
     <p class="font-mono text-base text-text-muted opacity-50 mb-2">
-      {% if is_admin %}Brak spółek w systemie.{% else %}Nie masz przypisanego dostępu do żadnej spółki.{% endif %}
+      {% if is_admin %}{% trans "Brak spółek w systemie." %}{% else %}{% trans "Nie masz przypisanego dostępu do żadnej spółki." %}{% endif %}
     </p>
     {% if not is_admin %}
-    <p class="font-mono text-xs text-text-muted opacity-40">Skontaktuj się z administratorem systemu w celu uzyskania dostępu.</p>
+    <p class="font-mono text-xs text-text-muted opacity-40">{% trans "Skontaktuj się z administratorem systemu w celu uzyskania dostępu." %}</p>
     {% endif %}
   </div>
   {% endif %}

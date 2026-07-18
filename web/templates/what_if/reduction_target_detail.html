@@ -1,107 +1,114 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ target.target_name }} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="max-w-5xl mx-auto space-y-8">
 
-    <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <a href="{% url 'what_if:reduction-target-list' %}" class="text-xs font-mono uppercase text-text-muted hover:text-accent transition-colors flex items-center gap-1 mb-2">
-                <span class="material-symbols-outlined text-[14px]">arrow_back</span> Powrót do listy celów
-            </a>
-            <h2 class="text-2xl font-heading font-bold text-text-main">
-                Cel: <span class="text-accent">{{ target.target_name }}</span>
-            </h2>
-            <div class="mt-2 flex gap-4 font-mono text-sm text-text-muted">
-                <span>Spółka: <strong>{{ target.company.name }}</strong></span>
-                <span>Zakres: <strong>{{ target.get_scope_display }}</strong></span>
-            </div>
-        </div>
-
-        <div class="bg-[rgba(255,255,255,0.03)] border border-border-subtle rounded-xl p-4 min-w-[260px]">
-            <p class="text-xs font-mono uppercase text-text-muted mb-1 text-center">Założona Redukcja: <span class="text-accent font-bold">-{{ target.reduction_pct }}%</span></p>
-            <div class="mt-2 pt-2 border-t border-border-subtle/50 text-xs font-mono space-y-1.5">
-                <div class="flex justify-between gap-4">
-                    <span class="text-text-muted">Rok bazowy ({{ target.base_year }}):</span>
-                    <span class="text-text-main font-bold">{{ base_emission_value|floatformat:2 }} tCO₂e</span>
-                </div>
-                <div class="flex justify-between gap-4">
-                    <span class="text-text-muted">Cel na rok ({{ target.target_year }}):</span>
-                    <span class="text-accent font-bold">max {{ target_emission_value|floatformat:2 }} tCO₂e</span>
-                </div>
-            </div>
-        </div>
+  <!-- HEADER -->
+  <div>
+    <a href="{% url 'what_if:reduction-target-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć do listy" %}
+    </a>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ target.target_name }}</h1>
+      </div>
+      <div class="flex gap-3">
+        <a href="{% url edit_url_name pk=target.pk %}"
+          class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
+          <span class="material-symbols-outlined" style="font-size:16px;">edit</span> {% trans "Edytuj" %}
+        </a>
+        <a href="{% url delete_url_name pk=target.pk %}"
+          class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-red-900/50 text-red-400 hover:bg-red-900/20 transition-colors">
+          <span class="material-symbols-outlined" style="font-size:16px;">delete</span> {% trans "Usuń" %}
+        </a>
+      </div>
     </div>
+    <p class="font-mono text-sm text-text-muted mt-3 ml-4">{{ target.company.name }}</p>
+  </div>
 
-    <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl p-6 backdrop-blur-sm shadow-lg">
-        <h3 class="text-lg font-heading font-bold text-text-main mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-accent">show_chart</span>
-            Trajektoria realizacji ścieżki dekarbonizacji
-        </h3>
-
-        <div class="w-full h-[400px] relative">
-            <canvas id="realizationChart"></canvas>
-        </div>
+  <!-- KPI CARDS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <p class="font-mono text-xs uppercase tracking-wider text-text-muted mb-2">{% trans "Rok docelowy" %}</p>
+      <p class="font-heading font-bold text-3xl text-text-main">{{ target.target_year }}</p>
     </div>
+    <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <p class="font-mono text-xs uppercase tracking-wider text-text-muted mb-2">{% trans "Redukcja" %}</p>
+      <p class="font-heading font-bold text-3xl text-accent">{{ target.reduction_pct }}%</p>
+    </div>
+    <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <p class="font-mono text-xs uppercase tracking-wider text-text-muted mb-2">{% trans "Rok bazowy" %}</p>
+      <p class="font-heading font-bold text-3xl text-text-main">{{ target.base_year }}</p>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <h2 class="font-heading font-bold text-lg text-text-main mb-6 pb-3 border-b border-border-subtle">
+      {% trans "Postęp realizacji celu" %}
+    </h2>
+    <div class="relative h-72">
+      <canvas id="progressChart"></canvas>
+    </div>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <h2 class="font-heading font-bold text-lg text-text-main mb-4 pb-3 border-b border-border-subtle">{% trans "Szczegóły" %}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-sm">
+      <div class="flex justify-between">
+        <span class="text-text-muted">{% trans "Zakres" %}:</span>
+        <span class="text-text-main font-bold">{{ target.scope }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-text-muted">{% trans "Emisja bazowa" %}:</span>
+        <span class="text-text-main font-bold">{{ target.base_emission|floatformat:2 }} tCO₂e</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-text-muted">{% trans "Cel emisji" %}:</span>
+        <span class="text-accent font-bold">{{ target.target_emission|floatformat:2 }} tCO₂e</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-text-muted">{% trans "Aktualna emisja" %}:</span>
+        <span class="text-text-main font-bold">{{ target.current_emission|floatformat:2 }} tCO₂e</span>
+      </div>
+    </div>
+  </div>
+
 </div>
+{% endblock %}
 
+{% block extra_scripts %}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('realizationChart').getContext('2d');
-        const years = {{ chart_years|safe }};
-        const actualEmissions = {{ chart_actual|safe }};
-        const targetLine = {{ chart_target_line|safe }};
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'Rzeczywiste wykonanie (Suma roczna tCO₂e)',
-                        data: actualEmissions,
-                        borderColor: 'rgba(200, 245, 53, 1)',
-                        backgroundColor: 'rgba(200, 245, 53, 0.05)',
-                        borderWidth: 3,
-                        pointBackgroundColor: 'rgba(200, 245, 53, 1)',
-                        pointRadius: 5,
-                        fill: true,
-                        tension: 0.2
-                    },
-                    {
-                        label: 'Modelowa ścieżka redukcji',
-                        data: targetLine,
-                        borderColor: 'rgba(255, 255, 255, 0.4)',
-                        borderWidth: 2,
-                        borderDash: [6, 6],
-                        pointRadius: 0,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { labels: { color: '#e8f4f0', font: { family: 'Roboto Mono' } } }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#8b9bb4', font: { family: 'Roboto Mono' } },
-                        title: { display: true, text: 'Wielkość emisji [tCO₂eq]', color: '#8b9bb4', font: { family: 'Roboto Mono' } }
-                    },
-                    x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.03)' },
-                        ticks: { color: '#e8f4f0', font: { family: 'Roboto Mono' } }
-                    }
-                }
-            }
-        });
-    });
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ chart_data.years|safe }},
+      datasets: [
+        { label: '{% trans "Emisja rzeczywista" %}', data: {{ chart_data.actual|safe }}, backgroundColor: 'rgba(200,245,53,0.8)', borderRadius: 4 },
+        { label: '{% trans "Cel" %}', data: {{ chart_data.target|safe }}, type: 'line', borderColor: '#f87171', borderWidth: 2, borderDash: [6,3], pointBackgroundColor: '#f87171', fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true } },
+        tooltip: { backgroundColor: 'rgba(17,23,32,0.9)', titleFont: { family: 'Roboto Mono' }, bodyFont: { family: 'Roboto Mono' }, borderColor: 'rgba(200,245,53,0.3)', borderWidth: 1 }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { family: 'Roboto Mono' } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af', font: { family: 'Roboto Mono' }, callback: val => val + ' t' } }
+      }
+    }
+  });
 </script>
 {% endblock %}

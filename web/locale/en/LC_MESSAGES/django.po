@@ -398,7 +398,7 @@ msgstr "Direct emissions"
 
 #: templates/emissions/dashboard.html:33
 msgid "Spalanie stacjonarne"
-msgstr "Stationary combustion"
+msgstr "Stationary emissions"
 
 #: templates/emissions/dashboard.html:34
 msgid "Kotły, piece, generatory"
@@ -406,7 +406,7 @@ msgstr "Boilers, furnaces, generators"
 
 #: templates/emissions/dashboard.html:40
 msgid "Spalanie mobilne"
-msgstr "Mobile combustion"
+msgstr "Mobile emissions"
 
 #: templates/emissions/dashboard.html:41
 msgid "Pojazdy, flota transportowa"
@@ -435,10 +435,6 @@ msgstr "Indirect energy emissions"
 #: templates/emissions/dashboard.html:67
 msgid "Energia z sieci zewnętrznej"
 msgstr "Energy from external grid"
-
-#: templates/emissions/dashboard.html:73
-msgid "Wyprodukowana"
-msgstr "Produced"
 
 #: templates/emissions/dashboard.html:74
 msgid "Fotowoltaika, własne źródła"

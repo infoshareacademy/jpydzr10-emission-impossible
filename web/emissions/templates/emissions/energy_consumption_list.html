@@ -1,154 +1,101 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}{{ title }} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
-  <style>
-    input, select {
-      background: rgba(255,255,255,0.04) !important;
-      border: 1px solid #2a3f4a !important;
-      border-radius: 8px !important;
-      color: #e8f4f0 !important;
-      font-family: 'Roboto Mono', monospace !important;
-      font-size: 12px !important;
-      padding: 8px 12px !important;
-      outline: none !important;
-      transition: border-color 0.2s !important;
-    }
-    input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
-  </style>
+<style>
+  input, select {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 8px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+  }
+  input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
+</style>
 {% endblock %}
 
 {% block content %}
 
-<!-- ===================== -->
-<!-- HEADER -->
-<!-- ===================== -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-    <div>
-      <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
-        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
-      </a>
-      <div class="flex items-center gap-3 mb-1">
-        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ title }}</h1>
-      </div>
-    </div>
-    <div class="flex gap-3">
-      <a href="{% url template_url_name %}"
-         class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
-        <span class="material-symbols-outlined" style="font-size:16px;">download</span> Szablon
-      </a>
-      <a href="{% url import_url_name %}"
-         class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
-        <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import
-      </a>
-      <a href="{% url add_url_name %}"
-         class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
-         style="background:#1a4a52; border:1px solid #2a6a72;">
-        <span class="material-symbols-outlined" style="font-size:16px;">add</span> Dodaj
-      </a>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+  <div>
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć" %}
+    </a>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ title }}</h1>
     </div>
   </div>
+  <div class="flex gap-3">
+    <a href="{% url import_url_name %}"
+      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
+      <span class="material-symbols-outlined" style="font-size:16px;">upload</span> {% trans "Import" %}
+    </a>
+    <a href="{% url add_url_name %}"
+      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
+      style="background:#1a4a52; border:1px solid #2a6a72;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> {% trans "Dodaj" %}
+    </a>
+  </div>
+</div>
 
-<!-- ===================== -->
-<!-- FILTERS -->
-<!-- ===================== -->
-  <form method="get" class="rounded-2xl border border-border-subtle p-5 mb-8 flex flex-wrap gap-4 items-end"
-        style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-    <div class="flex flex-col gap-1">
-      <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Firma</label>
-      <input type="text" name="company" value="{{ filter_company|default:'' }}" placeholder="Szukaj firmy..."/>
-    </div>
-    <div class="flex flex-col gap-1">
-      <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Rok</label>
-      <input type="number" name="year" value="{{ filter_year|default:'' }}" placeholder="YYYY" style="width:100px;"/>
-    </div>
-    <button type="submit"
-            class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
-            style="background:#1a4a52; border:1px solid #2a6a72;">
-      Szukaj
-    </button>
-    <a href="{% url list_url_name %}" class="font-mono text-xs text-text-muted hover:text-accent underline">Wyczyść</a>
-  </form>
-
-<!-- ===================== -->
-<!-- TABLE -->
-<!-- ===================== -->
-  <div class="rounded-2xl border border-border-subtle overflow-hidden"
-       style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="border-b border-border-subtle">
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">ID</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">Rok</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">Firma</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">Źródło</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">Typ</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Ilość</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">Jednostka</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Emisja CO₂e</th>
-            <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-center">Akcje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for record in records %}
-            <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
-              <td class="px-5 py-4 font-mono text-xs text-text-muted">{{ record.id }}</td>
-              <td class="px-5 py-4 font-mono font-bold text-text-main">{{ record.year }}</td>
-              <td class="px-5 py-4 font-mono text-sm text-text-main">{{ record.company }}</td>
-              <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.energy_source|default:"—" }}</td>
-              <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.energy_type|default:"—" }}</td>
-              <td class="px-5 py-4 font-mono text-sm text-text-main text-right">{{ record.amount|floatformat:2 }}</td>
-              <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.unit }}</td>
-              <td class="px-5 py-4 font-mono font-bold text-accent text-right">{{ record.emission_tco2eq|floatformat:2|default:"—" }} t</td>
-              <td class="px-5 py-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <a href="{% url edit_url_name record.id %}"
-                     class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors">
-                    <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
-                  </a>
-                  <a href="{% url delete_url_name record.id %}"
-                     class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors">
-                    <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="9" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
-                Brak rekordów.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-  <!-- Pagination -->
-    {% if page_obj.has_other_pages %}
-      <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
-        {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}&company={{ filter_company }}&year={{ filter_year }}"
-             class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">←</a>
-        {% endif %}
-        {% for num in page_range %}
-          {% if num == page_obj.paginator.ELLIPSIS %}
-            <span class="px-3 py-1.5 font-mono text-sm text-text-muted">…</span>
-          {% else %}
-            <a href="?page={{ num }}&company={{ filter_company }}&year={{ filter_year }}"
-               class="px-3 py-1.5 font-mono text-sm border rounded-lg transition-colors {% if page_obj.number == num %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">{{ num }}</a>
-          {% endif %}
+<div class="rounded-2xl border border-border-subtle overflow-hidden"
+  style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-border-subtle">
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">ID</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Rok" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Firma" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Źródło" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Typ" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Ilość" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Jednostka" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Emisja CO₂e" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-center">{% trans "Akcje" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+        <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
+          <td class="px-5 py-4 font-mono text-xs text-text-muted">{{ record.id }}</td>
+          <td class="px-5 py-4 font-mono font-bold text-text-main">{{ record.year }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-main">{{ record.company }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.energy_source|default:"—" }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.energy_type|default:"—" }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-main text-right">{{ record.amount|floatformat:2 }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.unit }}</td>
+          <td class="px-5 py-4 font-mono font-bold text-accent text-right">{{ record.emission_tco2eq|floatformat:2|default:"—" }} t</td>
+          <td class="px-5 py-4 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <a href="{% url edit_url_name record.id %}"
+                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors">
+                <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+              </a>
+              <a href="{% url delete_url_name record.id %}"
+                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors">
+                <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+            {% trans "Brak rekordów." %}
+          </td>
+        </tr>
         {% endfor %}
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}&company={{ filter_company }}&year={{ filter_year }}"
-             class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">→</a>
-        {% endif %}
-      </div>
-    {% endif %}
-
+      </tbody>
+    </table>
   </div>
+</div>
 
 {% endblock %}

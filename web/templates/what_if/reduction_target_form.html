@@ -1,109 +1,86 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}
-    {% if object %}Edytuj Cel{% else %}Dodaj Cel Redukcyjny{% endif %} - Emission Impossible
-{% endblock %}
+{% block title %}{% trans "Cel Redukcyjny" %} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
-    <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
-        .custom-form-container input,
-        .custom-form-container select,
-        .custom-form-container textarea {
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid #2a3f4a !important;
-            border-radius: 8px !important;
-            color: #e8f4f0 !important;
-            font-family: "Roboto Mono", monospace !important;
-            font-size: 13px !important;
-            padding: 10px 14px !important;
-            transition: border-color 0.2s, box-shadow 0.2s !important;
-            width: 100%;
-            outline: none !important;
-        }
-        .custom-form-container input:focus,
-        .custom-form-container select:focus,
-        .custom-form-container textarea:focus {
-            border-color: rgba(200, 245, 53, 0.5) !important;
-            box-shadow: 0 0 0 2px rgba(200, 245, 53, 0.1) !important;
-        }
-        .custom-form-container select option {
-            background: #151c27;
-            color: #e8f4f0;
-        }
-        .custom-form-container input[type="checkbox"],
-        .custom-form-container input[type="radio"] {
-            width: auto !important;
-            accent-color: #c8f535;
-            cursor: pointer;
-        }
-    </style>
+<style>
+  input, select, textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    width: 100%;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237ab5ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 2.5rem !important;
+  }
+  input[type="text"], input[type="number"] {
+    background-image: none !important;
+    padding-right: 14px !important;
+  }
+  input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
+  select option { background: #151c27; color: #e8f4f0; }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="max-w-4xl mx-auto">
+<div class="max-w-2xl mx-auto">
 
-    {# --- Nagłówek --- #}
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div>
-                <a href="{% url list_url_name %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
-                    <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
-                    Wróć do listy
-                </a>
-                <div class="flex items-center gap-3">
-                    <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
-                    <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">
-                        {% if object %}Edycja Celu{% else %}Nowy Cel Redukcyjny{% endif %}
-                    </h1>
-                </div>
-                {% if company %}
-                    <p class="font-mono text-xs uppercase tracking-widest text-text-muted mt-3 ml-4">
-                        Firma: <span class="text-accent font-bold">{{ company.name }}</span>
-                    </p>
-                {% endif %}
-            </div>
-        </div>
-
-    {# --- Karta z formularzem --- #}
-        <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
-            <form method="post" novalidate class="space-y-6">
-                {% csrf_token %}
-
-            {# Grupa pól w układzie siatki #}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% for field in form %}
-                    {# Warunek rozciągania na dwie kolumny np. dla nazwy celu lub dłuższego opisu #}
-                        <div class="flex flex-col gap-2 {% if field.name == 'target_name' or field.name == 'description' or field.name == 'notes' %}md:col-span-2{% endif %}">
-                            <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-widest text-text-muted">
-                                {{ field.label }}
-                            </label>
-
-                            {{ field }}
-
-                        {# Komunikaty o błędach walidacji pola #}
-                            {% if field.errors %}
-                                <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">error</span>
-                                    <span>{{ field.errors|striptags }}</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-
-            {# --- Sekcja przycisków akcji --- #}
-                <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
-                    <a href="{% url list_url_name %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
-                        Anuluj
-                    </a>
-
-                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all sm:w-48 flex justify-center items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">save</span> Zapisz Cel
-                    </button>
-                </div>
-            </form>
-        </div>
-
+  <div class="mb-8">
+    <a href="{% url 'what_if:reduction-target-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć do listy" %}
+    </a>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+        {% if form.instance.pk %}{% trans "Edytuj cel redukcyjny" %}{% else %}{% trans "Nowy cel redukcyjny" %}{% endif %}
+      </h1>
     </div>
+  </div>
+
+  <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="p-3 rounded-xl font-mono text-xs" style="background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3);">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for field in form %}
+        <div class="flex flex-col gap-2 {% if field.name == 'notes' %}md:col-span-2{% endif %}">
+          <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-wider text-text-muted">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <span class="font-mono text-xs text-red-400">{{ field.errors|striptags }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="flex gap-4 pt-4 border-t border-border-subtle">
+        <a href="{% url 'what_if:reduction-target-list' %}"
+          class="flex-1 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted text-center transition-colors">
+          {% trans "Anuluj" %}
+        </a>
+        <button type="submit"
+          class="flex-1 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          {% trans "Zapisz" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

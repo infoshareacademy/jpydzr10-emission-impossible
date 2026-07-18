@@ -1,82 +1,97 @@
 {% extends 'base.html' %}
-{% block title %}{{ thread.subject }} - Komunikacja{% endblock %}
+{% load i18n %}
+
+{% block title %}{{ thread.subject }} — Emission Impossible{% endblock %}
+
+{% block extra_head %}
+<style>
+  textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    width: 100%;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    min-height: 100px;
+    resize: vertical;
+  }
+  textarea:focus { border-color: rgba(200,245,53,0.5) !important; }
+</style>
+{% endblock %}
 
 {% block content %}
-    <div class="mb-6 flex items-center justify-between">
-        <a href="{% url 'communications:thread_list' %}" class="flex items-center gap-2 text-text-muted hover:text-accent font-mono text-sm transition-colors">
-            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span> Powrót do listy
-        </a>
+<div class="max-w-3xl mx-auto space-y-6">
 
-        {% if thread.status == 'open' and thread.author == request.user %}
-            <form method="POST" action="{% url 'communications:thread_close' thread.id %}">
-                {% csrf_token %}
-                <button type="submit" class="flex items-center gap-2 px-4 py-2 border border-red-500/50 rounded-lg text-red-400 hover:bg-red-900/20 transition-all font-mono text-xs uppercase tracking-widest">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">done_all</span> Zamknij wątek
-                </button>
-            </form>
+  <!-- HEADER -->
+  <div>
+    <a href="{% url 'communications:thread_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć do listy" %}
+    </a>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">{{ thread.subject }}</h1>
+    </div>
+    <div class="flex items-center gap-3 mt-3 ml-4">
+      <span class="font-mono text-xs text-text-muted">{{ thread.company.name }}</span>
+      <span class="font-mono text-xs text-text-muted">·</span>
+      <span class="font-mono text-xs text-text-muted">{{ thread.category }}</span>
+      <span class="font-mono text-xs text-text-muted">·</span>
+      {% if thread.status == 'open' %}
+      <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">{% trans "Otwarty" %}</span>
+      {% else %}
+      <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);">{% trans "Zamknięty" %}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="space-y-4">
+    {% for message in messages %}
+    <div class="rounded-2xl border border-border-subtle p-5 {% if message.sender == request.user %}ml-8{% else %}mr-8{% endif %}"
+      style="background:{% if message.sender == request.user %}rgba(26,74,82,0.3){% else %}rgba(17,23,32,0.6){% endif %}; backdrop-filter:blur(8px);">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-mono text-xs font-bold text-accent">@{{ message.sender.username }}</span>
+        <span class="font-mono text-xs text-text-muted">{{ message.created_at|date:"d.m.Y H:i" }}</span>
+      </div>
+      <p class="font-mono text-sm text-text-main leading-relaxed">{{ message.content }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- REPLY FORM -->
+  {% if thread.status == 'open' %}
+  <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <h3 class="font-mono text-xs uppercase tracking-wider text-text-muted mb-4">{% trans "Odpowiedz" %}</h3>
+    <form method="POST">
+      {% csrf_token %}
+      {{ reply_form.content }}
+      <div class="flex justify-end gap-4 mt-4">
+        {% if is_admin %}
+        <form method="POST" action="{% url 'communications:thread_close' thread.pk %}">
+          {% csrf_token %}
+          <button type="submit"
+            class="px-4 py-2 font-mono text-xs text-text-muted border border-border-subtle rounded-xl hover:border-text-muted transition-colors">
+            {% trans "Zamknij wątek" %}
+          </button>
+        </form>
         {% endif %}
-    </div>
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          <span class="material-symbols-outlined" style="font-size:18px;">send</span> {% trans "Wyślij" %}
+        </button>
+      </div>
+    </form>
+  </div>
+  {% else %}
+  <div class="rounded-2xl border border-border-subtle p-5 text-center" style="background:rgba(17,23,32,0.6);">
+    <p class="font-mono text-sm text-text-muted">{% trans "Ten wątek jest zamknięty." %}</p>
+  </div>
+  {% endif %}
 
-    <div class="bg-[rgba(42,63,74,0.4)] border border-border-subtle rounded-xl p-6 mb-8 relative overflow-hidden">
-        <div class="absolute left-0 top-0 bottom-0 w-1 {% if thread.status == 'open' %}bg-accent{% else %}bg-text-muted{% endif %}"></div>
-
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-2xl font-bold text-text-main">{{ thread.subject }}</h1>
-                <div class="flex items-center gap-4 mt-2 font-mono text-xs text-text-muted">
-                    <span class="flex items-center gap-1"><span class="material-symbols-outlined" style="font-size: 16px;">business</span> {{ thread.company.name }}</span>
-                    <span class="flex items-center gap-1"><span class="material-symbols-outlined" style="font-size: 16px;">category</span> {{ thread.get_category_display }}</span>
-                    <span>Utworzono: {{ thread.created_at|date:"d.m.Y H:i" }}</span>
-                </div>
-            </div>
-            <div>
-                {% if thread.status == 'closed' %}
-                    <span class="px-3 py-1 bg-white/10 text-text-muted rounded border border-border-subtle font-mono text-xs uppercase">Rozwiązane</span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="space-y-6 mb-8">
-        {% for msg in thread.messages.all %}
-            <div class="flex flex-col {% if msg.sender == request.user %}items-end{% else %}items-start{% endif %}">
-                <div class="flex items-end gap-2 max-w-[80%] {% if msg.sender == request.user %}flex-row-reverse{% endif %}">
-
-                    <div class="w-10 h-10 rounded-full bg-[#1d3a42] border border-accent/30 flex items-center justify-center shrink-0">
-                        <span class="material-symbols-outlined text-text-muted" style="font-size: 20px;">account_circle</span>
-                    </div>
-
-                    <div class="flex flex-col {% if msg.sender == request.user %}items-end{% else %}items-start{% endif %}">
-                        <span class="text-xs font-mono text-text-muted mb-1 px-1">@{{ msg.sender.username }} • {{ msg.created_at|date:"H:i, d.m.Y" }}</span>
-
-                        <div class="p-4 rounded-2xl {% if msg.sender == request.user %}bg-accent/10 border border-accent/20 text-text-main rounded-br-sm{% else %}bg-[rgba(255,255,255,0.05)] border border-border-subtle text-text-main rounded-bl-sm{% endif %}">
-                            <p class="whitespace-pre-wrap text-sm leading-relaxed">{{ msg.content }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
-    {% if thread.status == 'open' %}
-        <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-xl p-6">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="mb-4">
-                    {{ reply_form.content }}
-                </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="flex items-center gap-2 px-6 py-2.5 bg-accent text-bg rounded-xl font-bold font-mono text-sm uppercase tracking-wider hover:bg-[#a0d020] transition-colors">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">send</span> Wyślij odpowiedź
-                    </button>
-                </div>
-            </form>
-        </div>
-    {% else %}
-        <div class="bg-black/20 border border-border-subtle rounded-xl p-6 text-center">
-            <span class="material-symbols-outlined text-text-muted mb-2" style="font-size: 32px;">lock</span>
-            <p class="text-text-muted font-mono text-sm">Ten wątek został zamknięty. Nie można dodawać nowych wiadomości.</p>
-        </div>
-    {% endif %}
-
+</div>
 {% endblock %}

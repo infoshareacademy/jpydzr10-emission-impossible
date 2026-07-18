@@ -1,56 +1,59 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Audyt i Weryfikacja | Emission Impossible{% endblock %}
+{% block title %}{% trans "Audyt i Weryfikacja" %} | Emission Impossible{% endblock %}
 
 {% block content %}
-  <div class="mb-8">
-    <div class="flex items-center gap-3 mb-1">
-      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Weryfikacja Danych Emisyjnych</h1>
-    </div>
-    <p class="font-mono text-sm text-text-muted ml-4">Wybierz spółkę i okres rozliczeniowy, aby rozpocząć audyt.</p>
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-1">
+    <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{% trans "Weryfikacja Danych Emisyjnych" %}</h1>
   </div>
+  <p class="font-mono text-sm text-text-muted ml-4 mt-3">{% trans "Wybierz spółkę i okres rozliczeniowy, aby rozpocząć audyt." %}</p>
+</div>
 
-  <div class="bg-[#13383e]/40 rounded-2xl shadow-2xl overflow-hidden border border-[#1a4a52] max-w-6xl mx-auto backdrop-blur-sm">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-[#1a4a52]/60 border-b border-[#1a4a52]">
-            <th class="py-4 px-6 font-mono text-sm font-semibold text-text-muted uppercase tracking-wider">Spółka</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold text-text-muted uppercase tracking-wider">Rok Raportowy</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold text-text-muted uppercase tracking-wider">Status</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold text-text-muted uppercase tracking-wider text-right">Akcja</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[#1a4a52]/50">
-          {% for envelope in envelopes %}
-            <tr class="hover:bg-[#1a4a52]/30 transition-colors">
-              <td class="py-4 px-6 font-medium text-text-main">{{ envelope.company.name }}</td>
-              <td class="py-4 px-6 text-text-main">{{ envelope.period.year }}</td>
-              <td class="py-4 px-6">
-                {% if envelope.status == 'OPEN' %}
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-500/20 text-gray-300 border border-gray-500/30">W trakcie wprowadzania</span>
-                {% elif envelope.status == 'IN_REVIEW' %}
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Oczekuje na weryfikację</span>
-                {% elif envelope.status == 'RETURNED' %}
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">Zwrócono do poprawy</span>
-                {% elif envelope.status == 'APPROVED' %}
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30">Zatwierdzone (Zablokowane)</span>
-                {% endif %}
-              </td>
-              <td class="py-4 px-6 text-right">
-                <a href="{% url 'workflow:admin_detail' envelope.pk %}" class="inline-flex items-center justify-center rounded-lg bg-[#c8f535] px-4 py-2 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-sm">
-                  {% if envelope.status == 'IN_REVIEW' %}Rozpocznij{% else %}Podgląd{% endif %}
-                </a>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="4" class="py-8 text-center text-text-muted font-mono text-sm">Brak raportów w systemie.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+<div class="rounded-2xl border border-border-subtle overflow-hidden max-w-6xl mx-auto" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-border-subtle">
+          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Spółka" %}</th>
+          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Rok Raportowy" %}</th>
+          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Status" %}</th>
+          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Akcja" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for envelope in envelopes %}
+        <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
+          <td class="py-4 px-6 font-mono font-bold text-text-main">{{ envelope.company.name }}</td>
+          <td class="py-4 px-6 font-mono text-text-main">{{ envelope.period.year }}</td>
+          <td class="py-4 px-6">
+            {% if envelope.status == 'OPEN' %}
+            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);">{% trans "W trakcie wprowadzania" %}</span>
+            {% elif envelope.status == 'IN_REVIEW' %}
+            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(234,179,8,0.12); color:#fbbf24; border:1px solid rgba(234,179,8,0.3);">{% trans "Oczekuje na weryfikację" %}</span>
+            {% elif envelope.status == 'RETURNED' %}
+            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3);">{% trans "Zwrócono do poprawy" %}</span>
+            {% elif envelope.status == 'APPROVED' %}
+            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">{% trans "Zatwierdzone" %}</span>
+            {% endif %}
+          </td>
+          <td class="py-4 px-6 text-right">
+            <a href="{% url 'workflow:admin_detail' envelope.pk %}"
+              class="inline-flex items-center justify-center px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+              style="background:#1a4a52; border:1px solid #2a6a72;">
+              {% if envelope.status == 'IN_REVIEW' %}{% trans "Rozpocznij" %}{% else %}{% trans "Podgląd" %}{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="py-8 text-center font-mono text-sm text-text-muted">{% trans "Brak raportów w systemie." %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
 {% endblock %}
