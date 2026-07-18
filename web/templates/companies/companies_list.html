@@ -15,7 +15,7 @@
       <p class="font-mono text-sm text-text-muted mt-3">{% trans "Zarządzanie przedsiębiorstwami w systemie Emission Impossible." %}</p>
     </div>
     {% if is_admin %}
-    <a href="{% url 'companies:companies-add' %}"
+    <a href="{% url 'companies:company-create' %}"
       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors flex-shrink-0"
       style="background:#1a4a52; border:1px solid #2a6a72;">
       <span class="material-symbols-outlined" style="font-size:16px;">add</span> {% trans "Dodaj spółkę" %}
@@ -40,7 +40,7 @@
           {% for company in companies %}
           <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
             <td class="px-6 py-4">
-              <a href="{% url 'companies:companies-detail' company.pk %}" class="font-mono font-bold text-text-main hover:text-accent transition-colors">
+              <a href="{% url 'companies:company-detail' company.pk %}" class="font-mono font-bold text-text-main hover:text-accent transition-colors">
                 {{ company.name }}
               </a>
             </td>
@@ -49,13 +49,13 @@
             <td class="px-6 py-4 font-mono text-sm text-text-muted hidden lg:table-cell">{{ company.country|default:"—" }}</td>
             <td class="px-6 py-4 text-center">
               <div class="flex items-center justify-center gap-2">
-                <a href="{% url 'companies:companies-detail' company.pk %}"
+                <a href="{% url 'companies:company-detail' company.pk %}"
                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors"
                   style="background:rgba(255,255,255,0.03);">
                   <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
                 </a>
                 {% if is_admin %}
-                <a href="{% url 'companies:companies-edit' company.pk %}"
+                <a href="{% url 'companies:company-update' company.pk %}"
                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors"
                   style="background:rgba(255,255,255,0.03);">
                   <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
