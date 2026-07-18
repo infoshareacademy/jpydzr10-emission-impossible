@@ -1,28 +1,22 @@
-{% extends "base.html" %}
-{% block title %}{{ model_verbose_name_plural }} — Emission Impossible{% endblock %}
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Lista emisji" %} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
 <style>
-  input,
-  select {
-    background: rgba(255, 255, 255, 0.04) !important;
+  input, select {
+    background: rgba(255,255,255,0.04) !important;
     border: 1px solid #2a3f4a !important;
     border-radius: 8px !important;
     color: #e8f4f0 !important;
-    font-family: "Roboto Mono", monospace !important;
+    font-family: 'Roboto Mono', monospace !important;
     font-size: 12px !important;
     padding: 8px 12px !important;
+    outline: none !important;
     transition: border-color 0.2s !important;
   }
-  input:focus,
-  select:focus {
-    outline: none !important;
-    border-color: rgba(200, 245, 53, 0.5) !important;
-  }
-  select option {
-    background: #151c27;
-    color: #e8f4f0;
-  }
+  input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
 </style>
 {% endblock %}
 
@@ -30,392 +24,83 @@
 
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
   <div>
-    <a
-      href="{% url 'emissions:dashboard' company.pk %}"
-      class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3"
-    >
-      <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
-      Wróć do Dashboardu
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć" %}
     </a>
     <div class="flex items-center gap-3 mb-1">
-      <div
-        style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"
-      ></div>
-      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-        {{ company.name }}
-      </h1>
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ title }}</h1>
     </div>
-    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-        {{ model_verbose_name_plural }}
-      </h1>
   </div>
-  <div class="flex gap-3">
-    <a
-      href="?{{ query_string }}export=1"
-      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main hover:border-text-muted transition-colors"
-    >
-      <span class="material-symbols-outlined" style="font-size: 16px">download</span>
-      Eksport
+  <div class="flex gap-3 flex-wrap">
+    {% if import_url_name %}
     <a href="{% url import_url_name company.pk %}"
-      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main hover:border-text-muted transition-colors">
-      <span class="material-symbols-outlined" style="font-size: 16px">upload</span>
-      Import
-    <a
-      href="{% url add_url_name company.pk %}"
+      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
+      <span class="material-symbols-outlined" style="font-size:16px;">upload</span> {% trans "Import" %}
+    </a>
+    {% endif %}
+    <a href="{% url add_url_name company.pk %}"
       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
-      style="background: #1a4a52; border: 1px solid #2a6a72"
-    >
-      <span class="material-symbols-outlined" style="font-size: 16px">add</span>
-      Dodaj
+      style="background:#1a4a52; border:1px solid #2a6a72;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> {% trans "Dodaj" %}
     </a>
   </div>
 </div>
 
-<form
-  method="get"
-  class="rounded-2xl border border-border-subtle p-5 mb-8 flex flex-wrap gap-4 items-end"
-  style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)"
->
-  <div class="flex flex-col gap-1">
-    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Szukaj</label>
-    <input
-      type="text"
-      name="q"
-      value="{{ current_search }}"
-      placeholder="Paliwo, instalacja..."
-    />
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Rok</label>
-    <input
-      type="number"
-      name="year"
-      value="{{ current_year }}"
-      placeholder="YYYY"
-      style="width: 100px"
-    />
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Status</label>
-    <select name="status">
-      <option value="">Wszystkie</option>
-      {% for val, name in status_choices %}
-      <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>
-        {{ name }}
-      </option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="flex flex-col gap-1">
-    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Sortuj</label>
-    <select name="sort">
-      <option value="-year" {% if current_sort == '-year' %}selected{% endif %}>
-        Rok (Malejąco)
-      </option>
-      <option value="year" {% if current_sort == 'year' %}selected{% endif %}>
-        Rok (Rosnąco)
-      </option>
-      <option value="-amount" {% if current_sort == '-amount' %}selected{% endif %}>
-        Zużycie (Malejąco)
-      </option>
-    </select>
-  </div>
-  <button
-    type="submit"
-    class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
-    style="background: #1a4a52; border: 1px solid #2a6a72"
-  >
-    Filtruj
-  </button>
-  {% if current_year or current_status or current_search %}
-  <a
-    href="?"
-    class="font-mono text-xs text-text-muted hover:text-accent transition-colors underline"
-  >Wyczyść</a>
-  {% endif %}
-</form>
-
-<div
-  class="rounded-2xl border border-border-subtle overflow-hidden"
-  style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)"
->
+<div class="rounded-2xl border border-border-subtle overflow-hidden"
+  style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="border-b border-border-subtle">
-          <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">
-            Rok
-          </th>
-          <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">
-            Szczegóły
-          </th>
-          <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-right">
-            Ilość
-          </th>
-          <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">
-            Status
-          </th>
-          <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">
-            Akcje
-          </th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Rok" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Kategoria" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Paliwo" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Ilość" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Jednostka" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Emisja CO₂e" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Status" %}</th>
+          <th class="pt-6 pb-4 px-5 font-mono text-xs text-text-muted uppercase tracking-widest text-center">{% trans "Akcje" %}</th>
         </tr>
       </thead>
       <tbody>
-        {% for obj in object_list %}
+        {% for record in records %}
         <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
-          <td class="px-5 py-4 font-mono font-bold text-text-main">
-            {{ obj.year }}
-          </td>
+          <td class="px-5 py-4 font-mono font-bold text-text-main">{{ record.year }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.get_combustion_type_display|default:"—" }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-main">{{ record.fuel_type|default:"—" }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-main text-right">{{ record.amount|floatformat:2 }}</td>
+          <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.unit }}</td>
+          <td class="px-5 py-4 font-mono font-bold text-accent text-right">{{ record.emission_co2e|floatformat:2|default:"—" }} t</td>
           <td class="px-5 py-4">
-            <div class="font-mono text-sm text-text-main">
-              {% firstof obj.installation obj.vehicle obj.process "-" %}
-            </div>
-            <div class="font-mono text-xs text-text-muted">
-              {% firstof obj.fuel obj.product obj.energy_type "" %}
-            </div>
-          </td>
-          <td class="px-5 py-4 text-right font-mono font-bold text-text-main">
-            {{ obj.amount }}
-            <span class="text-xs text-text-muted">{{ obj.unit }}</span>
-          </td>
-          <td class="px-5 py-4">
-            <span
-              class="font-mono text-xs px-2 py-1 rounded"
-              style="{% if obj.workflow_status == 'APPROVED' %}
-                  background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);
-                {% elif obj.workflow_status == 'PENDING' %}
-                  background:rgba(147,197,253,0.15); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);
-                {% elif obj.workflow_status == 'REJECTED' %}
-                  background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);
-                {% else %}
-                  background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);
-                {% endif %}
-              "
-            >
-              {{ obj.get_workflow_status_display }}
+            <span class="font-mono text-xs px-2 py-1 rounded"
+              style="{% if record.status == 'approved' %}background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);{% elif record.status == 'rejected' %}background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3);{% else %}background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);{% endif %}">
+              {{ record.get_status_display }}
             </span>
           </td>
           <td class="px-5 py-4 text-center">
             <div class="flex items-center justify-center gap-2">
-              <a
-                href="{% url edit_url_name company.pk obj.pk %}"
-                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors"
-                title="Edytuj"
-              >
-                <span class="material-symbols-outlined" style="font-size: 16px">edit</span>
+              <a href="{% url edit_url_name company.pk record.pk %}"
+                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors">
+                <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
               </a>
-              <form
-                action="{% url delete_url_name company.pk obj.pk %}"
-                method="post"
-                class="inline-block"
-                onsubmit="return confirm('Na pewno usunąć?');"
-              >
-                {% csrf_token %}
-                <button
-                  type="submit"
-                  class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors"
-                  title="Usuń"
-                >
-                  <span class="material-symbols-outlined" style="font-size: 16px">delete</span>
-                </button>
-              </form>
-              {% if request.user.is_staff or request.user.is_superuser %}
-              <button
-                type="button"
-                onclick="openClarificationModal('{{ app_label }}', '{{ model_name }}', '{{ obj.pk }}')"
-                class="p-1.5 rounded-lg border border-yellow-500/30 text-yellow-500 hover:text-yellow-400 transition-colors"
-                title="Zgłoś uwagi"
-              >
-                <span class="material-symbols-outlined" style="font-size: 16px">chat_bubble</span>
-              </button>
-              {% endif %}
+              <a href="{% url delete_url_name company.pk record.pk %}"
+                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors">
+                <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+              </a>
             </div>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td
-            colspan="5"
-            class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider"
-          >
-            Brak danych dla wybranego filtru.
+          <td colspan="8" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+            {% trans "Brak rekordów." %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-
-  {% if is_paginated %}
-  <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
-    {% if page_obj.has_previous %}
-    <a
-      href="?{{ query_string }}page={{ page_obj.previous_page_number }}"
-      class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors"
-    >←</a>
-    {% endif %}
-    <span class="px-3 py-1.5 font-mono text-sm text-text-muted">Strona {{ page_obj.number }} z {{ paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a
-      href="?{{ query_string }}page={{ page_obj.next_page_number }}"
-      class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors"
-    >→</a>
-    {% endif %}
-  </div>
-  {% endif %}
 </div>
-<!-- Backdrop i Modal -->
-<div id="clarificationModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-  <!-- Tło -->
-  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
 
-  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-
-      <!-- Panel Modala -->
-      <div class="relative transform overflow-hidden rounded-2xl border border-border-subtle text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" style="background: #111720;">
-
-        <form id="clarificationForm" onsubmit="submitClarification(event)">
-          <div class="px-6 py-6 sm:p-8">
-            <div class="flex items-start gap-4">
-              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500/10 sm:mx-0 sm:h-10 sm:w-10 border border-yellow-500/20">
-                <span class="material-symbols-outlined text-yellow-500" style="font-size: 20px">warning</span>
-              </div>
-              <div class="mt-3 text-center sm:ml-2 sm:mt-0 sm:text-left w-full">
-                <h3 class="font-heading text-xl font-bold text-text-main" id="modal-title">Zgłoś uwagi do rekordu</h3>
-                <div class="mt-3">
-                  <p class="text-sm font-mono text-text-muted mb-3">
-                    Wprowadź szczegółowe uwagi. Użytkownik otrzyma powiadomienie i będzie musiał zaktualizować dane.
-                  </p>
-
-                  <!-- Ukryte pola na dane rekordu -->
-                  <input type="hidden" id="modalAppLabel" name="app_label">
-                  <input type="hidden" id="modalModelName" name="model_name">
-                  <input type="hidden" id="modalRecordPk" name="pk">
-
-                  <textarea
-                    id="modalMessage"
-                    name="message"
-                    rows="4"
-                    class="w-full bg-white/5 border border-border-subtle rounded-xl text-text-main font-mono text-sm p-3 focus:outline-none focus:border-accent transition-colors resize-none"
-                    placeholder="Wpisz treść uwagi..."
-                    required
-                  ></textarea>
-                  <div class="mt-4">
-                    <label for="modalDeadline" class="block text-xs font-mono text-text-muted mb-1 uppercase tracking-wider">
-                      Termin wykonania (opcjonalnie)
-                    </label>
-                    <input
-                      type="date"
-                      id="modalDeadline"
-                      name="deadline"
-                      class="w-full bg-white/5 border border-border-subtle rounded-xl text-text-main font-mono text-sm p-3 focus:outline-none focus:border-accent transition-colors"
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-black/20 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-border-subtle">
-            <button
-              type="submit"
-              id="submitClarificationBtn"
-              class="inline-flex w-full justify-center items-center gap-2 rounded-xl px-4 py-2.5 font-mono text-sm font-bold text-[#1a4a52] shadow-sm transition-colors sm:ml-3 sm:w-auto"
-              style="background: #c8f535;"
-            >
-              Wyślij uwagi
-            </button>
-            <button
-              type="button"
-              onclick="closeClarificationModal()"
-              class="mt-3 inline-flex w-full justify-center rounded-xl bg-transparent px-4 py-2.5 font-mono text-sm font-bold text-text-muted border border-border-subtle hover:text-text-main hover:border-text-muted transition-colors sm:mt-0 sm:w-auto"
-            >
-              Anuluj
-            </button>
-          </div>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  const modal = document.getElementById('clarificationModal');
-  const form = document.getElementById('clarificationForm');
-  const submitBtn = document.getElementById('submitClarificationBtn');
-
-  function openClarificationModal(appLabel, modelName, pk) {
-    document.getElementById('modalAppLabel').value = appLabel;
-    document.getElementById('modalModelName').value = modelName;
-    document.getElementById('modalRecordPk').value = pk;
-
-    document.getElementById('modalMessage').value = '';
-    document.getElementById('modalDeadline').value = ''
-
-    modal.classList.remove('hidden');
-    document.getElementById('modalMessage').focus();
-  }
-
-  function closeClarificationModal() {
-    modal.classList.add('hidden');
-  }
-
-  function submitClarification(event) {
-    event.preventDefault();
-
-    const appLabel = document.getElementById('modalAppLabel').value;
-    const modelName = document.getElementById('modalModelName').value;
-    const pk = document.getElementById('modalRecordPk').value;
-    const message = document.getElementById('modalMessage').value;
-    const deadline = document.getElementById('modalDeadline').value;
-    const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size: 16px">sync</span> Wysyłanie...';
-
-    fetch(`/workflow/admin/clarify/${appLabel}/${modelName}/${pk}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": csrfToken
-      },
-      body: new URLSearchParams({ message: message, deadline: deadline })    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "success") {
-        closeClarificationModal();
-        window.location.reload();
-      } else {
-        alert(`Błąd: ${data.message}`);
-        resetSubmitButton();
-      }
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Wystąpił błąd krytyczny podczas łączenia z serwerem.");
-      resetSubmitButton();
-    });
-  }
-
-  function resetSubmitButton() {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Wyślij uwagi';
-  }
-
-  modal.addEventListener('click', function(event) {
-    if (event.target === modal.children[0]) {
-      closeClarificationModal();
-    }
-  });
-
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
-      closeClarificationModal();
-    }
-  });
-</script>
 {% endblock %}

@@ -1,142 +1,87 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}
-    {% if form.instance.pk %}Edytuj wpis emisji{% else %}Dodaj wpis emisji{% endif %} - Emission Impossible
-{% endblock %}
+{% block title %}{{ title }} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
-    <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
-        .custom-form-container input,
-        .custom-form-container select,
-        .custom-form-container textarea {
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid #2a3f4a !important;
-            border-radius: 8px !important;
-            color: #e8f4f0 !important;
-            font-family: "Roboto Mono", monospace !important;
-            font-size: 13px !important;
-            padding: 10px 14px !important;
-            transition: border-color 0.2s, box-shadow 0.2s !important;
-            width: 100%;
-            outline: none !important;
-        }
-        .custom-form-container input:focus,
-        .custom-form-container select:focus,
-        .custom-form-container textarea:focus {
-            border-color: rgba(200, 245, 53, 0.5) !important;
-            box-shadow: 0 0 0 2px rgba(200, 245, 53, 0.1) !important;
-        }
-        .custom-form-container select option {
-            background: #151c27;
-            color: #e8f4f0;
-        }
-
-    /* Zabezpieczenie dla potencjalnych checkboxów (np. zgody/statusy) */
-        .custom-form-container input[type="checkbox"],
-        .custom-form-container input[type="radio"] {
-            width: auto !important;
-            accent-color: #c8f535;
-            cursor: pointer;
-        }
-    </style>
+<style>
+  input, select, textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    width: 100%;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237ab5ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 2.5rem !important;
+  }
+  input[type="text"], input[type="number"] {
+    background-image: none !important;
+    padding-right: 14px !important;
+  }
+  input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
+  select option { background: #151c27; color: #e8f4f0; }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="max-w-4xl mx-auto">
+<div class="max-w-3xl mx-auto">
 
-    {# --- Nagłówek --- #}
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div>
-                <a href="{% url list_url_name company_id %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
-                    <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
-                    Wróć do listy
-                </a>
-                <div class="flex items-center gap-3">
-                    <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
-                    <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">
-                        {% if form.instance.pk %}Edytuj wpis{% else %}Dodaj nowy wpis{% endif %}
-                    </h1>
-                </div>
-            </div>
-        </div>
-
-    {# --- WORKFLOW: RAMKA Z UWAGĄ ADMINISTRATORA (Powyżej formularza) --- #}
-        {% if admin_comment %}
-            <div class="mb-8 rounded-2xl border border-red-500/50 bg-red-900/20 p-6 backdrop-blur-md shadow-lg">
-                <div class="flex items-center gap-2 text-red-400 font-bold text-xl mb-3">
-                    <span class="material-symbols-outlined text-[24px]">error</span>
-                    <h3>Wpis został odrzucony przez Administratora</h3>
-                </div>
-
-                <p class="font-mono text-sm text-gray-200 bg-black/40 p-4 rounded-xl border border-red-900/50">
-                    <span class="text-red-400 font-bold block mb-1 uppercase tracking-wider text-xs">Powód odrzucenia:</span>
-                    {{ admin_comment.text }}
-                </p>
-            </div>
-        {% endif %}
-    {# --- KONIEC SEKCJI WORKFLOW --- #}
-
-
-    {# --- Karta z formularzem --- #}
-        <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
-            <form method="post" novalidate class="space-y-6">
-                {% csrf_token %}
-
-            {# Grupa pól w układzie siatki #}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% for field in form %}
-                    {# Warunek rozciągania na dwie kolumny np. dla dłuższych opisów lub uwag #}
-                        <div class="flex flex-col gap-2 {% if field.name == 'notes' or field.name == 'description' %}md:col-span-2{% endif %}">
-                            <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-widest text-text-muted">
-                                {{ field.label }}
-                            </label>
-
-                            {{ field }}
-
-                        {# Komunikaty o błędach walidacji pola #}
-                            {% if field.errors %}
-                                <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">error</span>
-                                    <span>{{ field.errors|striptags }}</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-
-            {# --- WORKFLOW: WYMUSZENIE ODPOWIEDZI UŻYTKOWNIKA (Wewnątrz formularza) --- #}
-                {% if admin_comment %}
-                    <div class="mt-8 pt-6 border-t border-red-900/50">
-                        <div class="flex flex-col gap-2">
-                            <label for="user_reply" class="font-mono text-xs uppercase tracking-widest text-red-400 font-bold">
-                                Twoje wyjaśnienia / Potwierdzenie poprawek <span class="text-red-400">*</span>
-                            </label>
-                            <p class="text-xs text-text-muted mb-2">Musisz skomentować swoje poprawki, aby odesłać wpis do ponownej weryfikacji.</p>
-
-                            <textarea id="user_reply" name="user_reply" required rows="3"
-                                      class="w-full rounded-lg border border-red-500/50 bg-black/20 text-white p-3 font-mono text-[13px] focus:border-red-400 focus:ring-1 focus:ring-red-400 outline-none transition-colors"
-                                      placeholder="Napisz stosowne wyjaśnienia lub potwierdź poprawę danych..."></textarea>
-                        </div>
-                    </div>
-                {% endif %}
-            {# --- KONIEC SEKCJI WORKFLOW --- #}
-
-
-            {# --- Sekcja przycisków akcji --- #}
-                <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
-                    <a href="{% url list_url_name company_id %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
-                        Anuluj
-                    </a>
-
-                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all flex justify-center items-center gap-2 {% if admin_comment %}sm:w-56{% else %}sm:w-36{% endif %}">
-                        <span class="material-symbols-outlined text-sm">{% if admin_comment %}send{% else %}save{% endif %}</span>
-                        {% if admin_comment %}Zapisz i odeślij{% else %}Zapisz{% endif %}
-                    </button>
-                </div>
-            </form>
-        </div>
-
+  <div class="mb-8">
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć" %}
+    </a>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ title }}</h1>
     </div>
+  </div>
+
+  <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <form method="post" novalidate class="space-y-6">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="p-3 rounded-xl font-mono text-xs" style="background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3);">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for field in form %}
+        <div class="flex flex-col gap-2 {% if field.name == 'notes' or field.name == 'source' %}md:col-span-2{% endif %}">
+          <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-wider text-text-muted">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+          <span class="font-mono text-xs text-text-muted">{{ field.help_text }}</span>
+          {% endif %}
+          {% if field.errors %}
+          <span class="font-mono text-xs text-red-400">{{ field.errors|striptags }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="flex justify-end gap-4 pt-4 border-t border-border-subtle">
+        <a href="javascript:history.back()"
+          class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted text-center transition-colors">
+          {% trans "Anuluj" %}
+        </a>
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          <span class="material-symbols-outlined" style="font-size:18px;">save</span> {% trans "Zapisz" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

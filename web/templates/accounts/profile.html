@@ -1,169 +1,157 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Profil Użytkownika — Emission Impossible{% endblock %}
+{% block title %}{% trans "Profil Użytkownika" %} — Emission Impossible{% endblock %}
 
 {% block content %}
-  <div class="max-w-4xl mx-auto space-y-8">
+<div class="max-w-4xl mx-auto space-y-8">
 
-  <!-- Messages -->
-    {% if messages %}
-      <div class="space-y-2">
-        {% for message in messages %}
-          <div class="p-3 rounded-xl font-mono text-xs" style="background:rgba(200,245,53,0.1); border:1px solid rgba(200,245,53,0.3); color:#c8f535;">
-            {{ message }}
+  {% if messages %}
+  <div class="space-y-2">
+    {% for message in messages %}
+    <div class="p-3 rounded-xl font-mono text-xs" style="background:rgba(200,245,53,0.1); border:1px solid rgba(200,245,53,0.3); color:#c8f535;">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="flex items-center gap-3 mb-1">
+    <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{% trans "Profil Użytkownika" %}</h1>
+  </div>
+  <p class="font-mono text-sm text-text-muted mt-3">{% trans "Przegląd danych i uprawnień systemowych." %}</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-between"
+      style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <div>
+        <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
+          <span class="material-symbols-outlined text-text-muted">fingerprint</span>
+          <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">{% trans "Dane systemowe" %}</h2>
+        </div>
+
+        {% if user.avatar %}
+        <div class="flex justify-center mb-6">
+          <img src="{{ user.avatar.url }}" alt="avatar"
+            style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid rgba(200,245,53,0.3);"/>
+        </div>
+        {% endif %}
+
+        <ul class="space-y-4 font-mono text-sm mb-6">
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "Nazwa użytkownika" %}</span>
+            <span class="text-text-main">{{ user.username }}</span>
+          </li>
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "E-mail" %}</span>
+            <span class="text-text-main">{{ user.email|default:"Brak danych" }}</span>
+          </li>
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "Imię i Nazwisko" %}</span>
+            <span class="text-text-main">
+              {% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{% trans "Brak danych" %}{% endif %}
+            </span>
+          </li>
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "Telefon" %}</span>
+            <span class="text-text-main">{{ user.phone_number|default:_("Brak danych") }}</span>
+          </li>
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "Rola systemowa" %}</span>
+            <span class="text-accent font-bold">{{ user.get_role_display }}</span>
+          </li>
+          <li class="flex flex-col gap-1">
+            <span class="text-text-muted text-xs uppercase tracking-wider">{% trans "W systemie od" %}</span>
+            <span class="text-text-main">{{ user.date_joined|date:"d.m.Y H:i" }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pt-4 border-t border-border-subtle">
+        <a href="{% url 'accounts:profile_edit' %}"
+          class="block w-full text-center py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+          {% trans "Edytuj dane" %}
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-border-subtle p-6"
+      style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
+        <span class="material-symbols-outlined text-text-muted">domain</span>
+        <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">{% trans "Zasięg operacyjny" %}</h2>
+      </div>
+
+      {% if is_admin_user %}
+      <div class="mb-4 p-3 rounded-xl font-mono text-xs flex items-start gap-2"
+        style="background:rgba(200,245,53,0.06); border:1px solid rgba(200,245,53,0.2); color:#c8f535;">
+        <span class="material-symbols-outlined text-sm mt-0.5" style="font-variation-settings:'FILL' 1;">gavel</span>
+        <div><span class="font-bold">{% trans "TRYB GLOBALNY:" %}</span> {% trans "Administrator — pełny dostęp do wszystkich spółek." %}</div>
+      </div>
+      {% if all_companies %}
+      <div class="space-y-3 max-h-72 overflow-y-auto pr-2">
+        {% for company in all_companies %}
+        <div class="p-3 rounded-xl border border-border-subtle hover:border-accent transition-colors"
+          style="background:rgba(255,255,255,0.03);">
+          <span class="font-mono text-sm text-text-main">{{ company.name }}</span>
+          <div class="mt-1">
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(200,245,53,0.1); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">ROOT ACCESS</span>
           </div>
+        </div>
         {% endfor %}
       </div>
-    {% endif %}
+      {% else %}
+      <p class="font-mono text-sm text-text-muted text-center p-4 border border-dashed border-border-subtle rounded-xl">{% trans "Brak zarejestrowanych spółek." %}</p>
+      {% endif %}
 
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
-    <div class="flex items-center gap-3 mb-1">
-      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Profil Użytkownika</h1>
-    </div>
-    <p class="font-mono text-sm text-text-muted mt-3">Przegląd danych i uprawnień systemowych.</p>
-
-  <!-- ===================== -->
-  <!-- MAIN GRID -->
-  <!-- ===================== -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <!-- User data -->
-      <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-between"
-           style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-        <div>
-          <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
-            <span class="material-symbols-outlined text-text-muted">fingerprint</span>
-            <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">Dane systemowe</h2>
+      {% else %}
+      {% if permissions %}
+      <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
+        {% for perm in permissions %}
+        <div class="p-3 rounded-xl border border-border-subtle hover:border-accent transition-colors"
+          style="background:rgba(255,255,255,0.03);">
+          <span class="font-mono text-sm text-text-main">{{ perm.company.name }}</span>
+          <div class="flex gap-2 mt-1">
+            {% if perm.can_read %}
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(134,239,172,0.1); color:#86efac; border:1px solid rgba(134,239,172,0.3);">{% trans "Odczyt" %}</span>
+            {% endif %}
+            {% if perm.can_save %}
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(147,197,253,0.1); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);">{% trans "Zapis" %}</span>
+            {% endif %}
+            {% if not perm.can_read and not perm.can_save %}
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.3);">{% trans "Brak uprawnień" %}</span>
+            {% endif %}
           </div>
-
-        <!-- Avatar -->
-          {% if user.avatar %}
-            <div class="flex justify-center mb-6">
-              <img src="{{ user.avatar.url }}" alt="avatar"
-                   style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid rgba(200,245,53,0.3);"/>
-            </div>
-          {% endif %}
-
-          <ul class="space-y-4 font-mono text-sm mb-6">
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">Nazwa użytkownika</span>
-              <span class="text-text-main">{{ user.username }}</span>
-            </li>
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">E-mail</span>
-              <span class="text-text-main">{{ user.email|default:"Brak danych" }}</span>
-            </li>
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">Imię i Nazwisko</span>
-              <span class="text-text-main">
-                {% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}Brak danych{% endif %}
-              </span>
-            </li>
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">Telefon</span>
-              <span class="text-text-main">{{ user.phone_number|default:"Brak danych" }}</span>
-            </li>
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">Rola systemowa</span>
-              <span class="text-accent font-bold">{{ user.get_role_display }}</span>
-            </li>
-            <li class="flex flex-col gap-1">
-              <span class="text-text-muted text-xs uppercase tracking-wider">W systemie od</span>
-              <span class="text-text-main">{{ user.date_joined|date:"d.m.Y H:i" }}</span>
-            </li>
-          </ul>
         </div>
-
-        <div class="pt-4 border-t border-border-subtle">
-          <a href="{% url 'accounts:profile_edit' %}"
-             class="block w-full text-center py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
-             style="background:#1a4a52; border:1px solid #2a6a72;">
-            Edytuj dane
-          </a>
-        </div>
+        {% endfor %}
       </div>
-
-    <!-- Company access -->
-      <div class="rounded-2xl border border-border-subtle p-6"
-           style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-        <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
-          <span class="material-symbols-outlined text-text-muted">domain</span>
-          <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">Zasięg operacyjny</h2>
-        </div>
-
-        {% if is_admin_user %}
-          <div class="mb-4 p-3 rounded-xl font-mono text-xs flex items-start gap-2"
-               style="background:rgba(200,245,53,0.06); border:1px solid rgba(200,245,53,0.2); color:#c8f535;">
-            <span class="material-symbols-outlined text-sm mt-0.5" style="font-variation-settings:'FILL' 1;">gavel</span>
-            <div><span class="font-bold">TRYB GLOBALNY:</span> Administrator — pełny dostęp do wszystkich spółek.</div>
-          </div>
-          {% if all_companies %}
-            <div class="space-y-3 max-h-72 overflow-y-auto pr-2">
-              {% for company in all_companies %}
-                <div class="p-3 rounded-xl border border-border-subtle hover:border-accent transition-colors"
-                     style="background:rgba(255,255,255,0.03);">
-                  <span class="font-mono text-sm text-text-main">{{ company.name }}</span>
-                  <div class="mt-1">
-                    <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(200,245,53,0.1); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">ROOT ACCESS</span>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <p class="font-mono text-sm text-text-muted text-center p-4 border border-dashed border-border-subtle rounded-xl">Brak zarejestrowanych spółek.</p>
-          {% endif %}
-
-        {% else %}
-          {% if permissions %}
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
-              {% for perm in permissions %}
-                <div class="p-3 rounded-xl border border-border-subtle hover:border-accent transition-colors"
-                     style="background:rgba(255,255,255,0.03);">
-                  <span class="font-mono text-sm text-text-main">{{ perm.company.name }}</span>
-                  <div class="flex gap-2 mt-1">
-                    {% if perm.can_read %}
-                      <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(134,239,172,0.1); color:#86efac; border:1px solid rgba(134,239,172,0.3);">Odczyt</span>
-                    {% endif %}
-                    {% if perm.can_save %}
-                      <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(147,197,253,0.1); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);">Zapis</span>
-                    {% endif %}
-                    {% if not perm.can_read and not perm.can_save %}
-                      <span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.3);">Brak uprawnień</span>
-                    {% endif %}
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <p class="font-mono text-sm text-text-muted text-center p-4 border border-dashed border-border-subtle rounded-xl">Brak przypisanych spółek.</p>
-          {% endif %}
-        {% endif %}
-      </div>
+      {% else %}
+      <p class="font-mono text-sm text-text-muted text-center p-4 border border-dashed border-border-subtle rounded-xl">{% trans "Brak przypisanych spółek." %}</p>
+      {% endif %}
+      {% endif %}
     </div>
-
-  <!-- ===================== -->
-  <!-- SECURITY ZONE -->
-  <!-- ===================== -->
-    <div class="rounded-2xl border border-red-900/50 p-6" style="background:rgba(42,10,10,0.2);">
-      <div class="flex items-center gap-2 mb-4 pb-4 border-b border-red-900/50">
-        <span class="material-symbols-outlined text-red-500">warning</span>
-        <h2 class="font-mono text-lg text-red-500 tracking-widest uppercase">Strefa bezpieczeństwa</h2>
-      </div>
-      <p class="font-mono text-sm text-text-muted mb-6">Zarządzaj swoimi danymi dostępowymi. Działania w tej strefie mogą być nieodwracalne.</p>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <a href="{% url 'accounts:password_reset' %}"
-           class="px-4 py-2.5 font-mono text-sm text-text-main border border-border-subtle hover:border-accent hover:text-accent transition-colors text-center rounded-xl">
-          Zmiana hasła
-        </a>
-        <a href="{% url 'accounts:account_delete' %}"
-           class="px-4 py-2.5 font-mono text-sm text-red-400 border border-red-900/50 hover:bg-red-900/30 hover:border-red-500 transition-colors text-center rounded-xl">
-          Usuń konto i dane
-        </a>
-      </div>
-    </div>
-
   </div>
+
+  <div class="rounded-2xl border border-red-900/50 p-6" style="background:rgba(42,10,10,0.2);">
+    <div class="flex items-center gap-2 mb-4 pb-4 border-b border-red-900/50">
+      <span class="material-symbols-outlined text-red-500">warning</span>
+      <h2 class="font-mono text-lg text-red-500 tracking-widest uppercase">{% trans "Strefa bezpieczeństwa" %}</h2>
+    </div>
+    <p class="font-mono text-sm text-text-muted mb-6">{% trans "Zarządzaj swoimi danymi dostępowymi. Działania w tej strefie mogą być nieodwracalne." %}</p>
+    <div class="flex flex-col sm:flex-row gap-4">
+      <a href="{% url 'accounts:password_reset' %}"
+        class="px-4 py-2.5 font-mono text-sm text-text-main border border-border-subtle hover:border-accent hover:text-accent transition-colors text-center rounded-xl">
+        {% trans "Zmiana hasła" %}
+      </a>
+      <a href="{% url 'accounts:account_delete' %}"
+        class="px-4 py-2.5 font-mono text-sm text-red-400 border border-red-900/50 hover:bg-red-900/30 hover:border-red-500 transition-colors text-center rounded-xl">
+        {% trans "Usuń konto i dane" %}
+      </a>
+    </div>
+  </div>
+
+</div>
 {% endblock %}
