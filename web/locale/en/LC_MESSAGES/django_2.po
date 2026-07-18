@@ -1,0 +1,2095 @@
+# Emission Impossible - English translations
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Emission Impossible\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-18 18:46+0000\n"
+"PO-Revision-Date: 2026-07-18 00:00+0000\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/registry.py:4 theme/templates/base.html:117
+#: theme/templates/base.html:182
+msgid "Raporty"
+msgstr "Reports"
+
+#: core/registry.py:7 theme/templates/base.html:122
+#: theme/templates/base.html:183
+msgid "Przedsiębiorstwo"
+msgstr "Company"
+
+#: core/registry.py:12 templates/emissions/factor_list.html:4
+#: templates/emissions/factor_list.html:44 theme/templates/base.html:127
+#: theme/templates/base.html:184
+msgid "Wskaźniki Emisji"
+msgstr "Emission Factors"
+
+#: core/registry.py:15 theme/templates/base.html:132
+#: theme/templates/base.html:185
+msgid "Przeliczniki"
+msgstr "Converters"
+
+#: core/registry.py:18 theme/templates/base.html:137
+#: theme/templates/base.html:190
+msgid "Cele i symulacje"
+msgstr "Goals & Simulations"
+
+#: core/registry.py:23 theme/templates/base.html:142
+#: theme/templates/base.html:191
+msgid "Użytkownicy"
+msgstr "Users"
+
+#: core/registry.py:28 templates/ai_services/global_chat.html:43
+#: theme/templates/base.html:147 theme/templates/base.html:192
+msgid "AI Asystent ESG"
+msgstr "AI ESG Assistant"
+
+#: core/registry.py:33 templates/communications/thread_list.html:13
+#: theme/templates/base.html:152 theme/templates/base.html:193
+msgid "Komunikacja e-mail"
+msgstr "Email Communication"
+
+#: core/registry.py:38 templates/workflow/admin_envelope_list.html:4
+#: theme/templates/base.html:158
+msgid "Audyt i Weryfikacja"
+msgstr "Audit & Verification"
+
+#: emissions/forms.py:62 emissions/forms.py:121 emissions/forms.py:167
+#: emissions/forms.py:213
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:31
+#: emissions/templates/emissions/energy_consumption_list.html:55
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:31
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:31
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:31
+#: emissions/templates/emissions/energyproduced_list.html:55
+#: emissions/templates/emissions/energypurchased_list.html:55
+#: emissions/templates/emissions/energysold_list.html:55
+#: templates/emissions/factor_list.html:64
+#: templates/emissions/factor_list.html:92
+#: templates/emissions/scope1_list.html:56 templates/reports/ghg_report.html:70
+msgid "Rok"
+msgstr "Year"
+
+#: emissions/forms.py:63 emissions/forms.py:122 emissions/forms.py:168
+#: emissions/forms.py:214
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:27
+#: emissions/templates/emissions/energy_consumption_list.html:56
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:27
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:27
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:27
+#: emissions/templates/emissions/energyproduced_list.html:56
+#: emissions/templates/emissions/energypurchased_list.html:56
+#: emissions/templates/emissions/energysold_list.html:56
+msgid "Firma"
+msgstr "Company"
+
+#: emissions/forms.py:64
+msgid "Źródło energii"
+msgstr "Energy source"
+
+#: emissions/forms.py:65 emissions/forms.py:123 emissions/forms.py:169
+#: emissions/forms.py:215
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:35
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:35
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:35
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:35
+msgid "Typ energii"
+msgstr "Energy type"
+
+#: emissions/forms.py:66 emissions/forms.py:124 emissions/forms.py:170
+#: emissions/forms.py:216
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:39
+#: emissions/templates/emissions/energy_consumption_list.html:59
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:39
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:39
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:39
+#: emissions/templates/emissions/energyproduced_list.html:59
+#: emissions/templates/emissions/energypurchased_list.html:59
+#: emissions/templates/emissions/energysold_list.html:59
+#: templates/emissions/scope1_list.html:59
+msgid "Ilość"
+msgstr "Amount"
+
+#: emissions/forms.py:67 emissions/forms.py:125 emissions/forms.py:171
+#: emissions/forms.py:217
+#: emissions/templates/emissions/energy_consumption_list.html:60
+#: emissions/templates/emissions/energyproduced_list.html:60
+#: emissions/templates/emissions/energypurchased_list.html:60
+#: emissions/templates/emissions/energysold_list.html:60
+#: templates/emissions/scope1_list.html:60
+msgid "Jednostka"
+msgstr "Unit"
+
+#: emissions/forms.py:68 emissions/forms.py:127 emissions/forms.py:173
+#: emissions/forms.py:219 templates/emissions/factor_list.html:95
+msgid "Źródło danych"
+msgstr "Data source"
+
+#: emissions/forms.py:78 emissions/forms.py:137 emissions/forms.py:183
+#: emissions/forms.py:233
+#, python-format
+msgid "Rok musi być między 2010 a %(current_year)s."
+msgstr "Year must be between 2010 and %(current_year)s."
+
+#: emissions/forms.py:88 emissions/forms.py:147 emissions/forms.py:193
+msgid "Ilość musi być większa od zera."
+msgstr "Amount must be greater than zero."
+
+#: emissions/forms.py:126 templates/calculator/dashboard.html:37
+#: templates/calculator/fuelspec_list.html:32
+#: templates/what_if/simulation.html:37
+msgid "Dostawca"
+msgstr "Supplier"
+
+#: emissions/forms.py:172
+msgid "Instalacja"
+msgstr "Installation"
+
+#: emissions/forms.py:218
+msgid "Odbiorca"
+msgstr "Recipient"
+
+#: emissions/forms.py:346 emissions/forms.py:365 emissions/forms.py:384
+#: emissions/forms.py:403 templates/emissions/scope1_import.html:60
+msgid "Wybierz plik XLSX"
+msgstr "Select XLSX file"
+
+#: emissions/forms.py:347 emissions/forms.py:366 emissions/forms.py:385
+#: emissions/forms.py:404
+msgid "Maksymalny rozmiar: 5MB"
+msgstr "Maximum size: 5MB"
+
+#: emissions/forms.py:355 emissions/forms.py:374 emissions/forms.py:393
+#: emissions/forms.py:412
+msgid "Obsługiwany jest tylko format .xlsx"
+msgstr "Only .xlsx format is supported"
+
+#: emissions/forms.py:357 emissions/forms.py:376 emissions/forms.py:395
+#: emissions/forms.py:414
+msgid "Plik jest za duży (max 5MB)"
+msgstr "File is too large (max 5MB)"
+
+#: emissions/models.py:34
+msgid "Emisja zadeklarowana"
+msgstr "Declared emission"
+
+#: emissions/models.py:42
+msgid "Emisja (Wyliczona przez system)"
+msgstr "Emission (Calculated by system)"
+
+#: emissions/models.py:50
+msgid "Użyty wskaźnik (Wartość)"
+msgstr "Used indicator (Value)"
+
+#: emissions/models.py:56
+msgid "Użyty wskaźnik (Jednostka)"
+msgstr "Used indicator (Unit)"
+
+#: emissions/models.py:63
+msgid "Użyty przelicznik jednostek (Wartość)"
+msgstr "Used unit converter (Value)"
+
+#: emissions/models.py:70
+msgid "Użyty przelicznik jednostek (Jednostka)"
+msgstr "Used unit converter (Unit)"
+
+#: emissions/models.py:82 emissions/models.py:102
+#: templates/emissions/scope1_list.html:58
+msgid "Paliwo"
+msgstr "Fuel"
+
+#: emissions/models.py:196 templates/companies/companies_detail.html:72
+#: templates/companies/companies_list.html:35
+msgid "Kraj"
+msgstr "Country"
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:4
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:4
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:4
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:4
+#, fuzzy
+#| msgid "Usuń konto i dane"
+msgid "Usuń rekord"
+msgstr "Delete account and data"
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:11
+#: emissions/templates/emissions/energy_consumption_list.html:28
+#: emissions/templates/emissions/energy_form.html:40
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:11
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:11
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:11
+#: emissions/templates/emissions/energyconsumption_form.html:40
+#: emissions/templates/emissions/energyproduced_form.html:40
+#: emissions/templates/emissions/energyproduced_list.html:28
+#: emissions/templates/emissions/energypurchased_form.html:40
+#: emissions/templates/emissions/energypurchased_list.html:28
+#: emissions/templates/emissions/energysold_form.html:40
+#: emissions/templates/emissions/energysold_list.html:28
+#: templates/ai_services/global_chat.html:39
+#: templates/calculator/fuelspec_form.html:48
+#: templates/calculator/fueltype_form.html:40
+#: templates/calculator/supplier_form.html:30
+#: templates/communications/thread_form.html:31
+#: templates/emissions/scope1_form.html:40
+#: templates/emissions/scope1_import.html:43
+#: templates/emissions/scope1_import.html:155
+#: templates/emissions/scope1_list.html:28
+msgid "Wróć"
+msgstr "Back"
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:15
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:15
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:15
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:15
+#: templates/what_if/reduction_target_confirm_delete.html:12
+msgid "Potwierdź usunięcie"
+msgstr ""
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:22
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:22
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:22
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:22
+msgid "Czy na pewno chcesz usunąć ten rekord? Ta operacja jest nieodwracalna!"
+msgstr ""
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:48
+#: emissions/templates/emissions/energy_form.html:73
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:48
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:48
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:48
+#: emissions/templates/emissions/energyconsumption_form.html:73
+#: emissions/templates/emissions/energyproduced_form.html:73
+#: emissions/templates/emissions/energypurchased_form.html:73
+#: emissions/templates/emissions/energysold_form.html:73
+#: templates/accounts/account_delete_confirm.html:69
+#: templates/accounts/company_users_list.html:69
+#: templates/accounts/profile_edit.html:86
+#: templates/calculator/fuelspec_form.html:114
+#: templates/calculator/fueltype_form.html:77
+#: templates/calculator/supplier_form.html:64
+#: templates/communications/thread_form.html:65
+#: templates/companies/companies_form.html:75
+#: templates/emissions/factor_form.html:75
+#: templates/emissions/scope1_form.html:76
+#: templates/emissions/scope1_import.html:78
+#: templates/registration/password_reset_form.html:52
+#: templates/what_if/reduction_target_confirm_delete.html:37
+#: templates/what_if/reduction_target_form.html:75
+#: templates/workflow/reporting_period_form.html:61
+msgid "Anuluj"
+msgstr "Cancel"
+
+#: emissions/templates/emissions/energy_consumption_confirm_delete.html:53
+#: emissions/templates/emissions/energy_produced_confirm_delete.html:53
+#: emissions/templates/emissions/energy_purchased_confirm_delete.html:53
+#: emissions/templates/emissions/energy_sold_confirm_delete.html:53
+#: templates/what_if/reduction_target_detail.html:30
+#: templates/what_if/reduction_target_list.html:111
+msgid "Usuń"
+msgstr ""
+
+#: emissions/templates/emissions/energy_consumption_list.html:38
+#: emissions/templates/emissions/energyproduced_list.html:38
+#: emissions/templates/emissions/energypurchased_list.html:38
+#: emissions/templates/emissions/energysold_list.html:38
+#: templates/emissions/scope1_list.html:39
+msgid "Import"
+msgstr "Import"
+
+#: emissions/templates/emissions/energy_consumption_list.html:43
+#: emissions/templates/emissions/energyproduced_list.html:43
+#: emissions/templates/emissions/energypurchased_list.html:43
+#: emissions/templates/emissions/energysold_list.html:43
+#: templates/calculator/dashboard.html:81
+#: templates/calculator/dashboard.html:102
+#: templates/emissions/scope1_list.html:45 templates/what_if/simulation.html:81
+#: templates/what_if/simulation.html:102
+msgid "Dodaj"
+msgstr "Add"
+
+#: emissions/templates/emissions/energy_consumption_list.html:57
+#: emissions/templates/emissions/energyproduced_list.html:57
+#: emissions/templates/emissions/energypurchased_list.html:57
+#: emissions/templates/emissions/energysold_list.html:57
+#: templates/emissions/factor_list.html:93
+#, fuzzy
+#| msgid "Źródło danych"
+msgid "Źródło"
+msgstr "Data source"
+
+#: emissions/templates/emissions/energy_consumption_list.html:58
+#: emissions/templates/emissions/energyproduced_list.html:58
+#: emissions/templates/emissions/energypurchased_list.html:58
+#: emissions/templates/emissions/energysold_list.html:58
+msgid "Typ"
+msgstr ""
+
+#: emissions/templates/emissions/energy_consumption_list.html:61
+#: emissions/templates/emissions/energyproduced_list.html:61
+#: emissions/templates/emissions/energypurchased_list.html:61
+#: emissions/templates/emissions/energysold_list.html:61
+#: templates/emissions/scope1_list.html:61
+msgid "Emisja CO₂e"
+msgstr "CO₂e emission"
+
+#: emissions/templates/emissions/energy_consumption_list.html:62
+#: emissions/templates/emissions/energyproduced_list.html:62
+#: emissions/templates/emissions/energypurchased_list.html:62
+#: emissions/templates/emissions/energysold_list.html:62
+#: templates/accounts/company_users_list.html:228
+#: templates/companies/companies_list.html:36
+#: templates/emissions/factor_list.html:97
+#: templates/emissions/scope1_list.html:63
+#: templates/what_if/reduction_target_list.html:88
+#: templates/workflow/admin_envelope_review.html:63
+msgid "Akcje"
+msgstr "Actions"
+
+#: emissions/templates/emissions/energy_consumption_list.html:92
+#: emissions/templates/emissions/energyproduced_list.html:92
+#: emissions/templates/emissions/energypurchased_list.html:92
+#: emissions/templates/emissions/energysold_list.html:92
+#: templates/emissions/scope1_list.html:97
+msgid "Brak rekordów."
+msgstr "No records."
+
+#: emissions/templates/emissions/energy_form.html:46
+#: emissions/templates/emissions/energyconsumption_form.html:46
+#: emissions/templates/emissions/energyproduced_form.html:46
+#: emissions/templates/emissions/energypurchased_form.html:46
+#: emissions/templates/emissions/energysold_form.html:46
+msgid "Wprowadź dane dotyczące energii."
+msgstr ""
+
+#: emissions/templates/emissions/energy_form.html:78
+#: emissions/templates/emissions/energyconsumption_form.html:78
+#: emissions/templates/emissions/energyproduced_form.html:78
+#: emissions/templates/emissions/energypurchased_form.html:78
+#: emissions/templates/emissions/energysold_form.html:78
+#: templates/calculator/fueltype_form.html:82
+#: templates/calculator/supplier_form.html:69
+#: templates/companies/companies_form.html:80
+#: templates/emissions/scope1_form.html:81
+#: templates/what_if/reduction_target_form.html:80
+msgid "Zapisz"
+msgstr "Save"
+
+#: emissions/views.py:248
+msgid "Zużycie energii"
+msgstr "Energy consumption"
+
+#: emissions/views.py:281 templates/emissions/dashboard.html:90
+msgid "Zakupiona energia"
+msgstr "Purchased energy"
+
+#: emissions/views.py:313
+msgid "Wyprodukowana energia"
+msgstr "Produced energy"
+
+#: emissions/views.py:345 templates/emissions/dashboard.html:108
+msgid "Sprzedana energia"
+msgstr "Sold energy"
+
+#: templates/accounts/account_delete_confirm.html:4
+#: templates/accounts/account_delete_confirm.html:33
+#: templates/accounts/account_delete_confirm.html:74
+#, fuzzy
+#| msgid "Usuń konto i dane"
+msgid "Usuń konto"
+msgstr "Delete account and data"
+
+#: templates/accounts/account_delete_confirm.html:29
+#: templates/accounts/profile_edit.html:49
+msgid "Wróć do profilu"
+msgstr "Back to profile"
+
+#: templates/accounts/account_delete_confirm.html:35
+msgid "Żądanie usunięcia profilu zgodnie z RODO Art. 17."
+msgstr ""
+
+#: templates/accounts/account_delete_confirm.html:40
+msgid "Uwaga — operacja nieodwracalna"
+msgstr ""
+
+#: templates/accounts/account_delete_confirm.html:41
+msgid ""
+"Twój profil, uprawnienia dostępowe do spółek oraz wszystkie ustawienia "
+"zostaną bezpowrotnie usunięte z bazy danych."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:4
+#: templates/accounts/company_users_list.html:80
+#, fuzzy
+#| msgid "Użytkownicy"
+msgid "Użytkownicy i uprawnienia"
+msgstr "Users"
+
+#: templates/accounts/company_users_list.html:55
+msgid "Potwierdź operację"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:64
+msgid "Tak, wykonaj"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:87
+#, fuzzy
+#| msgid "Nazwa użytkownika"
+msgid "Utwórz nowego użytkownika"
+msgstr "Username"
+
+#: templates/accounts/company_users_list.html:92
+#, fuzzy
+#| msgid "Zarządzanie przedsiębiorstwami w systemie Emission Impossible."
+msgid "Zarządzanie dostępem do spółek w systemie Emission Impossible."
+msgstr "Managing companies in the Emission Impossible system."
+
+#: templates/accounts/company_users_list.html:96
+#, fuzzy
+#| msgid "Lista Spółek"
+msgid "spółek"
+msgstr "Company List"
+
+#: templates/accounts/company_users_list.html:99
+#: templates/accounts/company_users_list.html:203
+#, fuzzy
+#| msgid "Użytkownik"
+msgid "użytkowników"
+msgstr "User"
+
+#: templates/accounts/company_users_list.html:102
+msgid "adminów"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:108
+msgid "Szukaj użytkownika lub spółki..."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:118
+#, fuzzy
+#| msgid "Panel Administratora"
+msgid "Administratorzy systemu"
+msgstr "Admin Panel"
+
+#: templates/accounts/company_users_list.html:121
+#, fuzzy
+#| msgid "Administrator — pełny dostęp do wszystkich spółek."
+msgid "Pełny dostęp do wszystkich danych"
+msgstr "Administrator — full access to all companies."
+
+#: templates/accounts/company_users_list.html:141
+msgid "brak adresu e-mail"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:145
+#: templates/companies/companies_detail.html:24 templates/home.html:124
+#: templates/what_if/reduction_target_detail.html:26
+#: templates/what_if/reduction_target_list.html:106
+msgid "Edytuj"
+msgstr "Edit"
+
+#: templates/accounts/company_users_list.html:153
+msgid "Brak zdefiniowanych administratorów systemu."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:163
+msgid "Wszystkie spółki"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:163
+#, fuzzy
+#| msgid "Dodaj spółkę"
+msgid "Twoje spółki"
+msgstr "Add company"
+
+#: templates/accounts/company_users_list.html:168
+msgid "Widzisz tylko spółki, do których masz przypisany dostęp."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:210
+#, fuzzy
+#| msgid "Profil Użytkownika"
+msgid "Przypisz użytkownika"
+msgstr "User Profile"
+
+#: templates/accounts/company_users_list.html:221 theme/templates/base.html:72
+msgid "Użytkownik"
+msgstr "User"
+
+#: templates/accounts/company_users_list.html:222
+#, fuzzy
+#| msgid "Imię i Nazwisko"
+msgid "Imię i nazwisko"
+msgstr "Full name"
+
+#: templates/accounts/company_users_list.html:223
+msgid "Rola"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:224
+#: templates/accounts/profile.html:48
+msgid "E-mail"
+msgstr "Email"
+
+#: templates/accounts/company_users_list.html:225
+#: templates/accounts/profile.html:119
+msgid "Odczyt"
+msgstr "Read"
+
+#: templates/accounts/company_users_list.html:226
+#: templates/accounts/profile.html:122
+msgid "Zapis"
+msgstr "Write"
+
+#: templates/accounts/company_users_list.html:247
+msgid "nieaktywny"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:303
+msgid "Odepnij użytkownika od spółki"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:303
+msgid "Czy na pewno odpiąć"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:303
+#, fuzzy
+#| msgid "Dodaj spółkę"
+msgid "od spółki"
+msgstr "Add company"
+
+#: templates/accounts/company_users_list.html:309
+#, fuzzy
+#| msgid "Nazwa użytkownika"
+msgid "Dezaktywuj konto użytkownika"
+msgstr "Username"
+
+#: templates/accounts/company_users_list.html:309
+msgid "Czy na pewno dezaktywować konto"
+msgstr ""
+
+#: templates/accounts/company_users_list.html:329
+#, fuzzy
+#| msgid "Brak przypisanych spółek."
+msgid "Brak przypisanych użytkowników do tej spółki."
+msgstr "No assigned companies."
+
+#: templates/accounts/company_users_list.html:334
+#, fuzzy
+#| msgid "Nazwa użytkownika"
+msgid "Przypisz pierwszego użytkownika"
+msgstr "Username"
+
+#: templates/accounts/company_users_list.html:346
+msgid "Brak wyników dla podanej frazy."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:353
+#: templates/companies/companies_list.html:75
+msgid "Brak spółek w systemie."
+msgstr "No companies in the system."
+
+#: templates/accounts/company_users_list.html:353
+msgid "Nie masz przypisanego dostępu do żadnej spółki."
+msgstr ""
+
+#: templates/accounts/company_users_list.html:356
+msgid "Skontaktuj się z administratorem systemu w celu uzyskania dostępu."
+msgstr ""
+
+#: templates/accounts/logged_out.html:4
+msgid "Wylogowano"
+msgstr "Logged out"
+
+#: templates/accounts/logged_out.html:37
+msgid "Pomyślnie wylogowano"
+msgstr "Successfully logged out"
+
+#: templates/accounts/logged_out.html:40
+msgid ""
+"Dziękujemy za Twoją pracę w systemie. Twoja sesja została bezpiecznie "
+"zakończona."
+msgstr ""
+"Thank you for your work in the system. Your session has been securely "
+"terminated."
+
+#: templates/accounts/logged_out.html:49
+msgid "Zaloguj się ponownie"
+msgstr "Log in again"
+
+#: templates/accounts/logged_out.html:54 templates/registration/login.html:133
+msgid "Polityka prywatności"
+msgstr "Privacy policy"
+
+#: templates/accounts/logged_out.html:56
+msgid "Pomoc techniczna"
+msgstr "Technical support"
+
+#: templates/accounts/profile.html:4 templates/accounts/profile.html:21
+msgid "Profil Użytkownika"
+msgstr "User Profile"
+
+#: templates/accounts/profile.html:23
+msgid "Przegląd danych i uprawnień systemowych."
+msgstr "Overview of data and system permissions."
+
+#: templates/accounts/profile.html:32
+msgid "Dane systemowe"
+msgstr "System data"
+
+#: templates/accounts/profile.html:44
+msgid "Nazwa użytkownika"
+msgstr "Username"
+
+#: templates/accounts/profile.html:52
+msgid "Imię i Nazwisko"
+msgstr "Full name"
+
+#: templates/accounts/profile.html:54 templates/accounts/profile.html:59
+msgid "Brak danych"
+msgstr "No data"
+
+#: templates/accounts/profile.html:58
+msgid "Telefon"
+msgstr "Phone"
+
+#: templates/accounts/profile.html:62
+msgid "Rola systemowa"
+msgstr "System role"
+
+#: templates/accounts/profile.html:66
+msgid "W systemie od"
+msgstr "Member since"
+
+#: templates/accounts/profile.html:76
+msgid "Edytuj dane"
+msgstr "Edit data"
+
+#: templates/accounts/profile.html:85
+msgid "Zasięg operacyjny"
+msgstr "Operational scope"
+
+#: templates/accounts/profile.html:92
+msgid "TRYB GLOBALNY:"
+msgstr "GLOBAL MODE:"
+
+#: templates/accounts/profile.html:92
+msgid "Administrator — pełny dostęp do wszystkich spółek."
+msgstr "Administrator — full access to all companies."
+
+#: templates/accounts/profile.html:107
+msgid "Brak zarejestrowanych spółek."
+msgstr "No registered companies."
+
+#: templates/accounts/profile.html:125
+msgid "Brak uprawnień"
+msgstr "No permissions"
+
+#: templates/accounts/profile.html:132
+msgid "Brak przypisanych spółek."
+msgstr "No assigned companies."
+
+#: templates/accounts/profile.html:141
+msgid "Strefa bezpieczeństwa"
+msgstr "Security zone"
+
+#: templates/accounts/profile.html:143
+msgid ""
+"Zarządzaj swoimi danymi dostępowymi. Działania w tej strefie mogą być "
+"nieodwracalne."
+msgstr "Manage your access data. Actions in this zone may be irreversible."
+
+#: templates/accounts/profile.html:147
+msgid "Zmiana hasła"
+msgstr "Change password"
+
+#: templates/accounts/profile.html:151
+msgid "Usuń konto i dane"
+msgstr "Delete account and data"
+
+#: templates/accounts/profile_edit.html:4
+#: templates/accounts/profile_edit.html:53
+msgid "Edycja Profilu"
+msgstr "Edit Profile"
+
+#: templates/accounts/profile_edit.html:55
+msgid "Modyfikacja danych osobowych konta."
+msgstr "Modify personal account data."
+
+#: templates/accounts/profile_edit.html:91
+msgid "Zapisz zmiany"
+msgstr "Save changes"
+
+#: templates/ai_services/global_chat.html:4
+#, fuzzy
+#| msgid "AI Asystent ESG"
+msgid "Asystent AI ESG"
+msgstr "AI ESG Assistant"
+
+#: templates/ai_services/global_chat.html:45
+msgid "Zadawaj pytania dotyczące śladu węglowego dowolnej spółki w systemie."
+msgstr ""
+
+#: templates/ai_services/global_chat.html:56
+#: templates/communications/thread_form.html:45
+#: templates/companies/companies_form.html:4
+#: templates/reports/ghg_report.html:60
+#: templates/workflow/admin_envelope_list.html:20
+msgid "Spółka"
+msgstr "Company"
+
+#: templates/ai_services/global_chat.html:58
+msgid "Wszystkie moje spółki"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:65
+#: templates/what_if/reduction_target_confirm_delete.html:24
+#: templates/what_if/reduction_target_detail.html:68
+#, fuzzy
+#| msgid "Zakres 1"
+msgid "Zakres"
+msgstr "Scope 1"
+
+#: templates/ai_services/global_chat.html:67
+msgid "Całość (Scope 1, 2, 3)"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:68
+msgid "Tylko Scope 1"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:69
+msgid "Tylko Scope 2"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:70
+msgid "Tylko Scope 3"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:77
+#: templates/ai_services/global_chat.html:128
+msgid "System AI"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:80
+msgid ""
+"Cześć! Jestem Twoim wirtualnym asystentem ESG. Wybierz spółkę z menu na "
+"górze i zadaj mi pytanie dotyczące emisji, wskaźników lub celów redukcyjnych."
+msgstr ""
+
+#: templates/ai_services/global_chat.html:88
+msgid "Asystent generuje odpowiedź..."
+msgstr ""
+
+#: templates/ai_services/global_chat.html:95
+msgid "Napisz pytanie... (np. Jakie były emisje Scope 1 w 2024?)"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:102
+#: templates/communications/thread_detail.html:85
+msgid "Wyślij"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:128
+msgid "Ty"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:162
+msgid "Błąd"
+msgstr ""
+
+#: templates/ai_services/global_chat.html:165
+msgid "Wystąpił problem z połączeniem z modułem AI."
+msgstr ""
+
+#: templates/calculator/dashboard.html:4 templates/what_if/simulation.html:4
+msgid "Baza Przeliczników i Wskaźników"
+msgstr ""
+
+#: templates/calculator/dashboard.html:13 templates/what_if/simulation.html:13
+#, fuzzy
+#| msgid "Przeliczniki"
+msgid "Baza Przeliczników"
+msgstr "Converters"
+
+#: templates/calculator/dashboard.html:15 templates/what_if/simulation.html:15
+msgid ""
+"Zarządzanie nośnikami energii, dostawcami oraz parametrami fizykochemicznymi "
+"dla Scope 1."
+msgstr ""
+
+#: templates/calculator/dashboard.html:20
+#: templates/calculator/fuelspec_list.html:21
+#: templates/what_if/simulation.html:20
+msgid "Nowa Specyfikacja"
+msgstr ""
+
+#: templates/calculator/dashboard.html:28 templates/what_if/simulation.html:28
+msgid "Aktywne parametry paliw"
+msgstr ""
+
+#: templates/calculator/dashboard.html:36
+#: templates/calculator/fuelspec_list.html:31
+#: templates/what_if/simulation.html:36
+msgid "Typ paliwa"
+msgstr ""
+
+#: templates/calculator/dashboard.html:38
+#: templates/calculator/fuelspec_list.html:33
+#: templates/what_if/simulation.html:38
+msgid "Gęstość (kg/m³)"
+msgstr ""
+
+#: templates/calculator/dashboard.html:39 templates/what_if/simulation.html:39
+msgid "Wartość opałowa (MJ/kg)"
+msgstr ""
+
+#: templates/calculator/dashboard.html:40 templates/what_if/simulation.html:40
+msgid "Wartość opałowa (MJ/m³)"
+msgstr ""
+
+#: templates/calculator/dashboard.html:41
+#: templates/calculator/fuelspec_list.html:34
+#: templates/emissions/factor_list.html:69
+#: templates/emissions/scope1_import.html:110
+#: templates/emissions/scope1_list.html:62 templates/what_if/simulation.html:41
+#: templates/workflow/admin_envelope_list.html:22
+#: templates/workflow/admin_envelope_review.html:61
+#: templates/workflow/reporting_period_list.html:25
+msgid "Status"
+msgstr "Status"
+
+#: templates/calculator/dashboard.html:51 templates/what_if/simulation.html:51
+msgid "DOMYŚLNY"
+msgstr ""
+
+#: templates/calculator/dashboard.html:58 templates/what_if/simulation.html:58
+msgid "DOMYŚLNA"
+msgstr ""
+
+#: templates/calculator/dashboard.html:60 templates/what_if/simulation.html:60
+msgid "DEDYKOWANA"
+msgstr ""
+
+#: templates/calculator/dashboard.html:69 templates/what_if/simulation.html:69
+msgid ""
+"Brak zdefiniowanych specyfikacji. Kliknij przycisk powyżej, aby dodać "
+"pierwszą."
+msgstr ""
+
+#: templates/calculator/dashboard.html:79 templates/what_if/simulation.html:79
+#, fuzzy
+#| msgid "Zużycie energii"
+msgid "Nośniki energii"
+msgstr "Energy consumption"
+
+#: templates/calculator/dashboard.html:91 templates/what_if/simulation.html:91
+#, fuzzy
+#| msgid "Brak zarejestrowanych spółek."
+msgid "Brak zarejestrowanych typów paliw."
+msgstr "No registered companies."
+
+#: templates/calculator/dashboard.html:100
+#: templates/what_if/simulation.html:100
+msgid "Zarejestrowani Dostawcy"
+msgstr ""
+
+#: templates/calculator/dashboard.html:112
+#: templates/what_if/simulation.html:112
+#, fuzzy
+#| msgid "Brak zarejestrowanych spółek."
+msgid "Brak zarejestrowanych dostawców."
+msgstr "No registered companies."
+
+#: templates/calculator/fuelspec_form.html:4
+msgid "Specyfikacja Fizykochemiczna"
+msgstr ""
+
+#: templates/calculator/fuelspec_form.html:52
+msgid "Specyfikacja Paliwa"
+msgstr ""
+
+#: templates/calculator/fuelspec_form.html:54
+msgid ""
+"Wprowadzanie gęstości oraz wartości opałowych dla dokładnych przeliczeń "
+"Scope 1."
+msgstr ""
+
+#: templates/calculator/fuelspec_form.html:81
+#, fuzzy
+#| msgid "Wskaźniki Emisji"
+msgid "Wskaźniki fizykochemiczne"
+msgstr "Emission Factors"
+
+#: templates/calculator/fuelspec_form.html:107
+msgid ""
+"Automatyczne stosowanie tych przeliczników jeśli nie wskazano konkretnego "
+"dostawcy."
+msgstr ""
+
+#: templates/calculator/fuelspec_form.html:119
+msgid "Zapisz specyfikację"
+msgstr ""
+
+#: templates/calculator/fuelspec_list.html:4
+#: templates/calculator/fuelspec_list.html:15
+msgid "Lista Specyfikacji Paliw"
+msgstr ""
+
+#: templates/calculator/fuelspec_list.html:11
+#, fuzzy
+#| msgid "Wróć do profilu"
+msgid "Wróć do Dashboardu"
+msgstr "Back to profile"
+
+#: templates/calculator/fuelspec_list.html:41
+msgid "Domyślny"
+msgstr ""
+
+#: templates/calculator/fuelspec_list.html:45
+msgid "Domyślna"
+msgstr ""
+
+#: templates/calculator/fuelspec_list.html:47
+#, fuzzy
+#| msgid "Wyprodukowana"
+msgid "Dedykowana"
+msgstr "Produced"
+
+#: templates/calculator/fuelspec_list.html:54
+msgid "Brak zdefiniowanych specyfikacji paliw."
+msgstr ""
+
+#: templates/calculator/fueltype_form.html:4
+#: templates/calculator/fueltype_form.html:44
+msgid "Nowy Typ Paliwa"
+msgstr ""
+
+#: templates/calculator/fueltype_form.html:46
+msgid "Definiowanie nowego nośnika energii w systemie kalkulacyjnym."
+msgstr ""
+
+#: templates/calculator/supplier_form.html:4
+#: templates/calculator/supplier_form.html:34
+#, fuzzy
+#| msgid "Dostawca"
+msgid "Nowy Dostawca"
+msgstr "Supplier"
+
+#: templates/calculator/supplier_form.html:36
+msgid "Dodawanie podmiotu dostarczającego komponenty emisyjne."
+msgstr ""
+
+#: templates/communications/thread_detail.html:32
+#: templates/companies/companies_detail.html:11
+#: templates/companies/companies_form.html:40
+#: templates/emissions/factor_form.html:40
+#: templates/what_if/reduction_target_detail.html:16
+#: templates/what_if/reduction_target_form.html:40
+#: templates/workflow/admin_envelope_review.html:12
+msgid "Wróć do listy"
+msgstr "Back to list"
+
+#: templates/communications/thread_detail.html:44
+#: templates/communications/thread_list.html:46
+msgid "Otwarty"
+msgstr ""
+
+#: templates/communications/thread_detail.html:46
+#: templates/communications/thread_list.html:48
+#: templates/workflow/reporting_period_list.html:37
+msgid "Zamknięty"
+msgstr ""
+
+#: templates/communications/thread_detail.html:68
+msgid "Odpowiedz"
+msgstr ""
+
+#: templates/communications/thread_detail.html:78
+msgid "Zamknij wątek"
+msgstr ""
+
+#: templates/communications/thread_detail.html:92
+msgid "Ten wątek jest zamknięty."
+msgstr ""
+
+#: templates/communications/thread_form.html:4
+msgid "Nowe Zapytanie"
+msgstr ""
+
+#: templates/communications/thread_form.html:35
+#: templates/communications/thread_list.html:20
+msgid "Nowe zapytanie"
+msgstr ""
+
+#: templates/communications/thread_form.html:37
+msgid "Rozpocznij nowy wątek komunikacji dla wybranej spółki."
+msgstr ""
+
+#: templates/communications/thread_form.html:47
+msgid "Wybierz spółkę, której dotyczy problem."
+msgstr ""
+
+#: templates/communications/thread_form.html:50
+#: templates/emissions/scope1_list.html:57
+msgid "Kategoria"
+msgstr "Category"
+
+#: templates/communications/thread_form.html:55
+msgid "Temat zapytania"
+msgstr ""
+
+#: templates/communications/thread_form.html:59
+msgid "Treść wiadomości"
+msgstr ""
+
+#: templates/communications/thread_form.html:70
+msgid "Utwórz zgłoszenie"
+msgstr ""
+
+#: templates/communications/thread_list.html:4
+#, fuzzy
+#| msgid "Komunikacja e-mail"
+msgid "Komunikacja"
+msgstr "Email Communication"
+
+#: templates/communications/thread_list.html:15
+msgid "Zarządzanie wątkami komunikacji dla spółek."
+msgstr ""
+
+#: templates/communications/thread_list.html:58
+msgid "Brak wątków komunikacji."
+msgstr ""
+
+#: templates/communications/thread_list.html:60
+msgid "Utwórz pierwsze zapytanie"
+msgstr ""
+
+#: templates/companies/companies_detail.html:29
+msgid "Kalkulator emisji"
+msgstr "Emissions calculator"
+
+#: templates/companies/companies_detail.html:39
+msgid "Dane podstawowe"
+msgstr "Basic data"
+
+#: templates/companies/companies_detail.html:42
+#: templates/companies/companies_list.html:33
+msgid "NIP"
+msgstr "Tax ID"
+
+#: templates/companies/companies_detail.html:46
+msgid "REGON"
+msgstr "REGON"
+
+#: templates/companies/companies_detail.html:50
+msgid "Sektor"
+msgstr "Sector"
+
+#: templates/companies/companies_detail.html:54
+#: templates/what_if/reduction_target_detail.html:48
+msgid "Rok bazowy"
+msgstr "Base year"
+
+#: templates/companies/companies_detail.html:61
+msgid "Adres"
+msgstr "Address"
+
+#: templates/companies/companies_detail.html:64
+msgid "Ulica"
+msgstr "Street"
+
+#: templates/companies/companies_detail.html:68
+#: templates/companies/companies_list.html:34
+msgid "Miasto"
+msgstr "City"
+
+#: templates/companies/companies_detail.html:76
+msgid "Kod pocztowy"
+msgstr "Postal code"
+
+#: templates/companies/companies_form.html:45
+msgid "Edytuj spółkę"
+msgstr "Edit company"
+
+#: templates/companies/companies_form.html:45
+msgid "Nowa spółka"
+msgstr "New company"
+
+#: templates/companies/companies_list.html:4
+#: templates/companies/companies_list.html:13
+msgid "Lista Spółek"
+msgstr "Company List"
+
+#: templates/companies/companies_list.html:15
+msgid "Zarządzanie przedsiębiorstwami w systemie Emission Impossible."
+msgstr "Managing companies in the Emission Impossible system."
+
+#: templates/companies/companies_list.html:21
+msgid "Dodaj spółkę"
+msgstr "Add company"
+
+#: templates/companies/companies_list.html:32
+msgid "Nazwa"
+msgstr "Name"
+
+#: templates/emissions/dashboard.html:4 templates/emissions/dashboard.html:21
+msgid "Kalkulator Emisji"
+msgstr "Emissions Calculator"
+
+#: templates/emissions/dashboard.html:12
+msgid "Wróć do listy firm"
+msgstr "Back to company list"
+
+#: templates/emissions/dashboard.html:25
+msgid ""
+"Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla "
+"wybranej firmy."
+msgstr ""
+"Select a category to add a new entry to the greenhouse gas registry for the "
+"selected company."
+
+#: templates/emissions/dashboard.html:32 templates/home.html:199
+#: templates/reports/ghg_report.html:148 templates/reports/ghg_report.html:217
+#: templates/reports/ghg_report.html:247
+msgid "Zakres 1"
+msgstr "Scope 1"
+
+#: templates/emissions/dashboard.html:33
+msgid "Emisje bezpośrednie"
+msgstr "Direct emissions"
+
+#: templates/emissions/dashboard.html:42
+msgid "Spalanie stacjonarne"
+msgstr "Stationary combustion"
+
+#: templates/emissions/dashboard.html:43
+msgid "Kotły, piece, generatory"
+msgstr "Boilers, furnaces, generators"
+
+#: templates/emissions/dashboard.html:51
+msgid "Spalanie mobilne"
+msgstr "Vehicle Fleet Emissions"
+
+#: templates/emissions/dashboard.html:52
+msgid "Pojazdy, flota transportowa"
+msgstr "Vehicles, transport fleet"
+
+#: templates/emissions/dashboard.html:60
+msgid "Emisje procesowe"
+msgstr "Process emissions"
+
+#: templates/emissions/dashboard.html:61
+msgid "Procesy technologiczne"
+msgstr "Technological processes"
+
+#: templates/emissions/dashboard.html:69
+msgid "Emisje niezorganizowane"
+msgstr "Uncontrolled Emissions"
+
+#: templates/emissions/dashboard.html:70
+msgid "Wycieki czynników chłodniczych"
+msgstr "Refrigerant leaks"
+
+#: templates/emissions/dashboard.html:80 templates/home.html:200
+#: templates/reports/ghg_report.html:152 templates/reports/ghg_report.html:218
+#: templates/reports/ghg_report.html:247
+msgid "Zakres 2"
+msgstr "Scope 2"
+
+#: templates/emissions/dashboard.html:81
+msgid "Emisje pośrednie energetyczne"
+msgstr "Indirect energy emissions"
+
+#: templates/emissions/dashboard.html:91
+msgid "Energia z sieci zewnętrznej"
+msgstr "Energy from external grid"
+
+#: templates/emissions/dashboard.html:99
+msgid "Wyprodukowana"
+msgstr "Produced"
+
+#: templates/emissions/dashboard.html:100
+msgid "Fotowoltaika, własne źródła"
+msgstr "Photovoltaics, own sources"
+
+#: templates/emissions/dashboard.html:109
+msgid "Odprzedaż nadwyżek do sieci"
+msgstr "Selling surplus to the grid"
+
+#: templates/emissions/dashboard.html:117
+msgid "Całkowite zużycie"
+msgstr "Total consumption"
+
+#: templates/emissions/dashboard.html:118
+msgid "Zbiorcze raportowanie"
+msgstr "Aggregate reporting"
+
+#: templates/emissions/factor_form.html:4
+#, fuzzy
+#| msgid "Wskaźniki Emisji"
+msgid "Wskaźnik Emisji"
+msgstr "Emission Factors"
+
+#: templates/emissions/factor_form.html:45
+#, fuzzy
+#| msgid "Edytuj dane"
+msgid "Edytuj wskaźnik"
+msgstr "Edit data"
+
+#: templates/emissions/factor_form.html:45
+#, fuzzy
+#| msgid "Wskaźniki Emisji"
+msgid "Nowy wskaźnik emisji"
+msgstr "Emission Factors"
+
+#: templates/emissions/factor_form.html:80
+#, fuzzy
+#| msgid "Zapisz zmiany"
+msgid "Zapisz Wskaźnik"
+msgstr "Save changes"
+
+#: templates/emissions/factor_list.html:40
+#, fuzzy
+#| msgid "Wróć do profilu"
+msgid "Wróć do Panelu"
+msgstr "Back to profile"
+
+#: templates/emissions/factor_list.html:46
+msgid "Słownik wskaźników emisji KOBiZE/DEFRA."
+msgstr ""
+
+#: templates/emissions/factor_list.html:52
+#, fuzzy
+#| msgid "Dodaj spółkę"
+msgid "Dodaj Wskaźnik"
+msgstr "Add company"
+
+#: templates/emissions/factor_list.html:60
+msgid "Szukaj"
+msgstr ""
+
+#: templates/emissions/factor_list.html:61
+msgid "np. Gaz ziemny"
+msgstr ""
+
+#: templates/emissions/factor_list.html:71
+#, fuzzy
+#| msgid "Wszystko gotowe!"
+msgid "Wszystkie w bazie"
+msgstr "All done!"
+
+#: templates/emissions/factor_list.html:72
+msgid "Brakujące (Wymagane)"
+msgstr ""
+
+#: templates/emissions/factor_list.html:79
+msgid "Filtruj"
+msgstr ""
+
+#: templates/emissions/factor_list.html:82
+#: templates/reports/ghg_report.html:107
+msgid "Wyczyść"
+msgstr ""
+
+#: templates/emissions/factor_list.html:94
+msgid "Wartość"
+msgstr ""
+
+#: templates/emissions/factor_list.html:109
+msgid "Brak w bazie"
+msgstr ""
+
+#: templates/emissions/factor_list.html:120
+msgid "Wymagane przez raporty!"
+msgstr ""
+
+#: templates/emissions/factor_list.html:128
+msgid "Uzupełnij"
+msgstr ""
+
+#: templates/emissions/factor_list.html:144
+msgid "Hurra!"
+msgstr ""
+
+#: templates/emissions/factor_list.html:144
+msgid "Wszystkie wskaźniki są uzupełnione."
+msgstr ""
+
+#: templates/emissions/factor_list.html:146
+msgid "Brak wyników do wyświetlenia."
+msgstr ""
+
+#: templates/emissions/scope1_import.html:4
+msgid "Import danych"
+msgstr "Data import"
+
+#: templates/emissions/scope1_import.html:47
+msgid "Import danych emisji"
+msgstr "Emissions data import"
+
+#: templates/emissions/scope1_import.html:49
+msgid ""
+"Wczytaj plik XLSX z danymi emisji. System zweryfikuje i wyświetli podgląd "
+"przed zapisem."
+msgstr ""
+"Load an XLSX file with emissions data. The system will verify and show a "
+"preview before saving."
+
+#: templates/emissions/scope1_import.html:62
+msgid "Obsługiwane formaty:"
+msgstr "Supported formats:"
+
+#: templates/emissions/scope1_import.html:69
+msgid "Szablon importu"
+msgstr "Import template"
+
+#: templates/emissions/scope1_import.html:70
+msgid "Pobierz szablon XLSX"
+msgstr "Download XLSX template"
+
+#: templates/emissions/scope1_import.html:84
+msgid "Wczytaj i sprawdź poprawność"
+msgstr "Load and verify"
+
+#: templates/emissions/scope1_import.html:97
+msgid "Podgląd danych"
+msgstr "Data preview"
+
+#: templates/emissions/scope1_import.html:100
+msgid "Znaleziono"
+msgstr "Found"
+
+#: templates/emissions/scope1_import.html:100
+#: templates/emissions/scope1_import.html:164
+#: templates/workflow/admin_envelope_review.html:53
+msgid "rekordów"
+msgstr "records"
+
+#: templates/emissions/scope1_import.html:126
+msgid "Duplikat"
+msgstr "Duplicate"
+
+#: templates/emissions/scope1_import.html:130
+msgid "OK"
+msgstr "OK"
+
+#: templates/emissions/scope1_import.html:145
+msgid "rekordów gotowych do importu"
+msgstr "records ready to import"
+
+#: templates/emissions/scope1_import.html:149
+msgid "duplikatów zostanie pominiętych"
+msgstr "duplicates will be skipped"
+
+#: templates/emissions/scope1_import.html:164
+msgid "Importuj"
+msgstr "Import"
+
+#: templates/emissions/scope1_list.html:4
+msgid "Lista emisji"
+msgstr "Emissions list"
+
+#: templates/home.html:4
+msgid "Panel startowy"
+msgstr "Dashboard"
+
+#: templates/home.html:9
+msgid "Witaj"
+msgstr "Welcome"
+
+#: templates/home.html:11
+msgid "ESG Dashboard: Podsumowanie i przegląd Twoich zadań"
+msgstr "ESG Dashboard: Summary and overview of your tasks"
+
+#: templates/home.html:16 templates/what_if/reduction_target_list.html:4
+msgid "Cele Redukcyjne"
+msgstr "Reduction Targets"
+
+#: templates/home.html:50
+msgid "Emisja (obecna):"
+msgstr "Current emission:"
+
+#: templates/home.html:54
+#: templates/what_if/reduction_target_confirm_delete.html:20
+#: templates/what_if/reduction_target_detail.html:98
+msgid "Cel"
+msgstr "Target"
+
+#: templates/home.html:70
+msgid "Oczekujące Zadania"
+msgstr "Pending Tasks"
+
+#: templates/home.html:80
+msgid "Termin"
+msgstr "Deadline"
+
+#: templates/home.html:85
+msgid "ZWIŃ/ROZWIŃ LISTĘ"
+msgstr "COLLAPSE/EXPAND LIST"
+
+#: templates/home.html:92
+msgid "Dotyczy spółek"
+msgstr "Applies to companies"
+
+#: templates/home.html:107
+msgid "Szczegóły dla"
+msgstr "Details for"
+
+#: templates/home.html:116 templates/what_if/reduction_target_detail.html:65
+#: templates/what_if/reduction_target_list.html:101
+msgid "Szczegóły"
+msgstr "Details"
+
+#: templates/home.html:132
+msgid "Brak odrzuconych rekordów w tej kategorii."
+msgstr "No rejected records in this category."
+
+#: templates/home.html:142
+msgid "Wszystko gotowe!"
+msgstr "All done!"
+
+#: templates/home.html:143
+msgid "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania."
+msgstr "You currently have no rejected records or tasks to complete."
+
+#: templates/home.html:149
+msgid "Ulubione Akcje"
+msgstr "Favourite Actions"
+
+#: templates/home.html:158
+msgid "Brak ulubionych akcji."
+msgstr "No favourite actions."
+
+#: templates/home.html:216
+msgid "POKAŻ LISTĘ"
+msgstr "SHOW LIST"
+
+#: templates/home.html:216
+msgid "ZWIŃ LISTĘ"
+msgstr "COLLAPSE LIST"
+
+#: templates/privacy_policy.html:4 templates/privacy_policy.html:11
+#, fuzzy
+#| msgid "Polityka prywatności"
+msgid "Polityka Prywatności"
+msgstr "Privacy policy"
+
+#: templates/privacy_policy.html:13
+msgid "Ostatnia aktualizacja: Czerwiec 2026"
+msgstr ""
+
+#: templates/privacy_policy.html:17
+#, fuzzy
+#| msgid "Panel Administratora"
+msgid "1. Administrator danych"
+msgstr "Admin Panel"
+
+#: templates/privacy_policy.html:18
+msgid ""
+"Administratorem danych osobowych jest Emission Impossible. Dane przetwarzane "
+"są zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 "
+"(RODO)."
+msgstr ""
+
+#: templates/privacy_policy.html:21
+msgid "2. Zakres przetwarzanych danych"
+msgstr ""
+
+#: templates/privacy_policy.html:22
+msgid ""
+"Przetwarzamy następujące dane osobowe: imię i nazwisko, adres e-mail, numer "
+"telefonu, dane logowania do systemu oraz dane dotyczące emisji gazów "
+"cieplarnianych wprowadzane przez użytkowników."
+msgstr ""
+
+#: templates/privacy_policy.html:25
+msgid "3. Cel przetwarzania"
+msgstr ""
+
+#: templates/privacy_policy.html:26
+msgid ""
+"Dane przetwarzane są w celu świadczenia usług kalkulatora śladu węglowego, "
+"zarządzania kontami użytkowników oraz generowania raportów GHG dla "
+"przedsiębiorstw."
+msgstr ""
+
+#: templates/privacy_policy.html:29
+#, fuzzy
+#| msgid "Nazwa użytkownika"
+msgid "4. Prawa użytkownika"
+msgstr "Username"
+
+#: templates/privacy_policy.html:30
+msgid ""
+"Zgodnie z RODO (Art. 17) przysługuje Ci prawo do usunięcia danych, dostępu "
+"do danych, sprostowania danych oraz przenoszenia danych. Możesz usunąć swoje "
+"konto w ustawieniach profilu."
+msgstr ""
+
+#: templates/privacy_policy.html:33
+msgid "5. Kontakt"
+msgstr ""
+
+#: templates/privacy_policy.html:34
+msgid ""
+"W sprawach dotyczących ochrony danych osobowych prosimy o kontakt pod "
+"adresem:"
+msgstr ""
+
+#: templates/registration/login.html:4 templates/registration/login.html:124
+#: templates/registration/password_reset_complete.html:22
+msgid "Zaloguj się"
+msgstr "Log in"
+
+#: templates/registration/login.html:78
+msgid "Zaloguj się do systemu"
+msgstr "Log in to the system"
+
+#: templates/registration/login.html:86
+msgid "Nazwa użytkownika lub hasło są nieprawidłowe."
+msgstr "Invalid username or password."
+
+#: templates/registration/login.html:100
+msgid "Hasło"
+msgstr "Password"
+
+#: templates/registration/login.html:102
+msgid "Zapomniałeś hasła?"
+msgstr "Forgot your password?"
+
+#: templates/registration/login.html:114
+msgid "Zapamiętaj mnie"
+msgstr "Remember me"
+
+#: templates/registration/login.html:135
+msgid "Kontakt z administratorem"
+msgstr "Contact administrator"
+
+#: templates/registration/password_reset_complete.html:4
+#: templates/registration/password_reset_complete.html:11
+msgid "Hasło zmienione"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:17
+msgid "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_confirm.html:29
+msgid "Nowe hasło"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:49
+#, fuzzy
+#| msgid "Zmiana hasła"
+msgid "Zmień hasło"
+msgstr "Change password"
+
+#: templates/registration/password_reset_confirm.html:57
+msgid "Link wygasł"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:58
+msgid "Link do resetowania hasła jest nieprawidłowy lub wygasł."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:64
+msgid "Poproś o nowy link"
+msgstr ""
+
+#: templates/registration/password_reset_done.html:4
+#: templates/registration/password_reset_done.html:11
+msgid "Sprawdź e-mail"
+msgstr ""
+
+#: templates/registration/password_reset_done.html:13
+msgid "Link do resetowania hasła został wysłany."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:18
+msgid ""
+"Wysłaliśmy e-mail z instrukcją resetowania hasła. Jeśli nie otrzymasz go w "
+"ciągu kilku minut, sprawdź folder Spam."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:23
+#: templates/registration/password_reset_form.html:28
+#, fuzzy
+#| msgid "Wróć do listy"
+msgid "Wróć do logowania"
+msgstr "Back to list"
+
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:32
+msgid "Resetowanie hasła"
+msgstr ""
+
+#: templates/registration/password_reset_form.html:34
+msgid ""
+"Podaj adres e-mail powiązany z kontem, a wyślemy link do zresetowania hasła."
+msgstr ""
+
+#: templates/registration/password_reset_form.html:57
+msgid "Wyślij link"
+msgstr ""
+
+#: templates/reports/ghg_report.html:4
+#, fuzzy
+#| msgid "Raporty"
+msgid "Raport GHG"
+msgstr "Reports"
+
+#: templates/reports/ghg_report.html:45
+msgid "Raport Śladu Węglowego (GHG)"
+msgstr ""
+
+#: templates/reports/ghg_report.html:47
+msgid "Analiza emisji gazów cieplarnianych dla wybranych spółek i lat."
+msgstr ""
+
+#: templates/reports/ghg_report.html:52
+msgid "Pobierz PDF"
+msgstr ""
+
+#: templates/reports/ghg_report.html:62
+msgid "Wszystkie dostępne spółki"
+msgstr ""
+
+#: templates/reports/ghg_report.html:75
+msgid "Rok do porównania"
+msgstr ""
+
+#: templates/reports/ghg_report.html:80
+#, fuzzy
+#| msgid "Źródło energii"
+msgid "Źródło emisji"
+msgstr "Energy source"
+
+#: templates/reports/ghg_report.html:82
+#, fuzzy
+#| msgid "Emisja (Wyliczona przez system)"
+msgid "Wyliczona (system)"
+msgstr "Emission (Calculated by system)"
+
+#: templates/reports/ghg_report.html:83
+#, fuzzy
+#| msgid "Nazwa użytkownika"
+msgid "Zadeklarowana (użytkownik)"
+msgstr "Username"
+
+#: templates/reports/ghg_report.html:88
+#, fuzzy
+#| msgid "rekordów"
+msgid "Statusy rekordów"
+msgstr "records"
+
+#: templates/reports/ghg_report.html:104
+msgid "Generuj"
+msgstr ""
+
+#: templates/reports/ghg_report.html:115
+msgid "Nie wybrano żadnego statusu"
+msgstr ""
+
+#: templates/reports/ghg_report.html:116
+msgid "Zaznacz co najmniej jeden status rekordów i kliknij Generuj."
+msgstr ""
+
+#: templates/reports/ghg_report.html:123
+msgid "Brak danych dla wybranych filtrów"
+msgstr ""
+
+#: templates/reports/ghg_report.html:125
+#, fuzzy
+#| msgid "Brak rekordów."
+msgid "Brak rekordów emisji dla roku"
+msgstr "No records."
+
+#: templates/reports/ghg_report.html:135
+#, fuzzy
+#| msgid "Emisja CO₂e"
+msgid "Emisje Skumulowane (tCO₂e)"
+msgstr "CO₂e emission"
+
+#: templates/reports/ghg_report.html:145
+msgid "Wielkość Emisji"
+msgstr ""
+
+#: templates/reports/ghg_report.html:156 templates/reports/ghg_report.html:234
+msgid "Suma"
+msgstr ""
+
+#: templates/reports/ghg_report.html:163
+#, fuzzy
+#| msgid "Kalkulator Emisji"
+msgid "Struktura Emisji"
+msgstr "Emissions Calculator"
+
+#: templates/reports/ghg_report.html:168 templates/reports/ghg_report.html:269
+#, fuzzy
+#| msgid "Emisja CO₂e"
+msgid "Suma tCO₂e"
+msgstr "CO₂e emission"
+
+#: templates/reports/ghg_report.html:171
+msgid "Kliknij legendę, aby filtrować."
+msgstr ""
+
+#: templates/reports/ghg_report.html:175
+msgid "Porównanie (YoY)"
+msgstr ""
+
+#: templates/reports/ghg_report.html:187
+#, fuzzy
+#| msgid "Całkowite zużycie"
+msgid "Całkowita Zmiana"
+msgstr "Total consumption"
+
+#: templates/reports/ghg_report.html:192
+msgid "Spadek emisji (dobrze)"
+msgstr ""
+
+#: templates/reports/ghg_report.html:192
+msgid "Wzrost emisji (źle)"
+msgstr ""
+
+#: templates/reports/ghg_report.html:192
+#, fuzzy
+#| msgid "Brak danych"
+msgid "Brak zmian"
+msgstr "No data"
+
+#: templates/reports/ghg_report.html:219
+msgid "Trend łączny"
+msgstr ""
+
+#: templates/reports/ghg_report.html:279
+#, fuzzy
+#| msgid "Raporty"
+msgid "Raport_GHG"
+msgstr "Reports"
+
+#: templates/what_if/reduction_target_confirm_delete.html:4
+#: templates/what_if/reduction_target_confirm_delete.html:42
+msgid "Usuń Cel"
+msgstr ""
+
+#: templates/what_if/reduction_target_confirm_delete.html:15
+msgid ""
+"Czy na pewno chcesz usunąć poniższy cel redukcyjny? Ta operacja jest "
+"nieodwracalna."
+msgstr ""
+
+#: templates/what_if/reduction_target_confirm_delete.html:28
+#: templates/what_if/reduction_target_detail.html:44
+#: templates/what_if/reduction_target_list.html:87
+#, fuzzy
+#| msgid "Cele Redukcyjne"
+msgid "Redukcja"
+msgstr "Reduction Targets"
+
+#: templates/what_if/reduction_target_detail.html:40
+#: templates/what_if/reduction_target_list.html:85
+#, fuzzy
+#| msgid "Rok bazowy"
+msgid "Rok docelowy"
+msgstr "Base year"
+
+#: templates/what_if/reduction_target_detail.html:56
+msgid "Postęp realizacji celu"
+msgstr ""
+
+#: templates/what_if/reduction_target_detail.html:72
+#, fuzzy
+#| msgid "Emisja zadeklarowana"
+msgid "Emisja bazowa"
+msgstr "Declared emission"
+
+#: templates/what_if/reduction_target_detail.html:76
+#, fuzzy
+#| msgid "Lista emisji"
+msgid "Cel emisji"
+msgstr "Emissions list"
+
+#: templates/what_if/reduction_target_detail.html:80
+#, fuzzy
+#| msgid "Kalkulator emisji"
+msgid "Aktualna emisja"
+msgstr "Emissions calculator"
+
+#: templates/what_if/reduction_target_detail.html:97
+msgid "Emisja rzeczywista"
+msgstr ""
+
+#: templates/what_if/reduction_target_form.html:4
+#, fuzzy
+#| msgid "Cele Redukcyjne"
+msgid "Cel Redukcyjny"
+msgstr "Reduction Targets"
+
+#: templates/what_if/reduction_target_form.html:45
+#, fuzzy
+#| msgid "Cele Redukcyjne"
+msgid "Edytuj cel redukcyjny"
+msgstr "Reduction Targets"
+
+#: templates/what_if/reduction_target_form.html:45
+#, fuzzy
+#| msgid "Cele Redukcyjne"
+msgid "Nowy cel redukcyjny"
+msgstr "Reduction Targets"
+
+#: templates/what_if/reduction_target_list.html:38
+#, fuzzy
+#| msgid "Cele i symulacje"
+msgid "Cele i Symulacje"
+msgstr "Goals & Simulations"
+
+#: templates/what_if/reduction_target_list.html:40
+msgid "Zarządzanie celami redukcyjnymi emisji dla wybranych spółek."
+msgstr ""
+
+#: templates/what_if/reduction_target_list.html:45
+msgid "Symulacja What-If"
+msgstr ""
+
+#: templates/what_if/reduction_target_list.html:52
+#, fuzzy
+#| msgid "Edytuj spółkę"
+msgid "Wybierz spółkę"
+msgstr "Edit company"
+
+#: templates/what_if/reduction_target_list.html:54
+#, fuzzy
+#| msgid "Wróć do listy"
+msgid "Wybierz spółkę z listy"
+msgstr "Back to list"
+
+#: templates/what_if/reduction_target_list.html:65
+msgid "Dodaj nowy cel"
+msgstr ""
+
+#: templates/what_if/reduction_target_list.html:76
+#, fuzzy
+#| msgid "Cele Redukcyjne"
+msgid "Cele redukcyjne dla:"
+msgstr "Reduction Targets"
+
+#: templates/what_if/reduction_target_list.html:86
+#, fuzzy
+#| msgid "Nazwa"
+msgid "Nazwa celu"
+msgstr "Name"
+
+#: templates/what_if/reduction_target_list.html:125
+msgid "Brak zdefiniowanych celów redukcyjnych dla tej spółki."
+msgstr ""
+
+#: templates/what_if/reduction_target_list.html:132
+msgid "Wybierz spółkę z listy powyżej, aby wyświetlić jej cele redukcyjne."
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:10
+msgid "Weryfikacja Danych Emisyjnych"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:12
+msgid "Wybierz spółkę i okres rozliczeniowy, aby rozpocząć audyt."
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:21
+#, fuzzy
+#| msgid "Raporty"
+msgid "Rok Raportowy"
+msgstr "Reports"
+
+#: templates/workflow/admin_envelope_list.html:23
+#, fuzzy
+#| msgid "Akcje"
+msgid "Akcja"
+msgstr "Actions"
+
+#: templates/workflow/admin_envelope_list.html:33
+msgid "W trakcie wprowadzania"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:35
+msgid "Oczekuje na weryfikację"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:37
+msgid "Zwrócono do poprawy"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:39
+msgid "Zatwierdzone"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:46
+msgid "Rozpocznij"
+msgstr ""
+
+#: templates/workflow/admin_envelope_list.html:46
+#, fuzzy
+#| msgid "Podgląd danych"
+msgid "Podgląd"
+msgstr "Data preview"
+
+#: templates/workflow/admin_envelope_list.html:52
+#, fuzzy
+#| msgid "Brak spółek w systemie."
+msgid "Brak raportów w systemie."
+msgstr "No companies in the system."
+
+#: templates/workflow/admin_envelope_review.html:4
+msgid "Weryfikacja Raportu"
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:33
+#, fuzzy
+#| msgid "Audyt i Weryfikacja"
+msgid "Szybka weryfikacja"
+msgstr "Audit & Verification"
+
+#: templates/workflow/admin_envelope_review.html:34
+msgid "Zatwierdź wszystkie rekordy i zamknij raport jednym kliknięciem."
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:41
+msgid "Zatwierdź wszystko"
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:59
+msgid "Opis"
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:60
+#, fuzzy
+#| msgid "Emisja CO₂e"
+msgid "Emisja"
+msgstr "CO₂e emission"
+
+#: templates/workflow/admin_envelope_review.html:87
+msgid "Zatwierdź"
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:96
+msgid "Odrzuć"
+msgstr ""
+
+#: templates/workflow/admin_envelope_review.html:105
+#, fuzzy
+#| msgid "Brak odrzuconych rekordów w tej kategorii."
+msgid "Brak rekordów w tej kategorii."
+msgstr "No rejected records in this category."
+
+#: templates/workflow/admin_envelope_review.html:123
+#, fuzzy
+#| msgid "Wróć do profilu"
+msgid "Zwróć do poprawy"
+msgstr "Back to profile"
+
+#: templates/workflow/admin_envelope_review.html:132
+msgid "Zatwierdź raport"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:4
+msgid "Nowy Okres Raportowy"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:35
+msgid "Utwórz Okres Raportowy"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:44
+#: templates/workflow/reporting_period_list.html:24
+#, fuzzy
+#| msgid "Raporty"
+msgid "Rok raportowy"
+msgstr "Reports"
+
+#: templates/workflow/reporting_period_form.html:48
+msgid "Termin wykonania (Deadline)"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:50
+msgid "Ten termin zostanie przypisany do zadań użytkowników."
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:54
+msgid "Oznacz jako aktywny (widoczny w systemie)"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:66
+#, fuzzy
+#| msgid "Zapisz"
+msgid "Zapisz okres"
+msgstr "Save"
+
+#: templates/workflow/reporting_period_form.html:77
+msgid ""
+"Czy chcesz natychmiast przypisać wszystkie spółki do tego okresu i otworzyć "
+"im raporty?"
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:78
+msgid "Kliknięcie OK wygeneruje zadania dla wszystkich użytkowników."
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:79
+msgid "Kliknięcie Anuluj tylko utworzy pusty okres w systemie."
+msgstr ""
+
+#: templates/workflow/reporting_period_form.html:86
+msgid "Przetwarzanie..."
+msgstr ""
+
+#: templates/workflow/reporting_period_list.html:4
+msgid "Okresy Raportowe"
+msgstr ""
+
+#: templates/workflow/reporting_period_list.html:10
+msgid "Zarządzanie Okresami"
+msgstr ""
+
+#: templates/workflow/reporting_period_list.html:15
+msgid "Utwórz nowy okres"
+msgstr ""
+
+#: templates/workflow/reporting_period_list.html:26
+msgid "Ostateczny termin"
+msgstr ""
+
+#: templates/workflow/reporting_period_list.html:35
+msgid "Aktywny"
+msgstr "Active"
+
+#: templates/workflow/reporting_period_list.html:44
+msgid "Brak zdefiniowanych okresów w bazie."
+msgstr ""
+
+#: theme/templates/base.html:56 theme/templates/base.html:58
+msgid "Panel Administratora"
+msgstr "Admin Panel"
+
+#: theme/templates/base.html:100
+msgid "Wyloguj"
+msgstr "Log out"
+
+#: theme/templates/base.html:177
+msgid "Wszelkie prawa zastrzeżone."
+msgstr "All rights reserved."
+
+#: theme/templates/base.html:181
+msgid "Nawigacja"
+msgstr "Navigation"
+
+#: theme/templates/base.html:189
+msgid "Więcej"
+msgstr "More"
