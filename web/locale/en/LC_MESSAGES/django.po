@@ -3,623 +3,519 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Emission Impossible\n"
-"POT-Creation-Date: 2026-07-17 21:23+0000\n"
-"PO-Revision-Date: 2026-07-17 21:23+0000\n"
+"POT-Creation-Date: 2026-07-18 00:00+0000\n"
+"PO-Revision-Date: 2026-07-18 00:00+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: core/registry.py:2
 msgid "Raporty"
 msgstr "Reports"
 
-#: core/registry.py:7
 msgid "Przedsiębiorstwo"
 msgstr "Company"
 
-#: core/registry.py:12
 msgid "Wskaźniki Emisji"
 msgstr "Emission Factors"
 
-#: core/registry.py:14
 msgid "Przeliczniki"
 msgstr "Converters"
 
-#: core/registry.py:19
 msgid "Cele i symulacje"
 msgstr "Goals & Simulations"
 
-#: core/registry.py:24
 msgid "Użytkownicy"
 msgstr "Users"
 
-#: core/registry.py:29
 msgid "AI Asystent ESG"
 msgstr "AI ESG Assistant"
 
-#: core/registry.py:34
 msgid "Komunikacja e-mail"
 msgstr "Email Communication"
 
-#: core/registry.py:40
 msgid "Audyt i Weryfikacja"
 msgstr "Audit & Verification"
 
-#: emissions/forms.py:63
 msgid "Firma"
 msgstr "Company"
 
-#: emissions/forms.py:64
 msgid "Źródło energii"
 msgstr "Energy source"
 
-#: emissions/forms.py:65
 msgid "Typ energii"
 msgstr "Energy type"
 
-#: emissions/forms.py:66
 msgid "Ilość"
 msgstr "Amount"
 
-#: emissions/forms.py:67
 msgid "Jednostka"
 msgstr "Unit"
 
-#: emissions/forms.py:68
 msgid "Źródło danych"
 msgstr "Data source"
 
-#: emissions/forms.py:62
 msgid "Rok"
 msgstr "Year"
 
 #, python-format
-#: emissions/forms.py:78
 msgid "Rok musi być między 2010 a %(current_year)s."
 msgstr "Year must be between 2010 and %(current_year)s."
 
-#: emissions/forms.py:88
 msgid "Ilość musi być większa od zera."
 msgstr "Amount must be greater than zero."
 
-#: emissions/forms.py:126
 msgid "Dostawca"
 msgstr "Supplier"
 
-#: emissions/forms.py:172
 msgid "Instalacja"
 msgstr "Installation"
 
-#: emissions/forms.py:218
 msgid "Odbiorca"
 msgstr "Recipient"
 
-#: emissions/forms.py:346
 msgid "Wybierz plik XLSX"
 msgstr "Select XLSX file"
 
-#: emissions/forms.py:347
 msgid "Maksymalny rozmiar: 5MB"
 msgstr "Maximum size: 5MB"
 
-#: emissions/forms.py:355
 msgid "Obsługiwany jest tylko format .xlsx"
 msgstr "Only .xlsx format is supported"
 
-#: emissions/forms.py:357
 msgid "Plik jest za duży (max 5MB)"
 msgstr "File is too large (max 5MB)"
 
-#: emissions/models.py:34
 msgid "Emisja zadeklarowana"
 msgstr "Declared emission"
 
-#: emissions/models.py:42
 msgid "Emisja (Wyliczona przez system)"
 msgstr "Emission (Calculated by system)"
 
-#: emissions/models.py:50
 msgid "Użyty wskaźnik (Wartość)"
 msgstr "Used indicator (Value)"
 
-#: emissions/models.py:56
 msgid "Użyty wskaźnik (Jednostka)"
 msgstr "Used indicator (Unit)"
 
-#: emissions/models.py:63
 msgid "Użyty przelicznik jednostek (Wartość)"
 msgstr "Used unit converter (Value)"
 
-#: emissions/models.py:70
 msgid "Użyty przelicznik jednostek (Jednostka)"
 msgstr "Used unit converter (Unit)"
 
-#: emissions/models.py:82
 msgid "Paliwo"
 msgstr "Fuel"
 
-#: emissions/models.py:196
 msgid "Kraj"
 msgstr "Country"
 
-#: emissions/views.py:248
 msgid "Zużycie energii"
 msgstr "Energy consumption"
 
-#: emissions/views.py:281
 msgid "Zakupiona energia"
 msgstr "Purchased energy"
 
-#: emissions/views.py:313
 msgid "Wyprodukowana energia"
 msgstr "Produced energy"
 
-#: emissions/views.py:345
 msgid "Sprzedana energia"
 msgstr "Sold energy"
 
-#: templates/accounts/logged_out.html:7
-msgid "Wylogowano"
-msgstr "Logged out"
-
-#: templates/accounts/logged_out.html:43
-msgid "Pomyślnie wylogowano"
-msgstr "Successfully logged out"
-
-#: templates/accounts/logged_out.html:47
-msgid "Dziękujemy za Twoją pracę w systemie. Twoja sesja została bezpiecznie zakończona."
-msgstr "Thank you for your work in the system. Your session has been securely terminated."
-
-#: templates/accounts/logged_out.html:53
-msgid "Zaloguj się ponownie"
-msgstr "Log in again"
-
-#: templates/accounts/logged_out.html:62
-msgid "Pomoc techniczna"
-msgstr "Technical support"
-
-#: templates/accounts/profile.html:22
-msgid "Profil Użytkownika"
-msgstr "User Profile"
-
-#: templates/accounts/profile.html:25
-msgid "Przegląd danych i uprawnień systemowych."
-msgstr "Overview of data and system permissions."
-
-#: templates/accounts/profile.html:31
-msgid "Dane systemowe"
-msgstr "System data"
-
-#: templates/accounts/profile.html:45
-msgid "Nazwa użytkownika"
-msgstr "Username"
-
-#: templates/accounts/profile.html:49
-msgid "E-mail"
-msgstr "Email"
-
-#: templates/accounts/profile.html:53
-msgid "Imię i Nazwisko"
-msgstr "Full name"
-
-#: templates/accounts/profile.html:57
-msgid "Brak danych"
-msgstr "No data"
-
-#: templates/accounts/profile.html:61
-msgid "Telefon"
-msgstr "Phone"
-
-#: templates/accounts/profile.html:65
-msgid "Rola systemowa"
-msgstr "System role"
-
-#: templates/accounts/profile.html:69
-msgid "W systemie od"
-msgstr "Member since"
-
-#: templates/accounts/profile.html:75
-msgid "Edytuj dane"
-msgstr "Edit data"
-
-#: templates/accounts/profile.html:82
-msgid "Zasięg operacyjny"
-msgstr "Operational scope"
-
-#: templates/accounts/profile.html:87
-msgid "TRYB GLOBALNY:"
-msgstr "GLOBAL MODE:"
-
-#: templates/accounts/profile.html:88
-msgid "Administrator — pełny dostęp do wszystkich spółek."
-msgstr "Administrator — full access to all companies."
-
-#: templates/accounts/profile.html:95
-msgid "Brak zarejestrowanych spółek."
-msgstr "No registered companies."
-
-#: templates/accounts/profile.html:105
-msgid "Odczyt"
-msgstr "Read"
-
-#: templates/accounts/profile.html:108
-msgid "Zapis"
-msgstr "Write"
-
-#: templates/accounts/profile.html:111
-msgid "Brak uprawnień"
-msgstr "No permissions"
-
-#: templates/accounts/profile.html:116
-msgid "Brak przypisanych spółek."
-msgstr "No assigned companies."
-
-#: templates/accounts/profile.html:122
-msgid "Strefa bezpieczeństwa"
-msgstr "Security zone"
-
-#: templates/accounts/profile.html:124
-msgid "Zarządzaj swoimi danymi dostępowymi. Działania w tej strefie mogą być nieodwracalne."
-msgstr "Manage your access data. Actions in this zone may be irreversible."
-
-#: templates/accounts/profile.html:128
-msgid "Zmiana hasła"
-msgstr "Change password"
-
-#: templates/accounts/profile.html:132
-msgid "Usuń konto i dane"
-msgstr "Delete account and data"
-
-#: templates/accounts/profile_edit.html:9
-msgid "Edycja Profilu"
-msgstr "Edit Profile"
-
-#: templates/accounts/profile_edit.html:17
-msgid "Wróć do profilu"
-msgstr "Back to profile"
-
-#: templates/accounts/profile_edit.html:23
-msgid "Modyfikacja danych osobowych konta."
-msgstr "Modify personal account data."
-
-#: templates/accounts/profile_edit.html:47
-msgid "Anuluj"
-msgstr "Cancel"
-
-#: templates/accounts/profile_edit.html:53
-msgid "Zapisz zmiany"
-msgstr "Save changes"
-
-#: templates/companies/companies_list.html:7
-msgid "Lista Spółek"
-msgstr "Company List"
-
-#: templates/companies/companies_list.html:14
-msgid "Zarządzanie przedsiębiorstwami w systemie Emission Impossible."
-msgstr "Managing companies in the Emission Impossible system."
-
-#: templates/companies/companies_list.html:19
-msgid "Dodaj spółkę"
-msgstr "Add company"
-
-#: templates/companies/companies_list.html:27
-msgid "Nazwa"
-msgstr "Name"
-
-#: templates/companies/companies_list.html:28
-msgid "NIP"
-msgstr "Tax ID"
-
-#: templates/companies/companies_list.html:29
-msgid "Miasto"
-msgstr "City"
-
-#: templates/companies/companies_list.html:31
-msgid "Akcje"
-msgstr "Actions"
-
-#: templates/companies/companies_list.html:48
-msgid "Brak spółek w systemie."
-msgstr "No companies in the system."
-
-#: templates/companies/companies_detail.html:10
-msgid "Wróć do listy"
-msgstr "Back to list"
-
-#: templates/companies/companies_detail.html:20
-msgid "Edytuj"
-msgstr "Edit"
-
-#: templates/companies/companies_detail.html:26
-msgid "Kalkulator emisji"
-msgstr "Emissions calculator"
-
-#: templates/companies/companies_detail.html:33
-msgid "Dane podstawowe"
-msgstr "Basic data"
-
-#: templates/companies/companies_detail.html:36
-msgid "REGON"
-msgstr "REGON"
-
-#: templates/companies/companies_detail.html:40
-msgid "Sektor"
-msgstr "Sector"
-
-#: templates/companies/companies_detail.html:44
-msgid "Rok bazowy"
-msgstr "Base year"
-
-#: templates/companies/companies_detail.html:49
-msgid "Adres"
-msgstr "Address"
-
-#: templates/companies/companies_detail.html:52
-msgid "Ulica"
-msgstr "Street"
-
-#: templates/companies/companies_detail.html:60
-msgid "Kod pocztowy"
-msgstr "Postal code"
-
-#: templates/companies/companies_form.html:7
-msgid "Spółka"
-msgstr "Company"
-
-#: templates/companies/companies_form.html:22
-msgid "Edytuj spółkę"
-msgstr "Edit company"
-
-#: templates/companies/companies_form.html:22
-msgid "Nowa spółka"
-msgstr "New company"
-
-#: templates/companies/companies_form.html:47
-msgid "Zapisz"
-msgstr "Save"
-
-#: templates/emissions/dashboard.html:7
-msgid "Kalkulator Emisji"
-msgstr "Emissions Calculator"
-
-#: templates/emissions/dashboard.html:14
-msgid "Wróć do listy firm"
-msgstr "Back to company list"
-
-#: templates/emissions/dashboard.html:22
-msgid "Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla wybranej firmy."
-msgstr "Select a category to add a new entry to the greenhouse gas registry for the selected company."
-
-#: templates/emissions/dashboard.html:28
-msgid "Emisje bezpośrednie"
-msgstr "Direct emissions"
-
-#: templates/emissions/dashboard.html:33
-msgid "Spalanie stacjonarne"
-msgstr "Stationary emissions"
-
-#: templates/emissions/dashboard.html:34
-msgid "Kotły, piece, generatory"
-msgstr "Boilers, furnaces, generators"
-
-#: templates/emissions/dashboard.html:40
-msgid "Spalanie mobilne"
-msgstr "Mobile emissions"
-
-#: templates/emissions/dashboard.html:41
-msgid "Pojazdy, flota transportowa"
-msgstr "Vehicles, transport fleet"
-
-#: templates/emissions/dashboard.html:47
-msgid "Emisje procesowe"
-msgstr "Process emissions"
-
-#: templates/emissions/dashboard.html:48
-msgid "Procesy technologiczne"
-msgstr "Technological processes"
-
-#: templates/emissions/dashboard.html:54
-msgid "Emisje niezorganizowane"
-msgstr "Fugitive emissions"
-
-#: templates/emissions/dashboard.html:55
-msgid "Wycieki czynników chłodniczych"
-msgstr "Refrigerant leaks"
-
-#: templates/emissions/dashboard.html:61
-msgid "Emisje pośrednie energetyczne"
-msgstr "Indirect energy emissions"
-
-#: templates/emissions/dashboard.html:67
-msgid "Energia z sieci zewnętrznej"
-msgstr "Energy from external grid"
-
-#: templates/emissions/dashboard.html:74
-msgid "Fotowoltaika, własne źródła"
-msgstr "Photovoltaics, own sources"
-
-#: templates/emissions/dashboard.html:81
-msgid "Odprzedaż nadwyżek do sieci"
-msgstr "Selling surplus to the grid"
-
-#: templates/emissions/dashboard.html:87
-msgid "Całkowite zużycie"
-msgstr "Total consumption"
-
-#: templates/emissions/dashboard.html:88
-msgid "Zbiorcze raportowanie"
-msgstr "Aggregate reporting"
-
-#: templates/emissions/scope1_list.html:7
-msgid "Lista emisji"
-msgstr "Emissions list"
-
-#: templates/emissions/scope1_list.html:14
-msgid "Wróć"
-msgstr "Back"
-
-#: templates/emissions/scope1_list.html:22
-msgid "Import"
-msgstr "Import"
-
-#: templates/emissions/scope1_list.html:28
-msgid "Dodaj"
-msgstr "Year"
-
-#: templates/emissions/scope1_list.html:36
-msgid "Kategoria"
-msgstr "Category"
-
-#: templates/emissions/scope1_list.html:39
-msgid "Emisja CO₂e"
-msgstr "CO₂e emission"
-
-#: templates/emissions/scope1_list.html:40
-msgid "Status"
-msgstr "Status"
-
-#: templates/emissions/scope1_list.html:55
-msgid "Brak rekordów."
-msgstr "No records."
-
-#: templates/home.html:17
 msgid "Panel startowy"
 msgstr "Dashboard"
 
-#: templates/home.html:22
 msgid "Witaj"
 msgstr "Welcome"
 
-#: templates/home.html:24
 msgid "ESG Dashboard: Podsumowanie i przegląd Twoich zadań"
 msgstr "ESG Dashboard: Summary and overview of your tasks"
 
-#: templates/home.html:29
 msgid "Cele Redukcyjne"
 msgstr "Reduction Targets"
 
-#: templates/home.html:63
 msgid "Emisja (obecna):"
 msgstr "Current emission:"
 
-#: templates/home.html:67
 msgid "Cel"
 msgstr "Target"
 
-#: templates/home.html:83
 msgid "Oczekujące Zadania"
 msgstr "Pending Tasks"
 
-#: templates/home.html:93
 msgid "Termin"
 msgstr "Deadline"
 
-#: templates/home.html:98
 msgid "ZWIŃ/ROZWIŃ LISTĘ"
 msgstr "COLLAPSE/EXPAND LIST"
 
-#: templates/home.html:105
 msgid "Dotyczy spółek"
 msgstr "Applies to companies"
 
-#: templates/home.html:120
 msgid "Szczegóły dla"
 msgstr "Details for"
 
-#: templates/home.html:129
 msgid "Szczegóły"
+msgstr "Details"
+
+msgid "Edytuj"
 msgstr "Edit"
 
-#: templates/home.html:145
 msgid "Brak odrzuconych rekordów w tej kategorii."
 msgstr "No rejected records in this category."
 
-#: templates/home.html:155
 msgid "Wszystko gotowe!"
 msgstr "All done!"
 
-#: templates/home.html:156
 msgid "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania."
 msgstr "You currently have no rejected records or tasks to complete."
 
-#: templates/home.html:162
 msgid "Ulubione Akcje"
 msgstr "Favourite Actions"
 
-#: templates/home.html:171
 msgid "Brak ulubionych akcji."
 msgstr "No favourite actions."
 
-#: templates/home.html:212
 msgid "Zakres 1"
 msgstr "Scope 1"
 
-#: templates/home.html:213
 msgid "Zakres 2"
 msgstr "Scope 2"
 
-#: templates/home.html:216
 msgid "POKAŻ LISTĘ"
 msgstr "SHOW LIST"
 
-#: templates/home.html:216
 msgid "ZWIŃ LISTĘ"
 msgstr "COLLAPSE LIST"
 
-#: templates/registration/login.html:4
 msgid "Zaloguj się"
 msgstr "Log in"
 
-#: templates/registration/login.html:78
 msgid "Zaloguj się do systemu"
 msgstr "Log in to the system"
 
-#: templates/registration/login.html:86
 msgid "Nazwa użytkownika lub hasło są nieprawidłowe."
 msgstr "Invalid username or password."
 
-#: templates/registration/login.html:100
 msgid "Hasło"
 msgstr "Password"
 
-#: templates/registration/login.html:102
 msgid "Zapomniałeś hasła?"
 msgstr "Forgot your password?"
 
-#: templates/registration/login.html:114
 msgid "Zapamiętaj mnie"
 msgstr "Remember me"
 
-#: templates/registration/login.html:133
 msgid "Polityka prywatności"
 msgstr "Privacy policy"
 
-#: templates/registration/login.html:135
 msgid "Kontakt z administratorem"
 msgstr "Contact administrator"
 
-#: theme/templates/base.html:56
+msgid "Profil Użytkownika"
+msgstr "User Profile"
+
+msgid "Przegląd danych i uprawnień systemowych."
+msgstr "Overview of data and system permissions."
+
+msgid "Dane systemowe"
+msgstr "System data"
+
+msgid "Nazwa użytkownika"
+msgstr "Username"
+
+msgid "E-mail"
+msgstr "Email"
+
+msgid "Imię i Nazwisko"
+msgstr "Full name"
+
+msgid "Brak danych"
+msgstr "No data"
+
+msgid "Telefon"
+msgstr "Phone"
+
+msgid "Rola systemowa"
+msgstr "System role"
+
+msgid "W systemie od"
+msgstr "Member since"
+
+msgid "Edytuj dane"
+msgstr "Edit data"
+
+msgid "Zasięg operacyjny"
+msgstr "Operational scope"
+
+msgid "TRYB GLOBALNY:"
+msgstr "GLOBAL MODE:"
+
+msgid "Administrator — pełny dostęp do wszystkich spółek."
+msgstr "Administrator — full access to all companies."
+
+msgid "Brak zarejestrowanych spółek."
+msgstr "No registered companies."
+
+msgid "Odczyt"
+msgstr "Read"
+
+msgid "Zapis"
+msgstr "Write"
+
+msgid "Brak uprawnień"
+msgstr "No permissions"
+
+msgid "Brak przypisanych spółek."
+msgstr "No assigned companies."
+
+msgid "Strefa bezpieczeństwa"
+msgstr "Security zone"
+
+msgid "Zarządzaj swoimi danymi dostępowymi. Działania w tej strefie mogą być nieodwracalne."
+msgstr "Manage your access data. Actions in this zone may be irreversible."
+
+msgid "Zmiana hasła"
+msgstr "Change password"
+
+msgid "Usuń konto i dane"
+msgstr "Delete account and data"
+
 msgid "Panel Administratora"
 msgstr "Admin Panel"
 
-#: theme/templates/base.html:72
 msgid "Użytkownik"
 msgstr "User"
 
-#: theme/templates/base.html:100
 msgid "Wyloguj"
 msgstr "Log out"
 
-#: theme/templates/base.html:117
-msgid "Więcej"
-msgstr "More"
+msgid "Wszelkie prawa zastrzeżone."
+msgstr "All rights reserved."
 
-#: theme/templates/base.html:181
 msgid "Nawigacja"
 msgstr "Navigation"
 
-#: theme/templates/base.html:177
-msgid "Wszelkie prawa zastrzeżone."
-msgstr "All rights reserved."
+msgid "Więcej"
+msgstr "More"
+
+msgid "Wylogowano"
+msgstr "Logged out"
+
+msgid "Pomyślnie wylogowano"
+msgstr "Successfully logged out"
+
+msgid "Dziękujemy za Twoją pracę w systemie. Twoja sesja została bezpiecznie zakończona."
+msgstr "Thank you for your work in the system. Your session has been securely terminated."
+
+msgid "Zaloguj się ponownie"
+msgstr "Log in again"
+
+msgid "Pomoc techniczna"
+msgstr "Technical support"
+
+msgid "Wróć do profilu"
+msgstr "Back to profile"
+
+msgid "Edycja Profilu"
+msgstr "Edit Profile"
+
+msgid "Modyfikacja danych osobowych konta."
+msgstr "Modify personal account data."
+
+msgid "Anuluj"
+msgstr "Cancel"
+
+msgid "Zapisz zmiany"
+msgstr "Save changes"
+
+msgid "Lista Spółek"
+msgstr "Company List"
+
+msgid "Zarządzanie przedsiębiorstwami w systemie Emission Impossible."
+msgstr "Managing companies in the Emission Impossible system."
+
+msgid "Dodaj spółkę"
+msgstr "Add company"
+
+msgid "Nazwa"
+msgstr "Name"
+
+msgid "NIP"
+msgstr "Tax ID"
+
+msgid "Miasto"
+msgstr "City"
+
+msgid "Akcje"
+msgstr "Actions"
+
+msgid "Brak spółek w systemie."
+msgstr "No companies in the system."
+
+msgid "Wróć do listy"
+msgstr "Back to list"
+
+msgid "Kalkulator emisji"
+msgstr "Emissions calculator"
+
+msgid "Dane podstawowe"
+msgstr "Basic data"
+
+msgid "REGON"
+msgstr "REGON"
+
+msgid "Sektor"
+msgstr "Sector"
+
+msgid "Rok bazowy"
+msgstr "Base year"
+
+msgid "Adres"
+msgstr "Address"
+
+msgid "Ulica"
+msgstr "Street"
+
+msgid "Kod pocztowy"
+msgstr "Postal code"
+
+msgid "Spółka"
+msgstr "Company"
+
+msgid "Edytuj spółkę"
+msgstr "Edit company"
+
+msgid "Nowa spółka"
+msgstr "New company"
+
+msgid "Zapisz"
+msgstr "Save"
+
+msgid "Kalkulator Emisji"
+msgstr "Emissions Calculator"
+
+msgid "Wróć do listy firm"
+msgstr "Back to company list"
+
+msgid "Wybierz kategorię, aby dodać nowy wpis do rejestru gazów cieplarnianych dla wybranej firmy."
+msgstr "Select a category to add a new entry to the greenhouse gas registry for the selected company."
+
+msgid "Emisje bezpośrednie"
+msgstr "Direct emissions"
+
+msgid "Spalanie stacjonarne"
+msgstr "Stationary combustion"
+
+msgid "Kotły, piece, generatory"
+msgstr "Boilers, furnaces, generators"
+
+msgid "Spalanie mobilne"
+msgstr "Vehicle Fleet Emissions"
+
+msgid "Pojazdy, flota transportowa"
+msgstr "Vehicles, transport fleet"
+
+msgid "Emisje procesowe"
+msgstr "Process emissions"
+
+msgid "Procesy technologiczne"
+msgstr "Technological processes"
+
+msgid "Emisje niezorganizowane"
+msgstr "Uncontrolled Emissions"
+
+msgid "Wycieki czynników chłodniczych"
+msgstr "Refrigerant leaks"
+
+msgid "Emisje pośrednie energetyczne"
+msgstr "Indirect energy emissions"
+
+msgid "Energia z sieci zewnętrznej"
+msgstr "Energy from external grid"
+
+msgid "Wyprodukowana"
+msgstr "Produced"
+
+msgid "Fotowoltaika, własne źródła"
+msgstr "Photovoltaics, own sources"
+
+msgid "Odprzedaż nadwyżek do sieci"
+msgstr "Selling surplus to the grid"
+
+msgid "Całkowite zużycie"
+msgstr "Total consumption"
+
+msgid "Zbiorcze raportowanie"
+msgstr "Aggregate reporting"
+
+msgid "Lista emisji"
+msgstr "Emissions list"
+
+msgid "Wróć"
+msgstr "Back"
+
+msgid "Import"
+msgstr "Import"
+
+msgid "Dodaj"
+msgstr "Add"
+
+msgid "Kategoria"
+msgstr "Category"
+
+msgid "Emisja CO₂e"
+msgstr "CO₂e emission"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Brak rekordów."
+msgstr "No records."
+
+msgid "Import danych"
+msgstr "Data import"
+
+msgid "Import danych emisji"
+msgstr "Emissions data import"
+
+msgid "Wczytaj plik XLSX z danymi emisji. System zweryfikuje i wyświetli podgląd przed zapisem."
+msgstr "Load an XLSX file with emissions data. The system will verify and show a preview before saving."
+
+msgid "Obsługiwane formaty:"
+msgstr "Supported formats:"
+
+msgid "Szablon importu"
+msgstr "Import template"
+
+msgid "Pobierz szablon XLSX"
+msgstr "Download XLSX template"
+
+msgid "Wczytaj i sprawdź poprawność"
+msgstr "Load and verify"
+
+msgid "Podgląd danych"
+msgstr "Data preview"
+
+msgid "Znaleziono"
+msgstr "Found"
+
+msgid "rekordów"
+msgstr "records"
+
+msgid "Duplikat"
+msgstr "Duplicate"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "rekordów gotowych do importu"
+msgstr "records ready to import"
+
+msgid "duplikatów zostanie pominiętych"
+msgstr "duplicates will be skipped"
+
+msgid "Importuj"
+msgstr "Import"
+
