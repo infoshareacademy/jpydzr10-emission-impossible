@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "channels",
     "accounts.apps.AccountsConfig",
     "core.apps.CoreConfig",
     "django.contrib.admin",
@@ -57,6 +59,14 @@ INSTALLED_APPS = [
     "audit.apps.AuditConfig",
     "workflow.apps.WorkflowConfig",
 ]
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 SITE_ID = 1
 
