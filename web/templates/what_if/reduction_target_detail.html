@@ -48,8 +48,17 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('realizationChart').getContext('2d');
+    (function() {
+        const canvasId = 'realizationChart';
+        const canvasEl = document.getElementById(canvasId);
+
+        if (!canvasEl) return;
+
+        const existingChart = Chart.getChart(canvasId);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+        const ctx = canvasEl.getContext('2d');
         const years = {{ chart_years|safe }};
         const actualEmissions = {{ chart_actual|safe }};
         const targetLine = {{ chart_target_line|safe }};
@@ -101,6 +110,6 @@
                 }
             }
         });
-    });
+    })();
 </script>
 {% endblock %}
