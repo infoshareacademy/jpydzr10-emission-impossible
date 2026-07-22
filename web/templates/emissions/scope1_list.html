@@ -263,15 +263,12 @@
   </div>
   {% endif %}
 </div>
-<!-- Backdrop i Modal -->
 <div id="clarificationModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-  <!-- Tło -->
   <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
 
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 
-      <!-- Panel Modala -->
       <div class="relative transform overflow-hidden rounded-2xl border border-border-subtle text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" style="background: #111720;">
 
         <form id="clarificationForm" onsubmit="submitClarification(event)">
@@ -286,8 +283,6 @@
                   <p class="text-sm font-mono text-text-muted mb-3">
                     Wprowadź szczegółowe uwagi. Użytkownik otrzyma powiadomienie i będzie musiał zaktualizować dane.
                   </p>
-
-                  <!-- Ukryte pola na dane rekordu -->
                   <input type="hidden" id="modalSubmitUrl" name="submit_url">
 
                   <textarea
@@ -341,19 +336,19 @@
 
 {% block extra_scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('clarificationModal');
-    const form = document.getElementById('clarificationForm');
-    const submitBtn = document.getElementById('submitClarificationBtn');
-
-    // 1. Otwieranie modala (Event Delegation)
+  (function() {
+    if (window.clarificationEventsBound) return;
+    window.clarificationEventsBound = true;
+    window.closeClarificationModal = function() {
+      const modal = document.getElementById('clarificationModal');
+      if (modal) modal.classList.add('hidden');
+    };
     document.body.addEventListener('click', function(e) {
       const btn = e.target.closest('.js-open-clarification');
       if (!btn) return;
-
-      // Pobieramy wygenerowany w Django URL i wrzucamy do hidden inputa
+      const modal = document.getElementById('clarificationModal');
+      if (!modal) return;
       document.getElementById('modalSubmitUrl').value = btn.dataset.url;
-
       document.getElementById('modalMessage').value = '';
       document.getElementById('modalDeadline').value = '';
 
@@ -361,26 +356,27 @@
       document.getElementById('modalMessage').focus();
     });
 
-    // 2. Zamykanie modala
-    function closeClarificationModal() {
-      modal.classList.add('hidden');
-    }
-
-    modal.addEventListener('click', function(event) {
-      if (event.target === modal.children[0]) closeClarificationModal();
-    });
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+    document.body.addEventListener('click', function(event) {
+      const modal = document.getElementById('clarificationModal');
+      if (modal && !modal.classList.contains('hidden') && event.target === modal.children[0]) {
         closeClarificationModal();
       }
     });
 
-    // 3. Wysyłanie formularza
-    form.addEventListener('submit', async function(event) {
+    document.addEventListener('keydown', function(event) {
+      const modal = document.getElementById('clarificationModal');
+      if (event.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        closeClarificationModal();
+      }
+    });
+
+    document.body.addEventListener('submit', async function(event) {
+      const form = document.getElementById('clarificationForm');
+      if (!form || event.target !== form) return;
+
       event.preventDefault();
 
-      // Odczytujemy bezpieczny URL z ukrytego pola
+      const submitBtn = document.getElementById('submitClarificationBtn');
       const targetUrl = document.getElementById('modalSubmitUrl').value;
       const message = document.getElementById('modalMessage').value;
       const deadline = document.getElementById('modalDeadline').value;
@@ -406,19 +402,19 @@
           window.location.reload();
         } else {
           alert(`Błąd: ${data.message}`);
-          resetSubmitButton();
+          resetSubmitButton(submitBtn);
         }
       } catch (error) {
         console.error("Error:", error);
         alert("Wystąpił błąd krytyczny podczas łączenia z serwerem.");
-        resetSubmitButton();
+        resetSubmitButton(submitBtn);
       }
     });
 
-    function resetSubmitButton() {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'Wyślij uwagi';
+    function resetSubmitButton(btn) {
+      btn.disabled = false;
+      btn.innerHTML = 'Wyślij uwagi';
     }
-  });
+  })();
 </script>
 {% endblock %}
