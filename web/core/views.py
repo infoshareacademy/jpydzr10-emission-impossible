@@ -1,8 +1,12 @@
-from decimal import Decimal
+import json
+from collections import defaultdict
+from datetime import date
 
 from companies.models import Companies
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.views.generic import TemplateView
 from emissions.models import (
@@ -98,12 +102,49 @@ class HomeView(LoginRequiredMixin, TemplateView):
             allowed_companies = Companies.objects.filter(
                 user_permissions__user=user, user_permissions__can_read=True
             ).distinct()
+        emissions_by_year = defaultdict(lambda: {"scope1": 0.0, "scope2": 0.0})
+        scope1_models = [
+            MobileCombustion,
+            StationaryCombustion,
+            ProcessEmission,
+            FugitiveEmission,
+        ]
+
+        for model in scope1_models:
+            qs = (
+                model.objects.filter(company__in=allowed_companies)
+                .values("year")
+                .annotate(total=Sum("emission_tco2eq"))
+            )
+            for row in qs:
+                if row["year"]:
+                    emissions_by_year[row["year"]]["scope1"] += float(row["total"] or 0)
+
+        qs_scope2 = (
+            EnergyConsumption.objects.filter(company__in=allowed_companies)
+            .values("year")
+            .annotate(total=Sum("emission_tco2eq"))
+        )
+        for row in qs_scope2:
+            if row["year"]:
+                emissions_by_year[row["year"]]["scope2"] += float(row["total"] or 0)
+
+        available_years = sorted(list(emissions_by_year.keys()))
+        current_year = available_years[-1] if available_years else date.today().year
+
+        if current_year not in emissions_by_year:
+            emissions_by_year[current_year] = {"scope1": 0.0, "scope2": 0.0}
+
+        context["emissions_data_json"] = json.dumps(
+            emissions_by_year, cls=DjangoJSONEncoder
+        )
+        context["available_years_json"] = json.dumps(available_years)
+        context["initial_year"] = current_year
 
         targets = ReductionTarget.objects.filter(
             company__in=allowed_companies
         ).select_related("company", "goal")
 
-        # Przygotowanie danych dla każdego celu
         for target in targets:
             target.chart_data = self.get_target_chart_data(target)
 

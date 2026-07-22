@@ -4,9 +4,11 @@
 {% block title %}Zaloguj się — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
 <style>
   nav, footer { display: none !important; }
-
 .login-bg {
     background-image: url("{% static 'images/login-bg.png' %}");
     background-size: cover;
@@ -14,7 +16,6 @@
     background-repeat: no-repeat;
     background-color: #51a49a;
   }
-
  .login-input {
     background: rgba(255,255,255,0.8) !important;
     border: 1px solid rgba(200,245,53,0.4) !important;
@@ -60,10 +61,6 @@
     transform: translate(-50%, -50%) !important;
   }
 </style>
-{% endblock %}
-
-{% block content %}
-<!-- Logo top left -->
 <div class="fixed z-50" style="top: 50px; left: 50px;">
   <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:90px;"/>
 </div>
@@ -71,17 +68,11 @@
 <div class="fixed inset-0 flex items-center justify-center login-bg p-4">
 
   <div class="w-full max-w-xl flex flex-col gap-4 items-center">
-
-    <!-- Login panel -->
-
-    <!-- Login panel -->
     <div class="w-full border rounded-[28px] p-8 md:p-10 shadow-2xl"
       style="background:rgba(255,255,255,0.45); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-color:rgba(255,255,255,0.6);">
-
       <h2 class="text-2xl font-semibold text-center mb-8 tracking-wide" style="color:#1a4a52;">
         Zaloguj się do systemu
       </h2>
-
       <form method="post" action="" class="space-y-5">
         {% csrf_token %}
 
@@ -90,8 +81,6 @@
           Nazwa użytkownika lub hasło są nieprawidłowe.
         </div>
         {% endif %}
-
-        <!-- Email -->
         <div class="flex flex-col gap-2">
           <label for="id_username" class="text-sm font-medium pl-1" style="color:#1a4a52;">Email</label>
           <input type="text" name="username" id="id_username"
@@ -99,8 +88,6 @@
             autofocus autocapitalize="none" autocomplete="username" maxlength="150" required
             class="login-input w-full text-sm px-4 py-3"/>
         </div>
-
-        <!-- Password -->
         <div class="flex flex-col gap-2">
           <div class="flex justify-between items-center pl-1">
             <label for="id_password" class="text-sm font-medium" style="color:#1a4a52;">Hasło</label>
@@ -113,16 +100,12 @@
             autocomplete="current-password" required
             class="login-input w-full text-sm px-4 py-3"/>
         </div>
-
-        <!-- Remember me -->
         <div class="flex items-center gap-3 pl-1">
           <input type="checkbox" name="remember_me" id="id_remember_me" class="w-4 h-4 rounded cursor-pointer"/>
           <label for="id_remember_me" class="text-sm cursor-pointer select-none" style="color:#1a4a52;">
             Zapamiętaj mnie
           </label>
         </div>
-
-        <!-- Submit -->
         <div class="pt-2">
           <button type="submit"
             class="w-full font-medium py-3.5 rounded-full transition-all duration-200 shadow-md tracking-wide text-sm text-white cursor-pointer"
@@ -132,17 +115,13 @@
             Zaloguj się
           </button>
         </div>
-
         <input type="hidden" name="next" value="{{ next }}"/>
       </form>
-
-      <!-- Footer links -->
       <div class="flex justify-center items-center gap-6 mt-6 text-xs font-medium" style="color:rgba(26,74,82,0.8);">
         <a href="{% url 'privacy-policy' %}" class="hover:underline">Polityka prywatności</a>
         <span style="color:rgba(255,255,255,0.4);">|</span>
         <a href="mailto:admin@emissionimpossible.pl" class="hover:underline">Kontakt z administratorem</a>
       </div>
-
     </div>
   </div>
 </div>

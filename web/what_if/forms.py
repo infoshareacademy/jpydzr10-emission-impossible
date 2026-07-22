@@ -38,7 +38,6 @@ class SimulationForm(forms.Form):
         empty_label="-- Cała organizacja (Wszystkie spółki) --",
         label="Spółka do symulacji",
     )
-
     current_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,
@@ -53,7 +52,6 @@ class SimulationForm(forms.Form):
         label="Ilość redukowana",
         help_text="Ilość zużycia, którą usuwasz z bilansu.",
     )
-
     new_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,

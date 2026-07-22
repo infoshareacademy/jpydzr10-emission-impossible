@@ -3,6 +3,9 @@
 {% block title %}Nowe Zapytanie — Komunikacja{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     input, select, textarea {
       background: rgba(255,255,255,0.04) !important;
@@ -22,14 +25,7 @@
     select option { background: #151c27; color: #e8f4f0; }
     textarea { min-height: 140px; resize: vertical; }
   </style>
-{% endblock %}
-
-{% block content %}
   <div class="max-w-3xl mx-auto">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="mb-8">
       <a href="{% url 'communications:thread_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
@@ -40,14 +36,9 @@
       </div>
       <p class="font-mono text-sm text-text-muted ml-4 mt-3">Rozpocznij nowy wątek komunikacji dla wybranej spółki.</p>
     </div>
-
-  <!-- ===================== -->
-  <!-- FORM -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <form method="POST">
         {% csrf_token %}
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
             <label class="block font-mono text-xs text-text-muted mb-2 uppercase tracking-wider">Spółka</label>
@@ -59,17 +50,14 @@
             {{ form.category }}
           </div>
         </div>
-
         <div class="mb-6">
           <label class="block font-mono text-xs text-text-muted mb-2 uppercase tracking-wider">Temat zapytania</label>
           {{ form.subject }}
         </div>
-
         <div class="mb-8">
           <label class="block font-mono text-xs text-text-muted mb-2 uppercase tracking-wider">Treść wiadomości</label>
           {{ form.first_message }}
         </div>
-
         <div class="flex justify-end gap-4 border-t border-border-subtle pt-6">
           <a href="{% url 'communications:thread_list' %}"
              class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">

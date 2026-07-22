@@ -2,7 +2,6 @@
 {% block title %}Użytkownicy i uprawnienia | Emission Impossible{% endblock %}
 
 {% block content %}
-<!-- PRZENIESIONO STYLE DO BODY ABY HTMX JE ZOBACZYŁ -->
 <style>
   .role-badge-admin    { background: rgba(200,245,53,.18); color:#c8f535; border:1px solid rgba(200,245,53,.4); }
   .role-badge-audytor  { background: rgba(100,200,240,.18); color:#6ac8e8; border:1px solid rgba(100,200,240,.35); }
@@ -42,8 +41,6 @@
   .stat-chip { background:rgba(17,23,32,0.6); border:1px solid #2a3f4a;
                border-radius:999px; padding:4px 12px; font-size:12px; }
 </style>
-
-<!-- Confirm modal -->
 <div id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-box">
     <div class="flex items-start gap-3 mb-5">
@@ -68,10 +65,6 @@
     </div>
   </div>
 </div>
-
-<!-- ===================== -->
-<!-- HEADER -->
-<!-- ===================== -->
 <div class="mb-8 space-y-4">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div class="flex items-center gap-3">
@@ -87,9 +80,7 @@
     </a>
     {% endif %}
   </div>
-
   <p class="font-mono text-sm text-text-muted">Zarządzanie dostępem do spółek w systemie Emission Impossible.</p>
-
   <div class="flex flex-wrap gap-2">
     <span class="stat-chip font-mono text-text-muted">
       <span class="text-text-main font-bold">{{ total_companies }}</span> spółek
@@ -101,7 +92,6 @@
       <span style="color:#c8f535;" class="font-bold">{{ admin_count }}</span> adminów
     </span>
   </div>
-
   <div class="relative max-w-sm">
     <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left:12px;font-size:18px;">search</span>
     <input id="global-search" type="text" placeholder="Szukaj użytkownika lub spółki..."
@@ -109,10 +99,6 @@
       style="background:rgba(255,255,255,.06); border:1px solid #2a3f4a;">
   </div>
 </div>
-
-<!-- ===================== -->
-<!-- ADMINS -->
-<!-- ===================== -->
 <section class="mb-10" id="section-admins">
   <div class="flex items-center gap-3 mb-4">
     <span class="material-symbols-outlined" style="font-size:20px;color:#c8f535;">shield_person</span>
@@ -122,7 +108,6 @@
       Pełny dostęp do wszystkich danych
     </span>
   </div>
-
   {% if admins %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
     {% for admin in admins %}
@@ -154,12 +139,7 @@
   <p class="font-mono text-sm text-text-muted italic">Brak zdefiniowanych administratorów systemu.</p>
   {% endif %}
 </section>
-
 <div style="height:1px;background:linear-gradient(to right,rgba(122,181,174,.3),transparent);margin-bottom:2.5rem;"></div>
-
-<!-- ===================== -->
-<!-- COMPANIES -->
-<!-- ===================== -->
 <section>
   <div class="flex items-center justify-between mb-5">
     <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">
@@ -172,12 +152,10 @@
     </p>
     {% endif %}
   </div>
-
   {% if company_data %}
   <div class="space-y-5" id="companies-list">
     {% for item in company_data %}
     <div class="company-card searchable-company" data-company="{{ item.company.name|lower }}">
-
       <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style="border-bottom:1px solid #2a3f4a;">
         <div class="flex items-center gap-3">
@@ -199,7 +177,6 @@
             </div>
           </div>
         </div>
-
         <div class="flex items-center gap-3 flex-shrink-0">
           <span class="font-mono text-xs text-text-muted stat-chip">
             <span class="material-symbols-outlined align-middle" style="font-size:13px">group</span>
@@ -215,7 +192,6 @@
           {% endif %}
         </div>
       </div>
-
       {% if item.permissions %}
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -237,7 +213,6 @@
             {% with u=perm.user %}
             <tr class="user-row searchable-user {% if not u.is_active %}inactive-row{% endif %}"
               data-username="{{ u.username|lower }}" data-fullname="{{ u.get_full_name|lower }}">
-
               <td class="px-5 py-3">
                 <div class="flex items-center gap-2.5">
                   {% if u.role == 'audytor' %}
@@ -251,11 +226,9 @@
                   </div>
                 </div>
               </td>
-
               <td class="px-4 py-3 hidden md:table-cell">
                 <span class="font-mono text-sm text-text-muted">{{ u.get_full_name|default:"—" }}</span>
               </td>
-
               <td class="px-4 py-3">
                 {% if u.role == 'audytor' %}
                 <span class="role-badge-audytor font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">audytor</span>
@@ -263,7 +236,6 @@
                 <span class="role-badge-default font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">{{ u.role|default:"użytkownik" }}</span>
                 {% endif %}
               </td>
-
               <td class="px-4 py-3 hidden lg:table-cell">
                 {% if u.email %}
                 <a href="mailto:{{ u.email }}" class="font-mono text-xs hover:underline flex items-center gap-1" style="color:#7ab5ae;">
@@ -273,7 +245,6 @@
                 <span class="font-mono text-xs text-text-muted opacity-40">—</span>
                 {% endif %}
               </td>
-
               <td class="px-4 py-3 text-center">
                 {% if perm.can_read %}
                 <span class="material-symbols-outlined perm-yes" style="font-size:20px">check_circle</span>
@@ -281,7 +252,6 @@
                 <span class="material-symbols-outlined perm-no" style="font-size:20px">remove_circle</span>
                 {% endif %}
               </td>
-
               <td class="px-4 py-3 text-center">
                 {% if perm.can_save %}
                 <span class="material-symbols-outlined perm-yes" style="font-size:20px">check_circle</span>
@@ -289,7 +259,6 @@
                 <span class="material-symbols-outlined perm-no" style="font-size:20px">remove_circle</span>
                 {% endif %}
               </td>
-
               {% if is_admin %}
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
@@ -318,14 +287,12 @@
                 </div>
               </td>
               {% endif %}
-
             </tr>
             {% endwith %}
             {% endfor %}
           </tbody>
         </table>
       </div>
-
       {% else %}
       <div class="px-5 py-8 text-center">
         <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted" style="font-size:36px;opacity:.3;">group_off</span>
@@ -339,16 +306,13 @@
         {% endif %}
       </div>
       {% endif %}
-
     </div>
     {% endfor %}
   </div>
-
   <div id="no-results" class="hidden text-center py-12">
     <span class="material-symbols-outlined block mx-auto mb-2 text-text-muted" style="font-size:40px;opacity:.25;">search_off</span>
     <p class="font-mono text-sm text-text-muted opacity-50">Brak wyników dla podanej frazy.</p>
   </div>
-
   {% else %}
   <div class="text-center py-16">
     <span class="material-symbols-outlined block mx-auto mb-3 text-text-muted" style="font-size:56px;opacity:.2;">domain_disabled</span>
@@ -360,21 +324,15 @@
     {% endif %}
   </div>
   {% endif %}
-
 </section>
-
 {% endblock %}
-
 {% block extra_scripts %}
 <script>
-// HERMETYZACJA: Zamykamy skrypt w IIFE (Immediately Invoked Function Expression)
 (function() {
     const modal = document.getElementById('confirm-modal');
     const modalMsg = document.getElementById('modal-message');
     const modalTitle = document.getElementById('modal-title');
     const modalForm = document.getElementById('modal-form');
-
-    // EXPOSE: Przypinamy funkcje do obiektu globalnego `window`, aby HTML mógł je wywołać przez `onclick`
     window.openModal = function(title, message, actionUrl) {
       if (!modal) return;
       modalTitle.textContent = title;
@@ -383,14 +341,11 @@
       modal.classList.add('show');
       document.body.style.overflow = 'hidden';
     };
-
     window.closeModal = function() {
       if (!modal) return;
       modal.classList.remove('show');
       document.body.style.overflow = '';
     };
-
-    // DELEGACJA ZDARZEŃ: Podłączamy eventy bezpośrednio na nowo wyrenderowane elementy w DOM
     if (modal) {
         modal.addEventListener('click', function(e) { if (e.target === modal) window.closeModal(); });
     }
@@ -399,7 +354,6 @@
     const searchInput = document.getElementById('global-search');
     const companyCards = document.querySelectorAll('.searchable-company');
     const noResults = document.getElementById('no-results');
-
     if (searchInput) {
         searchInput.addEventListener('input', function() {
           const query = this.value.trim().toLowerCase();

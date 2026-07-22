@@ -4,25 +4,20 @@
 {% block title %}Wylogowano - Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
-    /* Ukrycie nav i footer z base.html dla zachowania pełnoekranowego widoku */
         nav,
         footer {
             display: none !important;
         }
-
-    /* Pełnoekranowe tło spójne z panelem logowania */
         .login-bg {
             background-color: #51a49a;
-        /* Możesz odkomentować linię poniżej, jeśli używasz grafiki tła: */
-        /* background-image: url('{% static "images/login_background.png" %}'); */
             background-size: cover;
             background-position: center;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="fixed inset-0 flex items-center justify-center login-bg p-4 overflow-y-auto">
         <div class="w-full max-w-[530px] bg-white/20 backdrop-blur-md border border-white/30 rounded-[28px] p-8 md:p-12 shadow-xl flex flex-col text-center">
 

@@ -2,12 +2,19 @@
 {% load static %}
 
 {% block title %}
-    {% if form.instance.pk %}Edytuj wpis emisji{% else %}Dodaj wpis emisji{% endif %} - Emission Impossible
+    {% if form.instance.pk %}
+        Edytuj wpis emisji
+    {% else %}
+        Dodaj wpis emisji
+    {% endif %}
+    - Emission Impossible
 {% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
         .custom-form-container input,
         .custom-form-container select,
         .custom-form-container textarea {
@@ -32,8 +39,6 @@
             background: #151c27;
             color: #e8f4f0;
         }
-
-    /* Zabezpieczenie dla potencjalnych checkboxów (np. zgody/statusy) */
         .custom-form-container input[type="checkbox"],
         .custom-form-container input[type="radio"] {
             width: auto !important;
@@ -41,12 +46,7 @@
             cursor: pointer;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-4xl mx-auto">
-
-    {# --- Nagłówek --- #}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <a href="{% url list_url_name company_id %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
@@ -61,8 +61,6 @@
                 </div>
             </div>
         </div>
-
-    {# --- WORKFLOW: RAMKA Z UWAGĄ ADMINISTRATORA (Powyżej formularza) --- #}
         {% if admin_comment %}
             <div class="mb-8 rounded-2xl border border-red-500/50 bg-red-900/20 p-6 backdrop-blur-md shadow-lg">
                 <div class="flex items-center gap-2 text-red-400 font-bold text-xl mb-3">
@@ -76,15 +74,9 @@
                 </p>
             </div>
         {% endif %}
-    {# --- KONIEC SEKCJI WORKFLOW --- #}
-
-
-    {# --- Karta z formularzem --- #}
         <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
             <form method="post" novalidate class="space-y-6">
                 {% csrf_token %}
-
-            {# Grupa pól w układzie siatki #}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for field in form %}
                     {# Warunek rozciągania na dwie kolumny np. dla dłuższych opisów lub uwag #}
@@ -94,8 +86,6 @@
                             </label>
 
                             {{ field }}
-
-                        {# Komunikaty o błędach walidacji pola #}
                             {% if field.errors %}
                                 <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
                                     <span class="material-symbols-outlined text-sm">error</span>
@@ -105,8 +95,6 @@
                         </div>
                     {% endfor %}
                 </div>
-
-            {# --- WORKFLOW: WYMUSZENIE ODPOWIEDZI UŻYTKOWNIKA (Wewnątrz formularza) --- #}
                 {% if admin_comment %}
                     <div class="mt-8 pt-6 border-t border-red-900/50">
                         <div class="flex flex-col gap-2">
@@ -121,10 +109,6 @@
                         </div>
                     </div>
                 {% endif %}
-            {# --- KONIEC SEKCJI WORKFLOW --- #}
-
-
-            {# --- Sekcja przycisków akcji --- #}
                 <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
                     <a href="{% url list_url_name company_id %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
                         Anuluj

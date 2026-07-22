@@ -4,8 +4,6 @@
 
 {% block content %}
   <div class="max-w-4xl mx-auto space-y-8">
-
-  <!-- Messages -->
     {% if messages %}
       <div class="space-y-2">
         {% for message in messages %}
@@ -15,22 +13,12 @@
         {% endfor %}
       </div>
     {% endif %}
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="flex items-center gap-3 mb-1">
       <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
       <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Profil Użytkownika</h1>
     </div>
     <p class="font-mono text-sm text-text-muted mt-3">Przegląd danych i uprawnień systemowych.</p>
-
-  <!-- ===================== -->
-  <!-- MAIN GRID -->
-  <!-- ===================== -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <!-- User data -->
       <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-between"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <div>
@@ -38,15 +26,12 @@
             <span class="material-symbols-outlined text-text-muted">fingerprint</span>
             <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">Dane systemowe</h2>
           </div>
-
-        <!-- Avatar -->
           {% if user.avatar %}
             <div class="flex justify-center mb-6">
               <img src="{{ user.avatar.url }}" alt="avatar"
                    style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid rgba(200,245,53,0.3);"/>
             </div>
           {% endif %}
-
           <ul class="space-y-4 font-mono text-sm mb-6">
             <li class="flex flex-col gap-1">
               <span class="text-text-muted text-xs uppercase tracking-wider">Nazwa użytkownika</span>
@@ -76,7 +61,6 @@
             </li>
           </ul>
         </div>
-
         <div class="pt-4 border-t border-border-subtle">
           <a href="{% url 'accounts:profile_edit' %}"
              class="block w-full text-center py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
@@ -85,15 +69,12 @@
           </a>
         </div>
       </div>
-
-    <!-- Company access -->
       <div class="rounded-2xl border border-border-subtle p-6"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
           <span class="material-symbols-outlined text-text-muted">domain</span>
           <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">Zasięg operacyjny</h2>
         </div>
-
         {% if is_admin_user %}
           <div class="mb-4 p-3 rounded-xl font-mono text-xs flex items-start gap-2"
                style="background:rgba(200,245,53,0.06); border:1px solid rgba(200,245,53,0.2); color:#c8f535;">
@@ -115,7 +96,6 @@
           {% else %}
             <p class="font-mono text-sm text-text-muted text-center p-4 border border-dashed border-border-subtle rounded-xl">Brak zarejestrowanych spółek.</p>
           {% endif %}
-
         {% else %}
           {% if permissions %}
             <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
@@ -143,10 +123,6 @@
         {% endif %}
       </div>
     </div>
-
-  <!-- ===================== -->
-  <!-- SECURITY ZONE -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-red-900/50 p-6" style="background:rgba(42,10,10,0.2);">
       <div class="flex items-center gap-2 mb-4 pb-4 border-b border-red-900/50">
         <span class="material-symbols-outlined text-red-500">warning</span>
@@ -164,6 +140,5 @@
         </a>
       </div>
     </div>
-
   </div>
 {% endblock %}

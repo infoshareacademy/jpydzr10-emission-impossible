@@ -1,9 +1,8 @@
-{% extends "base.html" %} {% block title %}Zarządzanie Spółkami — Emission
-  Impossible{% endblock %} {% block content %}
-
-<!-- ===================== -->
-<!-- HEADER -->
-<!-- ===================== -->
+{% extends "base.html" %}
+{% block title %}
+Zarządzanie Spółkami — Emission Impossible
+{% endblock %}
+{% block content %}
     <div
       class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10"
     >
@@ -36,10 +35,6 @@
           Dodaj spółkę
         </a>
       </div>
-
-<!-- ===================== -->
-<!-- SEARCH -->
-<!-- ===================== -->
       <form method="GET" action="" class="mb-8" id="searchForm">
         <div class="flex flex-col sm:flex-row gap-4 max-w-2xl">
 
@@ -58,7 +53,6 @@
               autocomplete="off"
             />
           </div>
-
           <div class="relative w-full sm:w-36 shrink-0">
             <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left: 12px; font-size: 18px">calendar_month</span>
             <select
@@ -76,20 +70,14 @@
             </select>
             <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" style="right: 12px; font-size: 18px">expand_more</span>
           </div>
-
         </div>
       </form>
-
-<!-- ===================== -->
-<!-- COMPANIES GRID -->
-<!-- ===================== -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for company in companies %}
           <article
             class="rounded-2xl border border-border-subtle p-6 flex flex-col gap-5 transition-all hover:-translate-y-1 hover:border-text-muted relative"
             style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)"
           >
-    <!-- Edit button -->
             <div class="absolute top-4 right-4">
               <a
                 href="{% url 'companies:company-update' company.pk %}"
@@ -101,8 +89,6 @@
                   >
                 </a>
               </div>
-
-    <!-- Company header -->
               <header class="flex items-center gap-4">
                 <div
                   class="w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl"
@@ -131,8 +117,6 @@
                   </span>
                 </div>
               </header>
-
-    <!-- Company info -->
               <div
                 class="rounded-xl border border-border-subtle p-3 space-y-1"
                 style="background: rgba(255, 255, 255, 0.03)"
@@ -148,8 +132,6 @@
                   <span>{{ company.nip|default:"Brak NIP" }}</span>
                 </div>
               </div>
-
-    <!-- Progress bar -->
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="font-mono text-xs text-text-muted uppercase tracking-wider"
@@ -167,8 +149,6 @@
                   ></div>
                 </div>
               </div>
-
-    <!-- Buttons -->
                 <div class="flex gap-3 mt-2">
                   <a
                     href="{% url 'companies:company-detail' company.pk %}"

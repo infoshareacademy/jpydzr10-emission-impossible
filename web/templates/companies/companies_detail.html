@@ -6,6 +6,9 @@
 {% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     .django-form-wrapper p {
       display: flex;
@@ -51,14 +54,9 @@
       margin-top: 0.25rem;
     }
   </style>
-{% endblock %}
-
-{% block content %}
   <div class="max-w-4xl mx-auto">
 
     {% if form and not is_delete %}
-
-    <!-- BACK + TITLE -->
       <div class="mb-8">
         <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
           <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
@@ -70,7 +68,6 @@
           </h1>
         </div>
       </div>
-
       <div class="rounded-2xl border border-border-subtle p-6 md:p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <form method="post" novalidate>
           {% csrf_token %}
@@ -90,9 +87,7 @@
           </div>
         </form>
       </div>
-
     {% elif is_delete %}
-
       <div class="max-w-xl mx-auto mt-12">
         <div class="rounded-2xl border border-red-500/50 p-8 text-center flex flex-col items-center" style="background:rgba(42,10,10,0.3); backdrop-filter:blur(8px);">
           <span class="material-symbols-outlined text-red-400 mb-4" style="font-size:64px;">warning</span>
@@ -113,10 +108,7 @@
           </form>
         </div>
       </div>
-
     {% elif object %}
-
-    <!-- BACK + TITLE -->
       <div class="mb-8">
         <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
           <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
@@ -126,9 +118,7 @@
           <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Szczegóły firmy</h1>
         </div>
       </div>
-
       <div class="rounded-2xl border border-border-subtle p-6 md:p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-
         <div class="border-b border-border-subtle pb-6 mb-8">
           <h2 class="font-heading font-bold text-3xl text-accent">{{ object.name }}</h2>
           <div class="flex gap-4 mt-2">
@@ -136,7 +126,6 @@
             <span class="font-mono text-sm text-text-muted">NIP: <span class="text-text-main">{{ object.nip }}</span></span>
           </div>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-6">
           <div class="flex flex-col gap-1">
             <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Kraj</span>
@@ -171,7 +160,6 @@
             <span class="font-mono text-lg text-text-main">{{ object.capital_group_name }}</span>
           </div>
         </div>
-
         <div class="mt-10 pt-6 border-t border-border-subtle flex justify-end">
           <a href="javascript:history.back()"
              class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
@@ -179,9 +167,7 @@
           </a>
         </div>
       </div>
-
     {% else %}
-
       <div class="max-w-2xl mx-auto mt-12 rounded-2xl border border-yellow-500/50 p-6 flex items-start gap-4" style="background:rgba(42,33,10,0.3); backdrop-filter:blur(8px);">
         <span class="material-symbols-outlined text-yellow-400 mt-0.5" style="font-size:32px;">info</span>
         <div>
@@ -192,8 +178,6 @@
           </a>
         </div>
       </div>
-
     {% endif %}
-
   </div>
 {% endblock %}

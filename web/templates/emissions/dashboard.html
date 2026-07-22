@@ -1,7 +1,10 @@
-{% extends "base.html" %} {% block title %}Kalkulator Emisji — Emission
-Impossible{% endblock %} {% block content %}
+{% extends "base.html" %}
 
-<!-- Back link -->
+{% block title %}
+Kalkulator Emisji — Emission Impossible
+{% endblock %}
+
+{% block content %}
 <div class="mb-8">
   <a
     href="{% url 'companies:companies-list' %}"
@@ -23,8 +26,6 @@ Impossible{% endblock %} {% block content %}
     Wróć do listy firm
   </a>
 </div>
-
-<!-- Page title -->
 <div class="mb-10">
   <div class="flex items-center gap-3 mb-1">
     <div
@@ -60,8 +61,6 @@ Impossible{% endblock %} {% block content %}
     {{ company.name }}
   </p>
 </div>
-
-<!-- SCOPE 1 -->
 <section class="mb-12">
   <div class="flex items-center gap-3 mb-6">
     <span
@@ -90,7 +89,6 @@ Impossible{% endblock %} {% block content %}
       >Emisje bezpośrednie</span
     >
   </div>
-
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
     <a
       href="{% url 'emissions:stationarycombustion-list' company.pk %}"
@@ -152,7 +150,6 @@ Impossible{% endblock %} {% block content %}
         >Kotły, piece, generatory</span
       >
     </a>
-
     <a
       href="{% url 'emissions:mobilecombustion-list' company.pk %}"
       class="flex flex-col items-center"
@@ -213,7 +210,6 @@ Impossible{% endblock %} {% block content %}
         >Pojazdy, flota transportowa</span
       >
     </a>
-
     <a
       href="{% url 'emissions:processemission-list' company.pk %}"
       class="flex flex-col items-center"
@@ -345,8 +341,6 @@ Impossible{% endblock %} {% block content %}
     margin-bottom: 3rem;
   "
 />
-
-<!-- SCOPE 2 -->
 <section class="mb-12">
   <div class="flex items-center gap-3 mb-6">
     <span
@@ -623,5 +617,4 @@ Impossible{% endblock %} {% block content %}
     </a>
   </div>
 </section>
-
 {% endblock %}
