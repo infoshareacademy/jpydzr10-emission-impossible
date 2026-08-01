@@ -65,6 +65,14 @@ class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
                 status=400,
             )
 
+        if not company_id or company_id == "ALL":
+            return JsonResponse(
+                {
+                    "error": "Wybierz konkretną spółkę z listy przed wysłaniem wiadomości."
+                },
+                status=400,
+            )
+
         user = request.user
 
         # 1. WERYFIKACJA UPRAWNIEŃ DO SPÓŁKI
