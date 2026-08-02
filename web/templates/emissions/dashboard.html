@@ -1,19 +1,10 @@
 {% extends "base.html" %}
-<<<<<<< HEAD
 {% load i18n %}
 
 {% block title %}{% trans "Kalkulator Emisji" %} — Emission Impossible{% endblock %}
 
 {% block content %}
 <!-- Back link -->
-=======
-
-{% block title %}
-Kalkulator Emisji — Emission Impossible
-{% endblock %}
-
-{% block content %}
->>>>>>> origin/main
 <div class="mb-8">
   <a href="{% url 'companies:companies-list' %}"
     style="font-family: 'Roboto Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: #7ab5ae; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
@@ -47,102 +38,20 @@ Kalkulator Emisji — Emission Impossible
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Spalanie stacjonarne" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Kotły, piece, generatory" %}</span>
     </a>
-<<<<<<< HEAD
     <a href="{% url 'emissions:mobilecombustion-list' company.pk %}" class="flex flex-col items-center" style="text-decoration: none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#b8ece6,#5bc4be); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">
         <span class="material-symbols-outlined" style="font-size:52px; color:#1a4a52; font-variation-settings:'FILL' 1;">local_shipping</span>
-=======
-    <a
-      href="{% url 'emissions:mobilecombustion-list' company.pk %}"
-      class="flex flex-col items-center"
-      style="text-decoration: none"
-    >
-      <div
-        style="
-          width: 100%;
-          aspect-ratio: 1;
-          background: linear-gradient(145deg, #b8ece6, #5bc4be);
-          border-radius: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition:
-            transform 0.18s,
-            box-shadow 0.18s;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-        "
-        onmouseover="
-          this.style.transform = 'translateY(-3px) scale(1.02)';
-          this.style.boxShadow =
-            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-        "
-        onmouseout="
-          this.style.transform = '';
-          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-        "
-      >
-        <span
-          class="material-symbols-outlined"
-          style="
-            font-size: 52px;
-            color: #1a4a52;
-            font-variation-settings: &quot;FILL&quot; 1;
-          "
-          >local_shipping</span
-        >
->>>>>>> origin/main
       </div>
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Spalanie mobilne" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Pojazdy, flota transportowa" %}</span>
     </a>
-<<<<<<< HEAD
     <a href="{% url 'emissions:processemission-list' company.pk %}" class="flex flex-col items-center" style="text-decoration: none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#b8ece6,#5bc4be); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">
         <span class="material-symbols-outlined" style="font-size:52px; color:#1a4a52; font-variation-settings:'FILL' 1;">science</span>
-=======
-    <a
-      href="{% url 'emissions:processemission-list' company.pk %}"
-      class="flex flex-col items-center"
-      style="text-decoration: none"
-    >
-      <div
-        style="
-          width: 100%;
-          aspect-ratio: 1;
-          background: linear-gradient(145deg, #b8ece6, #5bc4be);
-          border-radius: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition:
-            transform 0.18s,
-            box-shadow 0.18s;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-        "
-        onmouseover="
-          this.style.transform = 'translateY(-3px) scale(1.02)';
-          this.style.boxShadow =
-            '0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(100,210,200,0.25)';
-        "
-        onmouseout="
-          this.style.transform = '';
-          this.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-        "
-      >
-        <span
-          class="material-symbols-outlined"
-          style="
-            font-size: 52px;
-            color: #1a4a52;
-            font-variation-settings: &quot;FILL&quot; 1;
-          "
-          >science</span
-        >
->>>>>>> origin/main
       </div>
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Emisje procesowe" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Procesy technologiczne" %}</span>
@@ -159,19 +68,9 @@ Kalkulator Emisji — Emission Impossible
   </div>
 </section>
 
-<<<<<<< HEAD
 <hr style="border:none; border-top:1px dashed rgba(42,63,74,0.8); margin-bottom:3rem;"/>
 
 <!-- SCOPE 2 -->
-=======
-<hr
-  style="
-    border: none;
-    border-top: 1px dashed rgba(42, 63, 74, 0.8);
-    margin-bottom: 3rem;
-  "
-/>
->>>>>>> origin/main
 <section class="mb-12">
   <div class="flex items-center gap-3 mb-6">
     <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; padding:3px 10px; border-radius:4px; background:linear-gradient(145deg,#4db8b0,#2a8a84); color:#6ac8e8; border:1px solid rgba(100,200,240,0.3);">{% trans "Zakres 2" %}</span>

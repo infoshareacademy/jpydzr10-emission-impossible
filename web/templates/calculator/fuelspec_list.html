@@ -4,7 +4,6 @@
 {% block title %}{% trans "Lista Specyfikacji Paliw" %} — Emission Impossible{% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
 
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
   <div>
@@ -61,59 +60,4 @@
   </div>
 </div>
 
-=======
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-    <div>
-      <a href="{% url 'calculator:dashboard' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
-        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć do Dashboardu
-      </a>
-      <div class="flex items-center gap-3 mb-1">
-        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Lista Specyfikacji Paliw</h1>
-      </div>
-    </div>
-    <a href="{% url 'calculator:fuelspec_add' %}"
-       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors flex-shrink-0"
-       style="background:#1a4a52; border:1px solid #2a6a72;">
-      <span class="material-symbols-outlined" style="font-size:16px;">add</span> Nowa Specyfikacja
-    </a>
-  </div>
-  <div class="rounded-2xl border border-border-subtle overflow-hidden"
-       style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="border-b border-border-subtle">
-            <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">Typ paliwa</th>
-            <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">Dostawca</th>
-            <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">Gęstość (kg/m³)</th>
-            <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-center">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for spec in fuel_specs %}
-            <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
-              <td class="px-6 py-4 font-mono font-bold text-text-main">{{ spec.fuel_type.name }}</td>
-              <td class="px-6 py-4 font-mono text-sm text-text-muted">{{ spec.supplier.name|default:"Domyślny" }}</td>
-              <td class="px-6 py-4 font-mono text-sm text-text-main text-right">{{ spec.density_kg_per_m3|default:"—" }}</td>
-              <td class="px-6 py-4 text-center">
-                {% if spec.is_default %}
-                  <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">Domyślna</span>
-                {% else %}
-                  <span class="font-mono text-xs text-text-muted">Dedykowana</span>
-                {% endif %}
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="4" class="px-6 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
-                Brak zdefiniowanych specyfikacji paliw.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
->>>>>>> origin/main
 {% endblock %}

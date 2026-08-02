@@ -1,12 +1,7 @@
-<<<<<<< HEAD
  {% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Użytkownicy i uprawnienia" %} — Emission Impossible{% endblock %}
-=======
-{% extends "base.html" %}
-{% block title %}Użytkownicy i uprawnienia | Emission Impossible{% endblock %}
->>>>>>> origin/main
 
 {% block content %}
 <style>
@@ -71,11 +66,8 @@
     </div>
   </div>
 </div>
-<<<<<<< HEAD
 
 <!-- HEADER -->
-=======
->>>>>>> origin/main
 <div class="mb-8 space-y-4">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div class="flex items-center gap-3">
@@ -91,13 +83,9 @@
     </a>
     {% endif %}
   </div>
-<<<<<<< HEAD
 
   <p class="font-mono text-sm text-text-muted">{% trans "Zarządzanie dostępem do spółek w systemie Emission Impossible." %}</p>
 
-=======
-  <p class="font-mono text-sm text-text-muted">Zarządzanie dostępem do spółek w systemie Emission Impossible.</p>
->>>>>>> origin/main
   <div class="flex flex-wrap gap-2">
     <span class="stat-chip font-mono text-text-muted">
       <span class="text-text-main font-bold">{{ total_companies }}</span> {% trans "spółek" %}
@@ -109,10 +97,7 @@
       <span style="color:#c8f535;" class="font-bold">{{ admin_count }}</span> {% trans "adminów" %}
     </span>
   </div>
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
   <div class="relative max-w-sm">
     <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left:12px;font-size:18px;">search</span>
     <input id="global-search" type="text" placeholder="{% trans 'Szukaj użytkownika lub spółki...' %}"
@@ -120,11 +105,8 @@
       style="background:rgba(255,255,255,.06); border:1px solid #2a3f4a;">
   </div>
 </div>
-<<<<<<< HEAD
 
 <!-- ADMINS -->
-=======
->>>>>>> origin/main
 <section class="mb-10" id="section-admins">
   <div class="flex items-center gap-3 mb-4">
     <span class="material-symbols-outlined" style="font-size:20px;color:#c8f535;">shield_person</span>
@@ -166,11 +148,8 @@
   {% endif %}
 </section>
 <div style="height:1px;background:linear-gradient(to right,rgba(122,181,174,.3),transparent);margin-bottom:2.5rem;"></div>
-<<<<<<< HEAD
 
 <!-- COMPANIES -->
-=======
->>>>>>> origin/main
 <section>
   <div class="flex items-center justify-between mb-5">
     <h2 class="font-heading font-semibold text-xl text-text-main tracking-wide">
@@ -187,10 +166,7 @@
   <div class="space-y-5" id="companies-list">
     {% for item in company_data %}
     <div class="company-card searchable-company" data-company="{{ item.company.name|lower }}">
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
       <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style="border-bottom:1px solid #2a3f4a;">
         <div class="flex items-center gap-3">
@@ -227,10 +203,7 @@
           {% endif %}
         </div>
       </div>
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
       {% if item.permissions %}
       <div class="overflow-x-auto">
         <table class="w-full">
