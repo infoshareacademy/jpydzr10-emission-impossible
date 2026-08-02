@@ -3,10 +3,6 @@
 {% block title %}Lista Specyfikacji Paliw — Emission Impossible{% endblock %}
 
 {% block content %}
-
-<!-- ===================== -->
-<!-- HEADER -->
-<!-- ===================== -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
     <div>
       <a href="{% url 'calculator:dashboard' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
@@ -23,10 +19,6 @@
       <span class="material-symbols-outlined" style="font-size:16px;">add</span> Nowa Specyfikacja
     </a>
   </div>
-
-<!-- ===================== -->
-<!-- TABLE -->
-<!-- ===================== -->
   <div class="rounded-2xl border border-border-subtle overflow-hidden"
        style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
     <div class="overflow-x-auto">
@@ -64,5 +56,4 @@
       </table>
     </div>
   </div>
-
 {% endblock %}

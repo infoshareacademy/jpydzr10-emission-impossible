@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "channels",
     "accounts.apps.AccountsConfig",
     "core.apps.CoreConfig",
     "django.contrib.admin",
@@ -55,7 +57,16 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "communications.apps.CommunicationsConfig",
     "audit.apps.AuditConfig",
+    "workflow.apps.WorkflowConfig",
 ]
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 SITE_ID = 1
 
@@ -85,6 +96,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.available_apps",
+                "companies.context_processors.global_user_companies",
             ],
         },
     },
@@ -139,6 +152,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 TAILWIND_APP_NAME = "theme"
 
@@ -156,3 +172,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

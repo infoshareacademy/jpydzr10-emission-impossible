@@ -8,7 +8,31 @@
     {% tailwind_css %}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+      #bielik-chat-messages {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(200, 245, 53, 0.4) rgba(255, 255, 255, 0.02);
+        }
+
+        #bielik-chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        #bielik-chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+        #bielik-chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(200, 245, 53, 0.4);
+            border-radius: 8px;
+        }
+        #bielik-chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 245, 53, 0.8);
+        }
+
       .material-symbols-outlined {
         font-family: "Material Symbols Outlined" !important;
         font-weight: normal;
@@ -40,40 +64,39 @@
 select {
   color-scheme: dark;
 }
+[x-cloak] { display: none !important; }
     </style>
     {% block extra_head %}{% endblock %}
   </head>
 
-  <body class="min-h-screen bg-bg text-text-main">
+  <body class="min-h-screen bg-bg text-text-main" hx-boost="true"
+      hx-target="#dynamic-view"
+      hx-select="#dynamic-view"
+      hx-swap="outerHTML show:window:top">
 
-    <!-- ===================== -->
-    <!-- NAVBAR -->
-    <!-- ===================== -->
-    <nav class="sticky top-0 z-30 relative border-b border-border-subtle"
-      style="background: rgba(17, 23, 32, 0.85); backdrop-filter: blur(8px);">
+    <nav id="main-navigation" class="sticky top-0 z-30 relative border-b border-border-subtle"
+     style="background: rgba(17, 23, 32, 0.85); backdrop-filter: blur(8px);"
+     x-data="{ open: false }"
+     @click.outside="open = false">
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
-        <!-- Logo -->
         <a href="{% url 'home' %}" class="mr-2 flex-shrink-0">
           <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px; padding:4px 0;"/>
         </a>
 
-        <!-- Burger button -->
-        <button id="burger" class="text-text-muted hover:text-accent transition-colors p-2">
-          <span id="burger-icon" class="material-symbols-outlined">menu</span>
+        <button @click="open = !open" class="text-text-muted hover:text-accent transition-colors p-2">
+          <span class="material-symbols-outlined" x-text="open ? 'close' : 'menu'">menu</span>
         </button>
 
         <div class="flex-1"></div>
 
-        <!-- Admin button -->
         {% if user.is_superuser or user.role == 'admin' %}
-        <a href="/admin/" class="text-text-muted hover:text-accent transition-colors" title="Panel Administratora">
+        <a href="/admin/" hx-boost="false" class="text-text-muted hover:text-accent transition-colors" title="Panel Administratora">
           <span class="admin-icon material-symbols-outlined" style="font-size:22px;">admin_panel_settings</span>
           <span class="admin-text font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">Panel Administratora</span>
         </a>
         {% endif %}
 
-        <!-- User -->
         <div class="flex items-center gap-3">
           <a href="{% url 'accounts:profile' %}"
             style="width:36px; height:36px; border-radius:50%; border:1px solid rgba(200,245,53,0.3); overflow:hidden; display:flex; align-items:center; justify-content:center; background:#1d3a42; flex-shrink:0;">
@@ -88,7 +111,6 @@ select {
           </a>
         </div>
 
-        <!-- Logout -->
         {% if user.is_authenticated %}
         <form method="post" action="{% url 'accounts:logout' %}" class="inline-block m-0 p-0">
           {% csrf_token %}
@@ -103,15 +125,19 @@ select {
 
       </div>
 
-      <!-- Lime accent line -->
       <div style="height:2px; background:linear-gradient(to right, #c8f535, #a0d020, transparent);"></div>
 
-      <!-- ===================== -->
-      <!-- DROPDOWN MENU -->
-      <!-- ===================== -->
-      <div id="dropdown"
-        class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden transition-all duration-300"
-        style="max-height:0; background:rgba(17,23,32,0.95); backdrop-filter:blur(8px);">
+      <div x-show="open"
+           @click="open = false"
+           x-cloak
+           x-transition:enter="transition-all ease-out duration-300"
+           x-transition:enter-start="max-h-0 opacity-0"
+           x-transition:enter-end="max-h-[500px] opacity-100"
+           x-transition:leave="transition-all ease-in duration-200"
+           x-transition:leave-start="max-h-[500px] opacity-100"
+           x-transition:leave-end="max-h-0 opacity-0"
+           class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden"
+           style="background:rgba(17,23,32,0.95); backdrop-filter:blur(8px); display: none;">
         <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
 
           <a href="{% url 'reports:ghg-report' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
@@ -153,25 +179,26 @@ select {
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">mail</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Komunikacja e-mail</span>
           </a>
+          {% if user.is_superuser or user.role == 'admin' %}
+          <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
+            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
+            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Audyt i Weryfikacja</span>
+          </a>
+          {% endif %}
 
         </div>
       </div>
     </nav>
-
-    <!-- ===================== -->
-    <!-- MAIN CONTENT -->
-    <!-- ===================== -->
+<div id="dynamic-view">
    <main class="max-w-7xl mx-auto px-6 py-10" style="min-height: calc(100vh - 64px - 200px);">
       {% block content %}{% endblock %}
     </main>
+  {% block extra_scripts %}{% endblock %}
+</div>
 
-    <!-- ===================== -->
-    <!-- FOOTER -->
-    <!-- ===================== -->
     <footer class="border-t border-border-subtle mt-20" style="background:rgba(17,23,32,0.85);">
       <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
-        <!-- Logo & copyright -->
         <div class="flex flex-col gap-3">
   <div>
     <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px; width:120px; min-width:120px; padding:4px 0; object-fit:contain; object-position:left;"/>
@@ -179,7 +206,6 @@ select {
   <p class="font-mono text-xs text-text-muted">© 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.</p>
 </div>
 
-        <!-- Navigation links -->
         <div class="flex flex-col gap-2">
           <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Nawigacja</span>
           <a href="{% url 'reports:ghg-report' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Raporty</a>
@@ -188,7 +214,6 @@ select {
           <a href="{% url 'calculator:dashboard' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
         </div>
 
-        <!-- More links -->
         <div class="flex flex-col gap-2">
           <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Więcej</span>
           <a href="{% url 'what_if:reduction-target-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
@@ -201,34 +226,7 @@ select {
       <div style="height:2px; background:linear-gradient(to right, #c8f535, #a0d020, transparent);"></div>
     </footer>
 
-    {% block extra_scripts %}{% endblock %}
 
-    <!-- ===================== -->
-    <!-- DROPDOWN JAVASCRIPT -->
-    <!-- ===================== -->
-    <script>
-      const dropdown = document.getElementById("dropdown");
-      const burger = document.getElementById("burger");
-      const burgerIcon = document.getElementById("burger-icon");
-      let isOpen = false;
-      burger.addEventListener("click", () => {
-        isOpen = !isOpen;
-        if (isOpen) {
-          dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-          burgerIcon.textContent = "close";
-        } else {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-        }
-      });
-      document.addEventListener("click", (e) => {
-        if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-          isOpen = false;
-        }
-      });
-    </script>
-
+    {% include 'ai_services/components/floating_chat.html' %}
   </body>
 </html>

@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}Audyt: {{ envelope.company.name }} | Emission Impossible{% endblock %}
+
+{% block content %}
+  {% csrf_token %}
+  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">Audyt: {{ envelope.company.name }}</h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4">Rok raportowy: {{ envelope.period.year }}</p>
+    </div>
+
+    <button id="btn-bulk-approve"
+            data-url="{% url 'workflow:bulk_approve' envelope_id=envelope.pk %}"
+            class="inline-flex items-center gap-2 rounded-lg bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md"
+            {% if envelope.status != 'IN_REVIEW' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+      <span class="material-symbols-outlined text-[20px]">task_alt</span>
+      ZAAKCEPTUJ WSZYSTKIE REKORDY
+    </button>
+  </div>
+
+  <div class="bg-[#13383e]/40 rounded-2xl shadow-2xl overflow-hidden border border-[#1a4a52] backdrop-blur-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-[#1a4a52] text-text-muted border-b border-[#1a4a52]">
+            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider">Kategoria</th>
+            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider">Szczegóły wpisu</th>
+            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider text-center">Status</th>
+            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider text-center">Akcja</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#1a4a52]/50">
+          {% for item in emission_records %}
+            <tr id="row-{{ item.app_label }}-{{ item.model_name }}-{{ item.instance.pk }}"
+                class="transition-colors {% if item.instance.workflow_status == 'APPROVED' %}bg-green-900/20{% elif item.instance.workflow_status == 'REJECTED' %}bg-red-900/20{% else %}hover:bg-[#1a4a52]/30{% endif %}">
+
+              <td class="py-4 px-6 font-medium text-text-main">{{ item.verbose_name }}</td>
+
+              <td class="py-4 px-6 text-text-main text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono">{{ item.instance }}</span>
+
+                  {% if item.admin_url != '#' %}
+                    <a href="{{ item.admin_url }}" target="_blank" class="inline-flex items-center gap-1 text-[#c8f535] hover:text-white transition-colors ml-4" title="Otwórz szczegóły w nowej karcie">
+                      <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                      <span class="text-xs font-bold uppercase tracking-wider">Podgląd</span>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="py-4 px-6 text-center">
+                <span class="record-status inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-800/50 text-gray-300 border border-gray-600">
+                  {{ item.instance.get_workflow_status_display }}
+                </span>
+              </td>
+              <td class="py-4 px-6 text-center">
+                {% if item.instance.workflow_status == 'PENDING' or item.instance.workflow_status == 'DRAFT' %}
+                  <div class="action-buttons flex justify-center gap-2">
+                    <button class="btn-approve inline-flex items-center justify-center rounded-lg border border-[#c8f535] text-[#c8f535] hover:bg-[#c8f535] hover:text-[#1a4a52] px-3 py-1.5 text-xs font-bold transition-all"
+                            data-url="{% url 'workflow:review_action' app_label=item.app_label model_name=item.model_name pk=item.instance.pk %}"
+                            data-app="{{ item.app_label }}" data-model="{{ item.model_name }}" data-id="{{ item.instance.pk }}">
+                      Zatwierdź
+                    </button>
+
+                    <button class="btn-reject inline-flex items-center justify-center rounded-lg border border-red-400 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 text-xs font-bold transition-all"
+                            data-url="{% url 'workflow:record_clarify' app_label=item.app_label model_name=item.model_name pk=item.instance.pk %}"
+                            data-app="{{ item.app_label }}" data-model="{{ item.model_name }}" data-id="{{ item.instance.pk }}">
+                      Odrzuć
+                    </button>
+                  </div>
+                {% else %}
+                  <span class="text-text-muted text-sm font-mono">Oceniono</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="py-8 text-center text-text-muted font-mono text-sm">Brak danych do weryfikacji. Wprowadź dane emisji dla tej spółki i roku.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <dialog id="rejectModal" class="rounded-2xl shadow-2xl p-0 backdrop:bg-black/70 backdrop:backdrop-blur-sm border border-[#1a4a52] bg-[#0d272d] w-full max-w-lg m-auto top-1/2 -translate-y-1/2 text-text-main">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4 border-b border-[#1a4a52] pb-3">
+        <h3 class="text-xl font-bold text-red-400">Odrzucenie rekordu</h3>
+        <button id="closeModalBtn" class="text-text-muted hover:text-text-main transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <p class="text-sm text-text-muted mb-4">Podaj powód odrzucenia. Użytkownik zobaczy ten komentarz i będzie musiał poprawić dane.</p>
+
+      <textarea id="rejectReason" rows="4" class="w-full rounded-lg border border-[#1a4a52] bg-[#071619] text-text-main p-3 text-sm focus:border-[#c8f535] focus:ring-1 focus:ring-[#c8f535] outline-none placeholder-gray-600" placeholder="Np. Nieprawidłowy współczynnik konwersji..."></textarea>
+
+      <!-- Ukryte pola przekazujące kontekst z klikniętego rzędu do Modala -->
+      <input type="hidden" id="rejectUrl">
+      <input type="hidden" id="rejectApp">
+      <input type="hidden" id="rejectModel">
+      <input type="hidden" id="rejectId">
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="cancelModalBtn" class="px-4 py-2 text-sm font-bold text-text-muted bg-transparent border border-[#1a4a52] hover:bg-[#1a4a52] rounded-lg transition-colors">Anuluj</button>
+        <button id="confirmRejectBtn" class="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-lg shadow-red-900/20">Potwierdź odrzucenie</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const modal = document.getElementById('rejectModal');
+
+      document.getElementById('closeModalBtn').addEventListener('click', () => modal.close());
+      document.getElementById('cancelModalBtn').addEventListener('click', () => modal.close());
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.close();
+      });
+
+      // API Zatwierdzania (uderza w AdminReviewActionView)
+      document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          const { app, model, id, url } = this.dataset;
+
+          const formData = new FormData();
+          formData.append('action', 'approve');
+
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': csrfToken },
+              body: formData
+            });
+            const res = await response.json();
+
+            if (res.status === 'success') {
+              const row = document.getElementById(`row-${app}-${model}-${id}`);
+              row.className = 'transition-colors bg-green-900/20';
+              row.querySelector('.record-status').textContent = 'Zaakceptowany';
+              row.querySelector('.record-status').className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30';
+              row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">Oceniono</span>';
+            } else {
+              alert('Błąd: ' + res.message);
+            }
+          } catch(err) {
+            console.error(err);
+            alert("Błąd połączenia z serwerem.");
+          }
+        });
+      });
+
+      // Złapanie kontekstu dla odrzucenia (wyświetlenie Modala)
+      document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.getElementById('rejectUrl').value = this.dataset.url;
+          document.getElementById('rejectApp').value = this.dataset.app;
+          document.getElementById('rejectModel').value = this.dataset.model;
+          document.getElementById('rejectId').value = this.dataset.id;
+          document.getElementById('rejectReason').value = '';
+          modal.showModal();
+        });
+      });
+
+      // API Odrzucania (uderza w RecordClarificationView)
+      document.getElementById('confirmRejectBtn').addEventListener('click', async function() {
+        const url = document.getElementById('rejectUrl').value;
+        const app = document.getElementById('rejectApp').value;
+        const model = document.getElementById('rejectModel').value;
+        const id = document.getElementById('rejectId').value;
+        const reason = document.getElementById('rejectReason').value;
+
+        if (!reason.trim()) {
+          alert('Musisz podać powód odrzucenia!');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('message', reason); // views.py oczekuje tu nazwy 'message', nie 'reason'
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+          });
+          const res = await response.json();
+
+          if (res.status === 'success') {
+            const row = document.getElementById(`row-${app}-${model}-${id}`);
+            row.className = 'transition-colors bg-red-900/20';
+            row.querySelector('.record-status').textContent = 'Odrzucony';
+            row.querySelector('.record-status').className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30';
+            row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">Oceniono</span>';
+            modal.close();
+          } else {
+            alert('Błąd: ' + res.message);
+          }
+        } catch(err) {
+          console.error(err);
+          alert("Błąd połączenia z serwerem.");
+        }
+      });
+
+      // Sfinalizowanie koperty (jeśli istnieje przycisk)
+      const finalizeBtn = document.getElementById('finalizeBtn');
+      if (finalizeBtn) {
+        finalizeBtn.addEventListener('click', async function() {
+          if (!confirm("Czy na pewno chcesz sfinalizować ten raport?")) return;
+
+          const url = this.dataset.url;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+          });
+          const res = await response.json();
+
+          if (res.status === 'success') {
+            alert(`Zakończono! Status końcowy: ${res.result}`);
+            window.location.href = "{% url 'workflow:admin_list' %}";
+          } else {
+            alert(`Nie można sfinalizować: ${res.message}`);
+          }
+        });
+      }
+
+      // Szybkie akceptowanie wszystkich wpisów
+      const bulkApproveBtn = document.getElementById('btn-bulk-approve');
+      if (bulkApproveBtn) {
+        bulkApproveBtn.addEventListener('click', function() {
+          if (!confirm("Czy na pewno chcesz zaakceptować wszystkie rekordy w tym raporcie?")) return;
+
+          const targetUrl = this.dataset.url;
+
+          fetch(targetUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken }
+          })
+            .then(r => r.json())
+            .then(data => {
+              if (data.status === "success") {
+                alert("Zaakceptowano " + data.count + " rekordów.");
+                window.location.reload();
+              } else {
+                alert("Błąd: " + data.message);
+              }
+            });
+        });
+      }
+    });
+  </script>
+{% endblock %}

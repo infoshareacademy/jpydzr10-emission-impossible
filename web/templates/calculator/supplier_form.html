@@ -3,6 +3,9 @@
 {% block title %}Nowy Dostawca — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     input, select, textarea {
       background: rgba(255,255,255,0.04) !important;
@@ -19,14 +22,8 @@
     input:focus, select:focus { border-color: rgba(200,245,53,0.5) !important; }
     select option { background: #151c27; color: #e8f4f0; }
   </style>
-{% endblock %}
 
-{% block content %}
   <div class="max-w-2xl mx-auto">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="mb-8">
       <a href="{% url 'calculator:supplier_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
@@ -37,10 +34,6 @@
       </div>
       <p class="font-mono text-sm text-text-muted mt-3">Dodawanie podmiotu dostarczającego komponenty emisyjne.</p>
     </div>
-
-  <!-- ===================== -->
-  <!-- FORM -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <form method="post" class="space-y-6">
         {% csrf_token %}
@@ -62,8 +55,6 @@
             {{ field }}
           </div>
         {% endfor %}
-
-      <!-- Buttons -->
         <div class="flex gap-4 pt-4 border-t border-border-subtle">
           <a href="{% url 'calculator:supplier_list' %}"
              class="flex-1 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors text-center">
@@ -75,7 +66,6 @@
             Zapisz
           </button>
         </div>
-
       </form>
     </div>
   </div>

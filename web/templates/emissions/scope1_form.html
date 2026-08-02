@@ -2,12 +2,19 @@
 {% load static %}
 
 {% block title %}
-    {% if form.instance.pk %}Edytuj wpis emisji{% else %}Dodaj wpis emisji{% endif %} - Emission Impossible
+    {% if form.instance.pk %}
+        Edytuj wpis emisji
+    {% else %}
+        Dodaj wpis emisji
+    {% endif %}
+    - Emission Impossible
 {% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
         .custom-form-container input,
         .custom-form-container select,
         .custom-form-container textarea {
@@ -32,8 +39,6 @@
             background: #151c27;
             color: #e8f4f0;
         }
-
-    /* Zabezpieczenie dla potencjalnych checkboxów (np. zgody/statusy) */
         .custom-form-container input[type="checkbox"],
         .custom-form-container input[type="radio"] {
             width: auto !important;
@@ -41,12 +46,7 @@
             cursor: pointer;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-4xl mx-auto">
-
-    {# --- Nagłówek --- #}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <a href="{% url list_url_name company_id %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
@@ -61,13 +61,22 @@
                 </div>
             </div>
         </div>
+        {% if admin_comment %}
+            <div class="mb-8 rounded-2xl border border-red-500/50 bg-red-900/20 p-6 backdrop-blur-md shadow-lg">
+                <div class="flex items-center gap-2 text-red-400 font-bold text-xl mb-3">
+                    <span class="material-symbols-outlined text-[24px]">error</span>
+                    <h3>Wpis został odrzucony przez Administratora</h3>
+                </div>
 
-    {# --- Karta z formularzem --- #}
+                <p class="font-mono text-sm text-gray-200 bg-black/40 p-4 rounded-xl border border-red-900/50">
+                    <span class="text-red-400 font-bold block mb-1 uppercase tracking-wider text-xs">Powód odrzucenia:</span>
+                    {{ admin_comment.text }}
+                </p>
+            </div>
+        {% endif %}
         <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
             <form method="post" novalidate class="space-y-6">
                 {% csrf_token %}
-
-            {# Grupa pól w układzie siatki #}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for field in form %}
                     {# Warunek rozciągania na dwie kolumny np. dla dłuższych opisów lub uwag #}
@@ -77,8 +86,6 @@
                             </label>
 
                             {{ field }}
-
-                        {# Komunikaty o błędach walidacji pola #}
                             {% if field.errors %}
                                 <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
                                     <span class="material-symbols-outlined text-sm">error</span>
@@ -88,15 +95,28 @@
                         </div>
                     {% endfor %}
                 </div>
+                {% if admin_comment %}
+                    <div class="mt-8 pt-6 border-t border-red-900/50">
+                        <div class="flex flex-col gap-2">
+                            <label for="user_reply" class="font-mono text-xs uppercase tracking-widest text-red-400 font-bold">
+                                Twoje wyjaśnienia / Potwierdzenie poprawek <span class="text-red-400">*</span>
+                            </label>
+                            <p class="text-xs text-text-muted mb-2">Musisz skomentować swoje poprawki, aby odesłać wpis do ponownej weryfikacji.</p>
 
-            {# --- Sekcja przycisków akcji --- #}
+                            <textarea id="user_reply" name="user_reply" required rows="3"
+                                      class="w-full rounded-lg border border-red-500/50 bg-black/20 text-white p-3 font-mono text-[13px] focus:border-red-400 focus:ring-1 focus:ring-red-400 outline-none transition-colors"
+                                      placeholder="Napisz stosowne wyjaśnienia lub potwierdź poprawę danych..."></textarea>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
                     <a href="{% url list_url_name company_id %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
                         Anuluj
                     </a>
 
-                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all sm:w-36 flex justify-center items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">save</span> Zapisz
+                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all flex justify-center items-center gap-2 {% if admin_comment %}sm:w-56{% else %}sm:w-36{% endif %}">
+                        <span class="material-symbols-outlined text-sm">{% if admin_comment %}send{% else %}save{% endif %}</span>
+                        {% if admin_comment %}Zapisz i odeślij{% else %}Zapisz{% endif %}
                     </button>
                 </div>
             </form>

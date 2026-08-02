@@ -4,10 +4,6 @@
 
 {% block content %}
   <div class="space-y-8">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
       <div>
         <div class="flex items-center gap-3 mb-1">
@@ -22,17 +18,12 @@
         <span class="material-symbols-outlined" style="font-size:16px;">add</span> Nowa Specyfikacja
       </a>
     </div>
-
-  <!-- ===================== -->
-  <!-- FUEL SPECS TABLE -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle overflow-hidden"
          style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <div class="px-6 py-4 border-b border-border-subtle flex items-center gap-2">
         <span class="material-symbols-outlined text-accent" style="font-size:18px;">analytics</span>
         <h2 class="font-mono text-sm text-text-main uppercase tracking-wider">Aktywne parametry paliw</h2>
       </div>
-
       {% if fuel_specs %}
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -74,13 +65,7 @@
         <p class="font-mono text-sm text-text-muted text-center py-10 px-5">Brak zdefiniowanych specyfikacji. Kliknij przycisk powyżej, aby dodać pierwszą.</p>
       {% endif %}
     </div>
-
-  <!-- ===================== -->
-  <!-- FUEL TYPES & SUPPLIERS -->
-  <!-- ===================== -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-    <!-- Fuel types -->
       <div class="rounded-2xl border border-border-subtle overflow-hidden"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
@@ -101,8 +86,6 @@
           {% endfor %}
         </div>
       </div>
-
-    <!-- Suppliers -->
       <div class="rounded-2xl border border-border-subtle overflow-hidden"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
@@ -123,7 +106,6 @@
           {% endfor %}
         </div>
       </div>
-
     </div>
   </div>
 {% endblock %}

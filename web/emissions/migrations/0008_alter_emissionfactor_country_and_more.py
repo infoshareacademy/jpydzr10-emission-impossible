@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("calculator", "0002_alter_fuelspec_supplier"),
         ("companies", "0002_alter_companies_nip"),

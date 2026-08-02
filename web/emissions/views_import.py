@@ -136,9 +136,9 @@ class Scope1TemplateDownloadMixin(LoginRequiredMixin, View):
             "zrodlo": 30,
         }
         for idx, header in enumerate(headers, start=1):
-            ws.column_dimensions[openpyxl.utils.get_column_letter(idx)].width = (
-                col_widths.get(header, 20)
-            )
+            ws.column_dimensions[
+                openpyxl.utils.get_column_letter(idx)
+            ].width = col_widths.get(header, 20)
 
         # ── Zamrożenie nagłówka ──────────────────────────────────────────────
         ws.freeze_panes = "A2"

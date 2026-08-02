@@ -1,6 +1,5 @@
 # web/ai_services/SLM_conf.py
 import logging
-from langdetect import detect
 
 import ollama
 from companies.models import Companies
@@ -13,25 +12,26 @@ from emissions.models import (
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,
-    RecordStatus,
     StationaryCombustion,
 )
+from langdetect import detect
+from workflow.models import WorkflowStatusMixin
 
 from ai_services.models import AIChatSession
 
 logger = logging.getLogger(__name__)
-
+RecordStatus = WorkflowStatusMixin.RecordStatus
 
 class BielikESGService:
     def __init__(self):
         self.client = ollama.Client(host="http://localhost:11434")
-        self.model_name = "llama3.1:8b"
+        self.model_name = "bielik:latest"
 
     def _build_emissions_context(
         self, company: Companies, scope_type: str = "ALL", year: int = None
     ) -> str:
-        valid_statuses = [RecordStatus.APPROVED, RecordStatus.VERIFIED]
-        base_filter = {"company": company, "status__in": valid_statuses}
+        valid_statuses = [RecordStatus.APPROVED]
+        base_filter = {"company": company, "workflow_status__in": valid_statuses}
         if year:
             base_filter["year"] = year
 

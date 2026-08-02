@@ -2,6 +2,9 @@
 {% block title %}{{ model_verbose_name_plural }} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
 <style>
   input,
   select {
@@ -24,10 +27,6 @@
     color: #e8f4f0;
   }
 </style>
-{% endblock %}
-
-{% block content %}
-
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
   <div>
     <a
@@ -42,9 +41,12 @@
         style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"
       ></div>
       <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
-        {{ model_verbose_name_plural }}
+        {{ company.name }}
       </h1>
     </div>
+    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+        {{ model_verbose_name_plural }}
+      </h1>
   </div>
   <div class="flex gap-3">
     <a
@@ -178,9 +180,18 @@
           <td class="px-5 py-4">
             <span
               class="font-mono text-xs px-2 py-1 rounded"
-              style="{% if obj.status == 'APPROVED' %}background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);{% elif obj.status == 'DRAFT' %}background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);{% elif obj.status == 'VERIFIED' %}background:rgba(147,197,253,0.15); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);{% else %}background:rgba(253,224,71,0.15); color:#fde047; border:1px solid rgba(253,224,71,0.3);{% endif %}"
+              style="{% if obj.workflow_status == 'APPROVED' %}
+                  background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);
+                {% elif obj.workflow_status == 'PENDING' %}
+                  background:rgba(147,197,253,0.15); color:#93c5fd; border:1px solid rgba(147,197,253,0.3);
+                {% elif obj.workflow_status == 'REJECTED' %}
+                  background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);
+                {% else %}
+                  background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);
+                {% endif %}
+              "
             >
-              {{ obj.get_status_display }}
+              {{ obj.get_workflow_status_display }}
             </span>
           </td>
           <td class="px-5 py-4 text-center">
@@ -207,6 +218,16 @@
                   <span class="material-symbols-outlined" style="font-size: 16px">delete</span>
                 </button>
               </form>
+              {% if request.user.is_staff or request.user.is_superuser %}
+              <button
+                type="button"
+                data-url="{% url 'workflow:record_clarify' app_label=obj.app_label model_name=obj.model_name pk=obj.pk %}"
+                class="js-open-clarification p-1.5 rounded-lg border border-yellow-500/30 text-yellow-500 hover:text-yellow-400 transition-colors"
+                title="Zgłoś uwagi"
+              >
+                <span class="material-symbols-outlined" style="font-size: 16px">chat_bubble</span>
+              </button>
+              {% endif %}
             </div>
           </td>
         </tr>
@@ -242,5 +263,158 @@
   </div>
   {% endif %}
 </div>
+<div id="clarificationModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
 
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+
+      <div class="relative transform overflow-hidden rounded-2xl border border-border-subtle text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg" style="background: #111720;">
+
+        <form id="clarificationForm" onsubmit="submitClarification(event)">
+          <div class="px-6 py-6 sm:p-8">
+            <div class="flex items-start gap-4">
+              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500/10 sm:mx-0 sm:h-10 sm:w-10 border border-yellow-500/20">
+                <span class="material-symbols-outlined text-yellow-500" style="font-size: 20px">warning</span>
+              </div>
+              <div class="mt-3 text-center sm:ml-2 sm:mt-0 sm:text-left w-full">
+                <h3 class="font-heading text-xl font-bold text-text-main" id="modal-title">Zgłoś uwagi do rekordu</h3>
+                <div class="mt-3">
+                  <p class="text-sm font-mono text-text-muted mb-3">
+                    Wprowadź szczegółowe uwagi. Użytkownik otrzyma powiadomienie i będzie musiał zaktualizować dane.
+                  </p>
+                  <input type="hidden" id="modalSubmitUrl" name="submit_url">
+
+                  <textarea
+                    id="modalMessage"
+                    name="message"
+                    rows="4"
+                    class="w-full bg-white/5 border border-border-subtle rounded-xl text-text-main font-mono text-sm p-3 focus:outline-none focus:border-accent transition-colors resize-none"
+                    placeholder="Wpisz treść uwagi..."
+                    required
+                  ></textarea>
+                  <div class="mt-4">
+                    <label for="modalDeadline" class="block text-xs font-mono text-text-muted mb-1 uppercase tracking-wider">
+                      Termin wykonania (opcjonalnie)
+                    </label>
+                    <input
+                      type="date"
+                      id="modalDeadline"
+                      name="deadline"
+                      class="w-full bg-white/5 border border-border-subtle rounded-xl text-text-main font-mono text-sm p-3 focus:outline-none focus:border-accent transition-colors"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-black/20 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-border-subtle">
+            <button
+              type="submit"
+              id="submitClarificationBtn"
+              class="inline-flex w-full justify-center items-center gap-2 rounded-xl px-4 py-2.5 font-mono text-sm font-bold text-[#1a4a52] shadow-sm transition-colors sm:ml-3 sm:w-auto"
+              style="background: #c8f535;"
+            >
+              Wyślij uwagi
+            </button>
+            <button
+              type="button"
+              onclick="closeClarificationModal()"
+              class="mt-3 inline-flex w-full justify-center rounded-xl bg-transparent px-4 py-2.5 font-mono text-sm font-bold text-text-muted border border-border-subtle hover:text-text-main hover:border-text-muted transition-colors sm:mt-0 sm:w-auto"
+            >
+              Anuluj
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function() {
+    if (window.clarificationEventsBound) return;
+    window.clarificationEventsBound = true;
+    window.closeClarificationModal = function() {
+      const modal = document.getElementById('clarificationModal');
+      if (modal) modal.classList.add('hidden');
+    };
+    document.body.addEventListener('click', function(e) {
+      const btn = e.target.closest('.js-open-clarification');
+      if (!btn) return;
+      const modal = document.getElementById('clarificationModal');
+      if (!modal) return;
+      document.getElementById('modalSubmitUrl').value = btn.dataset.url;
+      document.getElementById('modalMessage').value = '';
+      document.getElementById('modalDeadline').value = '';
+
+      modal.classList.remove('hidden');
+      document.getElementById('modalMessage').focus();
+    });
+
+    document.body.addEventListener('click', function(event) {
+      const modal = document.getElementById('clarificationModal');
+      if (modal && !modal.classList.contains('hidden') && event.target === modal.children[0]) {
+        closeClarificationModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(event) {
+      const modal = document.getElementById('clarificationModal');
+      if (event.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+        closeClarificationModal();
+      }
+    });
+
+    document.body.addEventListener('submit', async function(event) {
+      const form = document.getElementById('clarificationForm');
+      if (!form || event.target !== form) return;
+
+      event.preventDefault();
+
+      const submitBtn = document.getElementById('submitClarificationBtn');
+      const targetUrl = document.getElementById('modalSubmitUrl').value;
+      const message = document.getElementById('modalMessage').value;
+      const deadline = document.getElementById('modalDeadline').value;
+      const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size: 16px">sync</span> Wysyłanie...';
+
+      try {
+        const response = await fetch(targetUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+          },
+          body: new URLSearchParams({ message: message, deadline: deadline })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+          closeClarificationModal();
+          window.location.reload();
+        } else {
+          alert(`Błąd: ${data.message}`);
+          resetSubmitButton(submitBtn);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Wystąpił błąd krytyczny podczas łączenia z serwerem.");
+        resetSubmitButton(submitBtn);
+      }
+    });
+
+    function resetSubmitButton(btn) {
+      btn.disabled = false;
+      btn.innerHTML = 'Wyślij uwagi';
+    }
+  })();
+</script>
 {% endblock %}

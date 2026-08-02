@@ -1,97 +1,346 @@
 {% extends "base.html" %}
+{% load workflow_tags %}
 
-{% block title %}Panel startowy — Emission Impossible{% endblock %}
+{% block title %}Panel startowy | Emission Impossible{% endblock %}
 
 {% block content %}
-
-<!-- ===================== -->
-<!-- PAGE TITLE -->
-<!-- ===================== -->
-  <div class="mb-12">
-    <div class="flex items-center gap-3 mb-1">
-      <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-      <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Panel startowy</h1>
+    <div class="mb-10">
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+            Witaj, {{ request.user.username|default:"Użytkowniku" }}!
+        </h1>
+        <p class="font-mono text-sm text-text-muted mt-2">ESG Dashboard: Podsumowanie i przegląd Twoich zadań</p>
     </div>
-    <p class="font-mono text-sm text-text-muted ml-4">Wybierz moduł, aby rozpocząć pracę.</p>
-  </div>
 
-<!-- ===================== -->
-<!-- MAIN TILES GRID -->
-<!-- ===================== -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto w-full">
+    <div class="mt-12 px-2 md:px-8">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="font-heading font-bold text-2xl text-text-main">Cele Redukcyjne</h2>
+            <select id="targetSelector" onchange="scrollToTarget(this.value)"
+                    class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg px-4 py-2 outline-none">
+                {% for target in reduction_targets %}
+                    <option value="target-{{ target.id }}">{{ target.target_name }} ({{ target.company.name }})</option>
+                {% endfor %}
+            </select>
+        </div>
 
-  <!-- Raporty -->
-    <a href="{% url 'reports:ghg-report' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">book_2</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Raporty</span>
-    </a>
+        <div class="relative w-full">
+            <button id="btnPrev" class="absolute -left-4 md:-left-8 top-1/2 -translate-y-1/2 z-20 bg-[#111720] border-2 border-[#1a4a52] text-text-main hover:text-[#c8f535] hover:border-[#c8f535] w-12 h-12 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex">
+                <span class="material-symbols-outlined font-bold">chevron_left</span>
+            </button>
 
-  <!-- Przedsiębiorstwo -->
-    <a href="{% url 'companies:companies-list' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">business</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Przedsiębiorstwo</span>
-    </a>
+            <div id="carousel" class="flex overflow-x-auto gap-6 pb-6 w-full scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
+                <style>
+                    #carousel::-webkit-scrollbar { display: none; }
+                </style>
 
-  <!-- Wskaźniki Emisji -->
-    <a href="{% url 'emissions:factor-list' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">pie_chart</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Wskaźniki Emisji</span>
-    </a>
+                {% for target in reduction_targets %}
+                <div id="target-{{ target.id }}" class="flex-none w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] h-full bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl relative flex flex-col justify-between min-h-[380px]">
+                    <a href="{% url 'what_if:reduction-target-detail' target.id %}" class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </a>
 
-  <!-- Przeliczniki -->
-    <a href="{% url 'calculator:dashboard' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">bar_chart</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Przeliczniki</span>
-    </a>
+                    <div>
+                        <div class="w-full h-1.5 rounded-full mb-4 bg-[#111720] overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500 {% if target.chart_data.status_color == 'green' %}bg-[#c8f535]{% elif target.chart_data.status_color == 'yellow' %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: 70%;"></div>
+                        </div>
+                        <h3 class="font-bold text-lg text-text-main mb-1 truncate pr-6">{{ target.target_name }}</h3>
+                        <p class="text-xs text-text-muted mb-4 truncate">{{ target.company.name }}</p>
+                    </div>
 
-  <!-- Cele i symulacje -->
-    <a href="{% url 'what_if:reduction-target-list' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">local_fire_department</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Cele i symulacje</span>
-    </a>
+                    <div class="h-40 w-full relative mb-4">
+                        <canvas id="chart-{{ target.id }}"></canvas>
+                    </div>
 
-  <!-- Użytkownicy -->
-    <a href="{% url 'accounts:company-users-list' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">group</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Użytkownicy</span>
-    </a>
+                    <div class="flex justify-between items-end mt-auto pt-4 border-t border-[#1a4a52]/50">
+                        <div class="text-left">
+                            <p class="text-xs text-text-muted mb-1">Emisja (obecna):</p>
+                            <p class="font-mono text-base font-bold text-text-main">{{ target.chart_data.current_emission|floatformat:1 }} t</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-text-muted mb-1">Cel ({{ target.target_year }}):</p>
+                            <p class="font-mono text-base font-bold text-[#c8f535]">{{ target.chart_data.target_emission|floatformat:1 }} t</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
-  <!-- AI Asystent ESG -->
-    <a href="{% url 'ai_services:global_assistant' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">auto_awesome</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">AI Asystent ESG</span>
-    </a>
+            <button id="btnNext" class="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 z-20 bg-[#111720] border-2 border-[#1a4a52] text-text-main hover:text-[#c8f535] hover:border-[#c8f535] w-12 h-12 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex">
+                <span class="material-symbols-outlined font-bold">chevron_right</span>
+            </button>
+        </div>
+    </div>
+    <div class="mt-8 px-2 md:px-8 max-w-7xl mx-auto w-full">
+        <div class="flex justify-between items-center mb-6 bg-[#13383e]/20 border border-[#1a4a52] rounded-xl px-6 py-3 shadow-sm">
+            <h2 class="font-heading font-bold text-xl text-text-main flex items-center gap-2">
+                Skonsolidowane Emisje
+            </h2>
+            <div class="flex items-center gap-4 bg-[#111720] rounded-lg border border-border-subtle p-1">
+                <button id="btn-year-prev" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                    <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </button>
+                <span id="display-year" class="font-mono font-bold text-lg text-text-main min-w-[60px] text-center">
+                    {{ initial_year }}
+                </span>
+                <button id="btn-year-next" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                    <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-[#c8f535]/50 transition-colors">
+                <div>
+                    <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1">
+                        Zakres 1
+                        <span class="material-symbols-outlined text-[#c8f535] text-sm">factory</span>
+                    </h3>
+                    <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Paliwa, procesy, wycieki</p>
+                </div>
+                <div class="text-right">
+                    <span id="display-scope1" class="block font-mono text-3xl font-bold text-[#c8f535] transition-opacity duration-300">
+                        0.00
+                    </span>
+                    <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+                </div>
+            </div>
+            <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-[#5bc4be]/50 transition-colors">
+                <div>
+                    <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1">
+                        Zakres 2
+                        <span class="material-symbols-outlined text-[#5bc4be] text-sm">bolt</span>
+                    </h3>
+                    <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Zakupiona energia</p>
+                </div>
+                <div class="text-right">
+                    <span id="display-scope2" class="block font-mono text-3xl font-bold text-[#5bc4be] transition-opacity duration-300">
+                        0.00
+                    </span>
+                    <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto w-full mt-12">
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Oczekujące Zadania</h2>
 
-  <!-- Komunikacja e-mail -->
-    <a href="{% url 'communications:thread_list' %}" class="flex flex-col items-center gap-4 group">
-      <div class="w-full aspect-square rounded-2xl flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-           style="background:linear-gradient(145deg, #b8ece6, #5bc4be); box-shadow:0 4px 24px rgba(0,0,0,0.4);">
-        <span class="material-symbols-outlined" style="font-size:56px; color:#1a4a52; font-variation-settings:'FILL' 1;">mail</span>
-      </div>
-      <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors tracking-wide">Komunikacja e-mail</span>
-    </a>
+            {% if grouped_tasks %}
+                {% for group in grouped_tasks %}
+                    <div x-data="{ taskOpen: true }" class="mb-6 bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-lg font-bold text-text-main">{{ group.title }}</h2>
+                                <p class="text-sm text-text-muted mt-1">{{ group.description }}</p>
+                                {% if group.deadline %}
+                                    <p class="text-xs font-mono text-red-400 mt-2 font-bold">Termin: {{ group.deadline|date:"d.m.Y" }}</p>
+                                {% endif %}
+                            </div>
+                            <button
+                                @click="taskOpen = !taskOpen"
+                                x-text="taskOpen ? 'ZWIŃ LISTĘ' : 'POKAŻ LISTĘ'"
+                                class="text-xs font-bold font-mono text-accent hover:text-white transition-colors uppercase"
+                            >
+                                ZWIŃ/ROZWIŃ LISTĘ
+                            </button>
+                        </div>
 
-  </div>
+                        <div x-show="taskOpen" x-collapse x-cloak class="mt-6 space-y-4">
+                            {% if group.tasks|length > 1 %}
+                                <div class="p-4 bg-black/20 border border-border-subtle rounded-xl mb-4">
+                                    <span class="font-bold text-sm text-text-main mb-3 block">Dotyczy spółek ({{ group.tasks|length }}):</span>
+                                    <ul class="space-y-2">
+                                        {% for task in group.tasks %}
+                                            <li class="flex items-center bg-[#111720] p-3 rounded-lg border border-border-subtle">
+                                                <span class="material-symbols-outlined text-accent text-sm mr-2">business</span>
+                                                <span class="text-xs text-text-main font-mono">{{ task.company.name }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            {% for task in group.tasks %}
+                                {% get_grouped_rejected_records task as grouped_records %}
 
+                                {% if grouped_records %}
+                                    {% if group.tasks|length > 1 %}
+                                        <p class="text-xs font-bold text-text-muted mt-4 mb-2 uppercase tracking-wider">Szczegóły dla: {{ task.company.name }}</p>
+                                    {% endif %}
+
+                                    {% for category, data in grouped_records.items %}
+                                        <div class="p-4 bg-black/20 border border-border-subtle rounded-xl">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <span class="font-bold text-sm text-text-main">{{ category }}</span>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-0.5 rounded-full text-xs font-bold">
+                                                        {{ data.count }}
+                                                    </span>
+                                                    <a href="{{ data.list_url }}" class="text-xs font-mono bg-[#c8f535] text-[#1a4a52] px-3 py-1.5 rounded-md hover:bg-[#b5e02b] transition-colors font-bold shadow-sm">
+                                                        Szczegóły
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <ul class="space-y-2">
+                                                {% for item in data.items %}
+                                                    <li class="flex justify-between items-center bg-[#111720] p-3 rounded-lg border border-border-subtle hover:border-yellow-500/30 transition-colors">
+                                                        <span class="text-xs text-text-muted font-mono truncate mr-2">{{ item.str }}</span>
+                                                        <a href="{{ item.edit_url }}" class="text-yellow-500 hover:text-yellow-300 text-xs font-bold">Edytuj</a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% if group.tasks|length == 1 %}
+                                        <p class="text-xs text-text-muted italic">Brak odrzuconych rekordów w tej kategorii.</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+                    <span class="material-symbols-outlined text-5xl text-[#5bc4be] mb-3">task_alt</span>
+                    <h3 class="font-bold text-text-main text-lg">Wszystko gotowe!</h3>
+                    <p class="font-mono text-sm text-text-muted">Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Ulubione Akcje</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                {% for shortcut in favorite_shortcuts %}
+                    <a href="{{ shortcut.url }}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
+                        <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
+                              style="font-size:42px; font-variation-settings:'FILL' 1;">{{ shortcut.icon }}</span>
+                        <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">
+                            {{ shortcut.title }}
+                        </span>
+                    </a>
+                {% empty %}
+                    <p class="col-span-2 text-xs text-text-muted font-mono text-center">Brak ulubionych akcji.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    const carousel = document.getElementById('carousel');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    if (carousel && btnPrev && btnNext) {
+        const getScrollAmount = () => {
+            const firstCard = carousel.children[0];
+            return firstCard ? firstCard.offsetWidth + 24 : 350;
+        };
+        btnPrev.onclick = () => carousel.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+        btnNext.onclick = () => carousel.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+
+        const updateButtons = () => {
+            const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+            btnPrev.disabled = carousel.scrollLeft <= 2;
+            btnNext.disabled = carousel.scrollLeft >= maxScrollLeft - 2;
+        };
+        carousel.onscroll = updateButtons;
+        window.onresize = updateButtons;
+        setTimeout(updateButtons, 100);
+    }
+    {% for target in reduction_targets %}
+    (function() {
+        const canvasId = 'chart-{{ target.id }}';
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+        const existingChart = Chart.getChart(canvasId);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ target.chart_data.years|safe }},
+                datasets: [
+                    {
+                        label: 'Zakres 1',
+                        data: {{ target.chart_data.s1|safe }},
+                        backgroundColor: '#c8f535',
+                        stack: 'stack1',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Zakres 2',
+                        data: {{ target.chart_data.s2|safe }},
+                        backgroundColor: '#5bc4be',
+                        stack: 'stack1',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { stacked: true, display: false },
+                    y: { stacked: true, display: false, beginAtZero: true }
+                }
+            }
+        });
+    })();
+    {% endfor %}
+})();
+(function() {
+    const emissionsData = JSON.parse('{{ emissions_data_json|escapejs }}');
+    const availableYears = JSON.parse('{{ available_years_json|escapejs }}');
+    let currentYear = parseInt('{{ initial_year }}', 10);
+    const displayYear = document.getElementById('display-year');
+    const displayScope1 = document.getElementById('display-scope1');
+    const displayScope2 = document.getElementById('display-scope2');
+    const btnPrev = document.getElementById('btn-year-prev');
+    const btnNext = document.getElementById('btn-year-next');
+    if (availableYears.length === 0) {
+        availableYears.push(currentYear);
+    }
+
+    function updateUI() {
+        const data = emissionsData[currentYear] || { scope1: 0, scope2: 0 };
+        displayYear.textContent = currentYear;
+        displayScope1.style.opacity = 0;
+        displayScope2.style.opacity = 0;
+
+        setTimeout(() => {
+            displayScope1.textContent = data.scope1.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            displayScope2.textContent = data.scope2.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            displayScope1.style.opacity = 1;
+            displayScope2.style.opacity = 1;
+        }, 150);
+        const currentIndex = availableYears.indexOf(currentYear);
+        btnPrev.disabled = currentIndex <= 0;
+        btnNext.disabled = currentIndex >= availableYears.length - 1 || currentIndex === -1;
+    }
+
+    if (btnPrev && btnNext) {
+        btnPrev.addEventListener('click', () => {
+            const currentIndex = availableYears.indexOf(currentYear);
+            if (currentIndex > 0) {
+                currentYear = availableYears[currentIndex - 1];
+                updateUI();
+            }
+        });
+
+        btnNext.addEventListener('click', () => {
+            const currentIndex = availableYears.indexOf(currentYear);
+            if (currentIndex < availableYears.length - 1 && currentIndex !== -1) {
+                currentYear = availableYears[currentIndex + 1];
+                updateUI();
+            }
+        });
+    }
+    updateUI();
+})();
+</script>
 {% endblock %}

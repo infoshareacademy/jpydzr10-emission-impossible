@@ -1,48 +1,34 @@
 from companies.models import Companies
 from django import forms
+from django.db.models import Q
 from emissions.models import EmissionFactor
 
-from what_if.models import ReductionTarget
+from .models import ReductionGoal, ReductionTarget
 
 
 class ReductionTargetForm(forms.ModelForm):
     class Meta:
         model = ReductionTarget
-        fields = ["target_name", "base_year", "target_year", "reduction_pct", "scope"]
+        fields = ["goal"]
+        labels = {
+            "goal": "Wybierz cel korporacyjny"
+        }
         widgets = {
-            "target_name": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Np. Redukcja emisji z floty pojazdów",
-                }
-            ),
-            "base_year": forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "YYYY"}
-            ),
-            "target_year": forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "YYYY"}
-            ),
-            "reduction_pct": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "step": "0.01",
-                    "placeholder": "Wartość w %",
-                }
-            ),
-            "scope": forms.Select(attrs={"class": "form-control"}),
+            "goal": forms.Select(attrs={"class": "form-control"}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        base_year = cleaned_data.get("base_year")
-        target_year = cleaned_data.get("target_year")
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop("company", None)
+        super().__init__(*args, **kwargs)
+        self.fields["goal"].empty_label = "-- Wybierz cel z listy --"
 
-        if base_year and target_year and base_year >= target_year:
-            raise forms.ValidationError(
-                "Rok docelowy musi być późniejszy niż rok bazowy."
-            )
-
-        return cleaned_data
+        if company:
+            qs = ReductionGoal.objects.filter(
+                Q(company__isnull=True) | Q(company=company)
+            ).order_by("company", "-target_year", "name")
+            self.fields["goal"].queryset = qs
+        else:
+            self.fields["goal"].queryset = ReductionGoal.objects.none()
 
 
 class SimulationForm(forms.Form):
@@ -52,7 +38,6 @@ class SimulationForm(forms.Form):
         empty_label="-- Cała organizacja (Wszystkie spółki) --",
         label="Spółka do symulacji",
     )
-
     current_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,
@@ -67,7 +52,6 @@ class SimulationForm(forms.Form):
         label="Ilość redukowana",
         help_text="Ilość zużycia, którą usuwasz z bilansu.",
     )
-
     new_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,

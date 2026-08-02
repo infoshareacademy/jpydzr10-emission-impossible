@@ -4,6 +4,9 @@
 {% block title %}Import — {{ model_verbose_name }} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
     /* Niestandardowy wygląd przycisku 'Wybierz plik' */
         input[type="file"] {
@@ -29,12 +32,10 @@
             box-shadow: 0 0 0 2px rgba(200, 245, 53, 0.1);
         }
 
-    /* Tabela podglądu – sticky header */
         .preview-table-wrapper {
             max-height: 65vh;
             overflow-y: auto;
         }
-    /* Cyberpunkowy Scrollbar dla tabeli */
         .preview-table-wrapper::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -54,18 +55,11 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            background: #151c27; /* Solidne tło dla nagłówka by wiersze nie przebijały */
+            background: #151c27;
             box-shadow: 0 1px 0 rgba(255,255,255,0.1);
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-7xl mx-auto space-y-6">
-
-    {# ===================================================================== #}
-    {# NAGŁÓWEK STRONY                                                       #}
-    {# ===================================================================== #}
         <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
             <div>
                 <a href="{{ list_url }}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
@@ -82,8 +76,6 @@
                     Firma: <strong class="text-accent">{{ company.name }}</strong>
                 </p>
             </div>
-
-        {# Wskaźnik kroków #}
             <div class="flex items-center gap-2 flex-shrink-0 mt-4 md:mt-0">
                 <span class="px-4 py-2 text-xs font-mono font-bold uppercase rounded-lg border transition-colors
                              {% if step == 'upload' %}bg-accent text-bg border-accent shadow-[0_0_15px_rgba(200,245,53,0.2)]{% else %}bg-[rgba(255,255,255,0.03)] text-text-muted border-border-subtle{% endif %}">
@@ -96,10 +88,6 @@
                 </span>
             </div>
         </div>
-
-    {# ===================================================================== #}
-    {# BŁĘDY STRUKTURY PLIKU                                                 #}
-    {# ===================================================================== #}
         {% if parse_errors %}
             <div class="bg-red-900/20 border border-red-500/50 p-5 rounded-xl shadow-lg backdrop-blur-sm">
                 <div class="flex items-center gap-2 mb-3">
@@ -118,18 +106,12 @@
                 </p>
             </div>
         {% endif %}
-
-    {# ===================================================================== #}
-    {# KROK 1 – FORMULARZ WGRANIA PLIKU                                      #}
-    {# ===================================================================== #}
         {% if step == 'upload' %}
             <div class="bg-[rgba(17,23,32,0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl">
 
                 <h2 class="text-xl font-heading font-bold uppercase tracking-wide text-text-main mb-6 border-b border-border-subtle pb-3">
                     Wgraj plik XLSX z danymi
                 </h2>
-
-            {# Instrukcje i wymagana struktura #}
                 <div class="mb-8 p-5 bg-[rgba(253,224,71,0.05)] border border-[rgba(253,224,71,0.2)] rounded-xl space-y-4">
                     <p class="font-mono font-bold text-sm uppercase tracking-wider text-yellow-400 flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">info</span> Wymagana struktura pliku
@@ -137,15 +119,11 @@
                     <p class="text-sm text-text-muted font-sans">
                         Plik <strong class="text-text-main">.xlsx</strong> musi zawierać dokładnie te nagłówki w pierwszym wierszu (kolejność i pisownia muszą się zgadzać):
                     </p>
-
-                {# Wizualizacja nagłówków #}
                     <div class="flex flex-wrap gap-2">
                         {% for h in importer_headers %}
                             <code class="px-3 py-1.5 bg-black/50 text-accent text-xs font-mono rounded-lg border border-[rgba(200,245,53,0.2)]">{{ h }}</code>
                         {% endfor %}
                     </div>
-
-                {# Instrukcje per kolumna #}
                     <ul class="space-y-2 mt-4 bg-[rgba(0,0,0,0.2)] p-4 rounded-lg border border-border-subtle">
                         {% for instr in instructions %}
                             <li class="text-xs text-text-muted font-mono flex gap-2">
@@ -166,8 +144,6 @@
                         </a>
                     </div>
                 </div>
-
-            {# Formularz wgrania #}
                 <form method="post" enctype="multipart/form-data" class="space-y-6">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="upload">
@@ -191,10 +167,6 @@
                 </form>
             </div>
         {% endif %}
-
-    {# ===================================================================== #}
-    {# KROK 2 – PODGLĄD I POTWIERDZENIE                                      #}
-    {# ===================================================================== #}
         {% if step == 'preview' %}
 
         {# Karty statystyk #}
@@ -224,8 +196,6 @@
                     </div>
                 </div>
             </div>
-
-        {# Banner z informacją o pomijaniu błędnych wierszy #}
             {% if invalid_count > 0 and valid_count > 0 %}
                 <div class="bg-yellow-900/20 border border-yellow-500/30 p-4 rounded-xl flex items-start gap-3 backdrop-blur-sm">
                     <span class="material-symbols-outlined text-yellow-500 mt-0.5">warning</span>
@@ -249,10 +219,6 @@
                     </div>
                 </div>
             {% endif %}
-
-        {# ================================================================ #}
-        {# TABELA PODGLĄDU                                                  #}
-        {# ================================================================ #}
             <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-2xl backdrop-blur-sm overflow-hidden shadow-lg">
 
                 <div class="p-5 bg-[rgba(255,255,255,0.02)] border-b border-border-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -270,7 +236,6 @@
                         </span>
                     </div>
                 </div>
-
                 <div class="preview-table-wrapper">
                     <table class="preview-table w-full text-left border-collapse">
                         <thead>
@@ -327,14 +292,9 @@
                     </table>
                 </div>
             </div>
-
-        {# ================================================================ #}
-        {# PRZYCISKI AKCJI                                                  #}
-        {# ================================================================ #}
             <div class="flex flex-col sm:flex-row flex-wrap justify-between items-center gap-4 pb-8">
 
                 <div class="flex flex-wrap gap-4 w-full sm:w-auto">
-                {# IMPORTUJ (tylko gdy są prawidłowe wiersze) #}
                     {% if valid_count > 0 %}
                         <form method="post" class="w-full sm:w-auto">
                             {% csrf_token %}
@@ -345,15 +305,11 @@
                             </button>
                         </form>
                     {% endif %}
-
-                {# WGRAJ INNY PLIK #}
                     <a href="{{ import_url }}" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-6 py-3 bg-[rgba(255,255,255,0.05)] text-text-main border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase hover:border-accent hover:text-accent transition-colors">
                         <span class="material-symbols-outlined text-[16px]">refresh</span>
                         Wgraj inny plik
                     </a>
                 </div>
-
-            {# ANULUJ – czyści sesję i wraca do listy #}
                 <form method="post" class="w-full sm:w-auto">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="cancel">
@@ -362,10 +318,7 @@
                         Anuluj import
                     </button>
                 </form>
-
             </div>
-
-        {# Info o atomowości #}
             <p class="text-xs font-mono text-text-muted text-center md:text-left">
                 <span class="material-symbols-outlined text-[14px] align-text-bottom mr-1">lock</span>
                 Import jest w 100% atomowy — w przypadku awarii żaden niekompletny rekord nie zostanie zapisany.

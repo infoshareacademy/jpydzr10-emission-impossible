@@ -53,7 +53,6 @@ $$ LANGUAGE plpgsql;
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0002_auto_20260701_2051"),
     ]

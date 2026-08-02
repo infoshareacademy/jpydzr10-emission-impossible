@@ -3,6 +3,9 @@
 {% block title %}Specyfikacja Fizykochemiczna — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     input, select, textarea {
       background: rgba(255,255,255,0.04) !important;
@@ -39,14 +42,7 @@
     }
     select option { background: #151c27; color: #e8f4f0; }
   </style>
-{% endblock %}
-
-{% block content %}
   <div class="max-w-3xl mx-auto">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="mb-8">
       <a href="{% url 'calculator:fuelspec_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
@@ -57,10 +53,6 @@
       </div>
       <p class="font-mono text-sm text-text-muted mt-3">Wprowadzanie gęstości oraz wartości opałowych dla dokładnych przeliczeń Scope 1.</p>
     </div>
-
-  <!-- ===================== -->
-  <!-- FORM -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <form method="post" class="space-y-6">
         {% csrf_token %}
@@ -70,8 +62,6 @@
             {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
           </div>
         {% endif %}
-
-      <!-- Fuel type & supplier -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-border-subtle">
           <div class="flex flex-col gap-2">
             <label for="{{ form.fuel_type.id_for_label }}" class="font-mono text-xs uppercase tracking-wider text-text-muted">{{ form.fuel_type.label }}</label>
@@ -84,8 +74,6 @@
             {% if form.supplier.errors %}<p class="font-mono text-xs text-red-400">{{ form.supplier.errors|striptags }}</p>{% endif %}
           </div>
         </div>
-
-      <!-- Physical indicators -->
         <div class="space-y-4">
           <h3 class="font-mono text-xs font-bold uppercase tracking-widest text-accent border-l-2 border-accent pl-3">Wskaźniki fizykochemiczne</h3>
 
@@ -94,7 +82,6 @@
             {{ form.density_kg_per_m3 }}
             {% if form.density_kg_per_m3.errors %}<p class="font-mono text-xs text-red-400">{{ form.density_kg_per_m3.errors|striptags }}</p>{% endif %}
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col gap-2">
               <label for="{{ form.calorific_mj_per_kg.id_for_label }}" class="font-mono text-xs uppercase tracking-wider text-text-muted">{{ form.calorific_mj_per_kg.label }}</label>
@@ -108,8 +95,6 @@
             </div>
           </div>
         </div>
-
-      <!-- Is default checkbox -->
         <div class="rounded-xl border border-border-subtle p-4 flex items-start gap-3" style="background:rgba(255,255,255,0.03);">
           <div class="mt-0.5">{{ form.is_default }}</div>
           <div class="flex flex-col gap-1">
@@ -117,8 +102,6 @@
             <span class="font-mono text-xs text-text-muted">Automatyczne stosowanie tych przeliczników jeśli nie wskazano konkretnego dostawcy.</span>
           </div>
         </div>
-
-      <!-- Buttons -->
         <div class="flex gap-4 pt-4 border-t border-border-subtle">
           <a href="{% url 'calculator:fuelspec_list' %}"
              class="flex-1 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors text-center">
@@ -130,7 +113,6 @@
             Zapisz specyfikację
           </button>
         </div>
-
       </form>
     </div>
   </div>

@@ -17,4 +17,5 @@ urlpatterns = [
     path("calculator/", include("calculator.urls")),
     path("communications/", include("communications.urls")),
     path("privacy/", PrivacyPolicyView.as_view(), name="privacy-policy"),
+    path("workflow/", include("workflow.urls", namespace="workflow")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

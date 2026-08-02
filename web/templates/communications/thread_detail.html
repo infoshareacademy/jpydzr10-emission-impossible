@@ -6,7 +6,6 @@
         <a href="{% url 'communications:thread_list' %}" class="flex items-center gap-2 text-text-muted hover:text-accent font-mono text-sm transition-colors">
             <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span> Powrót do listy
         </a>
-
         {% if thread.status == 'open' and thread.author == request.user %}
             <form method="POST" action="{% url 'communications:thread_close' thread.id %}">
                 {% csrf_token %}
@@ -16,7 +15,6 @@
             </form>
         {% endif %}
     </div>
-
     <div class="bg-[rgba(42,63,74,0.4)] border border-border-subtle rounded-xl p-6 mb-8 relative overflow-hidden">
         <div class="absolute left-0 top-0 bottom-0 w-1 {% if thread.status == 'open' %}bg-accent{% else %}bg-text-muted{% endif %}"></div>
 
@@ -36,7 +34,6 @@
             </div>
         </div>
     </div>
-
     <div class="space-y-6 mb-8">
         {% for msg in thread.messages.all %}
             <div class="flex flex-col {% if msg.sender == request.user %}items-end{% else %}items-start{% endif %}">
@@ -57,7 +54,6 @@
             </div>
         {% endfor %}
     </div>
-
     {% if thread.status == 'open' %}
         <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-xl p-6">
             <form method="POST">
@@ -78,5 +74,4 @@
             <p class="text-text-muted font-mono text-sm">Ten wątek został zamknięty. Nie można dodawać nowych wiadomości.</p>
         </div>
     {% endif %}
-
 {% endblock %}

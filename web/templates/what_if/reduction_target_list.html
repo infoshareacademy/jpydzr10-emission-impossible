@@ -3,6 +3,9 @@
 {% block title %}Cele Redukcyjne — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     select {
       background: rgba(255,255,255,0.04) !important;
@@ -25,14 +28,7 @@
     select:focus { border-color: rgba(200,245,53,0.5) !important; }
     select option { background: #151C27; color: #E8F4F0; }
   </style>
-{% endblock %}
-
-{% block content %}
   <div class="space-y-8">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <div class="flex items-center gap-3 mb-1">
@@ -47,10 +43,6 @@
         <span class="material-symbols-outlined" style="font-size:16px;">science</span> Symulacja What-If
       </a>
     </div>
-
-  <!-- ===================== -->
-  <!-- FILTER + ADD -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle p-6 flex flex-col md:flex-row md:items-end justify-between gap-5"
          style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <form method="GET" action="{% url 'what_if:reduction-target-list' %}" class="flex flex-col gap-2 flex-1 max-w-sm">
@@ -71,10 +63,6 @@
         </a>
       {% endif %}
     </div>
-
-  <!-- ===================== -->
-  <!-- TABLE -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle overflow-hidden"
          style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
 

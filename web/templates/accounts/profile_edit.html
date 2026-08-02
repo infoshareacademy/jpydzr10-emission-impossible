@@ -3,6 +3,9 @@
 {% block title %}Edycja Profilu — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
   <style>
     input[type="text"],
     input[type="email"],
@@ -38,14 +41,7 @@
       border-color: rgba(200,245,53,0.4) !important;
     }
   </style>
-{% endblock %}
-
-{% block content %}
   <div class="max-w-lg mx-auto">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
     <div class="mb-8">
       <a href="{% url 'accounts:profile' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć do profilu
@@ -56,10 +52,6 @@
       </div>
       <p class="font-mono text-sm text-text-muted mt-3">Modyfikacja danych osobowych konta.</p>
     </div>
-
-  <!-- ===================== -->
-  <!-- FORM -->
-  <!-- ===================== -->
     <div class="rounded-2xl border border-border-subtle p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
       <form method="post" enctype="multipart/form-data" class="space-y-5">
         {% csrf_token %}
@@ -69,7 +61,6 @@
             {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
           </div>
         {% endif %}
-
         {% for field in form %}
           <div class="flex flex-col gap-2">
             <label for="{{ field.id_for_label }}" class="font-mono text-xs text-text-muted uppercase tracking-wider">
@@ -84,7 +75,6 @@
             {% endfor %}
           </div>
         {% endfor %}
-
         <div class="flex gap-4 pt-4 border-t border-border-subtle">
           <a href="{% url 'accounts:profile' %}"
              class="flex-1 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors text-center">
@@ -96,7 +86,6 @@
             Zapisz zmiany
           </button>
         </div>
-
       </form>
     </div>
   </div>

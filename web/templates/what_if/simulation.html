@@ -3,6 +3,10 @@
 {% block title %}Symulator What-If — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+
+{% endblock %}
+
+{% block content %}
 <style>
   .custom-input {
     background: rgba(255,255,255,0.04) !important;
@@ -37,15 +41,8 @@
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
 
-{% block content %}
 <div class="max-w-7xl mx-auto space-y-6">
-
-  <!-- ===================== -->
-  <!-- HEADER -->
-  <!-- ===================== -->
   <div class="flex justify-between items-center no-print">
     <a href="{% url 'what_if:reduction-target-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider">
       <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Powrót do listy celów
@@ -58,10 +55,6 @@
     </button>
     {% endif %}
   </div>
-
-  <!-- ===================== -->
-  <!-- SIMULATION FORM -->
-  <!-- ===================== -->
   <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
     <div class="mb-6 pb-4 border-b border-border-subtle flex items-center gap-2">
       <span class="material-symbols-outlined text-accent">science</span>
@@ -133,10 +126,6 @@
       </div>
     </form>
   </div>
-
-  <!-- ===================== -->
-  <!-- RESULTS -->
-  <!-- ===================== -->
   {% if actual.total > 0 %}
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -208,12 +197,16 @@
 
 {% if simulated %}
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const ctx = document.getElementById('comparisonChart').getContext('2d');
+  (function() {
+    const canvas = document.getElementById('comparisonChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
     const actualValue = {{ actual.total|stringformat:"f" }};
     const simulatedValue = {{ simulated.total|stringformat:"f" }};
     const simColor = simulatedValue < actualValue ? 'rgba(74,222,128,0.8)' : 'rgba(248,113,113,0.8)';
     const simBorder = simulatedValue < actualValue ? 'rgba(74,222,128,1)' : 'rgba(248,113,113,1)';
+
     new Chart(ctx, {
       type: 'bar',
       data: {
@@ -229,20 +222,22 @@
         }
       }
     });
-  });
+  })();
 </script>
 {% endif %}
 
 <script>
-  document.querySelectorAll('input, select').forEach(el => el.classList.add('custom-input'));
+  (function() {
+    document.querySelectorAll('input, select').forEach(el => el.classList.add('custom-input'));
 
-  document.addEventListener("DOMContentLoaded", function() {
     const factorValues = {{ factors_json|safe }};
     const currentFactorSelect = document.getElementById('id_current_factor');
     const reducedAmountInput = document.getElementById('id_reduced_amount');
     const newFactorSelect = document.getElementById('id_new_factor');
     const addedAmountInput = document.getElementById('id_added_amount');
     const previewEl = document.getElementById('live-preview');
+
+    if (!currentFactorSelect || !previewEl) return;
 
     function calculateLivePreview() {
       const currentVal = currentFactorSelect.value;
@@ -252,18 +247,25 @@
       const currentA = cleanNum(reducedAmountInput.value);
       const newF = parseFloat(factorValues[newVal]) || 0;
       const newA = cleanNum(addedAmountInput.value);
+
       if (currentVal && newVal && (currentA > 0 || newA > 0)) {
         const diff = (newA * newF) - (currentA * currentF);
         if (diff > 0) previewEl.innerHTML = `<span class="text-red-400">+${diff.toFixed(3)} tCO₂e (Wzrost emisji)</span>`;
         else if (diff < 0) previewEl.innerHTML = `<span class="text-green-400">${diff.toFixed(3)} tCO₂e (Oszczędność emisyjna)</span>`;
         else previewEl.innerHTML = `<span class="text-text-main">0.000 tCO₂e (Bilans neutralny)</span>`;
-      } else { previewEl.innerText = "-- tCO₂e"; }
+      } else {
+        previewEl.innerText = "-- tCO₂e";
+      }
     }
 
     [currentFactorSelect, reducedAmountInput, newFactorSelect, addedAmountInput].forEach(el => {
-      if(el) { el.addEventListener('input', calculateLivePreview); el.addEventListener('change', calculateLivePreview); }
+      if(el) {
+        el.addEventListener('input', calculateLivePreview);
+        el.addEventListener('change', calculateLivePreview);
+      }
     });
+
     calculateLivePreview();
-  });
+  })();
 </script>
 {% endblock %}
