@@ -86,6 +86,16 @@ class Companies(CoreModel):
         related_name="companies",
         related_query_name="company",
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Czy spółka aktywna",
+        help_text="Jeśli odznaczone, spółka nie będzie uwzględniana w procesach raportowania.",
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = "Spółka"
+        verbose_name_plural = "Spółki"
 
     def __str__(self):
         return self.name

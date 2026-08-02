@@ -1,10 +1,12 @@
 import datetime
 
 from accounts.models import CustomUser
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -50,15 +52,22 @@ class CompanyAccessMixin:
             ).distinct()
 
 
-class CompaniesListView(CompanyAccessMixin, ListView):
+class CompaniesListView(PageViewTrackerMixin, CompanyAccessMixin, ListView):
     model = Companies
     template_name = "companies/companies_list.html"
     context_object_name = "companies"
+    tracked_view_name = "Lista Firm"
 
+    def _get_selected_year(self):
+        """Metoda pomocnicza do ujednolicenia pobierania roku z requestu (DRY)"""
+        current_year = timezone.now().year
+        try:
+            return int(self.request.GET.get("year", current_year))
+        except ValueError:
+            return current_year
+        
     def get_queryset(self):
         qs = super().get_queryset()
-
-        # 1. Obsługa wyszukiwania tekstu
         query = self.request.GET.get("q")
         if query:
             qs = qs.filter(Q(name__icontains=query) | Q(nip__icontains=query))
@@ -116,14 +125,11 @@ class CompaniesListView(CompanyAccessMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        try:
-            selected_year = int(
-                self.request.GET.get("year", datetime.datetime.now().year)
-            )
-        except ValueError:
-            selected_year = datetime.datetime.now().year
-
+        selected_year = self._get_selected_year()
         context["selected_year"] = selected_year
+
+        current_year = timezone.now().year
+        context["available_years"] = range(2019, current_year + 3)
 
         for company in context["companies"]:
             filled_tables = sum(

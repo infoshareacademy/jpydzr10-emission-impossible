@@ -6,8 +6,10 @@
 {% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
         .custom-form-container input,
         .custom-form-container select,
         .custom-form-container textarea {
@@ -39,12 +41,7 @@
             cursor: pointer;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-4xl mx-auto">
-
-    {# --- Nagłówek --- #}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <a href="{% url 'emissions:factor-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
@@ -59,24 +56,16 @@
                 </div>
             </div>
         </div>
-
-    {# --- Karta z formularzem --- #}
         <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
             <form method="post" novalidate class="space-y-6">
                 {% csrf_token %}
-
-            {# Grupa pól w układzie siatki #}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for field in form %}
-                    {# Warunek rozciągania na dwie kolumny np. dla dłuższych opisów lub źródeł #}
                         <div class="flex flex-col gap-2 {% if field.name == 'notes' or field.name == 'description' or field.name == 'source' %}md:col-span-2{% endif %}">
                             <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-widest text-text-muted">
                                 {{ field.label }}
                             </label>
-
                             {{ field }}
-
-                        {# Komunikaty o błędach walidacji pola #}
                             {% if field.errors %}
                                 <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
                                     <span class="material-symbols-outlined text-sm">error</span>
@@ -86,8 +75,6 @@
                         </div>
                     {% endfor %}
                 </div>
-
-            {# --- Sekcja przycisków akcji --- #}
                 <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
                     <a href="{% url 'emissions:factor-list' %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
                         Anuluj

@@ -1,9 +1,10 @@
 from accounts.models import CustomUser
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import CreateView, DetailView, ListView, View
 
 from .forms import MessageReplyForm, ThreadCreateForm
@@ -13,7 +14,7 @@ from .send_mail import (
 )
 
 
-class ThreadListView(LoginRequiredMixin, ListView):
+class ThreadListView(PageViewTrackerMixin, LoginRequiredMixin, ListView):
     model = Thread
     template_name = "communications/thread_list.html"
     context_object_name = "threads"

@@ -2,6 +2,7 @@ import json
 
 from accounts.models import UserCompanyPermission
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.views.generic import TemplateView
@@ -10,19 +11,19 @@ from emissions.models import (
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,
-    RecordStatus,
     StationaryCombustion,
 )
+from workflow.models import WorkflowStatusMixin
 
 EMISSION_FIELDS = {
     "calculated": "calculated_emission_tco2eq",
     "declared": "emission_tco2eq",
 }
 
-DEFAULT_STATUSES = [choice[0] for choice in RecordStatus.choices]
+DEFAULT_STATUSES = [choice[0] for choice in WorkflowStatusMixin.RecordStatus.choices]
 
 
-class GHGReportView(LoginRequiredMixin, TemplateView):
+class GHGReportView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
     template_name = "reports/ghg_report.html"
 
     def get_accessible_companies(self):
@@ -34,7 +35,7 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
         )
         return Companies.objects.filter(id__in=perm_company_ids).order_by("name")
 
-    def get_emissions_for_scope(self, company_ids, year, statuses, emission_field):
+    def get_emissions_for_scope(self, company_ids, year, selected_statuses, emission_field):
         s1_total = 0
         for model in [
             StationaryCombustion,
@@ -45,14 +46,14 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
             result = model.objects.filter(
                 company_id__in=company_ids,
                 year=year,
-                status__in=statuses,
+                workflow_status__in=selected_statuses,
             ).aggregate(total=Sum(emission_field))
             s1_total += result["total"] or 0
 
         s2_result = EnergyConsumption.objects.filter(
             company_id__in=company_ids,
             year=year,
-            status__in=statuses,
+            workflow_status__in=selected_statuses,
         ).aggregate(total=Sum(emission_field))
         s2_total = s2_result["total"] or 0
 
@@ -77,7 +78,9 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
         emission_field = EMISSION_FIELDS[emission_source]
 
         if "statuses" in self.request.GET:
-            valid_statuses = [choice[0] for choice in RecordStatus.choices]
+            valid_statuses = [
+                choice[0] for choice in WorkflowStatusMixin.RecordStatus.choices
+            ]
             selected_statuses = [
                 s for s in self.request.GET.getlist("statuses") if s in valid_statuses
             ]
@@ -144,7 +147,7 @@ class GHGReportView(LoginRequiredMixin, TemplateView):
                 "compare_year": compare_year,
                 "emission_source": emission_source,
                 "selected_statuses": selected_statuses,
-                "all_statuses": RecordStatus.choices,
+                "all_statuses": WorkflowStatusMixin.RecordStatus.choices,
                 "s1_current": round(s1_current, 2),
                 "s2_current": round(s2_current, 2),
                 "total_current": round(total_current, 2),

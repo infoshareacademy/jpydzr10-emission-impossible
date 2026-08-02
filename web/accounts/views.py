@@ -1,10 +1,11 @@
 from companies.models import Companies
+from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, UpdateView, View
@@ -19,8 +20,9 @@ from django.utils import timezone
 from .models import TOTPDevice
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
+    tracked_view_name = "Profil"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

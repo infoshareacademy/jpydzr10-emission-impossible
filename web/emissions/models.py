@@ -5,6 +5,7 @@ from companies.models import Companies, Countries
 from core.models import CoreModel
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from workflow.models import WorkflowStatusMixin
 
 # Modele abstrakcyjne — nie tworzą tabel w bazie
 # służą jako baza dla innych modeli
@@ -21,24 +22,10 @@ class BaseRecord(CoreModel):
         abstract = True
 
 
-class RecordStatus(models.TextChoices):
-    DRAFT = "DRAFT", _("Roboczy")
-    PENDING = "PENDING", _("Do akceptacji")
-    APPROVED = "APPROVED", _("Zatwierdzony")
-    VERIFIED = "VERIFIED", _("Zweryfikowany")
-    REJECTED = "REJECTED", _("Odrzucony")
-
-
 class ActivityRecord(BaseRecord):
     amount = models.DecimalField(max_digits=12, decimal_places=3)
     unit = models.CharField(max_length=20)
     source = models.CharField(max_length=200, blank=True, null=True)
-    status = models.CharField(
-        max_length=20,
-        choices=RecordStatus.choices,
-        default=RecordStatus.DRAFT,
-        verbose_name=_("Status"),
-    )
     emission_tco2eq = models.DecimalField(
         max_digits=12,
         decimal_places=3,
@@ -87,7 +74,7 @@ class ActivityRecord(BaseRecord):
         abstract = True
 
 
-class StationaryCombustion(ActivityRecord):
+class StationaryCombustion(ActivityRecord, WorkflowStatusMixin):
     fuel = models.ForeignKey(
         FuelType,
         on_delete=models.PROTECT,
@@ -97,13 +84,16 @@ class StationaryCombustion(ActivityRecord):
     installation = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
 
+    def __str__(self):
+        return f"Spalanie: {self.fuel} ({self.amount} jednostek)"
+
     class Meta:
         db_table = "tbl_stationary_combustion"
         verbose_name = "Spalanie stacjonarne"
         verbose_name_plural = "Spalanie stacjonarne"
 
 
-class MobileCombustion(ActivityRecord):
+class MobileCombustion(ActivityRecord, WorkflowStatusMixin):
     vehicle = models.CharField(max_length=200)
     fuel = models.ForeignKey(
         FuelType,
@@ -119,7 +109,7 @@ class MobileCombustion(ActivityRecord):
         verbose_name_plural = "Spalanie mobilne"
 
 
-class ProcessEmission(ActivityRecord):
+class ProcessEmission(ActivityRecord, WorkflowStatusMixin):
     process = models.CharField(max_length=200)
     product = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
@@ -130,7 +120,7 @@ class ProcessEmission(ActivityRecord):
         verbose_name_plural = "Emisje procesowe"
 
 
-class FugitiveEmission(ActivityRecord):
+class FugitiveEmission(ActivityRecord, WorkflowStatusMixin):
     installation = models.CharField(max_length=200)
     product = models.CharField(max_length=200)
     raport = models.CharField(max_length=300, blank=True, null=True)
@@ -141,7 +131,7 @@ class FugitiveEmission(ActivityRecord):
         verbose_name_plural = "Emisje niezorganizowane"
 
 
-class EnergyConsumption(ActivityRecord):
+class EnergyConsumption(ActivityRecord, WorkflowStatusMixin):
     energy_source = models.CharField(max_length=100)
     energy_type = models.CharField(max_length=100)
 
@@ -154,9 +144,7 @@ class EnergyConsumption(ActivityRecord):
         from emissions.models import EmissionFactor
 
         factor_obj = EmissionFactor.objects.filter(
-            year=self.year,
-            country=self.company.country,
-            factor_name=self.energy_type
+            year=self.year, country=self.company.country, factor_name=self.energy_type
         ).first()
 
         if factor_obj:
@@ -167,7 +155,7 @@ class EnergyConsumption(ActivityRecord):
         super().save(*args, **kwargs)
 
 
-class EnergyPurchased(ActivityRecord):
+class EnergyPurchased(ActivityRecord, WorkflowStatusMixin):
     energy_type = models.CharField(max_length=100)
     trader = models.CharField(max_length=200, blank=True, default="")
     factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))
@@ -178,7 +166,7 @@ class EnergyPurchased(ActivityRecord):
         verbose_name_plural = "Zakupiona energia"
 
 
-class EnergyProduced(ActivityRecord):
+class EnergyProduced(ActivityRecord, WorkflowStatusMixin):
     installation = models.CharField(max_length=200, blank=True, default="")
     energy_type = models.CharField(max_length=100)
     factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))
@@ -189,7 +177,7 @@ class EnergyProduced(ActivityRecord):
         verbose_name_plural = "Wyprodukowana energia"
 
 
-class EnergySold(ActivityRecord):
+class EnergySold(ActivityRecord, WorkflowStatusMixin):
     energy_type = models.CharField(max_length=100)
     customer = models.CharField(max_length=200, blank=True, default="")
 

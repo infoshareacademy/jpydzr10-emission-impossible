@@ -6,8 +6,11 @@
 {% endblock %}
 
 {% block extra_head %}
+
+{% endblock %}
+
+{% block content %}
     <style>
-    /* Globalne ujednolicenie pól formularza wstrzykiwanych przez Django {{ field }} */
         .custom-form-container input,
         .custom-form-container select,
         .custom-form-container textarea {
@@ -39,9 +42,6 @@
             cursor: pointer;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-4xl mx-auto">
 
     {# --- Nagłówek --- #}

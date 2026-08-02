@@ -14,4 +14,3 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ["thread", "sender", "created_at"]
     list_filter = ["sender"]
     search_fields = ["thread__subject", "sender__username", "content"]
-

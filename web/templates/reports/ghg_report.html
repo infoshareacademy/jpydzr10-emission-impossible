@@ -1,280 +1,224 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Raport GHG — Emission Impossible{% endblock %}
+
 {% block extra_head %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @media print {
-            @page {
-                size: landscape;
-                margin: 10mm;
-            }
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background-color: #0d131a !important;
-                color: #e8f4f0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .bg-\[rgba\(42\,63\,74\,0\.3\)\] {
-                background-color: #16222f !important;
-                border: 1px solid rgba(200, 245, 53, 0.15) !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-        }
-    </style>
 {% endblock %}
 
 {% block content %}
+<style>
+  select, input[type="number"] {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid #2a3f4a !important;
+    border-radius: 10px !important;
+    color: #e8f4f0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237ab5ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 2.5rem !important;
+  }
+  input[type="number"] {
+    background-image: none !important;
+    padding-right: 12px !important;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: rgba(200,245,53,0.5) !important;
+  }
+  select option { background: #151c27; color: #e8f4f0; }
+</style>
 <div class="space-y-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <a href="javascript:history.back()" class="no-print font-mono text-sm uppercase text-text-muted hover:text-accent transition-colors mb-2 inline-flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">arrow_back</span> Wróć
-            </a>
-            <h1 class="text-3xl font-heading font-bold uppercase tracking-wide text-text-main">Raport Śladu Węglowego (GHG)</h1>
-        </div>
-        <button onclick="window.print()" class="no-print px-5 py-2.5 bg-transparent text-accent border border-accent rounded-lg font-mono text-sm hover:bg-accent hover:text-bg transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-lg">picture_as_pdf</span> Pobierz PDF
-        </button>
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Raport Śladu Węglowego (GHG)</h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4 mt-3">Analiza emisji gazów cieplarnianych dla wybranych spółek i lat.</p>
     </div>
-    <form method="get" class="no-print bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-lg p-5 flex flex-wrap gap-5 items-end backdrop-blur-sm">
-        <div class="flex flex-col gap-2 flex-1 min-w-[200px]">
-            <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Spółka</label>
-            <select name="company" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(200, 245, 53, 0.2);" class="rounded-lg px-3 py-2 text-sm text-[#e8f4f0] font-mono focus:outline-none focus:border-accent w-full">
-                <option value="all" class="bg-bg text-text-main" {% if selected_company == 'all' %}selected{% endif %}>Wszystkie dostępne spółki</option>
-                {% for comp in companies %}
-                    <option value="{{ comp.id }}" class="bg-bg text-text-main" {% if selected_company == comp.id|stringformat:"s" %}selected{% endif %}>{{ comp.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="flex flex-col gap-2">
-            <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Rok</label>
-            <input type="number" name="year" value="{{ selected_year }}"
-                   style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(200, 245, 53, 0.2);"
-                   class="rounded-lg px-3 py-2 text-sm text-[#e8f4f0] font-mono focus:outline-none focus:border-accent w-24">
-        </div>
-        <div class="flex flex-col gap-2">
-            <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Rok do porównania</label>
-            <input type="number" name="compare_year" value="{{ compare_year }}"
-                   style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(200, 245, 53, 0.2);"
-                   class="rounded-lg px-3 py-2 text-sm text-[#e8f4f0] font-mono focus:outline-none focus:border-accent w-36">
-        </div>
-        <div class="flex flex-col gap-2">
-            <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Źródło emisji</label>
-            <select name="emission_source" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(200, 245, 53, 0.2);" class="rounded-lg px-3 py-2 text-sm text-[#e8f4f0] font-mono focus:outline-none focus:border-accent">
-                <option value="calculated" class="bg-bg text-text-main" {% if emission_source == 'calculated' %}selected{% endif %}>Wyliczona (system)</option>
-                <option value="declared" class="bg-bg text-text-main" {% if emission_source == 'declared' %}selected{% endif %}>Zadeklarowana (użytkownik)</option>
-            </select>
-        </div>
-        <div class="flex flex-col gap-2">
-            <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Statusy rekordów</label>
-            <div class="flex flex-wrap gap-2">
-                {% for value, label in all_statuses %}
-                <label class="flex items-center gap-1 text-xs font-mono cursor-pointer rounded px-3 py-1.5 transition-colors border
-                              {% if value in selected_statuses %}bg-accent text-bg border-accent{% else %}bg-transparent text-text-muted border-border-subtle hover:border-accent hover:text-text-main{% endif %}">
-                    <input type="checkbox" name="statuses" value="{{ value }}"
-                           {% if value in selected_statuses %}checked{% endif %}
-                           class="hidden">
-                    {{ label }}
-                </label>
-                {% endfor %}
-            </div>
-        </div>
-        <button type="submit" class="px-6 py-2 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-lg hover:brightness-110 transition-all self-end h-[38px]">
-            Generuj
-        </button>
-    </form>
-    {% if no_statuses_selected %}
-    <div class="no-print bg-red-900/20 border border-red-500/50 rounded-lg p-5 flex items-start gap-3 backdrop-blur-sm">
-        <span class="material-symbols-outlined text-red-400 mt-0.5">error</span>
-        <div>
-            <p class="font-mono font-bold text-red-400 text-sm">Nie wybrano żadnego statusu</p>
-            <p class="text-red-300/70 text-xs mt-1 font-sans">Zaznacz co najmniej jeden status rekordów i kliknij "Generuj Raport".</p>
-        </div>
+    <button onclick="downloadPDF()"
+      class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors flex-shrink-0"
+      style="background:#1a4a52; border:1px solid #2a6a72;">
+      <span class="material-symbols-outlined" style="font-size:18px;">picture_as_pdf</span> Pobierz PDF
+    </button>
+  </div>
+  <form method="get" class="rounded-2xl border border-border-subtle p-6 flex flex-wrap gap-5 items-end"
+    style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+    <div class="flex flex-col gap-2 flex-1 min-w-[200px]">
+      <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Spółka</label>
+      <select name="company">
+        <option value="all" {% if selected_company == 'all' %}selected{% endif %}>Wszystkie dostępne spółki</option>
+        {% for comp in companies %}
+        <option value="{{ comp.id }}" {% if selected_company == comp.id|stringformat:"s" %}selected{% endif %}>{{ comp.name }}</option>
+        {% endfor %}
+      </select>
     </div>
-    {% elif not has_data %}
-    <div class="no-print bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-5 flex items-start gap-3 backdrop-blur-sm">
-        <span class="material-symbols-outlined text-yellow-400 mt-0.5">warning</span>
-        <div>
-            <p class="font-mono font-bold text-yellow-400 text-sm">Brak danych dla wybranych filtrów</p>
-            <p class="text-yellow-300/70 text-xs mt-1 font-sans">
-                Brak rekordów emisji dla roku <strong class="text-yellow-400">{{ selected_year }}</strong>
-                {% if form_submitted %}przy wybranych statusach: <strong class="text-yellow-400">{{ selected_statuses|join:", " }}</strong>.{% endif %}
-                Sprawdź czy dane zostały wprowadzone i zatwierdzone.
-            </p>
-        </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Rok</label>
+      <input type="number" name="year" value="{{ selected_year }}" style="width:100px;">
     </div>
-    {% endif %}
-    <div id="pdf-content" class="space-y-6">
-        <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-lg p-6 backdrop-blur-sm">
-            <h2 class="text-lg font-heading font-bold text-text-main mb-6 border-b border-border-subtle pb-3">
-                Emisje Skumulowane (tCO₂e) — {{ selected_year|add:"-2" }}–{{ selected_year }}
-            </h2>
-            <div class="relative h-72 w-full">
-                <canvas id="stackedBarChart"></canvas>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-lg p-6 flex flex-col justify-center backdrop-blur-sm">
-                <h3 class="text-md font-heading font-bold text-text-main mb-4 border-b border-border-subtle pb-2">Wielkość Emisji ({{ selected_year }})</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center font-mono">
-                        <span class="text-text-muted text-sm">Zakres 1:</span>
-                        <span class="text-xl font-bold text-text-main">{{ s1_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
-                    </div>
-                    <div class="flex justify-between items-center font-mono">
-                        <span class="text-text-muted text-sm">Zakres 2:</span>
-                        <span class="text-xl font-bold text-text-main">{{ s2_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
-                    </div>
-                    <div class="flex justify-between items-center pt-4 border-t border-border-subtle font-mono">
-                        <span class="text-accent uppercase text-sm font-bold">Suma:</span>
-                        <span class="text-2xl font-bold text-accent">{{ total_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-lg p-6 flex flex-col items-center relative backdrop-blur-sm">
-                <h3 class="text-md font-heading font-bold text-text-main w-full text-left mb-4 border-b border-border-subtle pb-2">Struktura Emisji ({{ selected_year }})</h3>
-                <div class="relative w-48 h-48">
-                    <canvas id="donutChart"></canvas>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span id="donut-center-val" class="text-2xl font-mono font-bold text-text-main">{{ total_current }}</span>
-                        <span id="donut-center-lbl" class="text-[10px] font-mono text-text-muted uppercase">Suma tCO₂e</span>
-                    </div>
-                </div>
-                <p class="text-[10px] font-mono text-text-muted mt-4 text-center no-print">Kliknij legendę, aby filtrować.</p>
-            </div>
-
-            <div class="bg-[rgba(42,63,74,0.3)] border border-border-subtle rounded-lg p-6 flex flex-col backdrop-blur-sm">
-                <h3 class="text-md font-heading font-bold text-text-main mb-4 border-b border-border-subtle pb-2">Porównanie (YoY)</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="bg-[rgba(255,255,255,0.03)] p-3 rounded border border-border-subtle flex flex-col justify-center items-center">
-                        <div class="text-xs font-mono text-text-muted uppercase mb-1">{{ selected_year }}</div>
-                        <div class="font-mono font-bold text-text-main">{{ total_current }} <span class="text-[10px] text-text-muted">t</span></div>
-                    </div>
-                    <div class="bg-[rgba(255,255,255,0.03)] p-3 rounded border border-border-subtle flex flex-col justify-center items-center">
-                        <div class="text-xs font-mono text-text-muted uppercase mb-1">{{ compare_year }}</div>
-                        <div class="font-mono font-bold text-text-main">{{ total_compare }} <span class="text-[10px] text-text-muted">t</span></div>
-                    </div>
-                </div>
-                <div class="mt-auto pt-2 border-t border-border-subtle">
-                    <span class="text-xs font-mono uppercase text-text-muted block mb-1">Całkowita Zmiana:</span>
-                    <div class="text-2xl font-mono font-bold {% if reduction_pct < 0 %}text-accent{% elif reduction_pct > 0 %}text-red-400{% else %}text-text-main{% endif %}">
-                        {% if reduction_pct > 0 %}+{% endif %}{{ reduction_pct }}%
-                    </div>
-                    <div class="text-[10px] font-mono uppercase mt-1
-                        {% if reduction_pct < 0 %}text-accent{% elif reduction_pct > 0 %}text-red-400{% else %}text-text-muted{% endif %}">
-                        {% if reduction_pct < 0 %}Spadek emisji (dobrze){% elif reduction_pct > 0 %}Wzrost emisji (źle){% else %}Brak zmian{% endif %}
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Rok do porównania</label>
+      <input type="number" name="compare_year" value="{{ compare_year }}" style="width:140px;">
     </div>
-
+    <div class="flex flex-col gap-2">
+      <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Źródło emisji</label>
+      <select name="emission_source">
+        <option value="calculated" {% if emission_source == 'calculated' %}selected{% endif %}>Wyliczona (system)</option>
+        <option value="declared" {% if emission_source == 'declared' %}selected{% endif %}>Zadeklarowana (użytkownik)</option>
+      </select>
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-mono text-xs uppercase text-text-muted tracking-widest">Statusy rekordów</label>
+      <div class="flex flex-wrap gap-2">
+        {% for value, label in all_statuses %}
+        <label class="flex items-center gap-1 font-mono text-xs cursor-pointer rounded-lg px-3 py-1.5 transition-colors border
+          {% if value in selected_statuses %}border-accent text-accent{% else %}border-border-subtle text-text-muted hover:border-accent hover:text-text-main{% endif %}"
+          style="{% if value in selected_statuses %}background:rgba(200,245,53,0.12);{% else %}background:transparent;{% endif %}">
+          <input type="checkbox" name="statuses" value="{{ value }}" {% if value in selected_statuses %}checked{% endif %} class="hidden">
+          {{ label }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <button type="submit"
+      class="px-6 py-2.5 font-mono font-bold uppercase text-sm rounded-xl text-white transition-colors self-end"
+      style="background:#1a4a52; border:1px solid #2a6a72;">
+      Generuj
+    </button>
+  </form>
+  {% if no_statuses_selected %}
+  <div class="rounded-2xl border border-red-500/50 p-5 flex items-start gap-3" style="background:rgba(42,10,10,0.3);">
+    <span class="material-symbols-outlined text-red-400 mt-0.5">error</span>
+    <div>
+      <p class="font-mono font-bold text-red-400 text-sm">Nie wybrano żadnego statusu</p>
+      <p class="font-mono text-xs text-red-300/70 mt-1">Zaznacz co najmniej jeden status rekordów i kliknij "Generuj".</p>
+    </div>
+  </div>
+  {% elif not has_data %}
+  <div class="rounded-2xl border border-yellow-500/50 p-5 flex items-start gap-3" style="background:rgba(42,33,10,0.3);">
+    <span class="material-symbols-outlined text-yellow-400 mt-0.5">warning</span>
+    <div>
+      <p class="font-mono font-bold text-yellow-400 text-sm">Brak danych dla wybranych filtrów</p>
+      <p class="font-mono text-xs text-yellow-300/70 mt-1">
+        Brak rekordów emisji dla roku <strong class="text-yellow-400">{{ selected_year }}</strong>.
+        Sprawdź czy dane zostały wprowadzone i zatwierdzone.
+      </p>
+    </div>
+  </div>
+  {% endif %}
+  <div id="pdf-content" class="space-y-6">
+    <div class="rounded-2xl border border-border-subtle p-6" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <h2 class="font-heading font-bold text-lg text-text-main mb-6 pb-3 border-b border-border-subtle">
+        Emisje Skumulowane (tCO₂e) — {{ selected_year|add:"-2" }}–{{ selected_year }}
+      </h2>
+      <div class="relative h-72 w-full">
+        <canvas id="stackedBarChart"></canvas>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-center" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <h3 class="font-heading font-bold text-md text-text-main mb-4 pb-2 border-b border-border-subtle">Wielkość Emisji ({{ selected_year }})</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-text-muted text-sm">Zakres 1:</span>
+            <span class="text-xl font-bold text-text-main">{{ s1_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
+          </div>
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-text-muted text-sm">Zakres 2:</span>
+            <span class="text-xl font-bold text-text-main">{{ s2_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
+          </div>
+          <div class="flex justify-between items-center pt-4 border-t border-border-subtle font-mono">
+            <span class="text-accent uppercase text-sm font-bold">Suma:</span>
+            <span class="text-2xl font-bold text-accent">{{ total_current }} <span class="text-xs text-text-muted">tCO₂e</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-border-subtle p-6 flex flex-col items-center" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <h3 class="font-heading font-bold text-md text-text-main w-full text-left mb-4 pb-2 border-b border-border-subtle">Struktura Emisji ({{ selected_year }})</h3>
+        <div class="relative w-48 h-48">
+          <canvas id="donutChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span id="donut-center-val" class="text-2xl font-mono font-bold text-text-main">{{ total_current }}</span>
+            <span id="donut-center-lbl" class="text-[10px] font-mono text-text-muted uppercase">Suma tCO₂e</span>
+          </div>
+        </div>
+        <p class="font-mono text-xs text-text-muted mt-4 text-center">Kliknij legendę, aby filtrować.</p>
+      </div>
+      <div class="rounded-2xl border border-border-subtle p-6 flex flex-col" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <h3 class="font-heading font-bold text-md text-text-main mb-4 pb-2 border-b border-border-subtle">Porównanie (YoY)</h3>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="rounded-xl border border-border-subtle p-3 flex flex-col justify-center items-center" style="background:rgba(255,255,255,0.03);">
+            <div class="font-mono text-xs text-text-muted uppercase mb-1">{{ selected_year }}</div>
+            <div class="font-mono font-bold text-text-main">{{ total_current }} <span class="text-[10px] text-text-muted">t</span></div>
+          </div>
+          <div class="rounded-xl border border-border-subtle p-3 flex flex-col justify-center items-center" style="background:rgba(255,255,255,0.03);">
+            <div class="font-mono text-xs text-text-muted uppercase mb-1">{{ compare_year }}</div>
+            <div class="font-mono font-bold text-text-main">{{ total_compare }} <span class="text-[10px] text-text-muted">t</span></div>
+          </div>
+        </div>
+        <div class="mt-auto pt-2 border-t border-border-subtle">
+          <span class="font-mono text-xs uppercase text-text-muted block mb-1">Całkowita Zmiana:</span>
+          <div class="text-2xl font-mono font-bold {% if reduction_pct < 0 %}text-accent{% elif reduction_pct > 0 %}text-red-400{% else %}text-text-main{% endif %}">
+            {% if reduction_pct > 0 %}+{% endif %}{{ reduction_pct }}%
+          </div>
+          <div class="font-mono text-[10px] uppercase mt-1
+            {% if reduction_pct < 0 %}text-accent{% elif reduction_pct > 0 %}text-red-400{% else %}text-text-muted{% endif %}">
+            {% if reduction_pct < 0 %}Spadek emisji (dobrze){% elif reduction_pct > 0 %}Wzrost emisji (źle){% else %}Brak zmian{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
-
 {% block extra_scripts %}
 <script>
+(function() {
     const chartData = {{ chart_data_json|safe }};
     const colorZ1 = '#c8f535';
     const colorZ2 = '#2dd4bf';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
     const textColor = '#9ca3af';
+    const barCanvasId = 'stackedBarChart';
+    const donutCanvasId = 'donutChart';
 
-    // 1. Wykres trendowy
-    const ctxBar = document.getElementById('stackedBarChart').getContext('2d');
+    const existingBarChart = Chart.getChart(barCanvasId);
+    if (existingBarChart) existingBarChart.destroy();
+
+    const existingDonutChart = Chart.getChart(donutCanvasId);
+    if (existingDonutChart) existingDonutChart.destroy();
+    const ctxBar = document.getElementById(barCanvasId).getContext('2d');
     new Chart(ctxBar, {
         type: 'bar',
         data: {
             labels: chartData.years,
             datasets: [
-                {
-                    label: 'Zakres 1',
-                    data: chartData.s1,
-                    backgroundColor: colorZ1,
-                    borderRadius: 4,
-                    stack: 'stack',
-                    order: 2,
-                },
-                {
-                    label: 'Zakres 2',
-                    data: chartData.s2,
-                    backgroundColor: colorZ2,
-                    borderRadius: 4,
-                    stack: 'stack',
-                    order: 2,
-                },
-                {
-                    label: 'Trend Łączny',
-                    data: chartData.s1.map((v, i) => +(v + chartData.s2[i]).toFixed(2)),
-                    type: 'line',
-                    borderColor: '#ffffff',
-                    borderWidth: 2,
-                    borderDash: [6, 3],
-                    pointBackgroundColor: '#ffffff',
-                    pointRadius: 4,
-                    fill: false,
-                    tension: 0.3,
-                    order: 1,
-                }
+                { label: 'Zakres 1', data: chartData.s1, backgroundColor: colorZ1, borderRadius: 4, stack: 'stack', order: 2 },
+                { label: 'Zakres 2', data: chartData.s2, backgroundColor: colorZ2, borderRadius: 4, stack: 'stack', order: 2 },
+                { label: 'Trend Łączny', data: chartData.s1.map((v, i) => +(v + chartData.s2[i]).toFixed(2)), type: 'line', borderColor: '#ffffff', borderWidth: 2, borderDash: [6, 3], pointBackgroundColor: '#ffffff', pointRadius: 4, fill: false, tension: 0.3, order: 1 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             scales: {
-                x: {
-                    stacked: true,
-                    grid: { display: false },
-                    ticks: { color: textColor, font: { family: 'Roboto Mono' } }
-                },
-                y: {
-                    stacked: true,
-                    grid: { color: gridColor },
-                    border: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Emisje Skumulowane (tCO₂e)',
-                        color: textColor,
-                        font: { family: 'Roboto Mono', size: 11, weight: 'bold' }
-                    },
-                    ticks: {
-                        color: textColor,
-                        font: { family: 'Roboto Mono' },
-                        callback: val => val.toLocaleString('pl-PL')
-                    }
-                }
+                x: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' } } },
+                y: { stacked: true, grid: { color: gridColor }, border: { display: false }, ticks: { color: textColor, font: { family: 'Roboto Mono' }, callback: val => val.toLocaleString('pl-PL') + ' t' } }
             },
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 }
-                },
+                legend: { position: 'bottom', labels: { color: '#e5e7eb', font: { family: 'Roboto Mono' }, usePointStyle: true, boxWidth: 8 } },
                 tooltip: {
-                    backgroundColor: 'rgba(17, 23, 32, 0.9)',
-                    titleFont: { family: 'Roboto Mono' },
-                    bodyFont: { family: 'Roboto Mono' },
-                    borderColor: 'rgba(200, 245, 53, 0.3)',
-                    borderWidth: 1,
-                    callbacks: {
-                        footer: function(tooltipItems) {
-                            const bars = tooltipItems.filter(i => i.dataset.type !== 'line');
-                            const sum = bars.reduce((acc, i) => acc + i.parsed.y, 0);
-                            return 'Suma: ' + sum.toLocaleString('pl-PL', {maximumFractionDigits: 2}) + ' tCO₂e';
-                        }
-                    }
+                    backgroundColor: 'rgba(17,23,32,0.9)', titleFont: { family: 'Roboto Mono' }, bodyFont: { family: 'Roboto Mono' },
+                    borderColor: 'rgba(200,245,53,0.3)', borderWidth: 1,
+                    callbacks: { footer: function(tooltipItems) { const bars = tooltipItems.filter(i => i.dataset.type !== 'line'); const sum = bars.reduce((acc, i) => acc + i.parsed.y, 0); return 'Suma: ' + sum.toLocaleString('pl-PL', {maximumFractionDigits: 2}) + ' tCO2e'; } }
                 }
             }
         }
@@ -298,7 +242,7 @@
 
             if (!chart.getActiveElements() || chart.getActiveElements().length === 0) {
                 document.getElementById('donut-center-val').innerText = visibleTotal.toFixed(2);
-                document.getElementById('donut-center-lbl').innerText = 'Suma tCO₂e';
+                document.getElementById('donut-center-lbl').innerText = 'Suma tCO2e';
             }
         }
     };
@@ -332,7 +276,7 @@
                             const val = context.raw;
                             const currentTotal = donutChart.visibleTotal !== undefined ? donutChart.visibleTotal : donutTotal;
                             const pct = currentTotal > 0 ? ((val / currentTotal) * 100).toFixed(1) : 0;
-                            return context.label + ': ' + val + ' tCO₂e (' + pct + '%)';
+                            return context.label + ': ' + val + ' tCO2e (' + pct + '%)';
                         }
                     }
                 }
@@ -350,24 +294,39 @@
                     lblEl.innerText = donutChart.data.labels[index];
                 } else {
                     valEl.innerText = currentTotal.toFixed(2);
-                    lblEl.innerText = 'Suma tCO₂e';
+                    lblEl.innerText = 'Suma tCO2e';
                 }
             }
         },
         plugins: [dynamicCenterHtmlPlugin]
     });
+    window.downloadPDF = function() {
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: 'Raport_GHG_{{ selected_year }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#111720' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = false; instance.update(); });
+        html2pdf().set(opt).from(element).save().then(() => { Object.values(Chart.instances).forEach(function(instance) { instance.options.animation = true; }); });
+    };
 
     document.querySelectorAll('input[name="statuses"]').forEach(function(cb) {
         cb.addEventListener('change', function() {
             const label = this.closest('label');
             if (this.checked) {
-                label.classList.add('bg-accent', 'text-bg', 'border-accent');
-                label.classList.remove('bg-transparent', 'text-text-muted', 'border-border-subtle', 'hover:border-accent', 'hover:text-text-main');
+                label.style.background = 'rgba(200,245,53,0.12)';
+                label.classList.add('border-accent', 'text-accent');
+                label.classList.remove('border-border-subtle', 'text-text-muted');
             } else {
-                label.classList.remove('bg-accent', 'text-bg', 'border-accent');
-                label.classList.add('bg-transparent', 'text-text-muted', 'border-border-subtle', 'hover:border-accent', 'hover:text-text-main');
+                label.style.background = 'transparent';
+                label.classList.remove('border-accent', 'text-accent');
+                label.classList.add('border-border-subtle', 'text-text-muted');
             }
         });
     });
+})();
 </script>
 {% endblock %}

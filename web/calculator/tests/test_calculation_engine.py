@@ -55,7 +55,6 @@ class CalculationEngineTests(TestCase):
 
         # 3. Typy Paliw i Parametry Fizyczne (FuelSpec)
         cls.fuel_coal = FuelType.objects.create(
-
             name="Węgiel kamienny", symbol="WEG", category="solid"
         )
         cls.fuel_gas = FuelType.objects.create(
@@ -64,7 +63,6 @@ class CalculationEngineTests(TestCase):
         cls.fuel_wood = FuelType.objects.create(
             name="Drewno opałowe", symbol="DREW", category="solid"
         )
-
 
         # Definiujemy wartość opałową dla węgla (25 MJ/kg, co matematycznie równe jest 25 GJ/t)
         FuelSpec.objects.create(

@@ -26,17 +26,21 @@ class CoreModel(models.Model):
         ordering = ["-created_at"]
 
 
-class ChangeLog(models.Model):
-    id_rejestr_zmian = models.AutoField(primary_key=True)
-    login = models.CharField(max_length=100)
-    date_change = models.DateTimeField()
-    table_name = models.CharField(max_length=200)
-    record_id = models.CharField(max_length=50)
-    change_type = models.CharField(max_length=10)
-    previous_data = models.TextField(blank=True, null=True)
-    actual_data = models.TextField(blank=True, null=True)
+class UserPageView(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="page_views"
+    )
+    view_name = models.CharField(max_length=255)
+    url_path = models.CharField(max_length=255)
+    visit_count = models.PositiveIntegerField(default=1)
+    last_visited = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = "tbl_change_log"
-        verbose_name = "Log zmian"
-        verbose_name_plural = "Logi zmian"
+        db_table = "user_page_views"
+        unique_together = ("user", "view_name")
+        indexes = [
+            models.Index(fields=["user", "-visit_count"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.view_name} ({self.visit_count})"

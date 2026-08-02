@@ -26,12 +26,16 @@ class DeleteAccountForm(forms.Form):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ["first_name", "last_name", "email", "phone_number"]
+        fields = ["first_name", "last_name", "email", "phone_number", "avatar"]
         labels = {
             "first_name": "Imię",
             "last_name": "Nazwisko",
             "email": "Adres e-mail",
             "phone_number": "Numer telefonu",
+            "avatar": "Zdjęcie profilowe",
+        }
+        widgets = {
+            "avatar": forms.FileInput(),
         }
         help_texts = {
             "email": "Wymagany poprawny format adresu do powiadomień systemowych.",

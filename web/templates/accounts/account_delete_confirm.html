@@ -3,6 +3,9 @@
 {% block title %}Destrukcja Konta - Emission Impossible{% endblock %}
 
 {% block extra_head %}
+{% endblock %}
+
+{% block content %}
     <style>
         .terminal-danger-form input[type="password"] {
             background: rgba(255, 255, 255, 0.05);
@@ -20,11 +23,7 @@
             border-color: #ef4444;
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-md mx-auto space-y-6">
-
         <div class="border-b border-red-900/50 pb-4">
             <h1 class="font-heading font-bold text-2xl text-red-500 flex items-center gap-3">
                 <span class="material-symbols-outlined text-red-500 animate-pulse">gavel</span>
@@ -32,7 +31,6 @@
             </h1>
             <p class="font-mono text-xs text-text-muted mt-1">Żądanie usunięcia struktury danych profilu (RODO Art. 17).</p>
         </div>
-
         <form method="post" class="space-y-6 terminal-danger-form p-6 border border-red-950 rounded-sm" style="background: rgba(42, 10, 10, 0.25);">
             {% csrf_token %}
 
@@ -40,7 +38,6 @@
                 <p class="font-bold uppercase text-center mb-1">!! UWAGA !!</p>
                 Ta operacja jest nieodwracalna. Twój profil, uprawnienia dostępowe do spółek kapitałowych oraz ustawienia zostaną bezpowrotnie usunięte z bazy danych.
             </div>
-
             {% if form.non_field_errors %}
                 <div class="p-3 bg-red-900/30 border border-red-700 text-red-400 font-mono text-xs rounded-sm">
                     {% for error in form.non_field_errors %}
@@ -48,21 +45,17 @@
                     {% endfor %}
                 </div>
             {% endif %}
-
             {% for field in form %}
                 <div class="flex flex-col gap-1.5">
                     <label for="{{ field.id_for_label }}" class="font-mono text-xs text-red-400 uppercase tracking-wider">
                         {{ field.label }}
                     </label>
-
                     {{ field }}
-
                     {% if field.help_text %}
                         <span class="font-mono text-[11px] text-text-muted leading-relaxed block mt-1">
                             {{ field.help_text }}
                         </span>
                     {% endif %}
-
                     {% for error in field.errors %}
                         <span class="font-mono text-xs text-red-500 mt-1 block">
                             _ AUTH_ERR: {{ error }}
@@ -70,7 +63,6 @@
                     {% endfor %}
                 </div>
             {% endfor %}
-
             <div class="pt-4 flex items-center justify-between font-mono text-sm">
                 <a href="{% url 'accounts:profile' %}" class="text-text-muted hover:text-text-main transition-colors">
                     [ Anuluj procedurę ]

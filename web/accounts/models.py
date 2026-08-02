@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 from core.models import CoreModel
 from encrypted_model_fields.fields import EncryptedCharField
 from django.db import models
@@ -6,7 +8,6 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=20, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name="Zdjęcie profilowe")
     ROLE_CHOICES = [
         ("admin", "Administrator"),
         ("użytkownik", "Użytkownik"),

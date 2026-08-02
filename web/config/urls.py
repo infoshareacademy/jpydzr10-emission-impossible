@@ -1,9 +1,12 @@
-from core.views import HomeView
+from core.views import HomeView, PrivacyPolicyView
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
+    path("accounts/", include("django.contrib.auth.urls")),
     path("accounts/", include("accounts.urls")),
     path("admin/", admin.site.urls),
     path("companies/", include("companies.urls")),
@@ -13,4 +16,6 @@ urlpatterns = [
     path("ai/", include("ai_services.urls")),
     path("calculator/", include("calculator.urls")),
     path("communications/", include("communications.urls")),
-]
+    path("privacy/", PrivacyPolicyView.as_view(), name="privacy-policy"),
+    path("workflow/", include("workflow.urls", namespace="workflow")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
