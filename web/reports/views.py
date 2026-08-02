@@ -46,22 +46,18 @@ class GHGReportView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
             result = model.objects.filter(
                 company_id__in=company_ids,
                 year=year,
-<<<<<<< HEAD
-                workflow_status__in=statuses,
-=======
+
                 workflow_status__in=selected_statuses,
->>>>>>> origin/main
+
             ).aggregate(total=Sum(emission_field))
             s1_total += result["total"] or 0
 
         s2_result = EnergyConsumption.objects.filter(
             company_id__in=company_ids,
             year=year,
-<<<<<<< HEAD
-            workflow_status__in=statuses,
-=======
+
             workflow_status__in=selected_statuses,
->>>>>>> origin/main
+
         ).aggregate(total=Sum(emission_field))
         s2_total = s2_result["total"] or 0
 

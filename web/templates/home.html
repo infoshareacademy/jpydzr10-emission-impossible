@@ -18,7 +18,7 @@
         class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg pl-4 pr-8 py-2 outline-none"
         style="appearance:none; -webkit-appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%237ab5ae%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>'); background-repeat:no-repeat; background-position:right 10px center;">
                 {% for target in reduction_targets %}
-                    <option value="target-{{ target.id }}">{{ target.target_name }} ({{ target.company.name }})</option>
+                    <option value="target-{{ target.id }}">{{ target.goal.name }} ({{ target.company.name }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -40,7 +40,7 @@
                         <div class="w-full h-1.5 rounded-full mb-4 bg-[#111720] overflow-hidden">
                             <div class="h-full rounded-full transition-all duration-500 {% if target.chart_data.status_color == 'green' %}bg-[#c8f535]{% elif target.chart_data.status_color == 'yellow' %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: 70%;"></div>
                         </div>
-                        <h3 class="font-bold text-lg text-text-main mb-1 truncate pr-6">{{ target.target_name }}</h3>
+                        <h3 class="font-bold text-lg text-text-main mb-1 truncate pr-6">{{ target.goal.name }}</h3>
                         <p class="text-xs text-text-muted mb-4 truncate">{{ target.company.name }}</p>
                     </div>
                     <div class="h-40 w-full relative mb-4">
@@ -52,7 +52,7 @@
                             <p class="font-mono text-base font-bold text-text-main">{{ target.chart_data.current_emission|floatformat:1 }} t</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs text-text-muted mb-1">{% trans "Cel" %} ({{ target.target_year }}):</p>
+                            <p class="text-xs text-text-muted mb-1">{% trans "Cel" %} ({{ target.goal.target_year }}):</p>
                             <p class="font-mono text-base font-bold text-[#c8f535]">{{ target.chart_data.target_emission|floatformat:1 }} t</p>
                         </div>
                     </div>
