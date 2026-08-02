@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
+<<<<<<< HEAD
 {% block title %}{{ company.name }} — Emission Impossible{% endblock %}
 
 {% block content %}
@@ -13,10 +14,74 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <div class="flex items-center gap-3 mb-1">
+=======
+{% block title %}
+  {% if is_delete %}Usuń firmę{% elif object %}Szczegóły firmy{% else %}Dodaj/Edytuj firmę{% endif %} — Emission Impossible
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+  <style>
+    .django-form-wrapper p {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1.25rem;
+    }
+    .django-form-wrapper label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #7ab5ae;
+      letter-spacing: 0.05em;
+    }
+    .django-form-wrapper input,
+    .django-form-wrapper select,
+    .django-form-wrapper textarea {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #2a3f4a;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      color: #e8f4f0;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.875rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s ease-in-out;
+    }
+    .django-form-wrapper input:focus,
+    .django-form-wrapper select:focus,
+    .django-form-wrapper textarea:focus {
+      border-color: rgba(200,245,53,0.5);
+    }
+    .django-form-wrapper select option { background: #151c27; }
+    .django-form-wrapper .helptext {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+    .django-form-wrapper .errorlist {
+      color: #f87171;
+      font-size: 0.75rem;
+      font-family: 'Roboto Mono', monospace;
+      margin-top: 0.25rem;
+    }
+  </style>
+  <div class="max-w-4xl mx-auto">
+
+    {% if form and not is_delete %}
+      <div class="mb-8">
+        <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
+        </a>
+        <div class="flex items-center gap-3">
+>>>>>>> origin/main
           <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
           <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ company.name }}</h1>
         </div>
       </div>
+<<<<<<< HEAD
       {% if is_admin %}
       <div class="flex gap-3">
         <a href="{% url 'companies:company-update' company.pk %}"
@@ -27,8 +92,55 @@
           class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
           style="background:#1a4a52; border:1px solid #2a6a72;">
           <span class="material-symbols-outlined" style="font-size:16px;">bar_chart</span> {% trans "Kalkulator emisji" %}
+=======
+      <div class="rounded-2xl border border-border-subtle p-6 md:p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="django-form-wrapper grid grid-cols-1 md:grid-cols-2 gap-x-6">
+            {{ form.as_p }}
+          </div>
+          <div class="flex items-center justify-end gap-4 pt-6 mt-4 border-t border-border-subtle">
+            <a href="javascript:history.back()"
+               class="px-5 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
+              Anuluj
+            </a>
+            <button type="submit"
+                    class="px-6 py-2.5 font-mono font-bold uppercase text-sm rounded-xl text-white transition-colors"
+                    style="background:#1a4a52; border:1px solid #2a6a72;">
+              Zapisz
+            </button>
+          </div>
+        </form>
+      </div>
+    {% elif is_delete %}
+      <div class="max-w-xl mx-auto mt-12">
+        <div class="rounded-2xl border border-red-500/50 p-8 text-center flex flex-col items-center" style="background:rgba(42,10,10,0.3); backdrop-filter:blur(8px);">
+          <span class="material-symbols-outlined text-red-400 mb-4" style="font-size:64px;">warning</span>
+          <h1 class="font-heading font-bold text-2xl text-red-400 uppercase mb-3">Potwierdzenie usunięcia</h1>
+          <p class="font-mono text-text-muted mb-8">Czy na pewno chcesz trwale usunąć firmę:<br>
+            <strong class="text-text-main text-xl">{{ object.name }}</strong>?
+          </p>
+          <form method="post" class="flex gap-4 w-full justify-center">
+            {% csrf_token %}
+            <a href="javascript:history.back()"
+               class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
+              Nie, wróć
+            </a>
+            <button type="submit"
+                    class="px-6 py-2.5 font-mono font-bold uppercase text-sm rounded-xl text-red-400 border border-red-500/50 hover:bg-red-500 hover:text-white transition-all">
+              Tak, usuń
+            </button>
+          </form>
+        </div>
+      </div>
+    {% elif object %}
+      <div class="mb-8">
+        <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> Wróć
+>>>>>>> origin/main
         </a>
       </div>
+<<<<<<< HEAD
       {% endif %}
     </div>
   </div>
@@ -79,6 +191,69 @@
       </ul>
     </div>
 
+=======
+      <div class="rounded-2xl border border-border-subtle p-6 md:p-8" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+        <div class="border-b border-border-subtle pb-6 mb-8">
+          <h2 class="font-heading font-bold text-3xl text-accent">{{ object.name }}</h2>
+          <div class="flex gap-4 mt-2">
+            <span class="font-mono text-sm text-text-muted">KRS: <span class="text-text-main">{{ object.krs }}</span></span>
+            <span class="font-mono text-sm text-text-muted">NIP: <span class="text-text-main">{{ object.nip }}</span></span>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-6">
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Kraj</span>
+            <span class="font-mono text-lg text-text-main">{{ object.country }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Miasto</span>
+            <span class="font-mono text-lg text-text-main">{{ object.city }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Ulica</span>
+            <span class="font-mono text-lg text-text-main">{{ object.street|default:"Brak" }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Kod pocztowy</span>
+            <span class="font-mono text-lg text-text-main">{{ object.zip }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Telefon</span>
+            <span class="font-mono text-lg text-text-main">{{ object.phone|default:"Brak" }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">E-mail</span>
+            <span class="font-mono text-lg text-text-main">{{ object.mail }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">REGON</span>
+            <span class="font-mono text-lg text-text-main">{{ object.regon }}</span>
+          </div>
+          <div class="flex flex-col gap-1 lg:col-span-2">
+            <span class="font-mono text-xs uppercase text-text-muted tracking-widest">Grupa kapitałowa</span>
+            <span class="font-mono text-lg text-text-main">{{ object.capital_group_name }}</span>
+          </div>
+        </div>
+        <div class="mt-10 pt-6 border-t border-border-subtle flex justify-end">
+          <a href="javascript:history.back()"
+             class="px-6 py-2.5 font-mono text-sm text-text-muted border border-border-subtle rounded-xl hover:border-text-muted hover:text-text-main transition-colors">
+            Powrót do listy
+          </a>
+        </div>
+      </div>
+    {% else %}
+      <div class="max-w-2xl mx-auto mt-12 rounded-2xl border border-yellow-500/50 p-6 flex items-start gap-4" style="background:rgba(42,33,10,0.3); backdrop-filter:blur(8px);">
+        <span class="material-symbols-outlined text-yellow-400 mt-0.5" style="font-size:32px;">info</span>
+        <div>
+          <p class="font-mono font-bold text-yellow-400 text-lg">Brak danych do wyświetlenia</p>
+          <p class="font-mono text-sm text-text-muted mt-1">Nie przekazano formularza ani obiektu.</p>
+          <a href="javascript:history.back()" class="mt-4 inline-block font-mono text-sm uppercase text-text-muted hover:text-yellow-400 transition-colors">
+            ← Wróć
+          </a>
+        </div>
+      </div>
+    {% endif %}
+>>>>>>> origin/main
   </div>
 </div>
 {% endblock %}

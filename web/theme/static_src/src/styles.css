@@ -1,18 +1,11 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source "../../../**/*.{html,py,js}";
 
-@theme {
-  --color-bg: #151c27;
-  --color-bg-nav: #111720;
-  --color-accent: #c8f535;
-  --color-teal-from: #b8ece6;
-  --color-teal-to: #5bc4be;
-  --color-teal-icon: #1a4a52;
-  --color-text-main: #e8f4f0;
-  --color-text-muted: #7ab5ae;
-  --color-border-subtle: #2a3f4a;
+/*@import "tailwindcss";*/
 
+<<<<<<< HEAD
   --font-mono: "Roboto Mono", monospace;
   --font-heading: "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -48,3 +41,22 @@ body.light-mode .dropdown-card:hover {
 body.light-mode footer {
   background: rgba(226,238,236,0.85) !important;
 }
+=======
+/*@source "../../..!**!*.{html,py,js}";*/
+
+/*@theme {*/
+/*  --color-bg: #151c27;*/
+/*  --color-bg-nav: #111720;*/
+/*  --color-accent: #c8f535;*/
+/*  --color-teal-from: #b8ece6;*/
+/*  --color-teal-to: #5bc4be;*/
+/*  --color-teal-icon: #1a4a52;*/
+/*  --color-text-main: #e8f4f0;*/
+/*  --color-text-muted: #7ab5ae;*/
+/*  --color-border-subtle: #2a3f4a;*/
+
+/*  --font-mono: "Roboto Mono", monospace;*/
+/*  --font-heading: "Inter", sans-serif;*/
+/*  --font-body: "Inter", sans-serif;*/
+/*}*/
+>>>>>>> origin/main

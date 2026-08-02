@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'base.html' %}
 {% load i18n %}
 
@@ -42,6 +43,201 @@
             <td class="px-6 py-4">
               <a href="{% url 'companies:company-detail' company.pk %}" class="font-mono font-bold text-text-main hover:text-accent transition-colors">
                 {{ company.name }}
+=======
+{% extends "base.html" %}
+{% block title %}
+Zarządzanie Spółkami — Emission Impossible
+{% endblock %}
+{% block content %}
+    <div
+      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10"
+    >
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <div
+            style="
+                   width: 4px;
+                   height: 32px;
+                   background: #c8f535;
+                   border-radius: 999px;
+                  "
+          ></div>
+          <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+            Zarządzanie Spółkami
+          </h1>
+        </div>
+        <p class="font-mono text-sm text-text-muted ml-4">
+          Struktura organizacyjna i monitoring emisji podmiotów.
+        </p>
+      </div>
+      <a
+        href="{% url 'companies:company-create' %}"
+        class="inline-flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-xl transition-colors text-white"
+        style="background: #1a4a52; border: 1px solid #2a6a72"
+      >
+        <span class="material-symbols-outlined" style="font-size: 18px"
+        >add_business</span
+          >
+          Dodaj spółkę
+        </a>
+      </div>
+      <form method="GET" action="" class="mb-8" id="searchForm">
+        <div class="flex flex-col sm:flex-row gap-4 max-w-2xl">
+
+          <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left: 12px; font-size: 18px">search</span>
+            <input
+              type="text"
+              name="q"
+              id="searchInput"
+              value="{{ request.GET.q|default:'' }}"
+              placeholder="Szukaj po NIP lub nazwie..."
+              class="w-full font-mono text-sm text-text-main pl-10 pr-4 py-3 rounded-xl border border-border-subtle transition-colors"
+              style="background: rgba(255, 255, 255, 0.04); outline: none"
+              onfocus="this.style.borderColor = 'rgba(200,245,53,0.4)'"
+              onblur="this.style.borderColor = '#2a3f4a'"
+              autocomplete="off"
+            />
+          </div>
+          <div class="relative w-full sm:w-36 shrink-0">
+            <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted" style="left: 12px; font-size: 18px">calendar_month</span>
+            <select
+              name="year"
+              id="yearSelect"
+              class="w-full font-mono text-sm text-text-main pl-10 pr-10 py-3 rounded-xl border border-border-subtle appearance-none transition-colors cursor-pointer bg-white/5 focus:outline-none focus:border-[#c8f535]/40"
+            >
+              {% for year in available_years %}
+                <option value="{{ year }}" class="bg-[#111720] text-text-main" {% if selected_year == year %}selected{% endif %}>
+                  {{ year }}
+                </option>
+              {% endfor %}
+            </select>
+            <span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" style="right: 12px; font-size: 18px">expand_more</span>
+          </div>
+        </div>
+      </form>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for company in companies %}
+          <article
+            class="rounded-2xl border border-border-subtle p-6 flex flex-col gap-5 transition-all hover:-translate-y-1 hover:border-text-muted relative"
+            style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)"
+          >
+            <div class="absolute top-4 right-4">
+              <a
+                href="{% url 'companies:company-update' company.pk %}"
+                class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors"
+                title="Edytuj spółkę"
+              >
+                <span class="material-symbols-outlined" style="font-size: 16px"
+                >edit</span
+                  >
+                </a>
+              </div>
+              <header class="flex items-center gap-4">
+                <div
+                  class="w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl"
+                  style="
+                         background: linear-gradient(145deg, #b8ece6, #5bc4be);
+                         color: #1a4a52;
+                        "
+                >
+                  {{ company.name|slice:":1"|upper }}
+                </div>
+                <div class="overflow-hidden flex-1">
+                  <h3
+                    class="font-heading font-bold text-lg text-text-main truncate uppercase tracking-tight"
+                  >
+                    {{ company.name }}
+                  </h3>
+                  <span
+                    class="font-mono text-xs px-2 py-0.5 rounded"
+                    style="
+                           background: rgba(200, 245, 53, 0.12);
+                           color: #c8f535;
+                           border: 1px solid rgba(200, 245, 53, 0.2);
+                          "
+                  >
+                    {{ company.capital_group_name|default:"Niezależna" }}
+                  </span>
+                </div>
+              </header>
+              <div
+                class="rounded-xl border border-border-subtle p-3 space-y-1"
+                style="background: rgba(255, 255, 255, 0.03)"
+              >
+                <div
+                  class="flex justify-between font-mono text-xs text-text-muted uppercase tracking-wider mb-1"
+                >
+                  <span>Lokalizacja</span>
+                  <span>NIP</span>
+                </div>
+                <div class="flex justify-between font-mono text-sm text-text-main">
+                  <span>{{ company.city|default:"Brak danych" }}</span>
+                  <span>{{ company.nip|default:"Brak NIP" }}</span>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-xs text-text-muted uppercase tracking-wider"
+                    >Kompletność danych ({{ selected_year }})</span
+                  >
+                  <span class="font-mono text-sm text-accent font-bold">{{ company.completion_percentage }}%</span>
+                </div>
+                <div class="h-2 w-full rounded-full overflow-hidden" style="background: rgba(255, 255, 255, 0.08)">
+                  <div
+                    class="h-full rounded-full transition-all duration-700 ease-out"
+                    style="
+                      width: {{ company.completion_percentage }}%;
+                      background: linear-gradient(to right, #c8f535, #a0d020);
+                    "
+                  ></div>
+                </div>
+              </div>
+                <div class="flex gap-3 mt-2">
+                  <a
+                    href="{% url 'companies:company-detail' company.pk %}"
+                    class="flex-1 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-center rounded-xl border border-border-subtle text-text-muted hover:text-text-main hover:border-text-muted transition-colors flex items-center justify-center gap-1"
+                  >
+                    Szczegóły
+                    <span class="material-symbols-outlined" style="font-size: 14px"
+                    >arrow_forward</span
+                      >
+                    </a>
+                    <a
+                      href="{% url 'emissions:dashboard' company.pk %}"
+                      class="flex-1 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-center rounded-xl text-white flex items-center justify-center gap-1 transition-colors"
+                      style="background: #1a4a52; border: 1px solid #2a6a72"
+                    >
+                      Uzupełnij dane
+                      <span class="material-symbols-outlined" style="font-size: 14px"
+                      >arrow_forward</span
+                        >
+                      </a>
+                    </div>
+                  </article>
+        {% empty %}
+          <div
+            class="col-span-full rounded-2xl border border-dashed border-border-subtle p-12 text-center"
+            style="background: rgba(17, 23, 32, 0.4)"
+          >
+            <span
+              class="material-symbols-outlined text-text-muted mb-4"
+              style="font-size: 64px"
+            >folder_off</span
+              >
+              <p class="font-heading font-bold text-xl text-text-main uppercase mb-2">
+                Brak przypisanych spółek
+              </p>
+              <p class="font-mono text-sm text-text-muted mb-6">
+                Nie masz przypisanych żadnych spółek do odczytu.
+              </p>
+              <a
+                href="{% url 'companies:company-create' %}"
+                class="inline-flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-xl text-white transition-colors"
+                style="background: #1a4a52; border: 1px solid #2a6a72"
+              >
+                Dodaj pierwszą spółkę
+>>>>>>> origin/main
               </a>
             </td>
             <td class="px-6 py-4 font-mono text-sm text-text-muted hidden md:table-cell">{{ company.nip|default:"—" }}</td>

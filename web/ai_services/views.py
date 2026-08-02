@@ -1,7 +1,6 @@
 import json
 
 from companies.models import Companies
-from core.mixins import PageViewTrackerMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -9,11 +8,11 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
 from django_ratelimit.decorators import ratelimit
 
-from .models import AIChatMessage, AIChatSession
+from .models import AIChatMessage, AIChatSession  # <--- IMPORT NOWYCH MODELI
 from .SLM_conf import BielikESGService
 
 
-class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
+class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
     template_name = "ai_services/global_chat.html"
 
     @method_decorator(ensure_csrf_cookie)
@@ -63,6 +62,14 @@ class GlobalAIAssistantView(PageViewTrackerMixin, LoginRequiredMixin, TemplateVi
         if not company_id:
             return JsonResponse(
                 {"error": "Wybierz podmiot z listy przed wysłaniem wiadomości."},
+                status=400,
+            )
+
+        if not company_id or company_id == "ALL":
+            return JsonResponse(
+                {
+                    "error": "Wybierz konkretną spółkę z listy przed wysłaniem wiadomości."
+                },
                 status=400,
             )
 

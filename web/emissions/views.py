@@ -368,7 +368,7 @@ class EnergySoldDeleteView(Scope2DeleteMixin, DeleteView):
         return context
 
 
-class Scope1CreateMixin(LoginRequiredMixin):
+class Scope1CreateMixin(LoginRequiredMixin, ReportLockMixin):
     """
     Wspólna logika dla wszystkich widoków dodawania i aktualizacji z Zakresu 1.
     Używa tego samego szablonu formularza i wraca na dashboard.
@@ -577,7 +577,7 @@ class EmissionListMixin(LoginRequiredMixin, ListView):
         return response
 
 
-class Scope1DeleteMixin(LoginRequiredMixin):
+class Scope1DeleteMixin(LoginRequiredMixin, ReportLockMixin):
     """Wspólna logika dla usuwania rekordów z Zakresu 1.
     Dynamicznie określa adres przekierowania powrotnego na listę.
     """
@@ -596,7 +596,7 @@ class Scope1DeleteMixin(LoginRequiredMixin):
         return super().delete(request, *args, **kwargs)
 
 
-class StationaryCombustionDeleteView(Scope1DeleteMixin, ReportLockMixin, DeleteView):
+class StationaryCombustionDeleteView(Scope1DeleteMixin, DeleteView):
     """Widok usuwania rekordów dla spalania stacjonarnego."""
 
     model = StationaryCombustion
@@ -607,17 +607,17 @@ class StationaryCombustionListView(EmissionListMixin):
     search_fields = ["fuel", "installation"]
 
 
-class StationaryCombustionCreateView(Scope1CreateMixin, ReportLockMixin, CreateView):
+class StationaryCombustionCreateView(Scope1CreateMixin,  CreateView):
     model = StationaryCombustion
     form_class = StationaryCombustionForm
 
 
-class StationaryCombustionUpdateView(Scope1CreateMixin, ReportLockMixin, UpdateView):
+class StationaryCombustionUpdateView(Scope1CreateMixin,  UpdateView):
     model = StationaryCombustion
     form_class = StationaryCombustionForm
 
 
-class MobileCombustionCreateView(Scope1CreateMixin, ReportLockMixin, CreateView):
+class MobileCombustionCreateView(Scope1CreateMixin, CreateView):
     model = MobileCombustion
     form_class = MobileCombustionForm
 
@@ -627,16 +627,16 @@ class MobileCombustionListView(EmissionListMixin):
     search_fields = ["fuel", "vehicle"]
 
 
-class MobileCombustionUpdateView(Scope1CreateMixin, ReportLockMixin, UpdateView):
+class MobileCombustionUpdateView(Scope1CreateMixin, UpdateView):
     model = MobileCombustion
     form_class = MobileCombustionForm
 
 
-class MobileCombustionDeleteView(Scope1DeleteMixin, ReportLockMixin, DeleteView):
+class MobileCombustionDeleteView(Scope1DeleteMixin, DeleteView):
     model = MobileCombustion
 
 
-class ProcessEmissionCreateView(Scope1CreateMixin, ReportLockMixin, CreateView):
+class ProcessEmissionCreateView(Scope1CreateMixin, CreateView):
     model = ProcessEmission
     form_class = ProcessEmissionForm
 
@@ -646,16 +646,16 @@ class ProcessEmissionListView(EmissionListMixin):
     search_fields = ["process", "product"]
 
 
-class ProcessEmissionUpdateView(Scope1CreateMixin, ReportLockMixin, UpdateView):
+class ProcessEmissionUpdateView(Scope1CreateMixin, UpdateView):
     model = ProcessEmission
     form_class = ProcessEmissionForm
 
 
-class ProcessEmissionDeleteView(Scope1DeleteMixin, ReportLockMixin, DeleteView):
+class ProcessEmissionDeleteView(Scope1DeleteMixin, DeleteView):
     model = ProcessEmission
 
 
-class FugitiveEmissionCreateView(Scope1CreateMixin, ReportLockMixin, CreateView):
+class FugitiveEmissionCreateView(Scope1CreateMixin, CreateView):
     model = FugitiveEmission
     form_class = FugitiveEmissionForm
 
@@ -665,12 +665,12 @@ class FugitiveEmissionListView(EmissionListMixin):
     search_fields = ["installation", "product"]
 
 
-class FugitiveEmissionUpdateView(Scope1CreateMixin, ReportLockMixin, UpdateView):
+class FugitiveEmissionUpdateView(Scope1CreateMixin, UpdateView):
     model = FugitiveEmission
     form_class = FugitiveEmissionForm
 
 
-class FugitiveEmissionDeleteView(Scope1DeleteMixin, ReportLockMixin, DeleteView):
+class FugitiveEmissionDeleteView(Scope1DeleteMixin, DeleteView):
     model = FugitiveEmission
 
 

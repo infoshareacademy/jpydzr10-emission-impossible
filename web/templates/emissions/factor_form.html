@@ -4,6 +4,7 @@
 {% block title %}{% trans "Wskaźnik Emisji" %} — Emission Impossible{% endblock %}
 
 {% block extra_head %}
+<<<<<<< HEAD
 <style>
   input, select, textarea {
     background: rgba(255,255,255,0.04) !important;
@@ -34,6 +35,88 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto">
+=======
+{% endblock %}
+
+{% block content %}
+    <style>
+        .custom-form-container input,
+        .custom-form-container select,
+        .custom-form-container textarea {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid #2a3f4a !important;
+            border-radius: 8px !important;
+            color: #e8f4f0 !important;
+            font-family: "Roboto Mono", monospace !important;
+            font-size: 13px !important;
+            padding: 10px 14px !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            width: 100%;
+            outline: none !important;
+        }
+        .custom-form-container input:focus,
+        .custom-form-container select:focus,
+        .custom-form-container textarea:focus {
+            border-color: rgba(200, 245, 53, 0.5) !important;
+            box-shadow: 0 0 0 2px rgba(200, 245, 53, 0.1) !important;
+        }
+        .custom-form-container select option {
+            background: #151c27;
+            color: #e8f4f0;
+        }
+        .custom-form-container input[type="checkbox"],
+        .custom-form-container input[type="radio"] {
+            width: auto !important;
+            accent-color: #c8f535;
+            cursor: pointer;
+        }
+    </style>
+    <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <a href="{% url 'emissions:factor-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+                    <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+                    Wróć do listy
+                </a>
+                <div class="flex items-center gap-3">
+                    <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
+                    <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">
+                        {% if object %}Edytuj Wskaźnik{% else %}Dodaj Nowy Wskaźnik{% endif %}
+                    </h1>
+                </div>
+            </div>
+        </div>
+        <div class="bg-[rgba(17, 23, 32, 0.6)] border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl custom-form-container">
+            <form method="post" novalidate class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for field in form %}
+                        <div class="flex flex-col gap-2 {% if field.name == 'notes' or field.name == 'description' or field.name == 'source' %}md:col-span-2{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="font-mono text-xs uppercase tracking-widest text-text-muted">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="bg-red-900/20 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono mt-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">error</span>
+                                    <span>{{ field.errors|striptags }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-border-subtle justify-end">
+                    <a href="{% url 'emissions:factor-list' %}" class="px-6 py-2.5 bg-transparent text-text-muted border border-border-subtle rounded-xl font-mono text-sm font-bold uppercase tracking-wider text-center hover:border-text-muted hover:text-text-main transition-colors sm:w-36">
+                        Anuluj
+                    </a>
+
+                    <button type="submit" class="px-6 py-2.5 bg-accent text-bg font-mono font-bold uppercase text-sm rounded-xl tracking-wider hover:brightness-110 transition-all sm:w-48 flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">save</span> Zapisz Wskaźnik
+                    </button>
+                </div>
+            </form>
+        </div>
+>>>>>>> origin/main
 
   <div class="mb-8">
     <a href="{% url 'emissions:factor-list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
