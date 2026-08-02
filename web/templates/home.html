@@ -15,7 +15,8 @@
         <div class="flex justify-between items-end mb-6">
             <h2 class="font-heading font-bold text-2xl text-text-main">{% trans "Cele Redukcyjne" %}</h2>
             <select id="targetSelector" onchange="scrollToTarget(this.value)"
-                    class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg px-4 py-2 outline-none">
+        class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg pl-4 pr-8 py-2 outline-none"
+        style="appearance:none; -webkit-appearance:none; background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%237ab5ae%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>'); background-repeat:no-repeat; background-position:right 10px center;">
                 {% for target in reduction_targets %}
                     <option value="target-{{ target.id }}">{{ target.target_name }} ({{ target.company.name }})</option>
                 {% endfor %}

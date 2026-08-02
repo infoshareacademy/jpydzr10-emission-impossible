@@ -50,14 +50,14 @@
           <span id="burger-icon" class="material-symbols-outlined">menu</span>
         </button>
 
-        <div class="flex-1"></div>
-
         {% if user.is_superuser or user.role == 'admin' %}
         <a href="/admin/" class="text-text-muted hover:text-accent transition-colors" title="{% trans 'Panel Administratora' %}">
           <span class="admin-icon material-symbols-outlined" style="font-size:22px;">admin_panel_settings</span>
           <span class="admin-text font-mono text-sm px-3 py-2 rounded border border-border-subtle hover:border-accent">{% trans "Panel Administratora" %}</span>
         </a>
         {% endif %}
+
+        <div class="flex-1"></div>
 
         <div class="flex items-center gap-3">
           <a href="{% url 'accounts:profile' %}"
@@ -72,6 +72,12 @@
             {% if user.is_authenticated %}@{{ user.username }}{% else %}@{% trans "Użytkownik" %}{% endif %}
           </a>
         </div>
+
+        <!-- Theme toggle -->
+        <button id="theme-toggle" onclick="toggleTheme()"
+          class="font-mono text-xs text-text-muted hover:text-accent transition-colors px-2 py-1 rounded border border-border-subtle hover:border-accent">
+          <span id="theme-icon" class="material-symbols-outlined" style="font-size:18px;">light_mode</span>
+        </button>
 
         <!-- Language switcher -->
         <form action="{% url 'set_language' %}" method="post" class="inline-block m-0 p-0">
@@ -193,138 +199,6 @@
 
     {% block extra_scripts %}{% endblock %}
 
-    <!-- ===================== -->
-    <!-- FLOATING AI CHAT WIDGET -->
-    <!-- ===================== -->
-    <div id="ai-chat-widget" style="position:fixed; bottom:88px; right:62px; z-index:1000;">
-
-      <!-- Chat window -->
-      <div id="ai-chat-window" style="display:none; width:340px; height:480px; border-radius:16px; border:1px solid #2a3f4a; background:rgba(17,23,32,0.95); backdrop-filter:blur(16px); box-shadow:0 20px 60px rgba(0,0,0,0.5); display:none; flex-direction:column; overflow:hidden;">
-
-        <!-- Header -->
-        <div style="background:rgba(42,63,74,0.8); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2a3f4a;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="material-symbols-outlined" style="font-size:20px; color:#c8f535; font-variation-settings:'FILL' 1;">auto_awesome</span>
-            <span style="font-family:'Roboto Mono',monospace; font-size:13px; font-weight:700; color:#e8f4f0; text-transform:uppercase; letter-spacing:0.05em;">AI Asystent ESG</span>
-          </div>
-          <button onclick="toggleAiChat()" style="background:none; border:none; cursor:pointer; color:#7ab5ae; padding:2px;">
-            <span class="material-symbols-outlined" style="font-size:20px;">close</span>
-          </button>
-        </div>
-
-        <!-- Messages -->
-        <div id="ai-widget-messages" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color:rgba(200,245,53,0.2) transparent;">
-          <div style="display:flex; flex-direction:column; align-items:flex-start;">
-            <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7ab5ae; text-transform:uppercase; margin-bottom:4px;">AI</span>
-            <div style="background:rgba(42,63,74,0.6); border:1px solid #2a3f4a; border-radius:12px; border-top-left-radius:3px; padding:10px 14px; font-family:'Roboto Mono',monospace; font-size:12px; color:#e8f4f0; line-height:1.5; max-width:90%;">
-              Cześć! Jestem asystentem ESG. Jak mogę pomóc?
-            </div>
-          </div>
-        </div>
-
-        <!-- Loading -->
-        <div id="ai-widget-loading" style="display:none; padding:8px 16px;">
-          <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#c8f535; text-transform:uppercase; letter-spacing:0.05em;">Generuję odpowiedź...</span>
-        </div>
-
-        <!-- Input -->
-        <div style="padding:12px; border-top:1px solid #2a3f4a; background:rgba(42,63,74,0.3);">
-          <form id="ai-widget-form" style="display:flex; gap:8px; align-items:center;">
-            {% csrf_token %}
-            <input id="ai-widget-input" type="text"
-              placeholder="Zadaj pytanie..."
-              autocomplete="off"
-              style="flex:1; background:rgba(255,255,255,0.04); border:1px solid #2a3f4a; border-radius:8px; padding:8px 12px; font-family:'Roboto Mono',monospace; font-size:12px; color:#e8f4f0; outline:none;">
-            <button type="submit"
-              style="background:#1a4a52; border:1px solid #2a6a72; border-radius:8px; padding:8px 10px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-              <span class="material-symbols-outlined" style="font-size:16px; color:white;">send</span>
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Toggle button -->
-      <button id="ai-chat-toggle" onclick="toggleAiChat()"
-        style="width:52px; height:52px; border-radius:50%; background:linear-gradient(145deg,#1a4a52,#2a6a72); border:2px solid rgba(200,245,53,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,0.4); transition:transform 0.2s;"
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'">
-        <span class="material-symbols-outlined" style="font-size:24px; color:#c8f535; font-variation-settings:'FILL' 1;">auto_awesome</span>
-      </button>
-
-    </div>
-
-    <script>
-      let aiChatOpen = false;
-
-      function toggleAiChat() {
-        aiChatOpen = !aiChatOpen;
-        const window_ = document.getElementById('ai-chat-window');
-        const toggle = document.getElementById('ai-chat-toggle');
-        if (aiChatOpen) {
-          window_.style.display = 'flex';
-          toggle.style.display = 'none';
-          document.getElementById('ai-widget-input').focus();
-        } else {
-          window_.style.display = 'none';
-          toggle.style.display = 'flex';
-        }
-      }
-
-      document.getElementById('ai-widget-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const input = document.getElementById('ai-widget-input');
-        const question = input.value.trim();
-        if (!question) return;
-
-        const messages = document.getElementById('ai-widget-messages');
-        const loading = document.getElementById('ai-widget-loading');
-        const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
-
-        // Add user message
-        messages.innerHTML += `
-          <div style="display:flex; flex-direction:column; align-items:flex-end;">
-            <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7ab5ae; text-transform:uppercase; margin-bottom:4px;">Ty</span>
-            <div style="background:rgba(200,245,53,0.12); border:1px solid rgba(200,245,53,0.3); border-radius:12px; border-top-right-radius:3px; padding:10px 14px; font-family:'Roboto Mono',monospace; font-size:12px; color:#e8f4f0; line-height:1.5; max-width:90%;">
-              ${question}
-            </div>
-          </div>`;
-
-        input.value = '';
-        loading.style.display = 'block';
-        messages.scrollTop = messages.scrollHeight;
-
-        fetch('{% url "ai_services:global_assistant" %}', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-          body: JSON.stringify({ question: question, company_id: 'ALL', scope_type: 'ALL' })
-        })
-        .then(r => r.json())
-        .then(data => {
-          loading.style.display = 'none';
-          const answer = data.error ? `<span style="color:#f87171;">Błąd: ${data.error}</span>` : data.answer.replace(/\n/g, '<br>');
-          messages.innerHTML += `
-            <div style="display:flex; flex-direction:column; align-items:flex-start;">
-              <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7ab5ae; text-transform:uppercase; margin-bottom:4px;">AI</span>
-              <div style="background:rgba(42,63,74,0.6); border:1px solid #2a3f4a; border-radius:12px; border-top-left-radius:3px; padding:10px 14px; font-family:'Roboto Mono',monospace; font-size:12px; color:#e8f4f0; line-height:1.5; max-width:90%;">
-                ${answer}
-              </div>
-            </div>`;
-          messages.scrollTop = messages.scrollHeight;
-        })
-        .catch(() => {
-          loading.style.display = 'none';
-          messages.innerHTML += `
-            <div style="display:flex; flex-direction:column; align-items:flex-start;">
-              <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7ab5ae; text-transform:uppercase; margin-bottom:4px;">AI</span>
-              <div style="background:rgba(42,63,74,0.6); border:1px solid #2a3f4a; border-radius:12px; border-top-left-radius:3px; padding:10px 14px; font-family:'Roboto Mono',monospace; font-size:12px; color:#f87171; line-height:1.5; max-width:90%;">
-                Problem z połączeniem z AI.
-              </div>
-            </div>`;
-          messages.scrollTop = messages.scrollHeight;
-        });
-      });
-    </script>
-
     <script>
       const dropdown = document.getElementById("dropdown");
       const burger = document.getElementById("burger");
@@ -347,6 +221,24 @@
           isOpen = false;
         }
       });
+
+      function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        const icon = document.getElementById('theme-icon');
+        if (document.body.classList.contains('light-mode')) {
+          icon.textContent = 'dark_mode';
+          localStorage.setItem('theme', 'light');
+        } else {
+          icon.textContent = 'light_mode';
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-icon').textContent = 'dark_mode';
+      }
     </script>
+
   </body>
 </html>

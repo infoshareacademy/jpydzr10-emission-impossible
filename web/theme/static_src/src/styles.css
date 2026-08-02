@@ -17,3 +17,34 @@
   --font-heading: "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
 }
+
+/* Light mode overrides */
+body.light-mode {
+  --color-bg: #f0f5f4;
+  --color-bg-nav: #e2eeec;
+  --color-accent: #1a7a52;
+  --color-text-main: #1a3a32;
+  --color-text-muted: #4a7a74;
+  --color-border-subtle: #b0ccc8;
+  background-color: #f0f5f4;
+}
+
+body.light-mode nav {
+  background: rgba(226,238,236,0.85) !important;
+}
+
+body.light-mode #dropdown {
+  background: rgba(226,238,236,0.97) !important;
+}
+
+body.light-mode .dropdown-card {
+  background: rgba(180,210,205,0.8);
+}
+
+body.light-mode .dropdown-card:hover {
+  background: rgba(160,195,190,1);
+}
+
+body.light-mode footer {
+  background: rgba(226,238,236,0.85) !important;
+}
