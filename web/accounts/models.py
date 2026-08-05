@@ -8,6 +8,9 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=20, blank=True)
+    avatar = models.ImageField(
+        upload_to="avatars/", blank=True, null=True, verbose_name="Zdjęcie profilowe"
+    )
     ROLE_CHOICES = [
         ("admin", "Administrator"),
         ("użytkownik", "Użytkownik"),

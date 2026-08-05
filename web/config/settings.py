@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "theme",
     "widget_tweaks",
     "communications.apps.CommunicationsConfig",
-    "audit.apps.AuditConfig",
     "encrypted_model_fields",
     "audit.apps.AuditConfig",
     "workflow.apps.WorkflowConfig",
