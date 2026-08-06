@@ -6,8 +6,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
-    path("accounts/", include("django.contrib.auth.urls")),
     path("accounts/", include("accounts.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path("companies/", include("companies.urls")),
     path("emissions/", include("emissions.urls")),

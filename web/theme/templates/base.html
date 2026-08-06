@@ -130,34 +130,6 @@ select {
       <!-- ===================== -->
       <!-- DROPDOWN MENU -->
       <!-- ===================== -->
-      <div
-        id="dropdown"
-        class="absolute left-0 right-0 z-50 border-t border-border-subtle overflow-hidden transition-all duration-300"
-        style="
-          max-height: 0;
-          background: rgba(17, 23, 32, 0.95);
-          backdrop-filter: blur(8px);
-        "
-      >
-        <div
-          class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
-        >
-          <a
-            href="{% url 'reports:ghg-report' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >book_2</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Raporty</span
-            >
       <div x-show="open"
            @click="open = false"
            x-cloak
@@ -175,138 +147,36 @@ select {
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">book_2</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Raporty</span>
           </a>
-          <a
-            href="{% url 'companies:companies-list' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >business</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Przedsiębiorstwo</span
-            >
 
           <a href="{% url 'companies:companies-list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">business</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Przedsiębiorstwo</span>
           </a>
-          <a
-            href="{% url 'emissions:factor-list' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >pie_chart</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Wskaźniki Emisji</span
-            >
 
           <a href="{% url 'emissions:factor-list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">pie_chart</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Wskaźniki Emisji</span>
           </a>
-          <a
-            href="{% url 'emissions:energy_consumption_list' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-          <span
-            class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-            style="font-size: 32px; font-variation-settings: 'FILL' 1;"
-            >bolt</span
-          >
-          <span
-            class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-            >Dane emisyjne</span
-          >
-        </a>
-          <a
-            href="{% url 'calculator:dashboard' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="font-size: 32px; font-variation-settings: 'FILL' 1;"
-              >bar_chart</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Przeliczniki</span
-            >
+
+          <a href="{% url 'emissions:energy_consumption_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
+            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">bolt</span>
+            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Dane emisyjne</span>
+          </a>
 
           <a href="{% url 'calculator:dashboard' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">bar_chart</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Przeliczniki</span>
           </a>
-          <a
-            href="{% url 'accounts:company-users-list' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >group</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Użytkownicy</span
-            >
 
           <a href="{% url 'what_if:reduction-target-list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">local_fire_department</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Cele i symulacje</span>
           </a>
-          <a
-            href="{% url 'ai_services:global_assistant' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >auto_awesome</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >AI Asystent ESG</span
-            >
 
           <a href="{% url 'accounts:company-users-list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">group</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Użytkownicy</span>
           </a>
-          <a
-            href="{% url 'communications:thread_list' %}"
-            class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group"
-          >
-            <span
-              class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors"
-              style="
-                font-size: 32px;
-                font-variation-settings: &quot;FILL&quot; 1;
-              "
-              >mail</span
-            >
-            <span
-              class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center"
-              >Komunikacja e-mail</span
-            >
 
           <a href="{% url 'ai_services:global_assistant' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">auto_awesome</span>
@@ -317,6 +187,7 @@ select {
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">mail</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Komunikacja e-mail</span>
           </a>
+
           {% if user.is_superuser or user.role == 'admin' %}
           <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
@@ -335,93 +206,57 @@ select {
 </div>
 
     <!-- ===================== -->
-<!-- FOOTER -->
-<!-- ===================== -->
-<footer
-  class="border-t border-border-subtle mt-20"
-  style="background: rgba(17, 23, 32, 0.85)"
->
-  <div
-    class="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-1 md:grid-cols-3 gap-8"
-  >
-    <div class="flex flex-col gap-3">
-      <div>
-        <span class="font-heading font-bold text-xl text-text-main tracking-wide">EMISSION</span>
-        <span class="font-mono text-text-muted tracking-widest block" style="font-size: 9px">IMPOSSIBLE</span>
-      </div>
-      <p class="font-mono text-xs text-text-muted">
-        © 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.
-      </p>
-    </div>
-    <div class="flex flex-col gap-2">
-      <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Nawigacja</span>
-      <a href="{% url 'home' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Strona główna</a>
-      <a href="{% url 'reports:ghg-report' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Raporty</a>
-      <a href="{% url 'companies:companies-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przedsiębiorstwo</a>
-      <a href="{% url 'emissions:factor-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Wskaźniki Emisji</a>
-      <a href="{% url 'emissions:energy_consumption_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Dane emisyjne</a>
-      <a href="{% url 'calculator:dashboard' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
-    </div>
-    <div class="flex flex-col gap-2">
-      <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Więcej</span>
-      <a href="{% url 'what_if:simulation' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
-      <a href="{% url 'accounts:company-users-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Użytkownicy</a>
-      <a href="{% url 'ai_services:global_assistant' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">AI Asystent ESG</a>
-      <a href="{% url 'communications:thread_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Komunikacja e-mail</a>
-    </div>
-  </div>
-  <div style="height: 2px; background: linear-gradient(to right, #c8f535, #a0d020, transparent);"></div>
-</footer>
+    <!-- FOOTER -->
     <!-- ===================== -->
-    <!-- DROPDOWN JAVASCRIPT -->
-    <!-- ===================== -->
-    <script>
-      const dropdown = document.getElementById("dropdown");
-      const burger = document.getElementById("burger");
-      const burgerIcon = document.getElementById("burger-icon");
-      let isOpen = false;
-      burger.addEventListener("click", () => {
-        isOpen = !isOpen;
-        if (isOpen) {
-          dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-          burgerIcon.textContent = "close";
-        } else {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-        }
-      });
-      document.addEventListener("click", (e) => {
-        if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.style.maxHeight = "0";
-          burgerIcon.textContent = "menu";
-          isOpen = false;
-        }
-      });
-    </script>
+
     <footer class="border-t border-border-subtle mt-20" style="background:rgba(17,23,32,0.85);">
       <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
         <div class="flex flex-col gap-3">
-  <div>
-    <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible" style="height:40px; width:120px; min-width:120px; padding:4px 0; object-fit:contain; object-position:left;"/>
-  </div>
-  <p class="font-mono text-xs text-text-muted">© 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.</p>
-</div>
+          <div>
+            <img src="{% static 'images/logo-white.svg' %}" alt="Emission Impossible"
+                 style="height:40px; width:120px; min-width:120px; padding:4px 0; object-fit:contain; object-position:left;"/>
+          </div>
+          <p class="font-mono text-xs text-text-muted">© 2026 Emission Impossible.<br/>Wszelkie prawa zastrzeżone.</p>
+        </div>
 
         <div class="flex flex-col gap-2">
           <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Nawigacja</span>
-          <a href="{% url 'reports:ghg-report' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Raporty</a>
-          <a href="{% url 'companies:companies-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przedsiębiorstwo</a>
-          <a href="{% url 'emissions:factor-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Wskaźniki Emisji</a>
-          <a href="{% url 'calculator:dashboard' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
+          <a href="{% url 'reports:ghg-report' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Raporty</a>
+          <a href="{% url 'companies:companies-list' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przedsiębiorstwo</a>
+          <a href="{% url 'emissions:factor-list' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Wskaźniki Emisji</a>
+          <a href="{% url 'calculator:dashboard' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
+          {% if user.is_authenticated %}
+          <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false" class="relative">
+            <a href="{% url 'emissions:energy_consumption_list' %}"
+               class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Dane Emisyjne</a>
+            <div x-show="show" x-cloak
+                 class="mt-1 ml-3 flex flex-col gap-1 border-l-2 border-border-subtle pl-2">
+              <a href="{% url 'emissions:energy_purchased_list' %}"
+                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Zakupiona energia</a>
+              <a href="{% url 'emissions:energy_produced_list' %}"
+                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Wyprodukowana energia</a>
+              <a href="{% url 'emissions:energy_sold_list' %}"
+                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Sprzedana energia</a>
+            </div>
+          </div>
+          {% endif %}
         </div>
 
         <div class="flex flex-col gap-2">
           <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">Więcej</span>
-          <a href="{% url 'what_if:reduction-target-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
-          <a href="{% url 'accounts:company-users-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Użytkownicy</a>
-          <a href="{% url 'ai_services:global_assistant' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">AI Asystent ESG</a>
-          <a href="{% url 'communications:thread_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Komunikacja e-mail</a>
+          <a href="{% url 'what_if:reduction-target-list' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
+          <a href="{% url 'accounts:company-users-list' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Użytkownicy</a>
+          <a href="{% url 'ai_services:global_assistant' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">AI Asystent ESG</a>
+          <a href="{% url 'communications:thread_list' %}"
+             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Komunikacja e-mail</a>
         </div>
 
       </div>
