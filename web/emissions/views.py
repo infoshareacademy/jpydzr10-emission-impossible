@@ -880,69 +880,47 @@ class EnergyConsumptionTemplateDownloadView(View):
 class EnergyConsumptionImportView(FormView):
     template_name = "emissions/energy_consumption_import.html"
     form_class = EnergyConsumptionImportForm
-    success_url = reverse_lazy("energy_consumption_list")
+    success_url = reverse_lazy("emissions:energy_consumption_list")  # było bez namespace — poprawione
+
+    EXPECTED_HEADERS = [
+        "year", "company", "energy_source", "energy_type", "amount", "unit", "source",
+    ]
+
+    def get_company(self):
+        # FAST FIX: bierzemy pierwszą firmę użytkownika, bo URL importu nie przyjmuje company_id
+        # TODO: docelowo dodać <int:company_id> do URL-a importu, tak jak w pozostałych widokach Scope2
+        return self.request.user.companies.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_verbose_name"] = "Zużycie energii"
+        context["company"] = self.get_company()
+        context["list_url"] = reverse_lazy("emissions:energy_consumption_list")
+        context["import_url"] = reverse_lazy("emissions:energy_consumption_import")
+        context["template_url"] = reverse_lazy("emissions:energy_consumption_template")
+        context["importer_headers"] = self.EXPECTED_HEADERS
+        context["instructions"] = [
+            "year — rok (liczba całkowita), np. 2024",
+            "company — dokładna nazwa firmy zapisana w systemie",
+            "energy_source / energy_type — źródło i typ energii",
+            "amount — ilość (liczba), unit — jednostka",
+        ]
+        context["max_size_mb"] = 5
+        context["max_rows"] = 1000
+        context.setdefault("step", "upload")
+        return context
 
     def get(self, request, *args, **kwargs):
-        # GET nie wykonuje żadnej logiki importu
+        request.session.pop("import_data", None)
         return self.render_to_response(self.get_context_data(form=self.get_form()))
 
     def post(self, request, *args, **kwargs):
-        # POST bez pliku = wyświetl formularz, nie importuj
-        if "confirm" not in request.POST and "file" not in request.FILES:
-            return self.render_to_response(self.get_context_data(form=self.get_form()))
-
-        if "confirm" in request.POST:
-            imported = 0
-            duplicates = 0
-
-            for row in request.session.get("import_data", []):
-                year, company_name, energy_source, energy_type, amount, unit, source = (
-                    row
-                )
-
-                try:
-                    company = Companies.objects.get(name=company_name)
-                except Companies.DoesNotExist:
-                    messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
-                    continue
-
-                exists = EnergyConsumption.objects.filter(
-                    year=year,
-                    company=company,
-                    energy_source=energy_source,
-                    energy_type=energy_type,
-                ).exists()
-
-                if exists:
-                    duplicates += 1
-                    continue
-
-                record = EnergyConsumption(
-                    year=year,
-                    company=company,
-                    energy_source=energy_source,
-                    energy_type=energy_type,
-                    amount=amount,
-                    unit=unit,
-                    source=source,
-                )
-
-                try:
-                    calculate_record_emissions(record)
-                except ValidationError as e:
-                    messages.warning(
-                        request, f"Rekord dodany, ale emisja nie obliczona: {e}"
-                    )
-
-                record.save()
-                imported += 1
-
-            messages.success(
-                request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
-            )
+        action = request.POST.get("action")
+        if action == "cancel":
+            request.session.pop("import_data", None)
             return redirect(self.success_url)
-
+        if action == "confirm":
+            return self.confirm_import(request)
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -955,31 +933,93 @@ class EnergyConsumptionImportView(FormView):
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_source",
-            "energy_type",
-            "amount",
-            "unit",
-            "source",
-        ]
-
-        if headers != expected_headers:
+        if headers != self.EXPECTED_HEADERS:
             messages.error(self.request, "Niepoprawna struktura pliku.")
             return self.form_invalid(form)
 
-        records_count = ws.max_row - 1
+        preview_rows = []
+        raw_rows = []
+        valid_count = 0
+        invalid_count = 0
 
-        self.request.session["import_data"] = []
-        for row in ws.iter_rows(min_row=2, values_only=True):
-            self.request.session["import_data"].append(row)
+        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            year, company_name, energy_source, energy_type, amount, unit, source = row
+            errors = []
+
+            if not company_name:
+                errors.append("Brak nazwy firmy")
+            elif not Companies.objects.filter(name=company_name).exists():
+                errors.append(f'Firma "{company_name}" nie znaleziona')
+
+            if not year:
+                errors.append("Brak roku")
+
+            if amount in (None, ""):
+                errors.append("Brak ilości")
+            else:
+                try:
+                    float(amount)
+                except (TypeError, ValueError):
+                    errors.append("Nieprawidłowa ilość")
+
+            is_valid = not errors
+            if is_valid:
+                valid_count += 1
+                raw_rows.append(row)
+            else:
+                invalid_count += 1
+
+            preview_rows.append({
+                "row_num": i,
+                "values": row,
+                "is_valid": is_valid,
+                "errors": errors,
+            })
+
+        request = self.request
+        request.session["import_data"] = raw_rows
 
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
-
+        context["step"] = "preview"
+        context["headers"] = self.EXPECTED_HEADERS
+        context["preview_rows"] = preview_rows
+        context["total_count"] = len(preview_rows)
+        context["valid_count"] = valid_count
+        context["invalid_count"] = invalid_count
         return self.render_to_response(context)
+
+    def confirm_import(self, request):
+        imported = 0
+        duplicates = 0
+        for row in request.session.get("import_data", []):
+            year, company_name, energy_source, energy_type, amount, unit, source = row
+            try:
+                company = Companies.objects.get(name=company_name)
+            except Companies.DoesNotExist:
+                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                continue
+            exists = EnergyConsumption.objects.filter(
+                year=year, company=company, energy_source=energy_source, energy_type=energy_type,
+            ).exists()
+            if exists:
+                duplicates += 1
+                continue
+            record = EnergyConsumption(
+                year=year, company=company, energy_source=energy_source,
+                energy_type=energy_type, amount=amount, unit=unit, source=source,
+            )
+            try:
+                calculate_record_emissions(record)
+            except ValidationError as e:
+                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+            record.save()
+            imported += 1
+
+        request.session.pop("import_data", None)
+        messages.success(
+            request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów."
+        )
+        return redirect(self.success_url)
 
 
 # ===== ENERGY PURCHASED IMPORT =====

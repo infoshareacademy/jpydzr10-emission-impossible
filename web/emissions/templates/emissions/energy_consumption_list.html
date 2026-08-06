@@ -35,11 +35,11 @@
       </div>
     </div>
     <div class="flex gap-3">
-      <a href="{% url template_url_name %}"
+      <a href="{% url template_url_name %}" hx-boost="false"
          class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
         <span class="material-symbols-outlined" style="font-size:16px;">download</span> Szablon
       </a>
-      <a href="{% url import_url_name %}"
+      <a href="{% url import_url_name %}" hx-boost="false"
          class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
         <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import
       </a>
@@ -49,6 +49,28 @@
         <span class="material-symbols-outlined" style="font-size:16px;">add</span> Dodaj
       </a>
     </div>
+  </div>
+
+<!-- ===================== -->
+<!-- SUB-NAV: DANE EMISYJNE -->
+<!-- ===================== -->
+  <div class="flex flex-wrap gap-2 mb-8 border-b border-border-subtle pb-4">
+    <a href="{% url 'emissions:energy_consumption_list' %}"
+       class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_consumption_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+      Przegląd zużycia
+    </a>
+    <a href="{% url 'emissions:energy_purchased_list' %}"
+       class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_purchased_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+      Zakupiona energia
+    </a>
+    <a href="{% url 'emissions:energy_produced_list' %}"
+       class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_produced_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+      Wyprodukowana energia
+    </a>
+    <a href="{% url 'emissions:energy_sold_list' %}"
+       class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_sold_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+      Sprzedana energia
+    </a>
   </div>
 
 <!-- ===================== -->

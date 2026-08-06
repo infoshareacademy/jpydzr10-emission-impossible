@@ -24,7 +24,7 @@ from core.models import UserPageView
 from .registry import APPS_REGISTRY
 
 
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(LoginRequiredMixin,TemplateView):
     template_name = "home.html"
 
     DEFAULT_SHORTCUTS = [

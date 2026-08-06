@@ -134,6 +134,11 @@
            class="px-4 py-2.5 font-mono text-sm text-text-main border border-border-subtle hover:border-accent hover:text-accent transition-colors text-center rounded-xl">
           Zmiana hasła
         </a>
+        <!-- Weryfikacja dwuetapowa 2FA -->
+        <a href="{% url 'accounts:2fa-setup' %}"
+          class="px-4 py-2.5 font-mono text-sm text-text-main border border-border-subtle hover:border-accent hover:text-accent transition-colors text-center rounded-xl">
+          Skonfiguruj 2FA
+        </a>
         <a href="{% url 'accounts:account_delete' %}"
            class="px-4 py-2.5 font-mono text-sm text-red-400 border border-red-900/50 hover:bg-red-900/30 hover:border-red-500 transition-colors text-center rounded-xl">
           Usuń konto i dane
