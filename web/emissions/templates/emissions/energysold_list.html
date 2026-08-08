@@ -124,14 +124,14 @@
               <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.energy_type|default:"—" }}</td>
               <td class="px-5 py-4 font-mono text-sm text-text-main text-right">{{ record.amount|floatformat:2 }}</td>
               <td class="px-5 py-4 font-mono text-sm text-text-muted">{{ record.unit }}</td>
-              <td class="px-5 py-4 font-mono font-bold text-accent text-right">{{ record.emission_tco2eq|floatformat:2|default:"—" }} t</td>
+              <td class="px-5 py-4 font-mono font-bold text-accent text-right">{{ record.calculated_emission_tco2eq|floatformat:2|default:"—" }} t</td>
               <td class="px-5 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <a href="{% url edit_url_name record.id %}"
                      class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors">
                     <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
                   </a>
-                  <a href="{% url delete_url_name record.id %}"
+                  <a href="{% url 'emissions:energy_sold_confirm_delete' record.id %}"
                      class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors">
                     <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
                   </a>

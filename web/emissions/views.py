@@ -364,6 +364,7 @@ class EnergySoldUpdateView(Scope2CreateMixin, UpdateView):
 
 class EnergySoldDeleteView(Scope2DeleteMixin, DeleteView):
     model = EnergySold
+    template_name = "emissions/energy_sold_confirm_delete.html"
     success_url = reverse_lazy("emissions:energy_sold_list")
 
     def get_context_data(self, **kwargs):

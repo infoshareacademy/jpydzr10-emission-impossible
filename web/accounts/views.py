@@ -273,33 +273,46 @@ class TwoFactorVerifyView(FormView):
 
     def form_valid(self, form):
         token = form.cleaned_data["token"]
-        user_id = self.request.session.get('2fa_user_id')
+        user_id = self.request.session.get("2fa_user_id")
 
         try:
             from django.contrib.auth import get_user_model
+
             User = get_user_model()
             user = User.objects.get(pk=user_id)
-            device = TOTPDevice.objects.get(
-                user=user, is_active=True, confirmed=True
-            )
+
+            # ZMIANA 1: Pobieramy urządzenie bez sztywnych wymogów aktywacji
+            device = TOTPDevice.objects.filter(user=user).first()
+            if not device:
+                messages.error(self.request, "Brak urządzenia 2FA w bazie.")
+                return self.form_invalid(form)
+
             totp = pyotp.TOTP(device.secret)
             if totp.verify(token):
+                # ZMIANA 2: Aktywujemy urządzenie w bazie po wpisaniu dobrego kodu
+                device.is_active = True
+                device.confirmed = True
                 device.last_used = timezone.now()
-                device.save(update_fields=["last_used"])
-                # Wyczyść sesję 2FA
-                del self.request.session['2fa_user_id']
-                del self.request.session['2fa_timestamp']
-                # Loguje usera
-                login(self.request, user,
-                      backend='django.contrib.auth.backends.ModelBackend')
-                messages.success(self.request, "Zalogowano pomyślnie!")
-                # Przekieruje na next lub home
-                next_url = self.request.session.pop('2fa_next', None)
-                return redirect(next_url or 'home')
-        except (TOTPDevice.DoesNotExist, Exception):
-            pass
+                device.save()
 
-        messages.error(self.request, "Nieprawidłowy kod. Spróbuj ponownie.")
+                del self.request.session["2fa_user_id"]
+                del self.request.session["2fa_timestamp"]
+
+                login(
+                    self.request,
+                    user,
+                    backend="django.contrib.auth.backends.ModelBackend",
+                )
+                messages.success(self.request, "Zalogowano pomyślnie!")
+
+                next_url = self.request.session.pop("2fa_next", None)
+                return redirect(next_url or "home")
+
+        except Exception as e:
+            messages.error(self.request, f"Błąd: {e}")
+            return self.form_invalid(form)
+
+        messages.error(self.request, "Nieprawidłowy kod 2FA.")
         return self.form_invalid(form)
 
 class CustomLoginView(LoginView):
@@ -307,9 +320,7 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        has_2fa = TOTPDevice.objects.filter(
-            user=user, is_active=True, confirmed=True
-        ).exists()
+        has_2fa = TOTPDevice.objects.filter(user=user).exists()
 
         if has_2fa:
             # Przygotowuje sesję do 2FA
