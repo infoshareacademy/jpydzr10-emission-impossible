@@ -77,7 +77,7 @@
     <span style="font-family:'Inter',sans-serif; font-weight:600; font-size:20px; color:#e8f4f0; letter-spacing:0.06em; text-transform:uppercase;">{% trans "Emisje pośrednie energetyczne" %}</span>
   </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-    <a href="{% url 'emissions:energy_purchased_list' %}" class="flex flex-col items-center" style="text-decoration:none">
+    <a href="{% url 'emissions:energy_purchased_list' %}?company={{ company.name|urlencode }}" class="flex flex-col items-center" style="text-decoration:none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#f4ffff,#b5ffff); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">
@@ -86,7 +86,7 @@
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Zakupiona energia" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Energia z sieci zewnętrznej" %}</span>
     </a>
-    <a href="{% url 'emissions:energy_produced_list' %}" class="flex flex-col items-center" style="text-decoration:none">
+    <a href="{% url 'emissions:energy_produced_list' %}?company={{ company.name|urlencode }}" class="flex flex-col items-center" style="text-decoration:none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#f4ffff,#b5ffff); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">
@@ -95,7 +95,7 @@
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Wyprodukowana" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Fotowoltaika, własne źródła" %}</span>
     </a>
-    <a href="{% url 'emissions:energy_sold_list' %}" class="flex flex-col items-center" style="text-decoration:none">
+    <a href="{% url 'emissions:energy_sold_list' %}?company={{ company.name|urlencode }}" class="flex flex-col items-center" style="text-decoration:none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#f4ffff,#b5ffff); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">
@@ -104,7 +104,7 @@
       <span style="font-family:'Roboto Mono',monospace; font-size:13px; color:#e8f4f0; text-align:center; margin-top:10px;">{% trans "Sprzedana energia" %}</span>
       <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#4a7a74; text-align:center; margin-top:3px;">{% trans "Odprzedaż nadwyżek do sieci" %}</span>
     </a>
-    <a href="{% url 'emissions:energy_consumption_list' %}" class="flex flex-col items-center" style="text-decoration:none">
+    <a href="{% url 'emissions:energy_consumption_list' %}?company={{ company.name|urlencode }}" class="flex flex-col items-center" style="text-decoration:none">
       <div style="width:100%; aspect-ratio:1; background:linear-gradient(145deg,#f4ffff,#92f5f5); border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .18s,box-shadow .18s; box-shadow:0 4px 24px rgba(0,0,0,.4);"
         onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 12px 36px rgba(0,0,0,.5),0 0 20px rgba(100,210,200,.25)'"
         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,.4)'">

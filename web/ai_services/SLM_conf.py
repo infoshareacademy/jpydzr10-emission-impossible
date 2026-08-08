@@ -25,7 +25,7 @@ RecordStatus = WorkflowStatusMixin.RecordStatus
 class BielikESGService:
     def __init__(self):
         self.client = ollama.Client(host="http://localhost:11434")
-        self.model_name = "bielik:latest"
+        self.model_name = "speakleash/bielik-11b-v2.2-instruct:q4_k_m"
 
     def _build_emissions_context(
         self, company: Companies, scope_type: str = "ALL", year: int = None

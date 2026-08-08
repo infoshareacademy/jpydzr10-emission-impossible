@@ -7,8 +7,8 @@ from django.urls import include, path
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("", HomeView.as_view(), name="home"),
-    path("accounts/", include("django.contrib.auth.urls")),
     path("accounts/", include("accounts.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path("companies/", include("companies.urls")),
     path("emissions/", include("emissions.urls")),
@@ -19,4 +19,5 @@ urlpatterns = [
     path("communications/", include("communications.urls")),
     path("privacy/", PrivacyPolicyView.as_view(), name="privacy-policy"),
     path("workflow/", include("workflow.urls", namespace="workflow")),
+    path('audit/', include('audit.urls', namespace='audit')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,139 +1,284 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Weryfikacja Raportu" %} | Emission Impossible{% endblock %}
+{% block title %}{% trans "Audyt" %}: {{ envelope.company.name }} | Emission Impossible{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
-
-  <!-- HEADER -->
-  <div>
-    <a href="{% url 'workflow:admin_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
-      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span> {% trans "Wróć do listy" %}
-    </a>
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div class="flex items-center gap-3">
-        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{{ envelope.company.name }}</h1>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="font-mono text-xs px-3 py-1.5 rounded-xl"
-          style="{% if envelope.status == 'APPROVED' %}background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);{% elif envelope.status == 'IN_REVIEW' %}background:rgba(234,179,8,0.12); color:#fbbf24; border:1px solid rgba(234,179,8,0.3);{% elif envelope.status == 'RETURNED' %}background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3);{% else %}background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);{% endif %}">
-          {{ envelope.get_status_display }}
-        </span>
-        <span class="font-mono text-sm text-text-muted">{{ envelope.period.year }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- BULK APPROVE -->
-  {% if envelope.status == 'IN_REVIEW' %}
-  <div class="rounded-2xl border border-border-subtle p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  {% csrf_token %}
+  <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
-      <h2 class="font-heading font-bold text-lg text-text-main mb-1">{% trans "Szybka weryfikacja" %}</h2>
-      <p class="font-mono text-sm text-text-muted">{% trans "Zatwierdź wszystkie rekordy i zamknij raport jednym kliknięciem." %}</p>
+      <!-- Powrót do Listy Raportów -->
+      <a href="{% url 'workflow:admin_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+        <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+        {% trans "Wróć do listy raportów" %}
+      </a>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">{% trans "Audyt" %}: {{ envelope.company.name }}</h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4 mt-2">{% trans "Rok raportowy" %}: {{ envelope.period.year }}</p>
     </div>
-    <form method="post" action="{% url 'workflow:bulk_approve' envelope.pk %}">
-      {% csrf_token %}
-      <button type="submit"
-        class="inline-flex items-center gap-2 px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
-        style="background:#1a4a52; border:1px solid #2a6a72;">
-        <span class="material-symbols-outlined" style="font-size:18px;">verified</span> {% trans "Zatwierdź wszystko" %}
-      </button>
-    </form>
-  </div>
-  {% endif %}
 
-  <!-- RECORDS -->
-  {% for group in grouped_records %}
-  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-    <div class="px-6 py-4 border-b border-border-subtle flex items-center gap-2">
-      <span class="material-symbols-outlined text-accent" style="font-size:18px;">folder</span>
-      <h2 class="font-mono text-sm uppercase tracking-wider text-text-main">{{ group.label }}</h2>
-      <span class="font-mono text-xs text-text-muted ml-auto">{{ group.records|length }} {% trans "rekordów" %}</span>
-    </div>
+    <button id="btn-bulk-approve"
+            data-url="{% url 'workflow:bulk_approve' envelope_id=envelope.pk %}"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md"
+            {% if envelope.status != 'IN_REVIEW' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+      <span class="material-symbols-outlined text-[20px]">task_alt</span>
+      {% trans "ZAAKCEPTUJ WSZYSTKIE REKORDY" %}
+    </button>
+  </div>
+
+  <!-- Tabela w spójnym stylu -->
+  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="border-b border-border-subtle">
-            <th class="pt-4 pb-3 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Opis" %}</th>
-            <th class="pt-4 pb-3 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Emisja" %}</th>
-            <th class="pt-4 pb-3 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-center">{% trans "Status" %}</th>
-            {% if envelope.status == 'IN_REVIEW' %}
-            <th class="pt-4 pb-3 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-center">{% trans "Akcje" %}</th>
-            {% endif %}
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">{% trans "Kategoria" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">{% trans "Szczegóły wpisu" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">{% trans "Status" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">{% trans "Akcja" %}</th>
           </tr>
         </thead>
         <tbody>
-          {% for record in group.records %}
-          <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
-            <td class="px-6 py-3 font-mono text-sm text-text-main">{{ record }}</td>
-            <td class="px-6 py-3 font-mono text-sm text-accent text-right">{{ record.emission_co2e|default:record.calculated_emission_tco2eq|floatformat:2 }} t</td>
-            <td class="px-6 py-3 text-center">
-              <span class="font-mono text-xs px-2 py-1 rounded"
-                style="{% if record.workflow_status == 'approved' %}background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);{% elif record.workflow_status == 'rejected' %}background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3);{% else %}background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);{% endif %}">
-                {{ record.get_workflow_status_display }}
-              </span>
-            </td>
-            {% if envelope.status == 'IN_REVIEW' %}
-            <td class="px-6 py-3 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <form method="post" action="{% url 'workflow:review_action' group.app_label group.model_name record.pk %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="action" value="approve">
-                  <button type="submit"
-                    class="px-3 py-1.5 font-mono text-xs font-bold uppercase rounded-lg text-white transition-colors"
-                    style="background:rgba(200,245,53,0.2); border:1px solid rgba(200,245,53,0.4); color:#c8f535;">
-                    {% trans "Zatwierdź" %}
-                  </button>
-                </form>
-                <form method="post" action="{% url 'workflow:review_action' group.app_label group.model_name record.pk %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="action" value="reject">
-                  <button type="submit"
-                    class="px-3 py-1.5 font-mono text-xs font-bold uppercase rounded-lg transition-colors"
-                    style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#f87171;">
-                    {% trans "Odrzuć" %}
-                  </button>
-                </form>
-              </div>
-            </td>
-            {% endif %}
-          </tr>
+          {% for item in emission_records %}
+            <tr id="row-{{ item.app_label }}-{{ item.model_name }}-{{ item.instance.pk }}"
+                class="border-b border-border-subtle transition-colors {% if item.instance.workflow_status == 'APPROVED' %}bg-green-900/20{% elif item.instance.workflow_status == 'REJECTED' %}bg-red-900/20{% else %}hover:bg-white/5{% endif %}">
+
+              <td class="px-5 py-4 font-medium text-text-main">{{ item.verbose_name }}</td>
+
+              <td class="px-5 py-4 text-text-main text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono">{{ item.instance }}</span>
+
+                  {% if item.admin_url != '#' %}
+                    <a href="{{ item.admin_url }}" target="_blank" class="inline-flex items-center gap-1 text-[#c8f535] hover:text-white transition-colors ml-4" title="{% trans 'Otwórz szczegóły w nowej karcie' %}">
+                      <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                      <span class="text-xs font-bold uppercase tracking-wider">{% trans "Podgląd" %}</span>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="px-5 py-4 text-center">
+                <span class="record-status font-mono text-xs font-bold px-2 py-1 rounded"
+                      style="{% if item.instance.workflow_status == 'PENDING' or item.instance.workflow_status == 'DRAFT' %}background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);{% elif item.instance.workflow_status == 'APPROVED' %}background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);{% elif item.instance.workflow_status == 'REJECTED' %}background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);{% endif %}">
+                  {{ item.instance.get_workflow_status_display }}
+                </span>
+              </td>
+              <td class="px-5 py-4 text-center">
+                {% if item.instance.workflow_status == 'PENDING' or item.instance.workflow_status == 'DRAFT' %}
+                  <div class="action-buttons flex justify-center gap-2">
+                    <button class="btn-approve inline-flex items-center justify-center rounded-lg border border-[#c8f535] text-[#c8f535] hover:bg-[#c8f535] hover:text-[#1a4a52] px-3 py-1.5 text-xs font-bold transition-all"
+                            data-url="{% url 'workflow:review_action' app_label=item.app_label model_name=item.model_name pk=item.instance.pk %}"
+                            data-app="{{ item.app_label }}" data-model="{{ item.model_name }}" data-id="{{ item.instance.pk }}">
+                      {% trans "Zatwierdź" %}
+                    </button>
+
+                    <button class="btn-reject inline-flex items-center justify-center rounded-lg border border-red-400 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 text-xs font-bold transition-all"
+                            data-url="{% url 'workflow:record_clarify' app_label=item.app_label model_name=item.model_name pk=item.instance.pk %}"
+                            data-app="{{ item.app_label }}" data-model="{{ item.model_name }}" data-id="{{ item.instance.pk }}">
+                      {% trans "Odrzuć" %}
+                    </button>
+                  </div>
+                {% else %}
+                  <span class="text-text-muted text-sm font-mono">{% trans "Oceniono" %}</span>
+                {% endif %}
+              </td>
+            </tr>
           {% empty %}
-          <tr>
-            <td colspan="4" class="px-6 py-8 text-center font-mono text-sm text-text-muted">{% trans "Brak rekordów w tej kategorii." %}</td>
-          </tr>
+            <tr><td colspan="4" class="px-5 py-12 text-center text-text-muted font-mono text-sm uppercase tracking-wider">{% trans "Brak danych do weryfikacji. Wprowadź dane emisji dla tej spółki i roku." %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-  {% endfor %}
 
-  <!-- FINALIZE -->
-  {% if envelope.status == 'IN_REVIEW' %}
-  <div class="rounded-2xl border border-border-subtle p-6 flex justify-end gap-4" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-    <form method="post" action="{% url 'workflow:finalize_review' envelope.pk %}">
-      {% csrf_token %}
-      <input type="hidden" name="decision" value="return">
-      <button type="submit"
-        class="px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl transition-colors"
-        style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#f87171;">
-        {% trans "Zwróć do poprawy" %}
-      </button>
-    </form>
-    <form method="post" action="{% url 'workflow:finalize_review' envelope.pk %}">
-      {% csrf_token %}
-      <input type="hidden" name="decision" value="approve">
-      <button type="submit"
-        class="px-6 py-2.5 font-mono text-sm font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
-        style="background:#1a4a52; border:1px solid #2a6a72;">
-        {% trans "Zatwierdź raport" %}
-      </button>
-    </form>
-  </div>
-  {% endif %}
+  <dialog id="rejectModal" class="rounded-2xl shadow-2xl p-0 backdrop:bg-black/70 backdrop:backdrop-blur-sm border border-[#1a4a52] bg-[#0d272d] w-full max-w-lg m-auto top-1/2 -translate-y-1/2 text-text-main">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4 border-b border-[#1a4a52] pb-3">
+        <h3 class="text-xl font-bold text-red-400">{% trans "Odrzucenie rekordu" %}</h3>
+        <button id="closeModalBtn" class="text-text-muted hover:text-text-main transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
 
-</div>
+      <p class="text-sm text-text-muted mb-4">{% trans "Podaj powód odrzucenia. Użytkownik zobaczy ten komentarz i będzie musiał poprawić dane." %}</p>
+
+      <textarea id="rejectReason" rows="4" class="w-full rounded-lg border border-[#1a4a52] bg-[#071619] text-text-main p-3 text-sm focus:border-[#c8f535] focus:ring-1 focus:ring-[#c8f535] outline-none placeholder-gray-600" placeholder="{% trans 'Np. Nieprawidłowy współczynnik konwersji...' %}"></textarea>
+
+      <!-- Ukryte pola przekazujące kontekst z klikniętego rzędu do Modala -->
+      <input type="hidden" id="rejectUrl">
+      <input type="hidden" id="rejectApp">
+      <input type="hidden" id="rejectModel">
+      <input type="hidden" id="rejectId">
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="cancelModalBtn" class="px-4 py-2 text-sm font-bold text-text-muted bg-transparent border border-[#1a4a52] hover:bg-[#1a4a52] rounded-lg transition-colors">{% trans "Anuluj" %}</button>
+        <button id="confirmRejectBtn" class="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-lg shadow-red-900/20">{% trans "Potwierdź odrzucenie" %}</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const modal = document.getElementById('rejectModal');
+
+      // Etykiety tłumaczone po stronie serwera
+      const T = {
+        approved:   '{% trans "Zaakceptowany" %}',
+        rejected:   '{% trans "Odrzucony" %}',
+        reviewed:   '{% trans "Oceniono" %}',
+        error:      '{% trans "Błąd" %}',
+        connError:  '{% trans "Błąd połączenia z serwerem." %}',
+        needReason: '{% trans "Musisz podać powód odrzucenia!" %}',
+        confirmFinalize: '{% trans "Czy na pewno chcesz sfinalizować ten raport?" %}',
+        finalized:  '{% trans "Zakończono! Status końcowy:" %}',
+        cantFinalize: '{% trans "Nie można sfinalizować:" %}',
+        confirmBulk: '{% trans "Czy na pewno chcesz zaakceptować wszystkie rekordy w tym raporcie?" %}',
+        bulkDone:   '{% trans "Zaakceptowano rekordów:" %}'
+      };
+
+      document.getElementById('closeModalBtn').addEventListener('click', () => modal.close());
+      document.getElementById('cancelModalBtn').addEventListener('click', () => modal.close());
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.close();
+      });
+
+      // API Zatwierdzania (uderza w AdminReviewActionView)
+      document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          const { app, model, id, url } = this.dataset;
+
+          const formData = new FormData();
+          formData.append('action', 'approve');
+
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': csrfToken },
+              body: formData
+            });
+            const res = await response.json();
+
+            if (res.status === 'success') {
+              const row = document.getElementById(`row-${app}-${model}-${id}`);
+              row.className = 'border-b border-border-subtle transition-colors bg-green-900/20';
+              row.querySelector('.record-status').textContent = T.approved;
+
+              // Zmiana stylu odznaki na zatwierdzony
+              row.querySelector('.record-status').setAttribute('style', 'background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);');
+              row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">' + T.reviewed + '</span>';
+            } else {
+              alert(T.error + ': ' + res.message);
+            }
+          } catch(err) {
+            console.error(err);
+            alert(T.connError);
+          }
+        });
+      });
+
+      // Złapanie kontekstu dla odrzucenia (wyświetlenie Modala)
+      document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.getElementById('rejectUrl').value = this.dataset.url;
+          document.getElementById('rejectApp').value = this.dataset.app;
+          document.getElementById('rejectModel').value = this.dataset.model;
+          document.getElementById('rejectId').value = this.dataset.id;
+          document.getElementById('rejectReason').value = '';
+          modal.showModal();
+        });
+      });
+
+      // API Odrzucania (uderza w RecordClarificationView)
+      document.getElementById('confirmRejectBtn').addEventListener('click', async function() {
+        const url = document.getElementById('rejectUrl').value;
+        const app = document.getElementById('rejectApp').value;
+        const model = document.getElementById('rejectModel').value;
+        const id = document.getElementById('rejectId').value;
+        const reason = document.getElementById('rejectReason').value;
+
+        if (!reason.trim()) {
+          alert(T.needReason);
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('message', reason);
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+          });
+          const res = await response.json();
+
+          if (res.status === 'success') {
+            const row = document.getElementById(`row-${app}-${model}-${id}`);
+            row.className = 'border-b border-border-subtle transition-colors bg-red-900/20';
+            row.querySelector('.record-status').textContent = T.rejected;
+
+            // Zmiana stylu odznaki na odrzucony
+            row.querySelector('.record-status').setAttribute('style', 'background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);');
+            row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">' + T.reviewed + '</span>';
+            modal.close();
+          } else {
+            alert(T.error + ': ' + res.message);
+          }
+        } catch(err) {
+          console.error(err);
+          alert(T.connError);
+        }
+      });
+
+      // Sfinalizowanie koperty (jeśli istnieje przycisk)
+      const finalizeBtn = document.getElementById('finalizeBtn');
+      if (finalizeBtn) {
+        finalizeBtn.addEventListener('click', async function() {
+          if (!confirm(T.confirmFinalize)) return;
+
+          const url = this.dataset.url;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+          });
+          const res = await response.json();
+
+          if (res.status === 'success') {
+            alert(`${T.finalized} ${res.result}`);
+            window.location.href = "{% url 'workflow:admin_list' %}";
+          } else {
+            alert(`${T.cantFinalize} ${res.message}`);
+          }
+        });
+      }
+
+      // Szybkie akceptowanie wszystkich wpisów
+      const bulkApproveBtn = document.getElementById('btn-bulk-approve');
+      if (bulkApproveBtn) {
+        bulkApproveBtn.addEventListener('click', function() {
+          if (!confirm(T.confirmBulk)) return;
+
+          const targetUrl = this.dataset.url;
+
+          fetch(targetUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken }
+          })
+            .then(r => r.json())
+            .then(data => {
+              if (data.status === "success") {
+                alert(T.bulkDone + ' ' + data.count);
+                window.location.reload();
+              } else {
+                alert(T.error + ': ' + data.message);
+              }
+            });
+        });
+      }
+    });
+  </script>
 {% endblock %}

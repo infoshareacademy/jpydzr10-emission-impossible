@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     AdminBulkApproveView,
+    AdminDashboardView,
     AdminEnvelopeListView,
     AdminEnvelopeReviewDetailView,
     AdminFinalizeReviewView,
@@ -42,4 +43,5 @@ urlpatterns = [
         RecordClarificationView.as_view(),
         name="record_clarify",
     ),
+    path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
 ]

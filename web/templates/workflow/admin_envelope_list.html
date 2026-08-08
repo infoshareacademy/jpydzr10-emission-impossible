@@ -4,56 +4,97 @@
 {% block title %}{% trans "Audyt i Weryfikacja" %} | Emission Impossible{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-  <div class="flex items-center gap-3 mb-1">
-    <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
-    <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">{% trans "Weryfikacja Danych Emisyjnych" %}</h1>
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+    <div>
+      <!-- Powrót do Panelu Admina -->
+      <a href="{% url 'workflow:admin_dashboard' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+        <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+        {% trans "Wróć do Panelu" %}
+      </a>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+          {% trans "Weryfikacja Danych Emisyjnych" %}
+        </h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4 mt-2">
+        {% trans "Wybierz spółkę i okres rozliczeniowy, aby rozpocząć audyt." %}
+      </p>
+    </div>
   </div>
-  <p class="font-mono text-sm text-text-muted ml-4 mt-3">{% trans "Wybierz spółkę i okres rozliczeniowy, aby rozpocząć audyt." %}</p>
-</div>
 
-<div class="rounded-2xl border border-border-subtle overflow-hidden max-w-6xl mx-auto" style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
-  <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="border-b border-border-subtle">
-          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Spółka" %}</th>
-          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Rok Raportowy" %}</th>
-          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest">{% trans "Status" %}</th>
-          <th class="pt-6 pb-4 px-6 font-mono text-xs text-text-muted uppercase tracking-widest text-right">{% trans "Akcja" %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for envelope in envelopes %}
-        <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
-          <td class="py-4 px-6 font-mono font-bold text-text-main">{{ envelope.company.name }}</td>
-          <td class="py-4 px-6 font-mono text-text-main">{{ envelope.period.year }}</td>
-          <td class="py-4 px-6">
-            {% if envelope.status == 'OPEN' %}
-            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(122,181,174,0.12); color:#7ab5ae; border:1px solid rgba(122,181,174,0.3);">{% trans "W trakcie wprowadzania" %}</span>
-            {% elif envelope.status == 'IN_REVIEW' %}
-            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(234,179,8,0.12); color:#fbbf24; border:1px solid rgba(234,179,8,0.3);">{% trans "Oczekuje na weryfikację" %}</span>
-            {% elif envelope.status == 'RETURNED' %}
-            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.3);">{% trans "Zwrócono do poprawy" %}</span>
-            {% elif envelope.status == 'APPROVED' %}
-            <span class="font-mono text-xs px-2 py-1 rounded" style="background:rgba(200,245,53,0.12); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">{% trans "Zatwierdzone" %}</span>
-            {% endif %}
-          </td>
-          <td class="py-4 px-6 text-right">
-            <a href="{% url 'workflow:admin_detail' envelope.pk %}"
-              class="inline-flex items-center justify-center px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider rounded-xl text-white transition-colors"
-              style="background:#1a4a52; border:1px solid #2a6a72;">
-              {% if envelope.status == 'IN_REVIEW' %}{% trans "Rozpocznij" %}{% else %}{% trans "Podgląd" %}{% endif %}
-            </a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="4" class="py-8 text-center font-mono text-sm text-text-muted">{% trans "Brak raportów w systemie." %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Tabela w spójnym stylu -->
+  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-border-subtle">
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">{% trans "Spółka" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">{% trans "Rok Raportowy" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">{% trans "Status" %}</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-right">{% trans "Akcja" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for envelope in envelopes %}
+            <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
+              <td class="px-5 py-4 font-mono font-bold text-text-main text-lg">
+                {{ envelope.company.name }}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm text-text-muted text-center">
+                {{ envelope.period.year }}
+              </td>
+              <td class="px-5 py-4 text-center">
+                {% if envelope.status == 'OPEN' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);">
+                    {% trans "W trakcie wprowadzania" %}
+                  </span>
+                {% elif envelope.status == 'IN_REVIEW' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3);">
+                    {% trans "Oczekuje na weryfikację" %}
+                  </span>
+                {% elif envelope.status == 'RETURNED' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);">
+                    {% trans "Zwrócono do poprawy" %}
+                  </span>
+                {% elif envelope.status == 'APPROVED' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);">
+                    {% trans "Zatwierdzone (Zablokowane)" %}
+                  </span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-4 text-right">
+                <a href="{% url 'workflow:admin_detail' envelope.pk %}" class="inline-flex items-center justify-center rounded-xl bg-[#c8f535] px-4 py-2 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-sm">
+                  {% if envelope.status == 'IN_REVIEW' %}
+                    {% trans "Rozpocznij" %}
+                  {% else %}
+                    {% trans "Podgląd" %}
+                  {% endif %}
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+                {% trans "Brak raportów w systemie." %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginacja (zadziała po dodaniu paginate_by w widoku) -->
+    {% if is_paginated %}
+      <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">«</a>
+        {% endif %}
+        <span class="px-3 py-1.5 font-mono text-sm text-text-muted">{% blocktrans with num=page_obj.number total=paginator.num_pages %}Strona {{ num }} z {{ total }}{% endblocktrans %}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">»</a>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
-</div>
 {% endblock %}

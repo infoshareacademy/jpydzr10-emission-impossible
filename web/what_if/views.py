@@ -4,7 +4,7 @@ from decimal import Decimal
 from companies.models import Companies
 from core.mixins import PageViewTrackerMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
@@ -28,7 +28,7 @@ from emissions.models import (
 )
 
 from .forms import ReductionTargetForm, SimulationForm
-from .models import ReductionTarget
+from .models import ReductionGoal, ReductionTarget
 
 
 class ReductionTargetListView(PageViewTrackerMixin, LoginRequiredMixin, ListView):
@@ -339,3 +339,42 @@ class ReductionTargetDetailView(LoginRequiredMixin, DetailView):
         context["target_emission_value"] = target_emission
 
         return context
+
+class AdminRequiredMixin(UserPassesTestMixin):
+    """Zabezpieczenie: tylko admin/superuser ma dostęp do globalnych celów."""
+    def test_func(self):
+        return self.request.user.is_superuser or getattr(self.request.user, 'role', '') == 'admin'
+
+class ReductionGoalListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    model = ReductionGoal
+    template_name = "what_if/goal_list.html"
+    context_object_name = "goals"
+
+class ReductionGoalCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    model = ReductionGoal
+    template_name = "what_if/goal_form.html"
+    fields = ['company', 'name', 'base_year', 'target_year', 'reduction_pct', 'scope']
+    success_url = reverse_lazy('what_if:goal_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Pomyślnie utworzono nowy cel redukcyjny.")
+        return super().form_valid(form)
+
+class ReductionGoalUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    model = ReductionGoal
+    template_name = "what_if/goal_form.html"  # Używa tego samego, udostępnionego wcześniej szablonu!
+    fields = ["company", "name", "base_year", "target_year", "reduction_pct", "scope"]
+    success_url = reverse_lazy("what_if:goal_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Cel redukcyjny został zaktualizowany.")
+        return super().form_valid(form)
+
+
+class ReductionGoalDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
+    model = ReductionGoal
+    success_url = reverse_lazy("what_if:goal_list")
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Cel redukcyjny został pomyślnie usunięty.")
+        return super().delete(request, *args, **kwargs)

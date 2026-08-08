@@ -33,6 +33,10 @@
     </div>
   </div>
   <div class="flex gap-3">
+    <a href="{% url template_url_name %}" hx-boost="false"
+       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
+      <span class="material-symbols-outlined" style="font-size:16px;">download</span> {% trans "Szablon" %}
+    </a>
     <a href="{% url import_url_name %}"
       class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-border-subtle text-text-muted hover:text-text-main transition-colors">
       <span class="material-symbols-outlined" style="font-size:16px;">upload</span> {% trans "Import" %}
@@ -45,6 +49,52 @@
   </div>
 </div>
 
+<!-- ===================== -->
+<!-- SUB-NAV: DANE EMISYJNE -->
+<!-- ===================== -->
+<div class="flex flex-wrap gap-2 mb-8 border-b border-border-subtle pb-4">
+  <a href="{% url 'emissions:energy_consumption_list' %}"
+     class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_consumption_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+    {% trans "Przegląd zużycia" %}
+  </a>
+  <a href="{% url 'emissions:energy_purchased_list' %}"
+     class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_purchased_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+    {% trans "Zakupiona energia" %}
+  </a>
+  <a href="{% url 'emissions:energy_produced_list' %}"
+     class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_produced_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+    {% trans "Wyprodukowana energia" %}
+  </a>
+  <a href="{% url 'emissions:energy_sold_list' %}"
+     class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl border transition-colors {% if list_url_name == 'emissions:energy_sold_list' %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">
+    {% trans "Sprzedana energia" %}
+  </a>
+</div>
+
+<!-- ===================== -->
+<!-- FILTERS -->
+<!-- ===================== -->
+<form method="get" class="rounded-2xl border border-border-subtle p-5 mb-8 flex flex-wrap gap-4 items-end"
+      style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+  <div class="flex flex-col gap-1">
+    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">{% trans "Firma" %}</label>
+    <input type="text" name="company" value="{{ filter_company|default:'' }}" placeholder="{% trans 'Szukaj firmy...' %}"/>
+  </div>
+  <div class="flex flex-col gap-1">
+    <label class="font-mono text-xs uppercase tracking-wider text-text-muted">{% trans "Rok" %}</label>
+    <input type="number" name="year" value="{{ filter_year|default:'' }}" placeholder="YYYY" style="width:100px;"/>
+  </div>
+  <button type="submit"
+          class="font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors"
+          style="background:#1a4a52; border:1px solid #2a6a72;">
+    {% trans "Szukaj" %}
+  </button>
+  <a href="{% url list_url_name %}" class="font-mono text-xs text-text-muted hover:text-accent underline">{% trans "Wyczyść" %}</a>
+</form>
+
+<!-- ===================== -->
+<!-- TABLE -->
+<!-- ===================== -->
 <div class="rounded-2xl border border-border-subtle overflow-hidden"
   style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
   <div class="overflow-x-auto">
@@ -96,6 +146,28 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+    <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&company={{ filter_company }}&year={{ filter_year }}"
+           class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">←</a>
+      {% endif %}
+      {% for num in page_range %}
+        {% if num == page_obj.paginator.ELLIPSIS %}
+          <span class="px-3 py-1.5 font-mono text-sm text-text-muted">…</span>
+        {% else %}
+          <a href="?page={{ num }}&company={{ filter_company }}&year={{ filter_year }}"
+             class="px-3 py-1.5 font-mono text-sm border rounded-lg transition-colors {% if page_obj.number == num %}text-accent border-accent{% else %}border-border-subtle text-text-muted hover:text-text-main{% endif %}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&company={{ filter_company }}&year={{ filter_year }}"
+           class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">→</a>
+      {% endif %}
+    </div>
+  {% endif %}
 </div>
 
 {% endblock %}

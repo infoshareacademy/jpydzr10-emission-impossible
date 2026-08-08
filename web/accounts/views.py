@@ -1,39 +1,47 @@
+import base64
+import io
+import time
+
+import pyotp
+import qrcode
 from companies.models import Companies
 from core.mixins import PageViewTrackerMixin
+from core.models import UserCarbonFootprint
 from django.contrib import messages
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import FormView, TemplateView, UpdateView, View
 
 from .forms import DeleteAccountForm, UserProfileForm
-from .models import UserCompanyPermission
+from .models import TOTPDevice, UserCompanyPermission
 
 
 class ProfileView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
-    template_name = "accounts/profile.html"
-    tracked_view_name = "Profil"
+  template_name = 'accounts/profile.html'
+  tracked_view_name = 'Profil'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    user = self.request.user
 
-        # Sprawdzamy czy użytkownik posiada rolę administratora
-        if user.role == "admin":
-            context["is_admin_user"] = True
-            # Admin widzi absolutnie wszystkie spółki w systemie
-            context["all_companies"] = Companies.objects.all()
-        else:
-            context["is_admin_user"] = False
-            # Zwykły użytkownik widzi tylko te, do których ma jawne uprawnienie
-            context["permissions"] = UserCompanyPermission.objects.filter(
-                user=user
-            ).select_related("company")
+    UserCarbonFootprint.objects.get_or_create(user=user)
 
-        return context
+    if user.role == 'admin':
+      context['is_admin_user'] = True
+      context['all_companies'] = Companies.objects.all()
+    else:
+      context['is_admin_user'] = False
+      context['permissions'] = UserCompanyPermission.objects.filter(
+          user=user
+      ).select_related('company')
+
+    return context
 
 
 class DeleteAccountView(LoginRequiredMixin, FormView):
@@ -213,3 +221,108 @@ class DeactivateUserView(LoginRequiredMixin, View):
             f"Konto użytkownika '{target_user.username}' zostało dezaktywowane.",
         )
         return redirect("accounts:company-users-list")
+
+class TwoFactorSetupView(LoginRequiredMixin, TemplateView):
+    """Widok konfiguracji 2FA — generuje QR kod."""
+    template_name = "accounts/2fa_setup.html"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        device, created = TOTPDevice.objects.get_or_create(
+            user=user,
+            name="Default",
+            defaults={"secret": pyotp.random_base32(), "is_active": False},
+        )
+        totp = pyotp.TOTP(device.secret)
+        uri = totp.provisioning_uri(
+            name=user.email or user.username,
+            issuer_name="Emission Impossible",
+        )
+        qr = qrcode.make(uri)
+        buffer = io.BytesIO()
+        qr.save(buffer, format="PNG")
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+        return self.render_to_response({"qr_base64": qr_base64, "device": device})
+
+
+class TwoFactorVerifyView(FormView):
+    """Widok weryfikacji tokenu 2FA po logowaniu."""
+    template_name = "accounts/2fa_verify.html"
+
+    def get_form_class(self):
+        from django import forms
+        class TOTPForm(forms.Form):
+            token = forms.CharField(
+                max_length=6,
+                label="Kod 2FA",
+                widget=forms.TextInput(attrs={
+                    'autofocus': True,
+                    'placeholder': '000000',
+                    'inputmode': 'numeric',
+                })
+            )
+        return TOTPForm
+
+    def dispatch(self, request, *args, **kwargs):
+        # Sprawdza czy sesja 2FA jest ważna (max 5 minut)
+        user_id = request.session.get('2fa_user_id')
+        timestamp = request.session.get('2fa_timestamp', 0)
+        if not user_id or (int(time.time()) - timestamp) > 300:
+            messages.error(request, "Sesja wygasła. Zaloguj się ponownie.")
+            return redirect('accounts:login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        token = form.cleaned_data["token"]
+        user_id = self.request.session.get('2fa_user_id')
+
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user = User.objects.get(pk=user_id)
+            device = TOTPDevice.objects.get(
+                user=user, is_active=True, confirmed=True
+            )
+            totp = pyotp.TOTP(device.secret)
+            if totp.verify(token):
+                device.last_used = timezone.now()
+                device.save(update_fields=["last_used"])
+                # Wyczyść sesję 2FA
+                del self.request.session['2fa_user_id']
+                del self.request.session['2fa_timestamp']
+                # Loguje usera
+                login(self.request, user,
+                      backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(self.request, "Zalogowano pomyślnie!")
+                # Przekieruje na next lub home
+                next_url = self.request.session.pop('2fa_next', None)
+                return redirect(next_url or 'home')
+        except (TOTPDevice.DoesNotExist, Exception):
+            pass
+
+        messages.error(self.request, "Nieprawidłowy kod. Spróbuj ponownie.")
+        return self.form_invalid(form)
+
+class CustomLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def form_valid(self, form):
+        user = form.get_user()
+        has_2fa = TOTPDevice.objects.filter(
+            user=user, is_active=True, confirmed=True
+        ).exists()
+
+        if has_2fa:
+            # Przygotowuje sesję do 2FA
+            self.request.session['2fa_user_id'] = user.pk
+            self.request.session['2fa_timestamp'] = int(time.time())
+
+            # Zapamiętuje next URL
+            if self.request.GET.get('next'):
+                self.request.session['2fa_next'] = self.request.GET.get('next')
+
+            return redirect('accounts:2fa-verify')
+
+        # Normalne logowanie bez 2FA
+        login(self.request, user)
+        return redirect(self.get_success_url())

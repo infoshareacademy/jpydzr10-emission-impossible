@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Narzędzia Administratora | Emission Impossible{% endblock %}
+
+{% block content %}
+  <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Narzędzia Administratora</h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4">Zarządzaj procesem raportowania i weryfikuj dane emisyjne.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+
+    <!-- Karta: Audyt i Weryfikacja -->
+    <a href="{% url 'workflow:admin_list' %}" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-xl backdrop-blur-sm hover:border-[#c8f535] hover:bg-[#1a4a52]/40 transition-all group flex flex-col items-center text-center">
+      <div class="w-20 h-20 rounded-full bg-[#111720] border border-[#1a4a52] flex items-center justify-center mb-6 group-hover:border-[#c8f535] transition-colors shadow-lg">
+        <span class="material-symbols-outlined text-[#c8f535] group-hover:scale-110 transition-transform duration-300" style="font-size: 40px;">fact_check</span>
+      </div>
+      <h3 class="font-heading font-bold text-2xl text-text-main mb-3">Audyt i Weryfikacja</h3>
+      <p class="font-mono text-sm text-text-muted">
+        Przeglądaj, zatwierdzaj i odrzucaj dane emisyjne przesłane przez spółki w otwartych raportach.
+      </p>
+    </a>
+
+    <!-- Karta: Zarządzanie Okresami -->
+    <a href="{% url 'workflow:period_list' %}" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-xl backdrop-blur-sm hover:border-[#5bc4be] hover:bg-[#1a4a52]/40 transition-all group flex flex-col items-center text-center">
+      <div class="w-20 h-20 rounded-full bg-[#111720] border border-[#1a4a52] flex items-center justify-center mb-6 group-hover:border-[#5bc4be] transition-colors shadow-lg">
+        <span class="material-symbols-outlined text-[#5bc4be] group-hover:scale-110 transition-transform duration-300" style="font-size: 40px;">calendar_month</span>
+      </div>
+      <h3 class="font-heading font-bold text-2xl text-text-main mb-3">Okresy Raportowe</h3>
+      <p class="font-mono text-sm text-text-muted">
+        Zarządzaj listą aktywnych i zamkniętych okresów raportowych oraz śledź ich statusy.
+      </p>
+    </a>
+
+    <!-- Karta: Globalne Cele Redukcji -->
+    <a href="{% url 'what_if:goal_list' %}" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-xl backdrop-blur-sm hover:border-[#fbbf24] hover:bg-[#1a4a52]/40 transition-all group flex flex-col items-center text-center">
+      <div class="w-20 h-20 rounded-full bg-[#111720] border border-[#1a4a52] flex items-center justify-center mb-6 group-hover:border-[#fbbf24] transition-colors shadow-lg">
+        <span class="material-symbols-outlined text-[#fbbf24] group-hover:scale-110 transition-transform duration-300" style="font-size: 40px;">track_changes</span>
+      </div>
+      <h3 class="font-heading font-bold text-2xl text-text-main mb-3">Cele Redukcyjne</h3>
+      <p class="font-mono text-sm text-text-muted">
+        Definiuj globalne wytyczne redukcyjne dla grupy kapitałowej oraz przypisuj dedykowane ścieżki dla poszczególnych spółek.
+      </p>
+    </a>
+
+    <!-- Karta: Logi Zmian (Audit) -->
+    <a href="{% url 'audit:audit_log_list' %}" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-xl backdrop-blur-sm hover:border-[#a855f7] hover:bg-[#1a4a52]/40 transition-all group flex flex-col items-center text-center">
+      <div class="w-20 h-20 rounded-full bg-[#111720] border border-[#1a4a52] flex items-center justify-center mb-6 group-hover:border-[#a855f7] transition-colors shadow-lg">
+        <span class="material-symbols-outlined text-[#a855f7] group-hover:scale-110 transition-transform duration-300" style="font-size: 40px;">history</span>
+      </div>
+      <h3 class="font-heading font-bold text-2xl text-text-main mb-3">Dziennik Zmian</h3>
+      <p class="font-mono text-sm text-text-muted">
+        Przeglądaj logi systemowe i pełną historię operacji CRUD z poziomu bazy danych. Monitoruj aktywność użytkowników.
+      </p>
+    </a>
+  </div>
+{% endblock %}

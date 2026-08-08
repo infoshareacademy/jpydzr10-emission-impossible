@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Cele Redukcyjne | Emission Impossible{% endblock %}
+
+{% block content %}
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+    <div>
+      <!-- Powrót do Panelu Admina -->
+      <a href="{% url 'workflow:admin_dashboard' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+        <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+        Wróć do Panelu
+      </a>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width: 4px; height: 32px; background: #c8f535; border-radius: 999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+          Cele Redukcyjne
+        </h1>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <!-- Przycisk dodawania w stylu Scope 1 -->
+      <a href="{% url 'what_if:goal_create' %}" class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl text-white transition-colors" style="background: #1a4a52; border: 1px solid #2a6a72">
+        <span class="material-symbols-outlined" style="font-size: 16px">add</span>
+        Dodaj Cel
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabela w stylu Scope 1 (rozmyte tło, obramowania) -->
+  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-border-subtle">
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">Nazwa celu</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">Przypisanie (Spółka)</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">Zakres emisji</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">Lata (Bazowy ➔ Docelowy)</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-right">Redukcja</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for goal in goals %}
+            <tr class="border-b border-border-subtle hover:bg-white/5 transition-colors">
+              <td class="px-5 py-4 font-mono font-bold text-text-main">
+                {{ goal.name }}
+              </td>
+              <td class="px-5 py-4">
+                {% if goal.company %}
+                  <span class="font-mono text-sm text-text-main">{{ goal.company.name }}</span>
+                {% else %}
+                  <!-- Specjalna odznaka dla celu globalnego -->
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3);">
+                    GLOBALNY
+                  </span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm text-text-muted text-center">
+                {{ goal.get_scope_display }}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm text-text-muted text-center">
+                {{ goal.base_year }} <span class="material-symbols-outlined text-[14px] align-middle mx-1">arrow_forward</span> {{ goal.target_year }}
+              </td>
+              <td class="px-5 py-4 text-right font-mono font-bold text-text-main">
+                {{ goal.reduction_pct }}<span class="text-xs text-text-muted">%</span>
+              </td>
+              <td class="px-5 py-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <!-- Edycja -->
+                  <a href="{% url 'what_if:goal_edit' goal.pk %}" class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-accent hover:border-accent transition-colors" title="Edytuj">
+                    <span class="material-symbols-outlined" style="font-size: 16px">edit</span>
+                  </a>
+                  <!-- Usuwanie (Zabezpieczone przez HTMX hx-confirm) -->
+                  <form action="{% url 'what_if:goal_delete' goal.pk %}" method="post" class="inline-block" hx-confirm="Czy na pewno chcesz usunąć ten cel redukcyjny?">
+                    {% csrf_token %}
+                    <button type="submit" class="p-1.5 rounded-lg border border-border-subtle text-text-muted hover:text-red-400 hover:border-red-400 transition-colors" title="Usuń">
+                      <span class="material-symbols-outlined" style="font-size: 16px">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+                Brak zdefiniowanych celów redukcyjnych.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginacja (Zgodna z widokami Zakresu 1) -->
+    {% if is_paginated %}
+      <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">«</a>
+        {% endif %}
+        <span class="px-3 py-1.5 font-mono text-sm text-text-muted">Strona {{ page_obj.number }} z {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">»</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+{% endblock %}

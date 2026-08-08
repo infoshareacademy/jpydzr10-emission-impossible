@@ -6,9 +6,12 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>{% block title %}Emission Impossible{% endblock %}</title>
     {% tailwind_css %}
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
     <style>
+      [x-cloak] { display: none !important; }
       .material-symbols-outlined {
         font-family: "Material Symbols Outlined" !important;
         font-weight: normal;
@@ -154,9 +157,9 @@
           </a>
 
           {% if user.is_superuser or user.role == 'admin' %}
-          <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
-            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
-            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">{% trans "Audyt i Weryfikacja" %}</span>
+          <a href="{% url 'workflow:admin_dashboard' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
+            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">admin_panel_settings</span>
+            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">{% trans "Narzędzia Administratora" %}</span>
           </a>
           {% endif %}
 
@@ -167,6 +170,10 @@
     <main class="max-w-7xl mx-auto px-6 py-10" style="min-height: calc(100vh - 64px - 200px);">
       {% block content %}{% endblock %}
     </main>
+
+    <!-- ===================== -->
+    <!-- FOOTER -->
+    <!-- ===================== -->
 
     <footer class="border-t border-border-subtle mt-20" style="background:rgba(17,23,32,0.85);">
       <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -184,6 +191,13 @@
           <a href="{% url 'companies:companies-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Przedsiębiorstwo" %}</a>
           <a href="{% url 'emissions:factor-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Wskaźniki Emisji" %}</a>
           <a href="{% url 'calculator:dashboard' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Przeliczniki" %}</a>
+          {% if user.is_authenticated %}
+          <div class="mt-1 ml-3 flex flex-col gap-1 border-l-2 border-border-subtle pl-2">
+            <a href="{% url 'emissions:energy_purchased_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Zakupiona energia" %}</a>
+            <a href="{% url 'emissions:energy_produced_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Wyprodukowana energia" %}</a>
+            <a href="{% url 'emissions:energy_sold_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Sprzedana energia" %}</a>
+          </div>
+          {% endif %}
         </div>
 
         <div class="flex flex-col gap-2">
