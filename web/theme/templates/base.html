@@ -187,7 +187,6 @@ select {
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">mail</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Komunikacja e-mail</span>
           </a>
-
           {% if user.is_superuser or user.role == 'admin' %}
           <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
