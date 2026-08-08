@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # to jest web/
@@ -27,6 +28,7 @@ load_dotenv(dotenv_path=BASE_DIR / ".env")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY")
+ENABLE_CARBON_TRACKING = os.getenv("ENABLE_CARBON_TRACKING")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -84,7 +86,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "crum.CurrentRequestUserMiddleware",
-    'core.middleware.PerUserCarbonTrackingMiddleware',
+    'core.middleware.FastCarbonTrackingMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -186,3 +188,10 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_BEAT_SCHEDULE = {
+    'flush-carbon-footprints-every-5-minutes': {
+        'task': 'core.tasks.flush_carbon_footprints_to_db',
+        'schedule': crontab(minute='*/5'),  # Uruchom co 5 minut
+    },
+}
