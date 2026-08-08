@@ -165,6 +165,22 @@ class EnergyPurchased(ActivityRecord, WorkflowStatusMixin):
         verbose_name = "Zakupiona energia"
         verbose_name_plural = "Zakupiona energia"
 
+    def save(self, *args, **kwargs):
+        from emissions.models import EmissionFactor
+
+        factor_obj = EmissionFactor.objects.filter(
+            year=self.year,
+            country=self.company.country,
+            factor_name=self.energy_type
+        ).first()
+
+        if factor_obj and self.amount:
+            self.emission_tco2eq = float(self.amount) * float(factor_obj.factor)
+            self.factor = factor_obj.factor
+        else:
+            self.emission_tco2eq = 0.0
+
+        super().save(*args, **kwargs)
 
 class EnergyProduced(ActivityRecord, WorkflowStatusMixin):
     installation = models.CharField(max_length=200, blank=True, default="")
@@ -176,15 +192,50 @@ class EnergyProduced(ActivityRecord, WorkflowStatusMixin):
         verbose_name = "Wyprodukowana energia"
         verbose_name_plural = "Wyprodukowana energia"
 
+    def save(self, *args, **kwargs):
+        from emissions.models import EmissionFactor
+
+        factor_obj = EmissionFactor.objects.filter(
+            year=self.year,
+            country=self.company.country,
+            factor_name=self.energy_type
+        ).first()
+
+        if factor_obj and self.amount:
+            self.emission_tco2eq = float(self.amount) * float(factor_obj.factor)
+            self.factor = factor_obj.factor
+        else:
+            self.emission_tco2eq = 0.0
+
+        super().save(*args, **kwargs)
+
 
 class EnergySold(ActivityRecord, WorkflowStatusMixin):
     energy_type = models.CharField(max_length=100)
     customer = models.CharField(max_length=200, blank=True, default="")
+    factor = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal("0"))  # ADDED FIELD
 
     class Meta:
         db_table = "tbl_e_sold"
         verbose_name = "Sprzedana energia"
         verbose_name_plural = "Sprzedana energia"
+
+    def save(self, *args, **kwargs):
+        from emissions.models import EmissionFactor
+
+        factor_obj = EmissionFactor.objects.filter(
+            year=self.year,
+            country=self.company.country,
+            factor_name=self.energy_type
+        ).first()
+
+        if factor_obj and self.amount:
+            self.emission_tco2eq = float(self.amount) * float(factor_obj.factor)
+            self.factor = factor_obj.factor
+        else:
+            self.emission_tco2eq = 0.0
+
+        super().save(*args, **kwargs)
 
 
 class EmissionFactor(models.Model):
