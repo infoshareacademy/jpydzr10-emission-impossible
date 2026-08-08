@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView, View
+from django.views.generic import CreateView, DetailView, ListView, TemplateView, View
 
 from workflow.models import WorkflowStatusMixin
 
@@ -263,3 +263,10 @@ class AdminBulkApproveView(LoginRequiredMixin, AdminRequiredMixin, View):
             return JsonResponse({"status": "success", "count": count})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+class AdminDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "workflow/admin_dashboard.html"  # Zmień na ścieżkę do swojego pliku
+
+    def test_func(self):
+        return self.request.user.is_superuser or getattr(self.request.user, "role", "") == "admin"

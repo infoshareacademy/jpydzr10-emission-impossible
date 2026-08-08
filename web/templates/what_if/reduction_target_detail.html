@@ -24,12 +24,13 @@
             <p class="text-xs font-mono uppercase text-text-muted mb-1 text-center">Założona Redukcja: <span class="text-accent font-bold">-{{ target.reduction_pct }}%</span></p>
             <div class="mt-2 pt-2 border-t border-border-subtle/50 text-xs font-mono space-y-1.5">
                 <div class="flex justify-between gap-4">
-                    <span class="text-text-muted">Rok bazowy ({{ target.base_year }}):</span>
-                    <span class="text-text-main font-bold">{{ base_emission_value|floatformat:2 }} tCO₂e</span>
+                    <!-- Dodano ID do dynamicznej podmiany -->
+                    <span class="text-text-muted">Rok bazowy (<span id="txt-base-year">{{ target.base_year }}</span>):</span>
+                    <span class="text-text-main font-bold"><span id="txt-base-emission">0.00</span> tCO₂e</span>
                 </div>
                 <div class="flex justify-between gap-4">
                     <span class="text-text-muted">Cel na rok ({{ target.target_year }}):</span>
-                    <span class="text-accent font-bold">max {{ target_emission_value|floatformat:2 }} tCO₂e</span>
+                    <span class="text-accent font-bold">max <span id="txt-target-emission">0.00</span> tCO₂e</span>
                 </div>
             </div>
         </div>
@@ -61,7 +62,51 @@
         const ctx = canvasEl.getContext('2d');
         const years = {{ chart_years|safe }};
         const actualEmissions = {{ chart_actual|safe }};
-        const targetLine = {{ chart_target_line|safe }};
+
+        // --- DYNAMICZNA LOGIKA BAZOWA ---
+        const reductionPct = parseFloat("{{ target.reduction_pct|default:0 }}".replace(',', '.'));
+        let declaredTargetYear = parseInt("{{ target.target_year|default:0 }}", 10);
+        let declaredBaseYear = parseInt("{{ target.base_year|default:0 }}", 10);
+
+        let actualBaseYear = declaredBaseYear;
+        let baseEmission = 0;
+
+        for (let i = 0; i < years.length; i++) {
+            if (years[i] >= declaredBaseYear) {
+                let currentEmission = actualEmissions[i] || 0;
+                if (currentEmission > 0) {
+                    actualBaseYear = years[i];
+                    baseEmission = currentEmission;
+                    break;
+                }
+            }
+        }
+
+        if (baseEmission === 0 && actualEmissions.length > 0) {
+            actualBaseYear = years[0];
+            baseEmission = actualEmissions[0] || 0;
+        }
+
+        const dynamicTargetEmission = baseEmission * (1 - (reductionPct / 100));
+
+        // --- AKTUALIZACJA KARTY INFORMACYJNEJ W HTML ---
+        document.getElementById('txt-base-year').textContent = actualBaseYear;
+        document.getElementById('txt-base-emission').textContent = baseEmission.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('txt-target-emission').textContent = dynamicTargetEmission.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // ----------------------------------------------
+
+        const adjustedTargetLine = [];
+        for (let i = 0; i < years.length; i++) {
+            const currentY = years[i];
+            if (currentY < actualBaseYear) {
+                adjustedTargetLine.push(null);
+            } else if (declaredTargetYear !== actualBaseYear) {
+                const expected = baseEmission + ((dynamicTargetEmission - baseEmission) / (declaredTargetYear - actualBaseYear)) * (currentY - actualBaseYear);
+                adjustedTargetLine.push(expected);
+            } else {
+                adjustedTargetLine.push(baseEmission);
+            }
+        }
 
         new Chart(ctx, {
             type: 'line',
@@ -69,7 +114,7 @@
                 labels: years,
                 datasets: [
                     {
-                        label: 'Rzeczywiste wykonanie (Suma roczna tCO₂e)',
+                        label: 'Suma roczna tCO₂e',
                         data: actualEmissions,
                         borderColor: 'rgba(200, 245, 53, 1)',
                         backgroundColor: 'rgba(200, 245, 53, 0.05)',
@@ -81,12 +126,13 @@
                     },
                     {
                         label: 'Modelowa ścieżka redukcji',
-                        data: targetLine,
+                        data: adjustedTargetLine,
                         borderColor: 'rgba(255, 255, 255, 0.4)',
                         borderWidth: 2,
                         borderDash: [6, 6],
                         pointRadius: 0,
-                        fill: false
+                        fill: false,
+                        spanGaps: true
                     }
                 ]
             },

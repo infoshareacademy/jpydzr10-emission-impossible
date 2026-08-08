@@ -372,7 +372,7 @@ Kalkulator Emisji — Emission Impossible
 
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
     <a
-      href="#"
+      href="{% url 'emissions:energy_purchased_list' %}?company={{ company.name|urlencode }}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >
@@ -433,7 +433,7 @@ Kalkulator Emisji — Emission Impossible
     </a>
 
     <a
-      href="#"
+      href="{% url 'emissions:energy_produced_list' %}?company={{ company.name|urlencode }}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >
@@ -494,7 +494,7 @@ Kalkulator Emisji — Emission Impossible
     </a>
 
     <a
-      href="#"
+      href="{% url 'emissions:energy_sold_list' %}?company={{ company.name|urlencode }}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >
@@ -555,7 +555,7 @@ Kalkulator Emisji — Emission Impossible
     </a>
 
     <a
-      href="#"
+      href="{% url 'emissions:energy_consumption_list' %}?company={{ company.name|urlencode }}"
       class="flex flex-col items-center"
       style="text-decoration: none"
     >

@@ -14,7 +14,7 @@
     <div class="mt-12 px-2 md:px-8">
         <div class="flex justify-between items-end mb-6">
             <h2 class="font-heading font-bold text-2xl text-text-main">Cele Redukcyjne</h2>
-            <select id="targetSelector" onchange="scrollToTarget(this.value)"
+            <select id="targetSelector" onchange="window.scrollToTarget(this.value)"
                     class="bg-[#111720] border border-border-subtle text-text-main text-sm rounded-lg px-4 py-2 outline-none">
                 {% for target in reduction_targets %}
                     <option value="target-{{ target.id }}">{{ target.target_name }} ({{ target.company.name }})</option>
@@ -27,11 +27,10 @@
                 <span class="material-symbols-outlined font-bold">chevron_left</span>
             </button>
 
+            <style>
+                #carousel::-webkit-scrollbar { display: none; }
+            </style>
             <div id="carousel" class="flex overflow-x-auto gap-6 pb-6 w-full scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
-                <style>
-                    #carousel::-webkit-scrollbar { display: none; }
-                </style>
-
                 {% for target in reduction_targets %}
                 <div id="target-{{ target.id }}" class="flex-none w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] h-full bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl relative flex flex-col justify-between min-h-[380px]">
                     <a href="{% url 'what_if:reduction-target-detail' target.id %}" class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors">
@@ -39,9 +38,6 @@
                     </a>
 
                     <div>
-                        <div class="w-full h-1.5 rounded-full mb-4 bg-[#111720] overflow-hidden">
-                            <div class="h-full rounded-full transition-all duration-500 {% if target.chart_data.status_color == 'green' %}bg-[#c8f535]{% elif target.chart_data.status_color == 'yellow' %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: 70%;"></div>
-                        </div>
                         <h3 class="font-bold text-lg text-text-main mb-1 truncate pr-6">{{ target.target_name }}</h3>
                         <p class="text-xs text-text-muted mb-4 truncate">{{ target.company.name }}</p>
                     </div>
@@ -53,11 +49,13 @@
                     <div class="flex justify-between items-end mt-auto pt-4 border-t border-[#1a4a52]/50">
                         <div class="text-left">
                             <p class="text-xs text-text-muted mb-1">Emisja (obecna):</p>
-                            <p class="font-mono text-base font-bold text-text-main">{{ target.chart_data.current_emission|floatformat:1 }} t</p>
+                            <!-- Dodano ID do dynamicznej aktualizacji przez JS -->
+                            <p class="font-mono text-base font-bold text-text-main"><span id="current-emission-{{ target.id }}">0.0</span> tCO₂e</p>
                         </div>
                         <div class="text-right">
                             <p class="text-xs text-text-muted mb-1">Cel ({{ target.target_year }}):</p>
-                            <p class="font-mono text-base font-bold text-[#c8f535]">{{ target.chart_data.target_emission|floatformat:1 }} t</p>
+                            <!-- Dodano ID do dynamicznej aktualizacji przez JS -->
+                            <p class="font-mono text-base font-bold text-[#c8f535]">max <span id="target-emission-{{ target.id }}">0.0</span> tCO₂e</p>
                         </div>
                     </div>
                 </div>
@@ -69,56 +67,71 @@
             </button>
         </div>
     </div>
+
     <div class="mt-8 px-2 md:px-8 max-w-7xl mx-auto w-full">
-        <div class="flex justify-between items-center mb-6 bg-[#13383e]/20 border border-[#1a4a52] rounded-xl px-6 py-3 shadow-sm">
-            <h2 class="font-heading font-bold text-xl text-text-main flex items-center gap-2">
-                Skonsolidowane Emisje
-            </h2>
-            <div class="flex items-center gap-4 bg-[#111720] rounded-lg border border-border-subtle p-1">
-                <button id="btn-year-prev" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    <span class="material-symbols-outlined text-xl">chevron_left</span>
-                </button>
-                <span id="display-year" class="font-mono font-bold text-lg text-text-main min-w-[60px] text-center">
-                    {{ initial_year }}
-                </span>
-                <button id="btn-year-next" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                    <span class="material-symbols-outlined text-xl">chevron_right</span>
-                </button>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-[#c8f535]/50 transition-colors">
-                <div>
-                    <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1">
-                        Zakres 1
-                        <span class="material-symbols-outlined text-[#c8f535] text-sm">factory</span>
-                    </h3>
-                    <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Paliwa, procesy, wycieki</p>
-                </div>
-                <div class="text-right">
-                    <span id="display-scope1" class="block font-mono text-3xl font-bold text-[#c8f535] transition-opacity duration-300">
-                        0.00
+        <!-- Główny połączony kontener (Jeden Div) -->
+        <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+
+            <!-- Górna belka z nagłówkiem i wyborem roku -->
+            <div class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-b border-[#1a4a52]/50 bg-[#1a4a52]/20">
+                <h2 class="font-heading font-bold text-xl text-text-main flex items-center gap-2 mb-4 sm:mb-0">
+                    Skonsolidowane Emisje
+                </h2>
+
+                <div class="flex items-center gap-4 bg-[#111720] rounded-lg border border-border-subtle p-1 shadow-inner">
+                    <button id="btn-year-prev" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-xl">chevron_left</span>
+                    </button>
+                    <span id="display-year" class="font-mono font-bold text-lg text-text-main min-w-[60px] text-center">
+                        {{ initial_year }}
                     </span>
-                    <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+                    <button id="btn-year-next" class="p-1 rounded text-text-muted hover:text-[#c8f535] hover:bg-[#13383e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-xl">chevron_right</span>
+                    </button>
                 </div>
             </div>
-            <div class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-6 shadow-xl flex items-center justify-between hover:border-[#5bc4be]/50 transition-colors">
-                <div>
-                    <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1">
-                        Zakres 2
-                        <span class="material-symbols-outlined text-[#5bc4be] text-sm">bolt</span>
-                    </h3>
-                    <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Zakupiona energia</p>
+
+            <!-- Dolna sekcja z wynikami rozdzielona subtelną linią -->
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1a4a52]/50">
+
+                <!-- Zakres 1 -->
+                <div class="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-white/5 transition-colors group">
+                    <div class="mb-4 sm:mb-0">
+                        <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1 group-hover:text-[#c8f535] transition-colors">
+                            Zakres 1
+                            <span class="material-symbols-outlined text-[#c8f535] text-lg">factory</span>
+                        </h3>
+                        <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Paliwa, procesy, wycieki</p>
+                    </div>
+                    <div class="text-left sm:text-right">
+                        <span id="display-scope1" class="block font-mono text-4xl font-bold text-[#c8f535] transition-opacity duration-300">
+                            0.00
+                        </span>
+                        <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <span id="display-scope2" class="block font-mono text-3xl font-bold text-[#5bc4be] transition-opacity duration-300">
-                        0.00
-                    </span>
-                    <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+
+                <!-- Zakres 2 -->
+                <div class="p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-white/5 transition-colors group">
+                    <div class="mb-4 sm:mb-0">
+                        <h3 class="font-heading font-bold text-2xl text-text-main flex items-center gap-2 mb-1 group-hover:text-[#5bc4be] transition-colors">
+                            Zakres 2
+                            <span class="material-symbols-outlined text-[#5bc4be] text-lg">bolt</span>
+                        </h3>
+                        <p class="text-xs font-mono text-text-muted uppercase tracking-wider">Zakupiona energia</p>
+                    </div>
+                    <div class="text-left sm:text-right">
+                        <span id="display-scope2" class="block font-mono text-4xl font-bold text-[#5bc4be] transition-opacity duration-300">
+                            0.00
+                        </span>
+                        <span class="text-sm text-text-muted font-sans font-normal">tCO₂e</span>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto w-full mt-12">
         <div class="lg:col-span-2 flex flex-col gap-4">
             <h2 class="font-heading font-bold text-2xl text-text-main mb-2">Oczekujące Zadania</h2>
@@ -228,13 +241,21 @@
 
 {% block extra_scripts %}
 <script>
+window.scrollToTarget = function(targetId) {
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    }
+};
+
 (function() {
     const carousel = document.getElementById('carousel');
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');
+
     if (carousel && btnPrev && btnNext) {
         const getScrollAmount = () => {
-            const firstCard = carousel.children[0];
+            const firstCard = carousel.querySelector('div');
             return firstCard ? firstCard.offsetWidth + 24 : 350;
         };
         btnPrev.onclick = () => carousel.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
@@ -245,10 +266,11 @@
             btnPrev.disabled = carousel.scrollLeft <= 2;
             btnNext.disabled = carousel.scrollLeft >= maxScrollLeft - 2;
         };
-        carousel.onscroll = updateButtons;
-        window.onresize = updateButtons;
+        carousel.addEventListener('scroll', updateButtons);
+        window.addEventListener('resize', updateButtons);
         setTimeout(updateButtons, 100);
     }
+
     {% for target in reduction_targets %}
     (function() {
         const canvasId = 'chart-{{ target.id }}';
@@ -259,40 +281,164 @@
             existingChart.destroy();
         }
 
+        const labels = {{ target.chart_data.years|safe }};
+        const s1Data = {{ target.chart_data.s1|safe }};
+        const s2Data = {{ target.chart_data.s2|safe }};
+
+        const reductionPct = parseFloat("{{ target.reduction_pct|default:0 }}".replace(',', '.'));
+        let declaredTargetYear = parseInt("{{ target.target_year|default:0 }}", 10);
+        let declaredBaseYear = parseInt("{{ target.base_year|default:0 }}", 10);
+
+        let actualBaseYearIndex = -1;
+        let actualBaseYear = declaredBaseYear;
+        let baseEmission = 0;
+
+        for (let i = 0; i < labels.length; i++) {
+            if (labels[i] >= declaredBaseYear) {
+                let currentEmission = (s1Data[i] || 0) + (s2Data[i] || 0);
+                if (currentEmission > 0) {
+                    actualBaseYearIndex = i;
+                    actualBaseYear = labels[i];
+                    baseEmission = currentEmission;
+                    break;
+                }
+            }
+        }
+
+        if (actualBaseYearIndex === -1) {
+            actualBaseYearIndex = 0;
+            actualBaseYear = labels[0];
+            baseEmission = (s1Data[0] || 0) + (s2Data[0] || 0);
+        }
+
+        const targetEmission = baseEmission * (1 - (reductionPct / 100));
+
+        // --- AKTUALIZACJA TEKSTÓW W KAFELKU (Emisja obecna i Cel) ---
+        const currentEmissionEl = document.getElementById('current-emission-{{ target.id }}');
+        const targetEmissionEl = document.getElementById('target-emission-{{ target.id }}');
+
+        if (currentEmissionEl) {
+            currentEmissionEl.textContent = baseEmission.toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+        if (targetEmissionEl) {
+            targetEmissionEl.textContent = targetEmission.toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+        // -----------------------------------------------------------
+
+        const trendData = [];
+        for (let i = 0; i < labels.length; i++) {
+            const currentY = labels[i];
+
+            if (currentY < actualBaseYear) {
+                trendData.push(null);
+            } else if (declaredTargetYear !== actualBaseYear) {
+                const expected = baseEmission + ((targetEmission - baseEmission) / (declaredTargetYear - actualBaseYear)) * (currentY - actualBaseYear);
+                trendData.push(expected);
+            } else {
+                trendData.push(baseEmission);
+            }
+        }
+
+        const lastIdx = labels.length - 1;
+        const lastTotal = (s1Data[lastIdx] || 0) + (s2Data[lastIdx] || 0);
+        const lastExpected = trendData[lastIdx];
+
+        let lineColor = '#f87171';
+        if (lastExpected !== null && lastTotal <= lastExpected) {
+            lineColor = '#86efac';
+        }
+
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: {{ target.chart_data.years|safe }},
+                labels: labels,
                 datasets: [
                     {
-                        label: 'Zakres 1',
-                        data: {{ target.chart_data.s1|safe }},
-                        backgroundColor: '#c8f535',
-                        stack: 'stack1',
-                        borderRadius: 4
+                        type: 'line',
+                        label: 'Ścieżka redukcji',
+                        data: trendData,
+                        borderColor: lineColor,
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointBackgroundColor: lineColor,
+                        pointRadius: 4,
+                        spanGaps: true,
+                        tension: 0,
+                        order: 0
                     },
                     {
+                        type: 'bar',
+                        label: 'Zakres 1',
+                        data: s1Data,
+                        backgroundColor: '#c8f535',
+                        stack: 'stack1',
+                        borderRadius: 4,
+                        order: 1
+                    },
+                    {
+                        type: 'bar',
                         label: 'Zakres 2',
-                        data: {{ target.chart_data.s2|safe }},
+                        data: s2Data,
                         backgroundColor: '#5bc4be',
                         stack: 'stack1',
-                        borderRadius: 4
+                        borderRadius: 4,
+                        order: 1
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            footer: function(tooltipItems) {
+                                let total = 0;
+                                let expected = null;
+
+                                tooltipItems.forEach(function(item) {
+                                    if (item.dataset.type === 'bar') {
+                                        total += item.raw;
+                                    } else if (item.dataset.type === 'line') {
+                                        expected = item.raw;
+                                    }
+                                });
+
+                                let text = '\nSuma emisji: ' + total.toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' t';
+                                if (expected !== null) {
+                                    text += '\nOczekiwany cel: ' + expected.toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' t';
+                                }
+                                return text;
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    x: { stacked: true, display: false },
-                    y: { stacked: true, display: false, beginAtZero: true }
+                    x: {
+                        stacked: true,
+                        display: true,
+                        grid: { display: false, drawBorder: false },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { family: "'Roboto Mono', monospace", size: 11 }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        display: true,
+                        beginAtZero: true
+                    }
                 }
             }
         });
     })();
     {% endfor %}
 })();
+
 (function() {
     const emissionsData = JSON.parse('{{ emissions_data_json|escapejs }}');
     const availableYears = JSON.parse('{{ available_years_json|escapejs }}');

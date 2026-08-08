@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Nowy Cel Redukcyjny | Emission Impossible{% endblock %}
+
+
+{% block content %}
+    <style>
+  /* Stylizacja dla domyślnych inputów renderowanych przez Django */
+        form input[type="text"],
+        form input[type="number"],
+        form select {
+            background: rgba(255,255,255,0.04) !important;
+            border: 1px solid #2a3f4a !important;
+            border-radius: 10px !important;
+            color: #e8f4f0 !important;
+            font-family: 'Roboto Mono', monospace !important;
+            font-size: 13px !important;
+            padding: 10px 14px !important;
+            outline: none !important;
+            transition: border-color 0.2s !important;
+            width: 100%;
+            display: block;
+        }
+        form input:focus, form select:focus {
+            border-color: rgba(200,245,53,0.5) !important;
+            box-shadow: 0 0 0 1px rgba(200,245,53,0.2) !important;
+        }
+        form select option {
+            background: #111720;
+            color: #e8f4f0;
+        }
+    </style>
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center gap-3 mb-8">
+            <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
+            <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">
+                {% if object %}Edytuj Cel Redukcyjny{% else %}Utwórz Cel Redukcyjny{% endif %}
+            </h1>
+        </div>
+
+        <form method="post" class="bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 backdrop-blur-sm shadow-xl">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+                    <p class="text-red-400 font-bold text-sm mb-2">Popraw poniższe błędy:</p>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="space-y-6">
+
+                <!-- Nazwa celu -->
+                <div>
+                    <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Nazwa celu <span class="text-red-400">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Spółka (Cel Globalny / Dedykowany) -->
+                <div class="p-5 bg-black/20 border border-border-subtle rounded-xl">
+                    <label class="block font-mono text-xs font-bold text-[#fbbf24] uppercase tracking-wider mb-2">Dedykowana spółka (Opcjonalnie)</label>
+                    {{ form.company }}
+                    <p class="text-xs font-mono text-text-muted mt-2 opacity-70">
+                        Zostaw to pole <strong>puste</strong>, aby utworzyć <span class="text-[#fbbf24] font-bold">Cel Globalny</span> dla całej grupy kapitałowej.
+                        Jeśli wybierzesz konkretną spółkę, cel będzie przypisany tylko do niej.
+                    </p>
+                    {% if form.company.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.company.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Lata: Bazowy i Docelowy -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Rok bazowy <span class="text-red-400">*</span></label>
+                        {{ form.base_year }}
+                        {% if form.base_year.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.base_year.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Rok docelowy <span class="text-red-400">*</span></label>
+                        {{ form.target_year }}
+                        {% if form.target_year.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.target_year.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <!-- Redukcja i Zakres (Scope) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Docelowa redukcja (%) <span class="text-red-400">*</span></label>
+                        {{ form.reduction_pct }}
+                        {% if form.reduction_pct.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.reduction_pct.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block font-mono text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Zakres emisji (Scope) <span class="text-red-400">*</span></label>
+                        {{ form.scope }}
+                        {% if form.scope.errors %}<p class="text-red-400 text-xs mt-1 font-mono">{{ form.scope.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-8 flex justify-end gap-4 border-t border-[#1a4a52] pt-6">
+                <a href="{% url 'what_if:goal_list' %}" class="px-6 py-2.5 rounded-xl font-mono text-sm font-bold text-text-muted border border-[#1a4a52] hover:text-text-main hover:bg-[#1a4a52]/50 transition-colors shadow-sm">
+                    Anuluj
+                </a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl font-mono text-sm font-bold bg-[#c8f535] text-[#1a4a52] hover:bg-[#b5e02b] transition-all shadow-md">
+                    Zapisz cel
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

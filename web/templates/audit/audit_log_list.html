@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Logi Zmian (Audit) | Emission Impossible{% endblock %}
+
+{% block content %}
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+    <div>
+    <!-- Powrót do Panelu Admina -->
+      <a href="{% url 'workflow:admin_dashboard' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+        <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+        Wróć do Panelu
+      </a>
+      <div class="flex items-center gap-3 mb-1">
+        <div style="width: 4px; height: 32px; background: #a855f7; border-radius: 999px;"></div>
+        <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">
+          Dziennik Zmian (Audit Log)
+        </h1>
+      </div>
+      <p class="font-mono text-sm text-text-muted ml-4 mt-2">Pełna historia operacji na bazie danych, powiązana z użytkownikami.</p>
+    </div>
+  </div>
+
+<!-- Filtry -->
+  <form method="get" class="rounded-2xl border border-border-subtle p-5 mb-8 flex flex-wrap gap-4 items-end" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
+    <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+      <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Szukaj (Tabela lub ID)</label>
+      <input type="text" name="q" value="{{ current_search }}" placeholder="np. tbl_stationary_combustion..." class="bg-white/5 border border-border-subtle rounded-lg text-text-main font-mono text-sm p-2 focus:outline-none focus:border-accent">
+    </div>
+
+    <div class="flex flex-col gap-1 min-w-[150px]">
+      <label class="font-mono text-xs uppercase tracking-wider text-text-muted">Operacja</label>
+      <select name="operation" class="bg-white/5 border border-border-subtle rounded-lg text-text-main font-mono text-sm p-2 focus:outline-none focus:border-accent">
+        <option value="" class="bg-[#111720]">Wszystkie</option>
+        {% for op in operations %}
+          <option value="{{ op }}" class="bg-[#111720]" {% if current_operation == op %}selected{% endif %}>{{ op }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="font-mono text-sm font-bold uppercase tracking-wider px-6 py-2.5 rounded-xl text-white transition-colors shadow-sm" style="background: #1a4a52; border: 1px solid #2a6a72">
+      Filtruj
+    </button>
+
+    {% if current_search or current_operation %}
+      <a href="?" class="font-mono text-sm text-text-muted hover:text-accent transition-colors underline mb-2">Wyczyść</a>
+    {% endif %}
+  </form>
+
+<!-- Tabela logów (z Alpine.js do rozwijania rzędów) -->
+  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse" x-data="{ expanded: null }">
+        <thead>
+          <tr class="border-b border-border-subtle bg-[#1a4a52]/30">
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted">Data operacji</th>
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted">Użytkownik</th>
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted text-center">Operacja</th>
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted">Tabela</th>
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted">ID Rekordu</th>
+            <th class="px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider text-text-muted text-right">Szczegóły</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border-subtle">
+          {% for log in logs %}
+          <!-- Główny rząd -->
+            <tr class="hover:bg-white/5 transition-colors cursor-pointer" @click="expanded = expanded === {{ log.pk }} ? null : {{ log.pk }}">
+              <td class="px-5 py-4 font-mono text-sm text-text-main">
+                {{ log.created_at|date:"Y-m-d H:i:s" }}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm text-text-main font-bold">
+                <span class="material-symbols-outlined text-[14px] align-middle text-text-muted mr-1">person</span>
+                {{ log.username }}
+              </td>
+              <td class="px-5 py-4 text-center">
+                {% if log.operation == 'INSERT' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);">INSERT</span>
+                {% elif log.operation == 'UPDATE' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3);">UPDATE</span>
+                {% elif log.operation == 'DELETE' %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);">DELETE</span>
+                {% else %}
+                  <span class="font-mono text-xs font-bold px-2 py-1 rounded" style="background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);">{{ log.operation }}</span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm text-text-muted">
+                {{ log.table_name }}
+              </td>
+              <td class="px-5 py-4 font-mono text-sm font-bold text-accent">
+                #{{ log.record_id }}
+              </td>
+              <td class="px-5 py-4 text-right">
+                <button class="text-text-muted hover:text-white transition-colors" title="Rozwiń">
+                  <span class="material-symbols-outlined transition-transform duration-300" :class="expanded === {{ log.pk }} ? 'rotate-180' : ''">expand_more</span>
+                </button>
+              </td>
+            </tr>
+
+          <!-- Rząd ze szczegółami JSON (Zwijany) -->
+            <tr x-show="expanded === {{ log.pk }}" x-cloak x-collapse>
+              <td colspan="6" class="px-5 py-4 bg-black/30">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Stare dane -->
+                  <div>
+                    <span class="font-mono text-xs font-bold uppercase tracking-wider text-red-400 mb-2 block">
+                      <span class="material-symbols-outlined text-[14px] align-middle">remove</span> Stare Dane (Przed operacją)
+                    </span>
+                    <div class="bg-[#071619] border border-border-subtle p-3 rounded-xl overflow-x-auto h-48 custom-scrollbar">
+                    <pre class="font-mono text-xs text-text-muted">{% if log.old_data %}{{ log.old_data|pprint }}{% else %}<span class="italic opacity-50">Brak starych danych (np. przy INSERT)</span>{% endif %}</pre>
+                    </div>
+                  </div>
+
+                <!-- Nowe dane -->
+                  <div>
+                    <span class="font-mono text-xs font-bold uppercase tracking-wider text-green-400 mb-2 block">
+                      <span class="material-symbols-outlined text-[14px] align-middle">add</span> Nowe Dane (Po operacji)
+                    </span>
+                    <div class="bg-[#071619] border border-border-subtle p-3 rounded-xl overflow-x-auto h-48 custom-scrollbar">
+                    <pre class="font-mono text-xs text-text-muted">{% if log.new_data %}{{ log.new_data|pprint }}{% else %}<span class="italic opacity-50">Brak nowych danych (np. przy DELETE)</span>{% endif %}</pre>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center font-mono text-sm text-text-muted uppercase tracking-wider">
+                Brak logów pasujących do kryteriów.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  <!-- Paginacja -->
+    {% if is_paginated %}
+      <div class="px-5 py-4 border-t border-border-subtle flex justify-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.operation %}&operation={{ request.GET.operation }}{% endif %}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">«</a>
+        {% endif %}
+        <span class="px-3 py-1.5 font-mono text-sm text-text-muted">Strona {{ page_obj.number }} z {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.operation %}&operation={{ request.GET.operation }}{% endif %}" class="px-3 py-1.5 font-mono text-sm border border-border-subtle text-text-muted hover:text-text-main rounded-lg transition-colors">»</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

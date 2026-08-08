@@ -158,11 +158,6 @@ select {
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Wskaźniki Emisji</span>
           </a>
 
-          <a href="{% url 'emissions:energy_consumption_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
-            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">bolt</span>
-            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Dane emisyjne</span>
-          </a>
-
           <a href="{% url 'calculator:dashboard' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">bar_chart</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Przeliczniki</span>
@@ -178,20 +173,15 @@ select {
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Użytkownicy</span>
           </a>
 
-          <a href="{% url 'ai_services:global_assistant' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
-            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">auto_awesome</span>
-            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">AI Asystent ESG</span>
-          </a>
-
           <a href="{% url 'communications:thread_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">mail</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Komunikacja e-mail</span>
           </a>
 
           {% if user.is_superuser or user.role == 'admin' %}
-          <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
-            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
-            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Audyt i Weryfikacja</span>
+          <a href="{% url 'workflow:admin_dashboard' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
+            <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">admin_panel_settings</span>
+            <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Narzędzia Administratora</span>
           </a>
           {% endif %}
 
@@ -232,8 +222,6 @@ select {
              class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Przeliczniki</a>
           {% if user.is_authenticated %}
           <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false" class="relative">
-            <a href="{% url 'emissions:energy_consumption_list' %}"
-               class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Dane Emisyjne</a>
             <div x-show="show" x-cloak
                  class="mt-1 ml-3 flex flex-col gap-1 border-l-2 border-border-subtle pl-2">
               <a href="{% url 'emissions:energy_purchased_list' %}"
@@ -253,8 +241,6 @@ select {
              class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Cele i symulacje</a>
           <a href="{% url 'accounts:company-users-list' %}"
              class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Użytkownicy</a>
-          <a href="{% url 'ai_services:global_assistant' %}"
-             class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">AI Asystent ESG</a>
           <a href="{% url 'communications:thread_list' %}"
              class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Komunikacja e-mail</a>
         </div>

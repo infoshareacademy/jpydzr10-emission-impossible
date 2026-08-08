@@ -3,7 +3,7 @@
 
 {% block title %}Import — {{ model_verbose_name }} — Emission Impossible{% endblock %}
 
-{% block extra_head %}
+{% block content %}
     <style>
     /* Niestandardowy wygląd przycisku 'Wybierz plik' */
         input[type="file"] {
@@ -58,9 +58,6 @@
             box-shadow: 0 1px 0 rgba(255,255,255,0.1);
         }
     </style>
-{% endblock %}
-
-{% block content %}
     <div class="max-w-7xl mx-auto space-y-6">
 
     {# ===================================================================== #}

@@ -1,6 +1,10 @@
 from django.urls import path
 
 from .views import (
+    ReductionGoalCreateView,
+    ReductionGoalDeleteView,
+    ReductionGoalListView,
+    ReductionGoalUpdateView,
     ReductionTargetCreateView,
     ReductionTargetDeleteView,
     ReductionTargetDetailView,
@@ -42,4 +46,8 @@ urlpatterns = [
         ReductionTargetDetailView.as_view(),
         name="reduction-target-detail",
     ),
+    path("goals/", ReductionGoalListView.as_view(), name="goal_list"),
+    path("goals/create/", ReductionGoalCreateView.as_view(), name="goal_create"),
+    path("goals/<int:pk>/edit/", ReductionGoalUpdateView.as_view(), name="goal_edit"),
+    path("goals/<int:pk>/delete/", ReductionGoalDeleteView.as_view(), name="goal_delete"),
 ]

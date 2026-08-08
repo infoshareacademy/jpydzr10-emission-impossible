@@ -713,7 +713,7 @@ class EmissionFactorListView(LoginRequiredMixin, ListView):
 
         for model in [StationaryCombustion, MobileCombustion]:
             for year, factor_name in model.objects.values_list(
-                "year", "fuel"
+                "year", "fuel__name"
             ).distinct():
                 if year and factor_name:
                     required.add((safe_int(year), str(factor_name).strip()))

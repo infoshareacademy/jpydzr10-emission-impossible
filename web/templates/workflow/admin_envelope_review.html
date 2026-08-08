@@ -4,43 +4,49 @@
 
 {% block content %}
   {% csrf_token %}
-  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
+      <!-- Powrót do Listy Raportów -->
+      <a href="{% url 'workflow:admin_list' %}" class="inline-flex items-center gap-2 font-mono text-sm text-text-muted hover:text-accent transition-colors uppercase tracking-wider mb-3">
+        <span class="material-symbols-outlined" style="font-size: 16px">arrow_back</span>
+        Wróć do listy raportów
+      </a>
       <div class="flex items-center gap-3 mb-1">
         <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
         <h1 class="font-heading font-bold text-3xl text-text-main tracking-wide">Audyt: {{ envelope.company.name }}</h1>
       </div>
-      <p class="font-mono text-sm text-text-muted ml-4">Rok raportowy: {{ envelope.period.year }}</p>
+      <p class="font-mono text-sm text-text-muted ml-4 mt-2">Rok raportowy: {{ envelope.period.year }}</p>
     </div>
 
     <button id="btn-bulk-approve"
             data-url="{% url 'workflow:bulk_approve' envelope_id=envelope.pk %}"
-            class="inline-flex items-center gap-2 rounded-lg bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#c8f535] px-6 py-3 text-sm font-bold text-[#1a4a52] hover:bg-[#b5e02b] transition-colors shadow-md"
             {% if envelope.status != 'IN_REVIEW' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
       <span class="material-symbols-outlined text-[20px]">task_alt</span>
       ZAAKCEPTUJ WSZYSTKIE REKORDY
     </button>
   </div>
 
-  <div class="bg-[#13383e]/40 rounded-2xl shadow-2xl overflow-hidden border border-[#1a4a52] backdrop-blur-sm">
+  <!-- Tabela w spójnym stylu -->
+  <div class="rounded-2xl border border-border-subtle overflow-hidden" style="background: rgba(17, 23, 32, 0.6); backdrop-filter: blur(8px)">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-[#1a4a52] text-text-muted border-b border-[#1a4a52]">
-            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider">Kategoria</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider">Szczegóły wpisu</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider text-center">Status</th>
-            <th class="py-4 px-6 font-mono text-sm font-semibold uppercase tracking-wider text-center">Akcja</th>
+          <tr class="border-b border-border-subtle">
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">Kategoria</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted">Szczegóły wpisu</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">Status</th>
+            <th class="px-5 py-4 font-mono text-xs uppercase tracking-wider text-text-muted text-center">Akcja</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#1a4a52]/50">
+        <tbody>
           {% for item in emission_records %}
             <tr id="row-{{ item.app_label }}-{{ item.model_name }}-{{ item.instance.pk }}"
-                class="transition-colors {% if item.instance.workflow_status == 'APPROVED' %}bg-green-900/20{% elif item.instance.workflow_status == 'REJECTED' %}bg-red-900/20{% else %}hover:bg-[#1a4a52]/30{% endif %}">
+                class="border-b border-border-subtle transition-colors {% if item.instance.workflow_status == 'APPROVED' %}bg-green-900/20{% elif item.instance.workflow_status == 'REJECTED' %}bg-red-900/20{% else %}hover:bg-white/5{% endif %}">
 
-              <td class="py-4 px-6 font-medium text-text-main">{{ item.verbose_name }}</td>
+              <td class="px-5 py-4 font-medium text-text-main">{{ item.verbose_name }}</td>
 
-              <td class="py-4 px-6 text-text-main text-sm">
+              <td class="px-5 py-4 text-text-main text-sm">
                 <div class="flex items-center justify-between">
                   <span class="font-mono">{{ item.instance }}</span>
 
@@ -52,12 +58,13 @@
                   {% endif %}
                 </div>
               </td>
-              <td class="py-4 px-6 text-center">
-                <span class="record-status inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-800/50 text-gray-300 border border-gray-600">
+              <td class="px-5 py-4 text-center">
+                <span class="record-status font-mono text-xs font-bold px-2 py-1 rounded"
+                      style="{% if item.instance.workflow_status == 'PENDING' or item.instance.workflow_status == 'DRAFT' %}background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.3);{% elif item.instance.workflow_status == 'APPROVED' %}background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);{% elif item.instance.workflow_status == 'REJECTED' %}background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);{% endif %}">
                   {{ item.instance.get_workflow_status_display }}
                 </span>
               </td>
-              <td class="py-4 px-6 text-center">
+              <td class="px-5 py-4 text-center">
                 {% if item.instance.workflow_status == 'PENDING' or item.instance.workflow_status == 'DRAFT' %}
                   <div class="action-buttons flex justify-center gap-2">
                     <button class="btn-approve inline-flex items-center justify-center rounded-lg border border-[#c8f535] text-[#c8f535] hover:bg-[#c8f535] hover:text-[#1a4a52] px-3 py-1.5 text-xs font-bold transition-all"
@@ -78,7 +85,7 @@
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="4" class="py-8 text-center text-text-muted font-mono text-sm">Brak danych do weryfikacji. Wprowadź dane emisji dla tej spółki i roku.</td></tr>
+            <tr><td colspan="4" class="px-5 py-12 text-center text-text-muted font-mono text-sm uppercase tracking-wider">Brak danych do weryfikacji. Wprowadź dane emisji dla tej spółki i roku.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -141,9 +148,11 @@
 
             if (res.status === 'success') {
               const row = document.getElementById(`row-${app}-${model}-${id}`);
-              row.className = 'transition-colors bg-green-900/20';
+              row.className = 'border-b border-border-subtle transition-colors bg-green-900/20';
               row.querySelector('.record-status').textContent = 'Zaakceptowany';
-              row.querySelector('.record-status').className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30';
+
+              // Zmiana stylu odznaki na zatwierdzony
+              row.querySelector('.record-status').setAttribute('style', 'background:rgba(134,239,172,0.15); color:#86efac; border:1px solid rgba(134,239,172,0.3);');
               row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">Oceniono</span>';
             } else {
               alert('Błąd: ' + res.message);
@@ -181,7 +190,7 @@
         }
 
         const formData = new FormData();
-        formData.append('message', reason); // views.py oczekuje tu nazwy 'message', nie 'reason'
+        formData.append('message', reason);
 
         try {
           const response = await fetch(url, {
@@ -193,9 +202,11 @@
 
           if (res.status === 'success') {
             const row = document.getElementById(`row-${app}-${model}-${id}`);
-            row.className = 'transition-colors bg-red-900/20';
+            row.className = 'border-b border-border-subtle transition-colors bg-red-900/20';
             row.querySelector('.record-status').textContent = 'Odrzucony';
-            row.querySelector('.record-status').className = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30';
+
+            // Zmiana stylu odznaki na odrzucony
+            row.querySelector('.record-status').setAttribute('style', 'background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3);');
             row.querySelector('.action-buttons').outerHTML = '<span class="text-text-muted text-sm font-mono">Oceniono</span>';
             modal.close();
           } else {

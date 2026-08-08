@@ -26,6 +26,7 @@ load_dotenv(dotenv_path=BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+FIELD_ENCRYPTION_KEY = os.getenv("FIELD_ENCRYPTION_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
