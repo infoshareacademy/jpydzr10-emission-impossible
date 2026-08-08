@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <div id="bielik-widget-container" hx-preserve="true" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
     <div id="bielik-chat-window"
          class="hidden pointer-events-auto w-[380px] h-[550px] mb-4 border border-border-subtle rounded-2xl flex-col shadow-2xl overflow-hidden transition-all duration-300 transform translate-y-4 opacity-0"
@@ -7,22 +7,22 @@
             <div class="flex justify-between items-center">
                 <div id="bielik-status-dot-header" class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-[#c8f535] animate-pulse"></div>
-                    <span class="font-heading font-bold text-sm text-text-main">AI Asystent ESG (Bielik)</span>
+                    <span class="font-heading font-bold text-sm text-text-main">{% trans "AI Asystent ESG (Bielik)" %}</span>
                 </div>
-                <button id="bielik-reset-btn" class="text-xs font-mono text-text-muted hover:text-red-400 transition-colors" title="Wyczyść historię">
+                <button id="bielik-reset-btn" class="text-xs font-mono text-text-muted hover:text-red-400 transition-colors" title="{% trans "Wyczyść historię" %}">
                     <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
                 </button>
             </div>
 
             <div class="flex gap-2">
                 <select id="bielik-company-select" class="bg-[#111720] border border-[#2a3f4a] text-text-main text-[11px] rounded flex-1 px-2 py-1 outline-none font-mono">
-                    <option value="">Wybierz spółkę...</option>
+                    <option value="">{% trans "Wybierz spółkę..." %}</option>
                     {% for comp in global_companies %}
                         <option value="{{ comp.id }}">{{ comp.name }}</option>
                     {% endfor %}
                 </select>
                 <select id="bielik-scope-select" class="bg-[#111720] border border-[#2a3f4a] text-text-main text-[11px] rounded flex-1 px-2 py-1 outline-none font-mono">
-                    <option value="ALL">Całość</option>
+                    <option value="ALL">{% trans "Całość" %}</option>
                     <option value="SCOPE_1">Scope 1</option>
                     <option value="SCOPE_2">Scope 2</option>
                     <option value="SCOPE_3">Scope 3</option>
@@ -35,13 +35,13 @@
         <div id="bielik-chat-loading" class="hidden px-4 py-2 border-t border-[#2a3f4a] shrink-0" style="background:rgba(0,0,0,0.2);">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#c8f535] animate-spin" style="font-size:14px;">hourglass_empty</span>
-                <span class="font-mono text-[10px] text-[#c8f535] uppercase tracking-widest animate-pulse">Bielik analizuje...</span>
+                <span class="font-mono text-[10px] text-[#c8f535] uppercase tracking-widest animate-pulse">{% trans "Bielik analizuje..." %}</span>
             </div>
         </div>
 
         <div class="border-t border-[#2a3f4a] p-3 shrink-0" style="background:rgba(42,63,74,0.4);">
             <form id="bielik-chat-form" class="flex items-center gap-2" onsubmit="event.preventDefault();">
-                <input type="text" id="bielik-user-input" placeholder="Zadaj pytanie..." autocomplete="off"
+                <input type="text" id="bielik-user-input" placeholder="{% trans "Zadaj pytanie..." %}" autocomplete="off"
                        class="flex-1 rounded-lg px-3 py-2 font-mono text-xs text-text-main focus:outline-none transition-colors border border-[#2a3f4a]"
                        style="background:rgba(255,255,255,0.04);">
                 <button type="submit" id="bielik-send-btn" class="p-2 rounded-lg text-[#1a4a52] bg-[#c8f535] hover:bg-[#b5e02b] transition-colors disabled:opacity-50">
@@ -114,7 +114,7 @@
 
             const label = document.createElement('span');
             label.className = 'font-mono text-[9px] text-gray-500 mb-1 uppercase tracking-widest ' + (role === 'user' ? 'mr-1' : 'ml-1');
-            label.textContent = role === 'user' ? 'Ty' : 'Bielik AI';
+            label.textContent = role === 'user' ? '{% trans "Ty" %}' : 'Bielik AI';
 
             const bubble = document.createElement('div');
             bubble.className = 'px-3 py-2 max-w-[90%] font-mono text-xs leading-relaxed break-words whitespace-pre-wrap ';
@@ -138,7 +138,7 @@
         const initHistory = () => {
             messagesContainer.innerHTML = '';
             if (chatHistory.length === 0) {
-                renderMessage('system', 'Witaj! Jestem asystentem ESG. Wybierz spółkę i zadaj pytanie.');
+                renderMessage('system', '{% trans "Witaj! Jestem asystentem ESG. Wybierz spółkę i zadaj pytanie." %}');
             } else {
                 chatHistory.forEach(msg => renderMessage(msg.role, msg.text));
             }
@@ -154,7 +154,7 @@
                 const data = JSON.parse(e.data);
 
                 if (data.type === 'error') {
-                    renderMessage('system', `<span style="color:#f87171;">Błąd: ${data.message}</span>`);
+                    renderMessage('system', `<span style="color:#f87171;">{% trans "Błąd" %}: ${data.message}</span>`);
                     resetUIState();
                 } else if (data.type === 'status' && data.status === 'processing') {
                     // Backend analizuje...
@@ -217,11 +217,11 @@
 
             if (!question) return;
             if (!compId) {
-                renderMessage('system', '<span style="color:#f87171;">Błąd: Musisz najpierw wybrać spółkę z listy.</span>');
+                renderMessage('system', '<span style="color:#f87171;">{% trans "Błąd: Musisz najpierw wybrać spółkę z listy." %}</span>');
                 return;
             }
             if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
-                renderMessage('system', '<span style="color:#f87171;">Brak połączenia z serwerem. Otwórz czat ponownie.</span>');
+                renderMessage('system', '<span style="color:#f87171;">{% trans "Brak połączenia z serwerem. Otwórz czat ponownie." %}</span>');
                 return;
             }
 
