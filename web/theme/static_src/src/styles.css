@@ -99,3 +99,58 @@ body.light-mode .dropdown-card:hover {
 body.light-mode footer {
   background: rgba(226,238,236,0.85) !important;
 }
+
+/* ---- Light mode: home page ---- */
+body.light-mode {
+  background: linear-gradient(160deg, #d9f2ec 0%, #eef9f6 45%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+/* Cards / panels */
+body.light-mode .bg-\[\#13383e\]\/20,
+body.light-mode .bg-\[\#13383e\]\/40 {
+  background: rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 2px 12px rgba(26, 74, 82, 0.08);
+}
+
+/* Inner wells (progress track, list rows) */
+body.light-mode .bg-\[\#111720\] {
+  background: #e4f1ed !important;
+}
+
+/* Borders */
+body.light-mode .border-\[\#1a4a52\] {
+  border-color: #b6d5ce !important;
+}
+
+/* Inline panel backgrounds used across templates */
+body.light-mode [style*="rgba(17,23,32"] {
+  background: rgba(255, 255, 255, 0.75) !important;
+}
+body.light-mode [style*="rgba(255,255,255,0.03)"],
+body.light-mode [style*="rgba(255,255,255,0.02)"] {
+  background: rgba(26, 74, 82, 0.04) !important;
+}
+
+/* Lime CTA -> deep teal for contrast on light */
+body.light-mode .bg-\[\#c8f535\] {
+  background: #1a4a52 !important;
+  color: #ffffff !important;
+}
+body.light-mode .hover\:bg-\[\#b5e02b\]:hover {
+  background: #235a63 !important;
+}
+
+/* Accent bars and rules */
+body.light-mode [style*="background:#c8f535"],
+body.light-mode [style*="background: #c8f535"] {
+  background: #1a7a52 !important;
+}
+body.light-mode [style*="linear-gradient(to right, #c8f535"] {
+  background: linear-gradient(to right, #4bc5b0, #9fe0d2, transparent) !important;
+}
+
+/* Logo: white SVG -> dark teal in light mode */
+body.light-mode img[src*="logo-white"] {
+  filter: brightness(0) saturate(100%) invert(23%) sepia(18%) saturate(1352%) hue-rotate(140deg) brightness(94%) contrast(92%);
+}
