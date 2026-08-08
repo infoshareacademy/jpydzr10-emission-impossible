@@ -1,11 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+@source "../../../**/*.{html,py,js}";
 
-/*@import "tailwindcss";*/
+@theme {
+  --color-bg: #151c27;
+  --color-bg-nav: #111720;
+  --color-accent: #c8f535;
+  --color-teal-from: #b8ece6;
+  --color-teal-to: #5bc4be;
+  --color-teal-icon: #1a4a52;
+  --color-text-main: #e8f4f0;
+  --color-text-muted: #7ab5ae;
+  --color-border-subtle: #2a3f4a;
 
-<<<<<<< HEAD
   --font-mono: "Roboto Mono", monospace;
   --font-heading: "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -41,22 +48,54 @@ body.light-mode .dropdown-card:hover {
 body.light-mode footer {
   background: rgba(226,238,236,0.85) !important;
 }
-=======
-/*@source "../../..!**!*.{html,py,js}";*/
+/* Light mode overrides */
+body.light-mode {
+  --color-bg: #f0f5f4;
+  --color-bg-nav: #e2eeec;
+  --color-accent: #1a7a52;
+  --color-text-main: #1a3a32;
+  --color-text-muted: #4a7a74;
+  --color-border-subtle: #b0ccc8;
+  background-color: #f0f5f4;
+}
+body.light-mode nav {
+  background: rgba(226,238,236,0.85) !important;
+}
+body.light-mode #dropdown {
+  background: rgba(226,238,236,0.97) !important;
+}
+body.light-mode .dropdown-card {
+  background: rgba(180,210,205,0.8);
+}
+body.light-mode .dropdown-card:hover {
+  background: rgba(160,195,190,1);
+}
+body.light-mode footer {
+  background: rgba(226,238,236,0.85) !important;
+}
 
-/*@theme {*/
-/*  --color-bg: #151c27;*/
-/*  --color-bg-nav: #111720;*/
-/*  --color-accent: #c8f535;*/
-/*  --color-teal-from: #b8ece6;*/
-/*  --color-teal-to: #5bc4be;*/
-/*  --color-teal-icon: #1a4a52;*/
-/*  --color-text-main: #e8f4f0;*/
-/*  --color-text-muted: #7ab5ae;*/
-/*  --color-border-subtle: #2a3f4a;*/
-
-/*  --font-mono: "Roboto Mono", monospace;*/
-/*  --font-heading: "Inter", sans-serif;*/
-/*  --font-body: "Inter", sans-serif;*/
-/*}*/
->>>>>>> origin/main
+/* Light mode overrides */
+body.light-mode {
+  --color-bg: #f0f5f4;
+  --color-bg-nav: #e2eeec;
+  --color-accent: #1a7a52;
+  --color-text-main: #1a3a32;
+  --color-text-muted: #4a7a74;
+  --color-border-subtle: #b0ccc8;
+  background-color: #f0f5f4;
+}
+body.light-mode nav {
+  background: rgba(226,238,236,0.85) !important;
+}
+body.light-mode #dropdown {
+  background: rgba(226,238,236,0.97) !important;
+}
+body.light-mode .dropdown-card {
+  background: rgba(180,210,205,0.8);
+}
+body.light-mode .dropdown-card:hover {
+  background: rgba(160,195,190,1);
+}
+body.light-mode footer {
+  background: rgba(226,238,236,0.85) !important;
+}
