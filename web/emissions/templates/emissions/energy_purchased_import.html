@@ -49,9 +49,9 @@
             <div class="space-y-3 mb-6">
                 {% for message in messages %}
                     <div class="p-4 rounded-xl text-sm font-mono font-bold border
-                        {% if message.tags == 'error' %}bg-red-500/10 border-red-500/30 text-red-400
-                        {% elif message.tags == 'warning' %}bg-yellow-500/10 border-yellow-500/30 text-yellow-400
-                        {% else %}bg-accent/10 border-accent/30 text-accent{% endif %}">
+                                {% if message.tags == 'error' %}bg-red-500/10 border-red-500/30 text-red-400
+                                {% elif message.tags == 'warning' %}bg-yellow-500/10 border-yellow-500/30 text-yellow-400
+                                {% else %}bg-accent/10 border-accent/30 text-accent{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
