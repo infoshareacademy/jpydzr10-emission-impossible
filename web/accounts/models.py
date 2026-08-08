@@ -1,12 +1,12 @@
+from core.models import CoreModel
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
-from core.models import CoreModel
 from encrypted_model_fields.fields import EncryptedCharField
-from django.db import models
 
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True, verbose_name="Adres e-mail")
+
     phone_number = models.CharField(max_length=20, blank=True)
     avatar = models.ImageField(
         upload_to="avatars/", blank=True, null=True, verbose_name="Zdjęcie profilowe"
@@ -58,9 +58,10 @@ class UserCompanyPermission(CoreModel):
 
     def __str__(self):
         return (
-            f"{self.user.username} → {self.company} "
+            f"{self.user.username} – {self.company} "
             f"(read={self.can_read}, save={self.can_save})"
         )
+
 
 class TOTPDevice(CoreModel):
     user = models.ForeignKey(
@@ -98,8 +99,7 @@ class TOTPDevice(CoreModel):
         verbose_name_plural = "Urządzenia TOTP"
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'name'],
-                name='unique_user_device_name'
+                fields=["user", "name"], name="unique_user_device_name"
             )
         ]
 
