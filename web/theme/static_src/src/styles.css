@@ -18,6 +18,8 @@
   --font-body: "Inter", sans-serif;
 }
 
+
+
 /* Light mode overrides */
 body.light-mode {
   --color-bg: #f0f5f4;
@@ -45,57 +47,6 @@ body.light-mode .dropdown-card:hover {
   background: rgba(160,195,190,1);
 }
 
-body.light-mode footer {
-  background: rgba(226,238,236,0.85) !important;
-}
-/* Light mode overrides */
-body.light-mode {
-  --color-bg: #f0f5f4;
-  --color-bg-nav: #e2eeec;
-  --color-accent: #1a7a52;
-  --color-text-main: #1a3a32;
-  --color-text-muted: #4a7a74;
-  --color-border-subtle: #b0ccc8;
-  background-color: #f0f5f4;
-}
-body.light-mode nav {
-  background: rgba(226,238,236,0.85) !important;
-}
-body.light-mode #dropdown {
-  background: rgba(226,238,236,0.97) !important;
-}
-body.light-mode .dropdown-card {
-  background: rgba(180,210,205,0.8);
-}
-body.light-mode .dropdown-card:hover {
-  background: rgba(160,195,190,1);
-}
-body.light-mode footer {
-  background: rgba(226,238,236,0.85) !important;
-}
-
-/* Light mode overrides */
-body.light-mode {
-  --color-bg: #f0f5f4;
-  --color-bg-nav: #e2eeec;
-  --color-accent: #1a7a52;
-  --color-text-main: #1a3a32;
-  --color-text-muted: #4a7a74;
-  --color-border-subtle: #b0ccc8;
-  background-color: #f0f5f4;
-}
-body.light-mode nav {
-  background: rgba(226,238,236,0.85) !important;
-}
-body.light-mode #dropdown {
-  background: rgba(226,238,236,0.97) !important;
-}
-body.light-mode .dropdown-card {
-  background: rgba(180,210,205,0.8);
-}
-body.light-mode .dropdown-card:hover {
-  background: rgba(160,195,190,1);
-}
 body.light-mode footer {
   background: rgba(226,238,236,0.85) !important;
 }
@@ -127,9 +78,29 @@ body.light-mode .border-\[\#1a4a52\] {
 body.light-mode [style*="rgba(17,23,32"] {
   background: rgba(255, 255, 255, 0.75) !important;
 }
+
+/* Subtle buttons: was near-invisible dark-on-light, now a visible bordered button */
 body.light-mode [style*="rgba(255,255,255,0.03)"],
 body.light-mode [style*="rgba(255,255,255,0.02)"] {
-  background: rgba(26, 74, 82, 0.04) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #8fb8b1 !important;
+  color: #1a4a52 !important;
+  box-shadow: 0 1px 4px rgba(26, 74, 82, 0.1);
+}
+
+/* Nav icon-buttons (theme toggle, language switcher, admin link) need a real fill + border to read as buttons on light bg */
+body.light-mode nav a[href="/admin/"],
+body.light-mode nav form button {
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#burger {
+  background: transparent !important;
+}
+
+body.light-mode nav .border-border-subtle,
+body.light-mode .border-border-subtle {
+  border-color: #8fb8b1 !important;
 }
 
 /* Lime CTA -> deep teal for contrast on light */
@@ -139,6 +110,22 @@ body.light-mode .bg-\[\#c8f535\] {
 }
 body.light-mode .hover\:bg-\[\#b5e02b\]:hover {
   background: #235a63 !important;
+}
+
+/* Inline light-colored text (designed for dark bg) needs to darken in light mode */
+body.light-mode [style*="color: #e8f4f0"],
+body.light-mode [style*="color:#e8f4f0"] {
+  color: #1a3a32 !important;
+}
+
+body.light-mode [style*="color: #7ab5ae"],
+body.light-mode [style*="color:#7ab5ae"] {
+  color: #2f5850 !important;
+}
+
+body.light-mode [style*="color: #4a7a74"],
+body.light-mode [style*="color:#4a7a74"] {
+  color: #3a6b62 !important;
 }
 
 /* Accent bars and rules */

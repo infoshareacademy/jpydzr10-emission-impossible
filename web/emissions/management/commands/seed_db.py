@@ -19,9 +19,11 @@ from emissions.models import (
     FugitiveEmission,
     MobileCombustion,
     ProcessEmission,
-    RecordStatus,
     StationaryCombustion,
 )
+from workflow.models import WorkflowStatusMixin
+
+RecordStatus = WorkflowStatusMixin.RecordStatus
 
 User = get_user_model()
 
@@ -157,7 +159,6 @@ class Command(BaseCommand):
             RecordStatus.DRAFT,
             RecordStatus.PENDING,
             RecordStatus.APPROVED,
-            RecordStatus.VERIFIED,
             RecordStatus.REJECTED,
         ]
 
@@ -371,7 +372,7 @@ class Command(BaseCommand):
                 stat_comb = StationaryCombustion(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(10, 5000),
                     unit=unit_stat,
                     source=f"Faktura {i}/2023",
@@ -392,7 +393,7 @@ class Command(BaseCommand):
                 mob_comb = MobileCombustion(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(50, 2000),
                     unit="l",
                     source=f"Raport floty {i}",
@@ -411,7 +412,7 @@ class Command(BaseCommand):
                 proc_emis = ProcessEmission(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(5, 50),
                     unit="t",
                     source="Raport technologiczny",
@@ -430,7 +431,7 @@ class Command(BaseCommand):
                 fug_emis = FugitiveEmission(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(1, 15),
                     unit="kg",
                     source="Karta Urządzenia",
@@ -455,7 +456,7 @@ class Command(BaseCommand):
                 EnergyConsumption.objects.create(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(1000, 50000),
                     unit=random.choice(["kWh", "MWh", "GJ"]),
                     source="Liczniki wewnętrzne",
@@ -466,7 +467,7 @@ class Command(BaseCommand):
                 EnergyPurchased.objects.create(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(500, 10000),
                     unit="MWh",
                     source="Faktura od dostawcy",
@@ -478,7 +479,7 @@ class Command(BaseCommand):
                 EnergyProduced.objects.create(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(100, 2000),
                     unit="MWh",
                     source="System SCADA",
@@ -489,7 +490,7 @@ class Command(BaseCommand):
                 EnergySold.objects.create(
                     year=random.choice(years),
                     company=company,
-                    status=random.choice(statuses),
+                    workflow_status=random.choice(statuses),
                     amount=rand_decimal(50, 500),
                     unit="MWh",
                     source="Faktury sprzedażowe",

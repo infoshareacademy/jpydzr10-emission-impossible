@@ -54,6 +54,17 @@
       <a href="{% url 'privacy-policy' %}" class="hover:underline">{% trans "Polityka prywatności" %}</a>
       <span style="color:rgba(255,255,255,0.4);">|</span>
       <a href="mailto:admin@emissionimpossible.pl" class="hover:underline">{% trans "Pomoc techniczna" %}</a>
+      <span style="color:rgba(255,255,255,0.4);">|</span>
+      <form action="{% url 'set_language' %}" method="post" class="inline">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}"/>
+        {% get_current_language as CURRENT_LANGUAGE %}
+        {% if CURRENT_LANGUAGE == 'pl' %}
+        <button type="submit" name="language" value="en" class="hover:underline cursor-pointer">EN</button>
+        {% else %}
+        <button type="submit" name="language" value="pl" class="hover:underline cursor-pointer">PL</button>
+        {% endif %}
+      </form>
     </div>
 
   </div>

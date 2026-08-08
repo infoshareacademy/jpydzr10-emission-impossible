@@ -78,7 +78,8 @@
 
         <!-- Theme toggle -->
         <button id="theme-toggle" onclick="toggleTheme()"
-          class="font-mono text-xs text-text-muted hover:text-accent transition-colors px-2 py-1 rounded border border-border-subtle hover:border-accent">
+          class="font-mono text-xs text-text-muted hover:text-accent transition-colors rounded border border-border-subtle hover:border-accent flex items-center justify-center"
+          style="width:32px; height:32px;">
           <span id="theme-icon" class="material-symbols-outlined" style="font-size:18px;">light_mode</span>
         </button>
 
@@ -89,12 +90,14 @@
           {% get_current_language as CURRENT_LANGUAGE %}
           {% if CURRENT_LANGUAGE == 'pl' %}
           <button type="submit" name="language" value="en"
-            class="font-mono text-xs text-text-muted hover:text-accent transition-colors px-2 py-1 rounded border border-border-subtle hover:border-accent">
+            class="font-mono text-xs text-text-muted hover:text-accent transition-colors rounded border border-border-subtle hover:border-accent flex items-center justify-center"
+            style="width:32px; height:32px;">
             EN
           </button>
           {% else %}
           <button type="submit" name="language" value="pl"
-            class="font-mono text-xs text-text-muted hover:text-accent transition-colors px-2 py-1 rounded border border-border-subtle hover:border-accent">
+            class="font-mono text-xs text-text-muted hover:text-accent transition-colors rounded border border-border-subtle hover:border-accent flex items-center justify-center"
+            style="width:32px; height:32px;">
             PL
           </button>
           {% endif %}
@@ -191,20 +194,18 @@
           <a href="{% url 'companies:companies-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Przedsiębiorstwo" %}</a>
           <a href="{% url 'emissions:factor-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Wskaźniki Emisji" %}</a>
           <a href="{% url 'calculator:dashboard' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Przeliczniki" %}</a>
-          {% if user.is_authenticated %}
-          <div class="mt-1 ml-3 flex flex-col gap-1 border-l-2 border-border-subtle pl-2">
-            <a href="{% url 'emissions:energy_purchased_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Zakupiona energia" %}</a>
-            <a href="{% url 'emissions:energy_produced_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Wyprodukowana energia" %}</a>
-            <a href="{% url 'emissions:energy_sold_list' %}" class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">{% trans "Sprzedana energia" %}</a>
-          </div>
-          {% endif %}
+          <a href="{% url 'what_if:reduction-target-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Cele i symulacje" %}</a>
+          <a href="{% url 'accounts:company-users-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Użytkownicy" %}</a>
+          <a href="{% url 'communications:thread_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Komunikacja e-mail" %}</a>
         </div>
 
         <div class="flex flex-col gap-2">
           <span class="font-mono text-xs text-accent uppercase tracking-widest mb-2">{% trans "Więcej" %}</span>
-          <a href="{% url 'what_if:reduction-target-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Cele i symulacje" %}</a>
-          <a href="{% url 'accounts:company-users-list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Użytkownicy" %}</a>
-          <a href="{% url 'communications:thread_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Komunikacja e-mail" %}</a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'emissions:energy_purchased_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Zakupiona energia" %}</a>
+          <a href="{% url 'emissions:energy_produced_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Wyprodukowana energia" %}</a>
+          <a href="{% url 'emissions:energy_sold_list' %}" class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">{% trans "Sprzedana energia" %}</a>
+          {% endif %}
         </div>
 
       </div>
