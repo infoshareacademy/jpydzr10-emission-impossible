@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext as _  # <--- DODANY IMPORT TŁUMACZEŃ
 from django.views.generic import CreateView, DetailView, ListView, TemplateView, View
 
 from workflow.models import WorkflowStatusMixin
@@ -52,12 +53,11 @@ class ReportingPeriodCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateVi
 
         if generate_envelopes:
             count = generate_envelopes_and_tasks_for_period(self.object)
-            messages.success(
-                self.request,
-                f"Utworzono okres {self.object.year} i wygenerowano zadania dla spółek.",
-            )
+            msg = _("Utworzono okres %(year)s i wygenerowano zadania dla spółek.") % {'year': self.object.year}
+            messages.success(self.request, msg)
         else:
-            messages.success(self.request, f"Utworzono pusty okres {self.object.year}.")
+            msg = _("Utworzono pusty okres %(year)s.") % {'year': self.object.year}
+            messages.success(self.request, msg)
 
         return response
 
@@ -179,7 +179,7 @@ class AdminReviewActionView(LoginRequiredMixin, AdminRequiredMixin, View):
             model = apps.get_model(app_label, model_name)
         except LookupError:
             return JsonResponse(
-                {"status": "error", "message": "Model nie istnieje"}, status=404
+                {"status": "error", "message": _("Model nie istnieje")}, status=404
             )
 
         record = get_object_or_404(model, pk=pk)
@@ -197,7 +197,7 @@ class AdminReviewActionView(LoginRequiredMixin, AdminRequiredMixin, View):
                 return JsonResponse({"status": "error", "message": str(e)}, status=400)
         else:
             return JsonResponse(
-                {"status": "error", "message": "Nieprawidłowa akcja"}, status=400
+                {"status": "error", "message": _("Nieprawidłowa akcja")}, status=400
             )
 
         return JsonResponse({"status": "success"})
@@ -225,7 +225,7 @@ class RecordClarificationView(LoginRequiredMixin, AdminRequiredMixin, View):
             model = apps.get_model(app_label, model_name)
         except LookupError:
             return JsonResponse(
-                {"status": "error", "message": "Nieznany model danych."}, status=404
+                {"status": "error", "message": _("Nieznany model danych.")}, status=404
             )
 
         record = get_object_or_404(model, pk=pk)
@@ -237,14 +237,14 @@ class RecordClarificationView(LoginRequiredMixin, AdminRequiredMixin, View):
             return JsonResponse(
                 {
                     "status": "success",
-                    "message": "Uwaga została wysłana do użytkownika.",
+                    "message": _("Uwaga została wysłana do użytkownika."),
                 }
             )
         except ValueError as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
         except Exception as e:
             return JsonResponse(
-                {"status": "error", "message": "Wystąpił błąd krytyczny serwera."},
+                {"status": "error", "message": _("Wystąpił błąd krytyczny serwera.")},
                 status=500,
             )
 
@@ -255,7 +255,7 @@ class AdminBulkApproveView(LoginRequiredMixin, AdminRequiredMixin, View):
 
         if envelope.status == CompanyReportEnvelope.Status.APPROVED:
             return JsonResponse(
-                {"status": "error", "message": "Raport już zatwierdzony"}, status=400
+                {"status": "error", "message": _("Raport już zatwierdzony")}, status=400
             )
 
         try:

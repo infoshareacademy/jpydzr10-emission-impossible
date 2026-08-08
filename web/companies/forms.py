@@ -1,4 +1,7 @@
 from django import forms
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA FORMULARZY
+)
 
 from companies.models import Companies
 
@@ -25,7 +28,7 @@ class CompaniesForm(forms.ModelForm):
         krs = str(self.cleaned_data.get("krs"))
 
         if len(krs) != 10:
-            raise forms.ValidationError("KRS number must consist of exactly 10 digits ")
+            raise forms.ValidationError(_("Numer KRS musi składać się z dokładnie 10 cyfr."))
 
         return krs
 
@@ -35,10 +38,10 @@ class CompaniesForm(forms.ModelForm):
 
         if not cleaned_phone.lstrip("+").isdigit():
             raise forms.ValidationError(
-                "A phone number can only contain digits, spaces, hyphens, and the ‘+’ sign."
+                _("Numer telefonu może zawierać tylko cyfry, spacje, myślniki oraz znak '+'.")
             )
 
         if len(cleaned_phone) < 9:
-            raise forms.ValidationError("The phone number is too short.")
+            raise forms.ValidationError(_("Numer telefonu jest za krótki."))
 
         return phone

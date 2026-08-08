@@ -3,10 +3,9 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-
 from .models import (
-    EnergyConsumption,
     EmissionFactor,
+    EnergyConsumption,
     EnergyProduced,
     EnergyPurchased,
     EnergySold,
@@ -17,21 +16,21 @@ from .models import (
 )
 
 ENERGY_TYPES = [
-    ("Energia elektryczna z OZE", "Energia elektryczna z OZE"),
-    ("Energia elektryczna nie OZE", "Energia elektryczna nie OZE"),
-    ("Ciepło z OZE", "Ciepło z OZE"),
-    ("Ciepło nie OZE", "Ciepło nie OZE"),
-    ("Chłód z OZE", "Chłód z OZE"),
-    ("Chłód nie OZE", "Chłód nie OZE"),
-    ("Para Techniczna z OZE", "Para Techniczna z OZE"),
-    ("Para Techniczna nie OZE", "Para Techniczna nie OZE"),
+    ("Energia elektryczna z OZE", _("Energia elektryczna z OZE")),
+    ("Energia elektryczna nie OZE", _("Energia elektryczna nie OZE")),
+    ("Ciepło z OZE", _("Ciepło z OZE")),
+    ("Ciepło nie OZE", _("Ciepło nie OZE")),
+    ("Chłód z OZE", _("Chłód z OZE")),
+    ("Chłód nie OZE", _("Chłód nie OZE")),
+    ("Para Techniczna z OZE", _("Para Techniczna z OZE")),
+    ("Para Techniczna nie OZE", _("Para Techniczna nie OZE")),
 ]
 
 ENERGY_SOURCES = [
-    ("Zakupiona", "Zakupiona"),
-    ("Wyprodukowana", "Wyprodukowana"),
-    ("Sprzedana", "Sprzedana"),
-    ("Zużyta", "Zużyta"),
+    ("Zakupiona", _("Zakupiona")),
+    ("Wyprodukowana", _("Wyprodukowana")),
+    ("Sprzedana", _("Sprzedana")),
+    ("Zużyta", _("Zużyta")),
 ]
 
 UNITS = [
@@ -43,9 +42,9 @@ UNITS = [
 
 
 class EnergyConsumptionForm(forms.ModelForm):
-    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
-    energy_source = forms.ChoiceField(choices=ENERGY_SOURCES)
-    unit = forms.ChoiceField(choices=UNITS)
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES, label=_("Typ energii"))
+    energy_source = forms.ChoiceField(choices=ENERGY_SOURCES, label=_("Źródło energii"))
+    unit = forms.ChoiceField(choices=UNITS, label=_("Jednostka"))
 
     class Meta:
         model = EnergyConsumption
@@ -94,17 +93,17 @@ class EnergyConsumptionForm(forms.ModelForm):
         energy_type = cleaned_data.get("energy_type")
         source = cleaned_data.get("source")
         if not energy_source:
-            self.add_error("energy_source", "Źródło energii jest wymagane.")
+            self.add_error("energy_source", _("Źródło energii jest wymagane."))
         if not energy_type:
-            self.add_error("energy_type", "Typ energii jest wymagany.")
+            self.add_error("energy_type", _("Typ energii jest wymagany."))
         if not source:
-            self.add_error("source", "Źródło danych jest wymagane.")
+            self.add_error("source", _("Źródło danych jest wymagane."))
         return cleaned_data
 
 
 class EnergyPurchasedForm(forms.ModelForm):
-    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
-    unit = forms.ChoiceField(choices=UNITS)
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES, label=_("Typ energii"))
+    unit = forms.ChoiceField(choices=UNITS, label=_("Jednostka"))
 
     class Meta:
         model = EnergyPurchased
@@ -149,8 +148,8 @@ class EnergyPurchasedForm(forms.ModelForm):
 
 
 class EnergyProducedForm(forms.ModelForm):
-    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
-    unit = forms.ChoiceField(choices=UNITS)
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES, label=_("Typ energii"))
+    unit = forms.ChoiceField(choices=UNITS, label=_("Jednostka"))
 
     class Meta:
         model = EnergyProduced
@@ -195,8 +194,8 @@ class EnergyProducedForm(forms.ModelForm):
 
 
 class EnergySoldForm(forms.ModelForm):
-    energy_type = forms.ChoiceField(choices=ENERGY_TYPES)
-    unit = forms.ChoiceField(choices=UNITS)
+    energy_type = forms.ChoiceField(choices=ENERGY_TYPES, label=_("Typ energii"))
+    unit = forms.ChoiceField(choices=UNITS, label=_("Jednostka"))
 
     class Meta:
         model = EnergySold
@@ -280,7 +279,7 @@ class Scope1BaseForm(forms.ModelForm):
                     }
                 )
             else:
-                # Standardowe pola — istniejący styl brutalistyczny
+                # Standardowe pola – istniejący styl brutalistyczny
                 field.widget.attrs.update(
                     {
                         "class": (
@@ -293,7 +292,8 @@ class Scope1BaseForm(forms.ModelForm):
                 )
                 if not field.widget.attrs.get("placeholder"):
                     label = field.label or field_name
-                    field.widget.attrs["placeholder"] = f"Wprowadź: {label}"
+                    wprowadz_label = str(_("Wprowadź"))
+                    field.widget.attrs["placeholder"] = f"{wprowadz_label}: {label}"
 
 
 class StationaryCombustionForm(Scope1BaseForm):

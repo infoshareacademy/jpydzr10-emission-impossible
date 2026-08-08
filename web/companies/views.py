@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _  # <--- DODANY IMPORT TŁUMACZEŃ
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -56,7 +57,7 @@ class CompaniesListView(PageViewTrackerMixin, CompanyAccessMixin, ListView):
     model = Companies
     template_name = "companies/companies_list.html"
     context_object_name = "companies"
-    tracked_view_name = "Lista Firm"
+    tracked_view_name = _("Lista Firm")  # <--- OZNACZONO DO TŁUMACZENIA
 
     def _get_selected_year(self):
         """Metoda pomocnicza do ujednolicenia pobierania roku z requestu (DRY)"""
@@ -65,7 +66,7 @@ class CompaniesListView(PageViewTrackerMixin, CompanyAccessMixin, ListView):
             return int(self.request.GET.get("year", current_year))
         except ValueError:
             return current_year
-        
+
     def get_queryset(self):
         qs = super().get_queryset()
         query = self.request.GET.get("q")
@@ -164,7 +165,8 @@ class CompaniesCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("companies:companies-list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie dodano nową spółkę.")
+        # NAPRAWIONE POLSKIE ZNAKI I DODANE TŁUMACZENIE
+        messages.success(self.request, _("Pomyślnie dodano nową spółkę."))
         return super().form_valid(form)
 
 
@@ -177,7 +179,8 @@ class CompaniesUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("companies:companies-list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Zmiany zostały zapisane.")
+        # NAPRAWIONE POLSKIE ZNAKI I DODANE TŁUMACZENIE
+        messages.success(self.request, _("Zmiany zostały zapisane."))
         return super().form_valid(form)
 
 

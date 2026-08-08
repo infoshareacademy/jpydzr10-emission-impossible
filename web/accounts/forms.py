@@ -1,13 +1,16 @@
 from django import forms
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA FORMULARZY
+)
 
 from accounts.models import CustomUser
 
 
 class DeleteAccountForm(forms.Form):
     password = forms.CharField(
-        label="Potwierdź hasłem",
+        label=_("Potwierdź hasłem"),
         widget=forms.PasswordInput(),
-        help_text="Wprowadź swoje aktualne hasło, aby autoryzować całkowite usunięcie profilu.",
+        help_text=_("Wprowadź swoje aktualne hasło, aby autoryzować całkowite usunięcie profilu."),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -18,7 +21,7 @@ class DeleteAccountForm(forms.Form):
         password = self.cleaned_data.get("password")
         if not self.user.check_password(password):
             raise forms.ValidationError(
-                "Podane hasło autoryzacyjne jest nieprawidłowe."
+                _("Podane hasło autoryzacyjne jest nieprawidłowe.")
             )
         return password
 
@@ -28,21 +31,21 @@ class UserProfileForm(forms.ModelForm):
         model = CustomUser
         fields = ["first_name", "last_name", "email", "phone_number", "avatar"]
         labels = {
-            "first_name": "Imię",
-            "last_name": "Nazwisko",
-            "email": "Adres e-mail",
-            "phone_number": "Numer telefonu",
-            "avatar": "Zdjęcie profilowe",
+            "first_name": _("Imię"),
+            "last_name": _("Nazwisko"),
+            "email": _("Adres e-mail"),
+            "phone_number": _("Numer telefonu"),
+            "avatar": _("Zdjęcie profilowe"),
         }
         widgets = {
             "avatar": forms.FileInput(),
         }
         help_texts = {
-            "email": "Wymagany poprawny format adresu do powiadomień systemowych.",
+            "email": _("Wymagany poprawny format adresu do powiadomień systemowych."),
         }
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
         if not email:
-            raise forms.ValidationError("Adres e-mail nie może być pusty.")
+            raise forms.ValidationError(_("Adres e-mail nie może być pusty."))
         return email

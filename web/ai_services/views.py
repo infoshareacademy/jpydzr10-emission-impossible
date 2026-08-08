@@ -4,11 +4,12 @@ from companies.models import Companies
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
 from django_ratelimit.decorators import ratelimit
 
-from .models import AIChatMessage, AIChatSession  # <--- IMPORT NOWYCH MODELI
+from .models import AIChatMessage, AIChatSession
 from .SLM_conf import BielikESGService
 
 
@@ -41,7 +42,7 @@ class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         if getattr(request, "limited", False):
             return JsonResponse(
-                {"error": "Za dużo zapytań. Spróbuj za minutę."}, status=429
+                {"error": _("Za dużo zapytań. Spróbuj za minutę.")}, status=429
             )
 
         try:
@@ -51,24 +52,24 @@ class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
             scope_type = body.get("scope_type", "ALL")
         except (json.JSONDecodeError, TypeError):
             return JsonResponse(
-                {"error": "Błąd dekodowania danych żądania."}, status=400
+                {"error": _("Błąd dekodowania danych żądania.")}, status=400
             )
 
         if not question or len(question) > 500:
             return JsonResponse(
-                {"error": "Zapytanie musi mieć od 1 do 500 znaków."}, status=400
+                {"error": _("Zapytanie musi mieć od 1 do 500 znaków.")}, status=400
             )
 
         if not company_id:
             return JsonResponse(
-                {"error": "Wybierz podmiot z listy przed wysłaniem wiadomości."},
+                {"error": _("Wybierz podmiot z listy przed wysłaniem wiadomości.")},
                 status=400,
             )
 
         if not company_id or company_id == "ALL":
             return JsonResponse(
                 {
-                    "error": "Wybierz konkretną spółkę z listy przed wysłaniem wiadomości."
+                    "error": _("Wybierz konkretną spółkę z listy przed wysłaniem wiadomości.")
                 },
                 status=400,
             )
@@ -91,16 +92,13 @@ class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
 
         if not company:
             return JsonResponse(
-                {"error": "Brak uprawnień lub spółka nie istnieje."}, status=403
+                {"error": _("Brak uprawnień lub spółka nie istnieje.")}, status=403
             )
 
-        # 2. POBRANIE LUB UTWORZENIE SESJI (Pamięć bazy danych)
-        # Dzięki get_or_create system automatycznie powiąże rozmowę z konkretną spółką i zakresem
         session, created = AIChatSession.objects.get_or_create(
             user=user, company=company, scope_type=scope_type, is_active=True
         )
 
-        # 3. ZAPIS PYTANIA UŻYTKOWNIKA DO BAZY
         AIChatMessage.objects.create(
             session=session, role=AIChatMessage.Role.USER, content=question
         )
@@ -109,7 +107,6 @@ class GlobalAIAssistantView(LoginRequiredMixin, TemplateView):
         ai_service = BielikESGService()
         answer = ai_service.generate_response(session, question)
 
-        # 5. ZAPIS ODPOWIEDZI AI DO BAZY (Tylko jeśli odpowiedź była poprawna)
         if not answer.startswith("Wystąpił błąd") and not answer.startswith(
             "Silnik AI"
         ):

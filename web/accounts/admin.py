@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA ADMINA
+)
 
 from .models import CustomUser, TOTPDevice, UserCompanyPermission
 
@@ -24,7 +27,7 @@ class CustomUserAdmin(UserAdmin):
 
     # Dodanie pola 'avatar' do sekcji edycji użytkownika
     fieldsets = UserAdmin.fieldsets + (
-        ("Dodatkowe informacje", {"fields": ("phone_number", "avatar", "role")}),
+        (_("Dodatkowe informacje"), {"fields": ("phone_number", "avatar", "role")}),
     )
 
     # Wyświetlanie miniatury awatara oraz podstawowych kolumn
@@ -38,9 +41,9 @@ class CustomUserAdmin(UserAdmin):
                 '<img src="{}" width="40" height="40" style="border-radius: 50%; object-fit: cover;" />',
                 obj.avatar.url,
             )
-        return "Brak"
+        return _("Brak")
 
-    avatar_preview.short_description = "Awatar"
+    avatar_preview.short_description = _("Awatar")
 
 
 @admin.register(UserCompanyPermission)

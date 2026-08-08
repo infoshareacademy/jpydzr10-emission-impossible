@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
+from django.utils.translation import gettext as _  # <--- DODANY IMPORT TŁUMACZEŃ
 from django.views.generic import ListView
 
 from .models import AuditLog
@@ -56,11 +57,11 @@ class AuditLogListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
 
         for log in logs:
             if log.user_id:
-                log.username = user_map.get(
-                    log.user_id, f"ID: {log.user_id} (Usunięty)"
-                )
+                # Zamiana f-stringa na formatowanie wspierające i18n
+                fallback_text = _("ID: %(user_id)s (Usunięty)") % {'user_id': log.user_id}
+                log.username = user_map.get(log.user_id, fallback_text)
             else:
-                log.username = "System/Brak"
+                log.username = _("System/Brak")
 
         context["current_search"] = self.request.GET.get("q", "")
         context["current_operation"] = self.request.GET.get("operation", "")

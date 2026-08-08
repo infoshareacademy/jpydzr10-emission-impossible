@@ -4,6 +4,7 @@ import logging
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from companies.models import Companies
+from django.utils.translation import gettext as _  # <--- KLUCZOWY IMPORT DLA TŁUMACZEŃ
 
 from .models import AIChatMessage, AIChatSession
 from .SLM_conf import BielikESGService
@@ -31,20 +32,20 @@ class BielikChatConsumer(AsyncWebsocketConsumer):
             company_id = data.get("company_id")
             scope_type = data.get("scope_type", "ALL")
         except json.JSONDecodeError:
-            await self.send_error("Błąd dekodowania danych żądania.")
+            await self.send_error(_("Błąd dekodowania danych żądania."))
             return
 
         if not question or len(question) > 500:
-            await self.send_error("Zapytanie musi mieć od 1 do 500 znaków.")
+            await self.send_error(_("Zapytanie musi mieć od 1 do 500 znaków."))
             return
 
         if not company_id:
-            await self.send_error("Wybierz podmiot z listy przed wysłaniem wiadomości.")
+            await self.send_error(_("Wybierz podmiot z listy przed wysłaniem wiadomości."))
             return
 
         company = await self.get_company(company_id)
         if not company:
-            await self.send_error("Brak uprawnień lub spółka nie istnieje.")
+            await self.send_error(_("Brak uprawnień lub spółka nie istnieje."))
             return
 
         session = await self.get_or_create_session(company, scope_type)

@@ -1,4 +1,7 @@
 from django import forms
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA FORMULARZY
+)
 
 from .models import FuelSpec, FuelType, Supplier
 
@@ -16,27 +19,27 @@ CHECKBOX_CLASSES = (
 
 class FuelTypeForm(forms.ModelForm):
     CATEGORY_CHOICES = [
-        ("liquid", "Ciekłe (Liquid)"),
-        ("gas", "Gazowe (Gas)"),
-        ("solid", "Stałe (Solid)"),
+        ("liquid", _("Ciekłe (Liquid)")),
+        ("gas", _("Gazowe (Gas)")),
+        ("solid", _("Stałe (Solid)")),
     ]
 
     category = forms.ChoiceField(
         choices=CATEGORY_CHOICES,
-        label="Kategoria paliwa",
+        label=_("Kategoria paliwa"),
         widget=forms.Select(attrs={"class": INPUT_CLASSES}),
     )
 
     class Meta:
         model = FuelType
         fields = ["name", "symbol", "category"]
-        labels = {"name": "Nazwa paliwa", "symbol": "Symbol / Kod"}
+        labels = {"name": _("Nazwa paliwa"), "symbol": _("Symbol / Kod")}
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": INPUT_CLASSES, "placeholder": "np. Olej napędowy"}
+                attrs={"class": INPUT_CLASSES, "placeholder": _("np. Olej napędowy")}
             ),
             "symbol": forms.TextInput(
-                attrs={"class": INPUT_CLASSES, "placeholder": "np. ON_DIESEL"}
+                attrs={"class": INPUT_CLASSES, "placeholder": _("np. ON_DIESEL")}
             ),
         }
 
@@ -45,10 +48,10 @@ class SupplierForm(forms.ModelForm):
     class Meta:
         model = Supplier
         fields = ["name"]
-        labels = {"name": "Nazwa dostawcy"}
+        labels = {"name": _("Nazwa dostawcy")}
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": INPUT_CLASSES, "placeholder": "np. PKN ORLEN S.A."}
+                attrs={"class": INPUT_CLASSES, "placeholder": _("np. PKN ORLEN S.A.")}
             ),
         }
 
@@ -65,12 +68,12 @@ class FuelSpecForm(forms.ModelForm):
             "is_default",
         ]
         labels = {
-            "fuel_type": "Typ paliwa",
-            "supplier": "Dostawca (opcjonalnie)",
-            "density_kg_per_m3": "Gęstość (kg/m³)",
-            "calorific_mj_per_kg": "Wartość opałowa (MJ/kg)",
-            "calorific_mj_per_m3": "Wartość opałowa (MJ/m³)",
-            "is_default": "Ustaw jako specyfikację domyślną",
+            "fuel_type": _("Typ paliwa"),
+            "supplier": _("Dostawca (opcjonalnie)"),
+            "density_kg_per_m3": _("Gęstość (kg/m³)"),
+            "calorific_mj_per_kg": _("Wartość opałowa (MJ/kg)"),
+            "calorific_mj_per_m3": _("Wartość opałowa (MJ/m³)"),
+            "is_default": _("Ustaw jako specyfikację domyślną"),
         }
         widgets = {
             "fuel_type": forms.Select(attrs={"class": INPUT_CLASSES}),

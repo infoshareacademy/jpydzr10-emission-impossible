@@ -11,7 +11,8 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -64,7 +65,7 @@ class Scope2CreateMixin(LoginRequiredMixin, FormView):
         instance = form.save(commit=False)
         is_new = instance.pk is None
 
-        # Jeśli edycja — zachowaj stare wartości emisji i wskaźników
+        # Jeśli edycja – zachowaj stare wartości emisji i wskaźników
         if not is_new:
             try:
                 db_instance = self.model.objects.get(pk=instance.pk)
@@ -92,16 +93,17 @@ class Scope2CreateMixin(LoginRequiredMixin, FormView):
             calculate_record_emissions(instance)
         except ValidationError as e:
             instance.calculated_emission_tco2eq = None
-            messages.warning(
-                self.request, f"Zapisano rekord, ale nie wyliczono emisji. Powód: {e}"
-            )
+            msg = _("Zapisano rekord, ale nie wyliczono emisji. Powód: %(error)s") % {'error': e}
+            messages.warning(self.request, msg)
 
         instance.save()
 
-        action_text = "dodano wpis do" if is_new else "zaktualizowano wpis w"
-        messages.success(
-            self.request, f"Pomyślnie {action_text}: {self.model._meta.verbose_name}"
-        )
+        action_text = _("dodano wpis do") if is_new else _("zaktualizowano wpis w")
+        msg = _("Pomyślnie %(action)s: %(model)s") % {
+            'action': action_text,
+            'model': self.model._meta.verbose_name
+        }
+        messages.success(self.request, msg)
 
         return super().form_valid(form)
 
@@ -237,7 +239,8 @@ class Scope2DeleteMixin(DeleteView):
 
     def delete(self, request, *args, **kwargs):
         model_verbose = self.model._meta.verbose_name
-        messages.success(self.request, f"Pomyślnie usunięto wpis z: {model_verbose}")
+        msg = _("Pomyślnie usunięto wpis z: %(model)s") % {'model': model_verbose}
+        messages.success(self.request, msg)
         return super().delete(request, *args, **kwargs)
 
 
@@ -426,9 +429,8 @@ class Scope1CreateMixin(LoginRequiredMixin, ReportLockMixin):
         except ValidationError as e:
             instance.calculated_emission_tco2eq = None
             instance.factor_used = None
-            messages.warning(
-                self.request, f"Zapisano rekord, ale nie wyliczono emisji. Powód: {e}"
-            )
+            msg = _("Zapisano rekord, ale nie wyliczono emisji. Powód: %(error)s") % {'error': e}
+            messages.warning(self.request, msg)
 
         if not is_new and hasattr(instance, "workflow_status"):
             if instance.workflow_status == WorkflowStatusMixin.RecordStatus.REJECTED:
@@ -446,14 +448,18 @@ class Scope1CreateMixin(LoginRequiredMixin, ReportLockMixin):
             ).first()
 
             if active_comment:
-                active_comment.text += f"\n\n[Wyjaśnienie użytkownika]: {user_reply}"
+                # To prawdopodobnie do logów/wewnętrznych komentarzy, więc można zostawić lub przetłumaczyć
+                user_explanation_prefix = _("[Wyjaśnienie użytkownika]:")
+                active_comment.text += f"\n\n{user_explanation_prefix} {user_reply}"
                 active_comment.is_resolved = True
                 active_comment.save()
 
-        action_text = "dodano wpis do" if is_new else "zaktualizowano wpis w"
-        messages.success(
-            self.request, f"Pomyślnie {action_text}: {self.model._meta.verbose_name}"
-        )
+        action_text = _("dodano wpis do") if is_new else _("zaktualizowano wpis w")
+        msg = _("Pomyślnie %(action)s: %(model)s") % {
+            'action': action_text,
+            'model': self.model._meta.verbose_name
+        }
+        messages.success(self.request, msg)
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -594,10 +600,8 @@ class Scope1DeleteMixin(LoginRequiredMixin, ReportLockMixin):
         )
 
     def delete(self, request, *args, **kwargs):
-        messages.success(
-            self.request,
-            f"Pomyślnie usunięto wpis z: {self.model._meta.verbose_name}",
-        )
+        msg = _("Pomyślnie usunięto wpis z: %(model)s") % {'model': self.model._meta.verbose_name}
+        messages.success(self.request, msg)
         return super().delete(request, *args, **kwargs)
 
 
@@ -829,7 +833,7 @@ class EmissionFactorCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         messages.success(
             self.request,
-            "Pomyślnie dodano nowy wskaźnik emisji. Możesz teraz przeliczyć brakujące rekordy!",
+            _("Pomyślnie dodano nowy wskaźnik emisji. Możesz teraz przeliczyć brakujące rekordy!"),
         )
         return super().form_valid(form)
 
@@ -841,7 +845,7 @@ class EmissionFactorUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("emissions:factor-list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Zaktualizowano wskaźnik emisji.")
+        messages.success(self.request, _("Zaktualizowano wskaźnik emisji."))
         return super().form_valid(form)
 
 
@@ -851,7 +855,7 @@ class EmissionFactorDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("emissions:factor-list")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Usunięto wskaźnik emisji z bazy.")
+        messages.success(self.request, _("Usunięto wskaźnik emisji z bazy."))
         return super().delete(request, *args, **kwargs)
 
 
@@ -861,7 +865,7 @@ class EnergyConsumptionTemplateDownloadView(View):
     def get(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Zużycie energii"
+        ws.title = _lazy("Zużycie energii")
 
         headers = [
             "year",
@@ -885,7 +889,7 @@ class EnergyConsumptionTemplateDownloadView(View):
 class EnergyConsumptionImportView(FormView):
     template_name = "emissions/energy_consumption_import.html"
     form_class = EnergyConsumptionImportForm
-    success_url = reverse_lazy("emissions:energy_consumption_list")  # było bez namespace — poprawione
+    success_url = reverse_lazy("emissions:energy_consumption_list")
 
     EXPECTED_HEADERS = [
         "year", "company", "energy_source", "energy_type", "amount", "unit", "source",
@@ -898,17 +902,17 @@ class EnergyConsumptionImportView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["model_verbose_name"] = "Zużycie energii"
+        context["model_verbose_name"] = _lazy("Zużycie energii")
         context["company"] = self.get_company()
         context["list_url"] = reverse_lazy("emissions:energy_consumption_list")
         context["import_url"] = reverse_lazy("emissions:energy_consumption_import")
         context["template_url"] = reverse_lazy("emissions:energy_consumption_template")
         context["importer_headers"] = self.EXPECTED_HEADERS
         context["instructions"] = [
-            "year — rok (liczba całkowita), np. 2024",
-            "company — dokładna nazwa firmy zapisana w systemie",
-            "energy_source / energy_type — źródło i typ energii",
-            "amount — ilość (liczba), unit — jednostka",
+            _("year – rok (liczba całkowita), np. 2024"),
+            _("company – dokładna nazwa firmy zapisana w systemie"),
+            _("energy_source / energy_type – źródło i typ energii"),
+            _("amount – ilość (liczba), unit – jednostka"),
         ]
         context["max_size_mb"] = 5
         context["max_rows"] = 1000
@@ -934,12 +938,13 @@ class EnergyConsumptionImportView(FormView):
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            msg = _("Błąd wczytywania pliku: %(error)s") % {'error': e}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
         if headers != self.EXPECTED_HEADERS:
-            messages.error(self.request, "Niepoprawna struktura pliku.")
+            messages.error(self.request, _("Niepoprawna struktura pliku."))
             return self.form_invalid(form)
 
         preview_rows = []
@@ -952,20 +957,21 @@ class EnergyConsumptionImportView(FormView):
             errors = []
 
             if not company_name:
-                errors.append("Brak nazwy firmy")
+                errors.append(_("Brak nazwy firmy"))
             elif not Companies.objects.filter(name=company_name).exists():
-                errors.append(f'Firma "{company_name}" nie znaleziona')
+                msg = _('Firma "%(company)s" nie znaleziona') % {'company': company_name}
+                errors.append(msg)
 
             if not year:
-                errors.append("Brak roku")
+                errors.append(_("Brak roku"))
 
             if amount in (None, ""):
-                errors.append("Brak ilości")
+                errors.append(_("Brak ilości"))
             else:
                 try:
                     float(amount)
                 except (TypeError, ValueError):
-                    errors.append("Nieprawidłowa ilość")
+                    errors.append(_("Nieprawidłowa ilość"))
 
             is_valid = not errors
             if is_valid:
@@ -1001,7 +1007,8 @@ class EnergyConsumptionImportView(FormView):
             try:
                 company = Companies.objects.get(name=company_name)
             except Companies.DoesNotExist:
-                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                msg = _('Firma "%(company)s" nie znaleziona!') % {'company': company_name}
+                messages.warning(request, msg)
                 continue
             exists = EnergyConsumption.objects.filter(
                 year=year, company=company, energy_source=energy_source, energy_type=energy_type,
@@ -1016,19 +1023,20 @@ class EnergyConsumptionImportView(FormView):
             try:
                 calculate_record_emissions(record)
             except ValidationError as e:
-                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+                msg = _("Rekord dodany, ale emisja nie obliczona: %(error)s") % {'error': e}
+                messages.warning(request, msg)
             record.save()
             imported += 1
 
         request.session.pop("import_data", None)
-        messages.success(
-            request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów."
-        )
+        msg = _("Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów.") % {
+            'imported': imported, 'duplicates': duplicates
+        }
+        messages.success(request, msg)
         return redirect(self.success_url)
 
 
 # ===== ENERGY PURCHASED IMPORT =====
-
 
 class EnergyPurchasedTemplateDownloadView(View):
     """Pobiera szablon XLSX dla zakupionej energii."""
@@ -1036,7 +1044,7 @@ class EnergyPurchasedTemplateDownloadView(View):
     def get(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Zakupiona energia"
+        ws.title = str(_lazy("Zakupiona energia"))
 
         headers = [
             "year",
@@ -1071,17 +1079,17 @@ class EnergyPurchasedImportView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["model_verbose_name"] = "Zakupiona energia"
+        context["model_verbose_name"] = _lazy("Zakupiona energia")
         context["company"] = self.get_company()
         context["list_url"] = reverse_lazy("emissions:energy_purchased_list")
         context["import_url"] = reverse_lazy("emissions:energy_purchased_import")
         context["template_url"] = reverse_lazy("emissions:energy_purchased_template")
         context["importer_headers"] = self.EXPECTED_HEADERS
         context["instructions"] = [
-            "year — rok (liczba całkowita), np. 2024",
-            "company — dokładna nazwa firmy zapisana w systemie",
-            "energy_type — typ energii, amount/unit — ilość i jednostka",
-            "trader — dostawca/pośrednik energii",
+            _("year – rok (liczba całkowita), np. 2024"),
+            _("company – dokładna nazwa firmy zapisana w systemie"),
+            _("energy_type – typ energii, amount/unit – ilość i jednostka"),
+            _("trader – dostawca/pośrednik energii"),
         ]
         context["max_size_mb"] = 5
         context["max_rows"] = 1000
@@ -1107,12 +1115,14 @@ class EnergyPurchasedImportView(FormView):
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            msg = _("Błąd wczytywania pliku: %(error)s") % {'error': e}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
         if headers != self.EXPECTED_HEADERS:
-            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
+            msg = _("Niepoprawna struktura pliku. Oczekiwane kolumny: %(headers)s") % {'headers': self.EXPECTED_HEADERS}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         preview_rows, raw_rows = [], []
@@ -1122,18 +1132,19 @@ class EnergyPurchasedImportView(FormView):
             year, company_name, energy_type, amount, unit, trader, source = row
             errors = []
             if not company_name:
-                errors.append("Brak nazwy firmy")
+                errors.append(_("Brak nazwy firmy"))
             elif not Companies.objects.filter(name=company_name).exists():
-                errors.append(f'Firma "{company_name}" nie znaleziona')
+                msg = _('Firma "%(company)s" nie znaleziona') % {'company': company_name}
+                errors.append(msg)
             if not year:
-                errors.append("Brak roku")
+                errors.append(_("Brak roku"))
             if amount in (None, ""):
-                errors.append("Brak ilości")
+                errors.append(_("Brak ilości"))
             else:
                 try:
                     float(amount)
                 except (TypeError, ValueError):
-                    errors.append("Nieprawidłowa ilość")
+                    errors.append(_("Nieprawidłowa ilość"))
 
             is_valid = not errors
             if is_valid:
@@ -1159,7 +1170,8 @@ class EnergyPurchasedImportView(FormView):
             try:
                 company = Companies.objects.get(name=company_name)
             except Companies.DoesNotExist:
-                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                msg = _('Firma "%(company)s" nie znaleziona!') % {'company': company_name}
+                messages.warning(request, msg)
                 continue
             if EnergyPurchased.objects.filter(year=year, company=company, energy_type=energy_type).exists():
                 duplicates += 1
@@ -1171,11 +1183,15 @@ class EnergyPurchasedImportView(FormView):
             try:
                 calculate_record_emissions(record)
             except ValidationError as e:
-                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+                msg = _("Rekord dodany, ale emisja nie obliczona: %(error)s") % {'error': e}
+                messages.warning(request, msg)
             record.save()
             imported += 1
         request.session.pop("import_data_purchased", None)
-        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        msg = _("Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów.") % {
+            'imported': imported, 'duplicates': duplicates
+        }
+        messages.success(request, msg)
         return redirect(self.success_url)
 
 # ===== ENERGY PRODUCED IMPORT =====
@@ -1187,7 +1203,7 @@ class EnergyProducedTemplateDownloadView(View):
     def get(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Wyprodukowana energia"
+        ws.title = str(_lazy("Wyprodukowana energia"))
 
         headers = [
             "year",
@@ -1222,17 +1238,17 @@ class EnergyProducedImportView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["model_verbose_name"] = "Wyprodukowana energia"
+        context["model_verbose_name"] = _lazy("Wyprodukowana energia")
         context["company"] = self.get_company()
         context["list_url"] = reverse_lazy("emissions:energy_produced_list")
         context["import_url"] = reverse_lazy("emissions:energy_produced_import")
         context["template_url"] = reverse_lazy("emissions:energy_produced_template")
         context["importer_headers"] = self.EXPECTED_HEADERS
         context["instructions"] = [
-            "year — rok (liczba całkowita), np. 2024",
-            "company — dokładna nazwa firmy zapisana w systemie",
-            "energy_type — typ energii, amount/unit — ilość i jednostka",
-            "installation — instalacja/źródło produkcji",
+            _("year – rok (liczba całkowita), np. 2024"),
+            _("company – dokładna nazwa firmy zapisana w systemie"),
+            _("energy_type – typ energii, amount/unit – ilość i jednostka"),
+            _("installation – instalacja/źródło produkcji"),
         ]
         context["max_size_mb"] = 5
         context["max_rows"] = 1000
@@ -1258,12 +1274,14 @@ class EnergyProducedImportView(FormView):
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            msg = _("Błąd wczytywania pliku: %(error)s") % {'error': e}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
         if headers != self.EXPECTED_HEADERS:
-            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
+            msg = _("Niepoprawna struktura pliku. Oczekiwane kolumny: %(headers)s") % {'headers': self.EXPECTED_HEADERS}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         preview_rows, raw_rows = [], []
@@ -1273,18 +1291,19 @@ class EnergyProducedImportView(FormView):
             year, company_name, energy_type, amount, unit, installation, source = row
             errors = []
             if not company_name:
-                errors.append("Brak nazwy firmy")
+                errors.append(_("Brak nazwy firmy"))
             elif not Companies.objects.filter(name=company_name).exists():
-                errors.append(f'Firma "{company_name}" nie znaleziona')
+                msg = _('Firma "%(company)s" nie znaleziona') % {'company': company_name}
+                errors.append(msg)
             if not year:
-                errors.append("Brak roku")
+                errors.append(_("Brak roku"))
             if amount in (None, ""):
-                errors.append("Brak ilości")
+                errors.append(_("Brak ilości"))
             else:
                 try:
                     float(amount)
                 except (TypeError, ValueError):
-                    errors.append("Nieprawidłowa ilość")
+                    errors.append(_("Nieprawidłowa ilość"))
 
             is_valid = not errors
             if is_valid:
@@ -1310,7 +1329,8 @@ class EnergyProducedImportView(FormView):
             try:
                 company = Companies.objects.get(name=company_name)
             except Companies.DoesNotExist:
-                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                msg = _('Firma "%(company)s" nie znaleziona!') % {'company': company_name}
+                messages.warning(request, msg)
                 continue
             if EnergyProduced.objects.filter(year=year, company=company, energy_type=energy_type).exists():
                 duplicates += 1
@@ -1322,11 +1342,15 @@ class EnergyProducedImportView(FormView):
             try:
                 calculate_record_emissions(record)
             except ValidationError as e:
-                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+                msg = _("Rekord dodany, ale emisja nie obliczona: %(error)s") % {'error': e}
+                messages.warning(request, msg)
             record.save()
             imported += 1
         request.session.pop("import_data_produced", None)
-        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        msg = _("Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów.") % {
+            'imported': imported, 'duplicates': duplicates
+        }
+        messages.success(request, msg)
         return redirect(self.success_url)
 
 
@@ -1339,7 +1363,7 @@ class EnergySoldTemplateDownloadView(View):
     def get(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Sprzedana energia"
+        ws.title = str(_lazy("Sprzedana energia"))
 
         headers = [
             "year",
@@ -1374,17 +1398,17 @@ class EnergySoldImportView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["model_verbose_name"] = "Sprzedana energia"
+        context["model_verbose_name"] = _lazy("Sprzedana energia")
         context["company"] = self.get_company()
         context["list_url"] = reverse_lazy("emissions:energy_sold_list")
         context["import_url"] = reverse_lazy("emissions:energy_sold_import")
         context["template_url"] = reverse_lazy("emissions:energy_sold_template")
         context["importer_headers"] = self.EXPECTED_HEADERS
         context["instructions"] = [
-            "year — rok (liczba całkowita), np. 2024",
-            "company — dokładna nazwa firmy zapisana w systemie",
-            "energy_type — typ energii, amount/unit — ilość i jednostka",
-            "customer — odbiorca/klient",
+            _("year – rok (liczba całkowita), np. 2024"),
+            _("company – dokładna nazwa firmy zapisana w systemie"),
+            _("energy_type – typ energii, amount/unit – ilość i jednostka"),
+            _("customer – odbiorca/klient"),
         ]
         context["max_size_mb"] = 5
         context["max_rows"] = 1000
@@ -1410,12 +1434,14 @@ class EnergySoldImportView(FormView):
             wb = openpyxl.load_workbook(file)
             ws = wb.active
         except Exception as e:
-            messages.error(self.request, f"Błąd wczytywania pliku: {e}")
+            msg = _("Błąd wczytywania pliku: %(error)s") % {'error': e}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
         if headers != self.EXPECTED_HEADERS:
-            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
+            msg = _("Niepoprawna struktura pliku. Oczekiwane kolumny: %(headers)s") % {'headers': self.EXPECTED_HEADERS}
+            messages.error(self.request, msg)
             return self.form_invalid(form)
 
         preview_rows, raw_rows = [], []
@@ -1425,18 +1451,19 @@ class EnergySoldImportView(FormView):
             year, company_name, energy_type, amount, unit, customer, source = row
             errors = []
             if not company_name:
-                errors.append("Brak nazwy firmy")
+                errors.append(_("Brak nazwy firmy"))
             elif not Companies.objects.filter(name=company_name).exists():
-                errors.append(f'Firma "{company_name}" nie znaleziona')
+                msg = _('Firma "%(company)s" nie znaleziona') % {'company': company_name}
+                errors.append(msg)
             if not year:
-                errors.append("Brak roku")
+                errors.append(_("Brak roku"))
             if amount in (None, ""):
-                errors.append("Brak ilości")
+                errors.append(_("Brak ilości"))
             else:
                 try:
                     float(amount)
                 except (TypeError, ValueError):
-                    errors.append("Nieprawidłowa ilość")
+                    errors.append(_("Nieprawidłowa ilość"))
 
             is_valid = not errors
             if is_valid:
@@ -1462,7 +1489,8 @@ class EnergySoldImportView(FormView):
             try:
                 company = Companies.objects.get(name=company_name)
             except Companies.DoesNotExist:
-                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                msg = _('Firma "%(company)s" nie znaleziona!') % {'company': company_name}
+                messages.warning(request, msg)
                 continue
             if EnergySold.objects.filter(year=year, company=company, energy_type=energy_type).exists():
                 duplicates += 1
@@ -1474,9 +1502,13 @@ class EnergySoldImportView(FormView):
             try:
                 calculate_record_emissions(record)
             except ValidationError as e:
-                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+                msg = _("Rekord dodany, ale emisja nie obliczona: %(error)s") % {'error': e}
+                messages.warning(request, msg)
             record.save()
             imported += 1
         request.session.pop("import_data_sold", None)
-        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        msg = _("Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów.") % {
+            'imported': imported, 'duplicates': duplicates
+        }
+        messages.success(request, msg)
         return redirect(self.success_url)

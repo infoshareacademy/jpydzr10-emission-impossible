@@ -1,7 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- DODANY IMPORT TŁUMACZEŃ (LAZY)
+)
+from django.views.generic import CreateView, ListView, TemplateView
 
 from .forms import FuelSpecForm, FuelTypeForm, SupplierForm
 from .models import FuelSpec, FuelType, Supplier
@@ -13,7 +16,7 @@ class FuelTypeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = (
         "calculator/fueltype_form.html"  # Ścieżkę dostosuj do swojej struktury
     )
-    success_message = "Typ paliwa '%(name)s' został pomyślnie dodany."
+    success_message = _("Typ paliwa '%(name)s' został pomyślnie dodany.")
     # Po udanym zapisie przekieruj (np. na listę paliw lub z powrotem do formularza)
     success_url = reverse_lazy("calculator:dashboard")
 
@@ -27,7 +30,7 @@ class SupplierCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Supplier
     form_class = SupplierForm
     template_name = "calculator/supplier_form.html"
-    success_message = "Dostawca '%(name)s' został pomyślnie dodany."
+    success_message = _("Dostawca '%(name)s' został pomyślnie dodany.")
     success_url = reverse_lazy("calculator:dashboard")
 
 
@@ -35,7 +38,7 @@ class FuelSpecCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = FuelSpec
     form_class = FuelSpecForm
     template_name = "calculator/fuelspec_form.html"
-    success_message = "Specyfikacja paliwa została pomyślnie dodana."
+    success_message = _("Specyfikacja paliwa została pomyślnie dodana.")
     success_url = reverse_lazy("calculator:dashboard")
 
 

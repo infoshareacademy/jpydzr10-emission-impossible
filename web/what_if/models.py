@@ -1,13 +1,16 @@
 from companies.models import Companies
 from django.db import models
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA MODELI
+)
 
 
 class ReductionGoal(models.Model):
 
     SCOPE_CHOICES = [
-        ("Scope 1", "Zakres 1 (Emisje bezpośrednie)"),
-        ("Scope 2", "Zakres 2 (Emisje pośrednie energetyczne)"),
-        ("1+2", "Zakres 1 + Zakres 2"),
+        ("Scope 1", _("Zakres 1 (Emisje bezpośrednie)")),
+        ("Scope 2", _("Zakres 2 (Emisje pośrednie energetyczne)")),
+        ("1+2", _("Zakres 1 + Zakres 2")),
     ]
     company = models.ForeignKey(
         Companies,
@@ -15,29 +18,30 @@ class ReductionGoal(models.Model):
         null=True,
         blank=True,
         related_name="dedicated_goals",
-        verbose_name="Dedykowana spółka (zostaw puste = cel globalny)",
-        help_text="Jeśli wybierzesz spółkę, cel będzie widoczny tylko dla niej.",
+        verbose_name=_("Dedykowana spółka (zostaw puste = cel globalny)"),
+        help_text=_("Jeśli wybierzesz spółkę, cel będzie widoczny tylko dla niej."),
     )
-    name = models.CharField(max_length=300, verbose_name="Nazwa celu")
-    base_year = models.PositiveIntegerField(verbose_name="Rok bazowy")
-    target_year = models.PositiveIntegerField(verbose_name="Rok docelowy")
+    name = models.CharField(max_length=300, verbose_name=_("Nazwa celu"))
+    base_year = models.PositiveIntegerField(verbose_name=_("Rok bazowy"))
+    target_year = models.PositiveIntegerField(verbose_name=_("Rok docelowy"))
     reduction_pct = models.DecimalField(
-        max_digits=5, decimal_places=2, verbose_name="Docelowa redukcja (%)"
+        max_digits=5, decimal_places=2, verbose_name=_("Docelowa redukcja (%)")
     )
     scope = models.CharField(
         max_length=10,
         choices=SCOPE_CHOICES,
         default="1+2",
-        verbose_name="Zakres (Scope)",
+        verbose_name=_("Zakres (Scope)"),
     )
 
     class Meta:
         db_table = "tbl_reduction_goals"
-        verbose_name = "Cel redukcji (Globalny)"
-        verbose_name_plural = "Cele redukcji (Globalne)"
+        verbose_name = _("Cel redukcji (Globalny)")
+        verbose_name_plural = _("Cele redukcji (Globalne)")
 
     def __str__(self) -> str:
-        prefix = f"[{self.company.name}] " if self.company_id else "[GLOBALNY] "
+        global_label = str(_("GLOBALNY"))
+        prefix = f"[{self.company.name}] " if self.company_id else f"[{global_label}] "
         return f"{prefix}{self.name} ({self.reduction_pct}%)"
 
 
@@ -47,19 +51,19 @@ class ReductionTarget(models.Model):
         Companies,
         on_delete=models.CASCADE,
         related_name="reduction_targets",
-        verbose_name="Firma",
+        verbose_name=_("Firma"),
     )
     goal = models.ForeignKey(
         ReductionGoal,
         on_delete=models.CASCADE,
         related_name="company_targets",
-        verbose_name="Przypisany cel",
+        verbose_name=_("Przypisany cel"),
     )
 
     class Meta:
         db_table = "tbl_reduction_targets"
-        verbose_name = "Przypisanie celu"
-        verbose_name_plural = "Przypisania celów"
+        verbose_name = _("Przypisanie celu")
+        verbose_name_plural = _("Przypisania celów")
         unique_together = ("company", "goal")
 
     def __str__(self) -> str:

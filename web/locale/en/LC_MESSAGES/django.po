@@ -1,0 +1,1795 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-09 00:57+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/admin.py:30
+msgid "Dodatkowe informacje"
+msgstr "Dodatkowe informacje"
+
+#: accounts/admin.py:44
+msgid "Brak"
+msgstr "Brak"
+
+#: accounts/admin.py:46
+msgid "Awatar"
+msgstr "Awatar"
+
+#: accounts/forms.py:11
+msgid "Potwierdź hasłem"
+msgstr "Potwierdź hasłem"
+
+#: accounts/forms.py:13
+msgid ""
+"Wprowadź swoje aktualne hasło, aby autoryzować całkowite usunięcie profilu."
+msgstr ""
+"Wprowadź swoje aktualne hasło, aby autoryzować całkowite usunięcie profilu."
+
+#: accounts/forms.py:24
+msgid "Podane hasło autoryzacyjne jest nieprawidłowe."
+msgstr "Podane hasło autoryzacyjne jest nieprawidłowe."
+
+#: accounts/forms.py:34
+msgid "Imię"
+msgstr "Imię"
+
+#: accounts/forms.py:35
+msgid "Nazwisko"
+msgstr "Nazwisko"
+
+#: accounts/forms.py:36 accounts/models.py:11 companies/models.py:83
+msgid "Adres e-mail"
+msgstr "Adres e-mail"
+
+#: accounts/forms.py:37 companies/models.py:79
+msgid "Numer telefonu"
+msgstr "Numer telefonu"
+
+#: accounts/forms.py:38 accounts/models.py:15
+msgid "Zdjęcie profilowe"
+msgstr "Zdjęcie profilowe"
+
+#: accounts/forms.py:44
+msgid "Wymagany poprawny format adresu do powiadomień systemowych."
+msgstr "Wymagany poprawny format adresu do powiadomień systemowych."
+
+#: accounts/forms.py:50
+msgid "Adres e-mail nie może być pusty."
+msgstr "Adres e-mail nie może być pusty."
+
+#: accounts/models.py:18
+msgid "Administrator"
+msgstr "Administrator"
+
+#: accounts/models.py:19 accounts/models.py:34 accounts/models.py:46
+#: accounts/models.py:74 ai_services/models.py:24 ai_services/models.py:57
+#: audit/admin.py:35 core/models.py:36 core/models.py:61
+#: theme/templates/base.html:75
+msgid "Użytkownik"
+msgstr "Użytkownik"
+
+#: accounts/models.py:20
+msgid "Audytor"
+msgstr "Audytor"
+
+#: accounts/models.py:23 ai_services/models.py:67
+msgid "Rola"
+msgstr "Rola"
+
+#: accounts/models.py:30
+msgid "Firmy"
+msgstr "Firmy"
+
+#: accounts/models.py:35 theme/templates/base.html:154
+#: theme/templates/base.html:198
+msgid "Użytkownicy"
+msgstr "Użytkownicy"
+
+#: accounts/models.py:52 emissions/forms.py:62 emissions/forms.py:121
+#: emissions/forms.py:167 emissions/forms.py:213 emissions/models.py:17
+#: emissions/models.py:265 what_if/models.py:54 workflow/models.py:34
+#: workflow/models.py:121
+msgid "Firma"
+msgstr "Firma"
+
+#: accounts/models.py:54
+msgid "Może zapisywać?"
+msgstr "Może zapisywać?"
+
+#: accounts/models.py:55
+msgid "Może przeglądać?"
+msgstr "Może przeglądać?"
+
+#: accounts/models.py:58
+msgid "Uprawnienie do firmy"
+msgstr "Uprawnienie do firmy"
+
+#: accounts/models.py:59
+msgid "Uprawnienia do firm"
+msgstr "Uprawnienia do firm"
+
+#: accounts/models.py:78
+msgid "Zaszyfrowany sekret TOTP"
+msgstr "Zaszyfrowany sekret TOTP"
+
+#: accounts/models.py:82
+msgid "Aktywne 2FA"
+msgstr "Aktywne 2FA"
+
+#: accounts/models.py:87
+msgid "Nazwa urządzenia"
+msgstr "Nazwa urządzenia"
+
+#: accounts/models.py:92
+msgid "Potwierdzone"
+msgstr "Potwierdzone"
+
+#: accounts/models.py:97
+msgid "Ostatnio użyte"
+msgstr "Ostatnio użyte"
+
+#: accounts/models.py:101
+msgid "Urządzenie TOTP"
+msgstr "Urządzenie TOTP"
+
+#: accounts/models.py:102
+msgid "Urządzenia TOTP"
+msgstr "Urządzenia TOTP"
+
+#: ai_services/SLM_conf.py:39 what_if/models.py:11 what_if/views.py:232
+msgid "Zakres 1 (Emisje bezpośrednie)"
+msgstr "Zakres 1 (Emisje bezpośrednie)"
+
+#: ai_services/SLM_conf.py:40
+msgid "Zakres 2 (Emisje pośrednie wynikające z energii)"
+msgstr "Zakres 2 (Emisje pośrednie wynikające z energii)"
+
+#: ai_services/SLM_conf.py:41
+msgid "Pełny Ślad Węglowy (Carbon Footprint - Wszystkie zakresy)"
+msgstr "Pełny Ślad Węglowy (Carbon Footprint - Wszystkie zakresy)"
+
+#: ai_services/SLM_conf.py:125
+msgid "Nieznany"
+msgstr "Nieznany"
+
+#: ai_services/SLM_conf.py:203
+msgid ""
+"Wystąpił błąd komunikacji. Silnik AI (Bielik) jest niedostępny lub "
+"przeciążony."
+msgstr ""
+"Wystąpił błąd komunikacji. Silnik AI (Bielik) jest niedostępny lub "
+"przeciążony."
+
+#: ai_services/consumers.py:35 ai_services/views.py:55
+msgid "Błąd dekodowania danych żądania."
+msgstr "Błąd dekodowania danych żądania."
+
+#: ai_services/consumers.py:39 ai_services/views.py:60
+msgid "Zapytanie musi mieć od 1 do 500 znaków."
+msgstr "Zapytanie musi mieć od 1 do 500 znaków."
+
+#: ai_services/consumers.py:43 ai_services/views.py:65
+msgid "Wybierz podmiot z listy przed wysłaniem wiadomości."
+msgstr "Wybierz podmiot z listy przed wysłaniem wiadomości."
+
+#: ai_services/consumers.py:48 ai_services/views.py:95
+msgid "Brak uprawnień lub spółka nie istnieje."
+msgstr "Brak uprawnień lub spółka nie istnieje."
+
+#: ai_services/models.py:15
+msgid "Cały Ślad Węglowy"
+msgstr "Cały Ślad Węglowy"
+
+#: ai_services/models.py:16 templates/home.html:99 templates/home.html:361
+msgid "Zakres 1"
+msgstr "Zakres 1"
+
+#: ai_services/models.py:17 templates/home.html:116 templates/home.html:370
+msgid "Zakres 2"
+msgstr "Zakres 2"
+
+#: ai_services/models.py:30
+msgid "Analizowana Spółka"
+msgstr "Analizowana Spółka"
+
+#: ai_services/models.py:36
+msgid "Zakres merytoryczny"
+msgstr "Zakres merytoryczny"
+
+#: ai_services/models.py:38
+msgid "Sesja aktywna"
+msgstr "Sesja aktywna"
+
+#: ai_services/models.py:39 ai_services/models.py:69 core/models.py:9
+#: workflow/models.py:101
+msgid "Data utworzenia"
+msgstr "Data utworzenia"
+
+#: ai_services/models.py:43
+msgid "Sesja Czatu AI"
+msgstr "Sesja Czatu AI"
+
+#: ai_services/models.py:44
+msgid "Sesje Czatu AI"
+msgstr "Sesje Czatu AI"
+
+#: ai_services/models.py:58
+msgid "Asystent AI"
+msgstr "Asystent AI"
+
+#: ai_services/models.py:59
+msgid "System / Kontekst"
+msgstr "System / Kontekst"
+
+#: ai_services/models.py:65
+msgid "Sesja"
+msgstr "Sesja"
+
+#: ai_services/models.py:68 communications/forms.py:17
+#: communications/models.py:64
+msgid "Treść wiadomości"
+msgstr "Treść wiadomości"
+
+#: ai_services/models.py:73
+msgid "Wiadomość AI"
+msgstr "Wiadomość AI"
+
+#: ai_services/models.py:74
+msgid "Wiadomości AI"
+msgstr "Wiadomości AI"
+
+#: ai_services/views.py:45
+msgid "Za dużo zapytań. Spróbuj za minutę."
+msgstr "Za dużo zapytań. Spróbuj za minutę."
+
+#: ai_services/views.py:72
+msgid "Wybierz konkretną spółkę z listy przed wysłaniem wiadomości."
+msgstr "Wybierz konkretną spółkę z listy przed wysłaniem wiadomości."
+
+#: audit/models.py:18
+msgid "Log zmian"
+msgstr "Log zmian"
+
+#: audit/models.py:19
+msgid "Logi zmian"
+msgstr "Logi zmian"
+
+#: audit/views.py:61
+#, python-format
+msgid "ID: %(user_id)s (Usunięty)"
+msgstr "ID: %(user_id)s (Usunięty)"
+
+#: audit/views.py:64
+msgid "System/Brak"
+msgstr "System/Brak"
+
+#: calculator/admin.py:44
+msgid "Informacje podstawowe"
+msgstr "Informacje podstawowe"
+
+#: calculator/admin.py:47
+msgid ""
+"Wybierz typ paliwa i dostawcę. Pozostaw dostawcę puste dla specyfikacji "
+"domyślnej."
+msgstr ""
+"Wybierz typ paliwa i dostawcę. Pozostaw dostawcę puste dla specyfikacji "
+"domyślnej."
+
+#: calculator/admin.py:51
+msgid "Parametry fizykochemiczne"
+msgstr "Parametry fizykochemiczne"
+
+#: calculator/calculation.py:38
+#, python-format
+msgid "Nieobsługiwany model dla kalkulatora: %(model)s"
+msgstr "Nieobsługiwany model dla kalkulatora: %(model)s"
+
+#: calculator/calculation.py:101
+#, python-format
+msgid "Błąd konwersji jednostek dla '%(lookup)s': %(error)s"
+msgstr "Błąd konwersji jednostek dla '%(lookup)s': %(error)s"
+
+#: calculator/forms.py:22
+msgid "Ciekłe (Liquid)"
+msgstr "Ciekłe (Liquid)"
+
+#: calculator/forms.py:23
+msgid "Gazowe (Gas)"
+msgstr "Gazowe (Gas)"
+
+#: calculator/forms.py:24
+msgid "Stałe (Solid)"
+msgstr "Stałe (Solid)"
+
+#: calculator/forms.py:29
+msgid "Kategoria paliwa"
+msgstr "Kategoria paliwa"
+
+#: calculator/forms.py:36
+msgid "Nazwa paliwa"
+msgstr "Nazwa paliwa"
+
+#: calculator/forms.py:36
+msgid "Symbol / Kod"
+msgstr "Symbol / Kod"
+
+#: calculator/forms.py:39
+msgid "np. Olej napędowy"
+msgstr "np. Olej napędowy"
+
+#: calculator/forms.py:42
+msgid "np. ON_DIESEL"
+msgstr "np. ON_DIESEL"
+
+#: calculator/forms.py:51 calculator/models.py:22
+msgid "Nazwa dostawcy"
+msgstr "Nazwa dostawcy"
+
+#: calculator/forms.py:54
+msgid "np. PKN ORLEN S.A."
+msgstr "np. PKN ORLEN S.A."
+
+#: calculator/forms.py:71 calculator/models.py:14 calculator/models.py:38
+msgid "Typ paliwa"
+msgstr "Typ paliwa"
+
+#: calculator/forms.py:72
+msgid "Dostawca (opcjonalnie)"
+msgstr "Dostawca (opcjonalnie)"
+
+#: calculator/forms.py:73 calculator/models.py:50
+msgid "Gęstość (kg/m³)"
+msgstr "Gęstość (kg/m³)"
+
+#: calculator/forms.py:74 calculator/models.py:51
+msgid "Wartość opałowa (MJ/kg)"
+msgstr "Wartość opałowa (MJ/kg)"
+
+#: calculator/forms.py:75 calculator/models.py:52
+msgid "Wartość opałowa (MJ/m³)"
+msgstr "Wartość opałowa (MJ/m³)"
+
+#: calculator/forms.py:76
+msgid "Ustaw jako specyfikację domyślną"
+msgstr "Ustaw jako specyfikację domyślną"
+
+#: calculator/models.py:9
+msgid "Nazwa typu paliwa"
+msgstr "Nazwa typu paliwa"
+
+#: calculator/models.py:10
+msgid "Symbol"
+msgstr "Symbol"
+
+#: calculator/models.py:11 communications/models.py:30
+msgid "Kategoria"
+msgstr "Kategoria"
+
+#: calculator/models.py:15
+msgid "Typy paliw"
+msgstr "Typy paliw"
+
+#: calculator/models.py:25 calculator/models.py:47 emissions/forms.py:125
+#: emissions/models.py:160
+msgid "Dostawca"
+msgstr "Dostawca"
+
+#: calculator/models.py:26
+msgid "Dostawcy"
+msgstr "Dostawcy"
+
+#: calculator/models.py:54
+msgid "Domyślny"
+msgstr "Domyślny"
+
+#: calculator/models.py:57
+msgid "Specyfikacja paliwa"
+msgstr "Specyfikacja paliwa"
+
+#: calculator/models.py:58
+msgid "Specyfikacje paliw"
+msgstr "Specyfikacje paliw"
+
+#: calculator/models.py:71
+msgid "DOMYŚLNY"
+msgstr "DOMYŚLNY"
+
+#: calculator/views.py:19
+#, python-format
+msgid "Typ paliwa '%(name)s' został pomyślnie dodany."
+msgstr "Typ paliwa '%(name)s' został pomyślnie dodany."
+
+#: calculator/views.py:33
+#, python-format
+msgid "Dostawca '%(name)s' został pomyślnie dodany."
+msgstr "Dostawca '%(name)s' został pomyślnie dodany."
+
+#: calculator/views.py:41
+msgid "Specyfikacja paliwa została pomyślnie dodana."
+msgstr "Specyfikacja paliwa została pomyślnie dodana."
+
+#: communications/forms.py:64
+msgid "Napisz odpowiedź..."
+msgstr "Napisz odpowiedź..."
+
+#: communications/models.py:12
+msgid "Otwarte"
+msgstr "Otwarte"
+
+#: communications/models.py:13
+msgid "Rozwiązane"
+msgstr "Rozwiązane"
+
+#: communications/models.py:17
+msgid "Weryfikacja danych"
+msgstr "Weryfikacja danych"
+
+#: communications/models.py:18
+msgid "Korekta danych"
+msgstr "Korekta danych"
+
+#: communications/models.py:19
+msgid "Brakujące dane"
+msgstr "Brakujące dane"
+
+#: communications/models.py:20
+msgid "Wyjaśnienie odchylenia"
+msgstr "Wyjaśnienie odchylenia"
+
+#: communications/models.py:21
+msgid "Dane źródłowe"
+msgstr "Dane źródłowe"
+
+#: communications/models.py:22
+msgid "Własna wiadomość"
+msgstr "Własna wiadomość"
+
+#: communications/models.py:25 emissions/models.py:269
+msgid "Temat"
+msgstr "Temat"
+
+#: communications/models.py:36 companies/models.py:114
+msgid "Spółka"
+msgstr "Spółka"
+
+#: communications/models.py:42 workflow/models.py:96
+msgid "Autor"
+msgstr "Autor"
+
+#: communications/models.py:45 workflow/models.py:36
+msgid "Status"
+msgstr "Status"
+
+#: communications/models.py:49
+msgid "Wątek komunikacyjny"
+msgstr "Wątek komunikacyjny"
+
+#: communications/models.py:50
+msgid "Wątki komunikacyjne"
+msgstr "Wątki komunikacyjne"
+
+#: communications/models.py:59
+msgid "Wątek"
+msgstr "Wątek"
+
+#: communications/models.py:62 emissions/models.py:263
+msgid "Nadawca"
+msgstr "Nadawca"
+
+#: communications/models.py:67
+msgid "Wiadomość"
+msgstr "Wiadomość"
+
+#: communications/models.py:68
+msgid "Wiadomości"
+msgstr "Wiadomości"
+
+#: communications/send_mail.py:32
+msgid "Nowe zgłoszenie"
+msgstr "Nowe zgłoszenie"
+
+#: communications/send_mail.py:32
+msgid "Nowa odpowiedź"
+msgstr "Nowa odpowiedź"
+
+#: communications/views.py:103
+msgid "Nie można dodawać wiadomości do zamkniętego wątku."
+msgstr "Nie można dodawać wiadomości do zamkniętego wątku."
+
+#: communications/views.py:115
+msgid "Odpowiedź została wysłana."
+msgstr "Odpowiedź została wysłana."
+
+#: communications/views.py:143
+msgid "Zgłoszenie zostało pomyślnie utworzone."
+msgstr "Zgłoszenie zostało pomyślnie utworzone."
+
+#: communications/views.py:158
+msgid "Wątek został pomyślnie zamknięty."
+msgstr "Wątek został pomyślnie zamknięty."
+
+#: communications/views.py:160
+msgid "Nie masz uprawnień do zamknięcia tego wątku."
+msgstr "Nie masz uprawnień do zamknięcia tego wątku."
+
+#: companies/forms.py:31
+msgid "Numer KRS musi składać się z dokładnie 10 cyfr."
+msgstr "Numer KRS musi składać się z dokładnie 10 cyfr."
+
+#: companies/forms.py:41
+msgid ""
+"Numer telefonu może zawierać tylko cyfry, spacje, myślniki oraz znak '+'."
+msgstr ""
+"Numer telefonu może zawierać tylko cyfry, spacje, myślniki oraz znak '+'."
+
+#: companies/forms.py:45
+msgid "Numer telefonu jest za krótki."
+msgstr "Numer telefonu jest za krótki."
+
+#: companies/models.py:14
+msgid "Nazwa grupy kapitałowej"
+msgstr "Nazwa grupy kapitałowej"
+
+#: companies/models.py:16
+msgid "Poziom w strukturze"
+msgstr "Poziom w strukturze"
+
+#: companies/models.py:19 companies/models.py:104
+msgid "Grupa kapitałowa"
+msgstr "Grupa kapitałowa"
+
+#: companies/models.py:20
+msgid "Grupy kapitałowe"
+msgstr "Grupy kapitałowe"
+
+#: companies/models.py:31
+msgid "Nazwa kraju"
+msgstr "Nazwa kraju"
+
+#: companies/models.py:37
+msgid "Kod Alfa-2"
+msgstr "Kod Alfa-2"
+
+#: companies/models.py:41 companies/models.py:60 emissions/models.py:248
+msgid "Kraj"
+msgstr "Kraj"
+
+#: companies/models.py:42
+msgid "Kraje"
+msgstr "Kraje"
+
+#: companies/models.py:53
+msgid "Nazwa firmy"
+msgstr "Nazwa firmy"
+
+#: companies/models.py:64
+msgid "Miasto"
+msgstr "Miasto"
+
+#: companies/models.py:69
+msgid "Ulica"
+msgstr "Ulica"
+
+#: companies/models.py:74
+msgid "Kod pocztowy"
+msgstr "Kod pocztowy"
+
+#: companies/models.py:87
+msgid "Numer KRS"
+msgstr "Numer KRS"
+
+#: companies/models.py:91
+msgid "Numer REGON"
+msgstr "Numer REGON"
+
+#: companies/models.py:96
+msgid "NIP"
+msgstr "NIP"
+
+#: companies/models.py:108
+msgid "Czy spółka aktywna"
+msgstr "Czy spółka aktywna"
+
+#: companies/models.py:109
+msgid ""
+"Jeśli odznaczone, spółka nie będzie uwzględniana w procesach raportowania."
+msgstr ""
+"Jeśli odznaczone, spółka nie będzie uwzględniana w procesach raportowania."
+
+#: companies/models.py:115
+msgid "Spółki"
+msgstr "Spółki"
+
+#: companies/views.py:60
+msgid "Lista Firm"
+msgstr "Lista Firm"
+
+#: companies/views.py:169
+msgid "Pomyślnie dodano nową spółkę."
+msgstr "Pomyślnie dodano nową spółkę."
+
+#: companies/views.py:183
+msgid "Zmiany zostały zapisane."
+msgstr "Zmiany zostały zapisane."
+
+#: config/settings.py:156
+msgid "Polish"
+msgstr "Polski"
+
+#: config/settings.py:157
+msgid "English"
+msgstr "Angielski"
+
+#: core/models.py:16
+msgid "Utworzył(-a)"
+msgstr "Utworzył(-a)"
+
+#: core/models.py:18
+msgid "Data aktualizacji"
+msgstr "Data aktualizacji"
+
+#: core/models.py:25
+msgid "Zaktualizował(-a)"
+msgstr "Zaktualizował(-a)"
+
+#: core/models.py:27
+msgid "Notatka"
+msgstr "Notatka"
+
+#: core/models.py:38
+msgid "Nazwa widoku"
+msgstr "Nazwa widoku"
+
+#: core/models.py:39
+msgid "Ścieżka URL"
+msgstr "Ścieżka URL"
+
+#: core/models.py:40
+msgid "Liczba odwiedzin"
+msgstr "Liczba odwiedzin"
+
+#: core/models.py:41
+msgid "Ostatnio odwiedzone"
+msgstr "Ostatnio odwiedzone"
+
+#: core/models.py:45
+msgid "Wyświetlenie strony użytkownika"
+msgstr "Wyświetlenie strony użytkownika"
+
+#: core/models.py:46
+msgid "Wyświetlenia stron użytkowników"
+msgstr "Wyświetlenia stron użytkowników"
+
+#: core/models.py:65
+msgid "Całkowita emisja (kg CO2eq)"
+msgstr "Całkowita emisja (kg CO2eq)"
+
+#: core/models.py:69
+msgid "Całkowita liczba zapytań"
+msgstr "Całkowita liczba zapytań"
+
+#: core/models.py:73
+msgid "Ostatnia aktualizacja"
+msgstr "Ostatnia aktualizacja"
+
+#: core/models.py:77
+msgid "Ślad węglowy użytkownika"
+msgstr "Ślad węglowy użytkownika"
+
+#: core/models.py:78
+msgid "Ślady węglowe użytkowników"
+msgstr "Ślady węglowe użytkowników"
+
+#: core/models.py:81
+msgid "zapytań"
+msgstr "zapytań"
+
+#: emissions/forms.py:19
+msgid "Energia elektryczna z OZE"
+msgstr "Energia elektryczna z OZE"
+
+#: emissions/forms.py:20
+msgid "Energia elektryczna nie OZE"
+msgstr "Energia elektryczna nie OZE"
+
+#: emissions/forms.py:21
+msgid "Ciepło z OZE"
+msgstr "Ciepło z OZE"
+
+#: emissions/forms.py:22
+msgid "Ciepło nie OZE"
+msgstr "Ciepło nie OZE"
+
+#: emissions/forms.py:23
+msgid "Chłód z OZE"
+msgstr "Chłód z OZE"
+
+#: emissions/forms.py:24
+msgid "Chłód nie OZE"
+msgstr "Chłód nie OZE"
+
+#: emissions/forms.py:25
+msgid "Para Techniczna z OZE"
+msgstr "Para Techniczna z OZE"
+
+#: emissions/forms.py:26
+msgid "Para Techniczna nie OZE"
+msgstr "Para Techniczna nie OZE"
+
+#: emissions/forms.py:30
+msgid "Zakupiona"
+msgstr "Zakupiona"
+
+#: emissions/forms.py:31
+msgid "Wyprodukowana"
+msgstr "Wyprodukowana"
+
+#: emissions/forms.py:32
+msgid "Sprzedana"
+msgstr "Sprzedana"
+
+#: emissions/forms.py:33
+msgid "Zużyta"
+msgstr "Zużyta"
+
+#: emissions/forms.py:45 emissions/forms.py:64 emissions/forms.py:105
+#: emissions/forms.py:122 emissions/forms.py:151 emissions/forms.py:168
+#: emissions/forms.py:197 emissions/forms.py:214 emissions/models.py:136
+#: emissions/models.py:159 emissions/models.py:188 emissions/models.py:215
+msgid "Typ energii"
+msgstr "Typ energii"
+
+#: emissions/forms.py:46 emissions/forms.py:63 emissions/models.py:135
+msgid "Źródło energii"
+msgstr "Źródło energii"
+
+#: emissions/forms.py:47 emissions/forms.py:66 emissions/forms.py:106
+#: emissions/forms.py:124 emissions/forms.py:152 emissions/forms.py:170
+#: emissions/forms.py:198 emissions/forms.py:216 emissions/models.py:27
+msgid "Jednostka"
+msgstr "Jednostka"
+
+#: emissions/forms.py:61 emissions/forms.py:120 emissions/forms.py:166
+#: emissions/forms.py:212 emissions/models.py:15 emissions/models.py:250
+#: emissions/models.py:271
+msgid "Rok"
+msgstr "Rok"
+
+#: emissions/forms.py:65 emissions/forms.py:123 emissions/forms.py:169
+#: emissions/forms.py:215 emissions/models.py:26
+msgid "Ilość"
+msgstr "Ilość"
+
+#: emissions/forms.py:67 emissions/forms.py:126 emissions/forms.py:172
+#: emissions/forms.py:218 emissions/models.py:28 emissions/models.py:253
+msgid "Źródło danych"
+msgstr "Źródło danych"
+
+#: emissions/forms.py:77 emissions/forms.py:136 emissions/forms.py:182
+#: emissions/forms.py:232
+#, python-format
+msgid "Rok musi być między 2010 a %(current_year)s."
+msgstr "Rok musi być między 2010 a %(current_year)s."
+
+#: emissions/forms.py:87 emissions/forms.py:146 emissions/forms.py:192
+msgid "Ilość musi być większa od zera."
+msgstr "Ilość musi być większa od zera."
+
+#: emissions/forms.py:96
+msgid "Źródło energii jest wymagane."
+msgstr "Źródło energii jest wymagane."
+
+#: emissions/forms.py:98
+msgid "Typ energii jest wymagany."
+msgstr "Typ energii jest wymagany."
+
+#: emissions/forms.py:100
+msgid "Źródło danych jest wymagane."
+msgstr "Źródło danych jest wymagane."
+
+#: emissions/forms.py:171 emissions/models.py:84 emissions/models.py:124
+#: emissions/models.py:187
+msgid "Instalacja"
+msgstr "Instalacja"
+
+#: emissions/forms.py:217 emissions/models.py:216
+msgid "Odbiorca"
+msgstr "Odbiorca"
+
+#: emissions/forms.py:295
+msgid "Wprowadź"
+msgstr "Wprowadź"
+
+#: emissions/forms.py:346 emissions/forms.py:365 emissions/forms.py:384
+#: emissions/forms.py:403
+msgid "Wybierz plik XLSX"
+msgstr "Wybierz plik XLSX"
+
+#: emissions/forms.py:347 emissions/forms.py:366 emissions/forms.py:385
+#: emissions/forms.py:404
+msgid "Maksymalny rozmiar: 5MB"
+msgstr "Maksymalny rozmiar: 5MB"
+
+#: emissions/forms.py:355 emissions/forms.py:374 emissions/forms.py:393
+#: emissions/forms.py:412
+msgid "Obsługiwany jest tylko format .xlsx"
+msgstr "Obsługiwany jest tylko format .xlsx"
+
+#: emissions/forms.py:357 emissions/forms.py:376 emissions/forms.py:395
+#: emissions/forms.py:414
+msgid "Plik jest za duży (max 5MB)"
+msgstr "Plik jest za duży (max 5MB)"
+
+#: emissions/importers.py:88
+msgid "Plik jest całkowicie pusty."
+msgstr "Plik jest całkowicie pusty."
+
+#: emissions/importers.py:109
+msgid "Plik nie zawiera żadnych danych (poza wierszem nagłówkowym)."
+msgstr "Plik nie zawiera żadnych danych (poza wierszem nagłówkowym)."
+
+#: emissions/importers.py:218
+#, python-format
+msgid "Rok '%(value)s' nie jest poprawną liczbą całkowitą."
+msgstr "Rok '%(value)s' nie jest poprawną liczbą całkowitą."
+
+#: emissions/importers.py:221
+#, python-format
+msgid "Rok %(year)s jest poza dozwolonym zakresem (2010–2035)."
+msgstr "Rok %(year)s jest poza dozwolonym zakresem (2010–2035)."
+
+#: emissions/importers.py:228
+msgid "Brak wartości ilości."
+msgstr "Brak wartości ilości."
+
+#: emissions/importers.py:234
+#, python-format
+msgid "Nieprawidłowa wartość ilości: '%(value)s'."
+msgstr "Nieprawidłowa wartość ilości: '%(value)s'."
+
+#: emissions/importers.py:237
+#, python-format
+msgid "Ilość musi być większa od zera (podano: %(value)s)."
+msgstr "Ilość musi być większa od zera (podano: %(value)s)."
+
+#: emissions/importers.py:244
+#, python-format
+msgid "Brak jednostki. Dozwolone: %(allowed)s."
+msgstr "Brak jednostki. Dozwolone: %(allowed)s."
+
+#: emissions/importers.py:249
+#, python-format
+msgid "Jednostka '%(v)s' jest niedozwolona. Dozwolone wartości: %(allowed)s."
+msgstr "Jednostka '%(v)s' jest niedozwolona. Dozwolone wartości: %(allowed)s."
+
+#: emissions/importers.py:267
+#, python-format
+msgid "Pole '%(label)s' jest wymagane."
+msgstr "Pole '%(label)s' jest wymagane."
+
+#: emissions/importers.py:272
+#, python-format
+msgid "Pole '%(label)s' jest za długie (%(len)d znaków, max: %(max_len)d)."
+msgstr "Pole '%(label)s' jest za długie (%(len)d znaków, max: %(max_len)d)."
+
+#: emissions/importers.py:283
+msgid "Brak nazwy paliwa."
+msgstr "Brak nazwy paliwa."
+
+#: emissions/importers.py:299
+#, python-format
+msgid "Nieznane paliwo: '%(name)s'. Sprawdź dostępne paliwa w słowniku."
+msgstr "Nieznane paliwo: '%(name)s'. Sprawdź dostępne paliwa w słowniku."
+
+#: emissions/importers.py:322 emissions/importers.py:371
+#: emissions/importers.py:421 emissions/importers.py:471
+msgid "Rok: 2010–2035"
+msgstr "Rok: 2010–2035"
+
+#: emissions/importers.py:323
+msgid ""
+"Paliwo: nazwa z bazy (np. Gaz ziemny, Węgiel kamienny, Olej napędowy (ON))"
+msgstr ""
+"Paliwo: nazwa z bazy (np. Gaz ziemny, Węgiel kamienny, Olej napędowy (ON))"
+
+#: emissions/importers.py:334 emissions/importers.py:483
+msgid "instalacja"
+msgstr "instalacja"
+
+#: emissions/importers.py:337 emissions/importers.py:387
+#: emissions/importers.py:437 emissions/importers.py:487
+msgid "źródło"
+msgstr "źródło"
+
+#: emissions/importers.py:372
+msgid "Pojazd: dowolny opis identyfikujący pojazd/flotę"
+msgstr "Pojazd: dowolny opis identyfikujący pojazd/flotę"
+
+#: emissions/importers.py:373
+msgid "Paliwo: nazwa z bazy (np. Olej napędowy (ON), Benzyna (Pb95), LPG)"
+msgstr "Paliwo: nazwa z bazy (np. Olej napędowy (ON), Benzyna (Pb95), LPG)"
+
+#: emissions/importers.py:383
+msgid "pojazd"
+msgstr "pojazd"
+
+#: emissions/importers.py:422
+msgid "Proces: nazwa procesu technologicznego"
+msgstr "Proces: nazwa procesu technologicznego"
+
+#: emissions/importers.py:423
+msgid "Produkt: nazwa produktu/substratu emitującego GHG"
+msgstr "Produkt: nazwa produktu/substratu emitującego GHG"
+
+#: emissions/importers.py:433
+msgid "proces"
+msgstr "proces"
+
+#: emissions/importers.py:434
+msgid "produkt"
+msgstr "produkt"
+
+#: emissions/importers.py:472
+msgid "Instalacja: opis urządzenia/instalacji (klimatyzator, chłodnia itp.)"
+msgstr "Instalacja: opis urządzenia/instalacji (klimatyzator, chłodnia itp.)"
+
+#: emissions/importers.py:473
+msgid "Czynnik: nazwa czynnika chłodniczego/gazu (np. R410A, R134a, SF6)"
+msgstr "Czynnik: nazwa czynnika chłodniczego/gazu (np. R410A, R134a, SF6)"
+
+#: emissions/importers.py:484
+msgid "czynnik"
+msgstr "czynnik"
+
+#: emissions/models.py:19
+msgid "Jakość danych"
+msgstr "Jakość danych"
+
+#: emissions/models.py:34
+msgid "Emisja zadeklarowana"
+msgstr "Emisja zadeklarowana"
+
+#: emissions/models.py:42
+msgid "Emisja (Wyliczona przez system)"
+msgstr "Emisja (Wyliczona przez system)"
+
+#: emissions/models.py:50
+msgid "Użyty wskaźnik (Wartość)"
+msgstr "Użyty wskaźnik (Wartość)"
+
+#: emissions/models.py:56
+msgid "Użyty wskaźnik (Jednostka)"
+msgstr "Użyty wskaźnik (Jednostka)"
+
+#: emissions/models.py:63
+msgid "Użyty przelicznik jednostek (Wartość)"
+msgstr "Użyty przelicznik jednostek (Wartość)"
+
+#: emissions/models.py:70
+msgid "Użyty przelicznik jednostek (Jednostka)"
+msgstr "Użyty przelicznik jednostek (Jednostka)"
+
+#: emissions/models.py:82 emissions/models.py:102
+msgid "Paliwo"
+msgstr "Paliwo"
+
+#: emissions/models.py:85 emissions/models.py:104 emissions/models.py:115
+#: emissions/models.py:126
+msgid "Raport"
+msgstr "Raport"
+
+#: emissions/models.py:92 emissions/models.py:93
+msgid "Spalanie stacjonarne"
+msgstr "Spalanie stacjonarne"
+
+#: emissions/models.py:97
+msgid "Pojazd"
+msgstr "Pojazd"
+
+#: emissions/models.py:108 emissions/models.py:109
+msgid "Spalanie mobilne"
+msgstr "Spalanie mobilne"
+
+#: emissions/models.py:113
+msgid "Proces"
+msgstr "Proces"
+
+#: emissions/models.py:114 emissions/models.py:125
+msgid "Produkt"
+msgstr "Produkt"
+
+#: emissions/models.py:119
+msgid "Emisja procesowa"
+msgstr "Emisja procesowa"
+
+#: emissions/models.py:120
+msgid "Emisje procesowe"
+msgstr "Emisje procesowe"
+
+#: emissions/models.py:130
+msgid "Emisja niezorganizowana"
+msgstr "Emisja niezorganizowana"
+
+#: emissions/models.py:131
+msgid "Emisje niezorganizowane"
+msgstr "Emisje niezorganizowane"
+
+#: emissions/models.py:140 emissions/models.py:141 emissions/views.py:255
+msgid "Zużycie energii"
+msgstr "Zużycie energii"
+
+#: emissions/models.py:161 emissions/models.py:189 emissions/models.py:217
+msgid "Wskaźnik"
+msgstr "Wskaźnik"
+
+#: emissions/models.py:165 emissions/models.py:166 emissions/views.py:288
+#: templates/home.html:119 theme/templates/base.html:205
+msgid "Zakupiona energia"
+msgstr "Zakupiona energia"
+
+#: emissions/models.py:193 emissions/models.py:194 emissions/views.py:320
+#: theme/templates/base.html:206
+msgid "Wyprodukowana energia"
+msgstr "Wyprodukowana energia"
+
+#: emissions/models.py:221 emissions/models.py:222 emissions/views.py:352
+#: theme/templates/base.html:207
+msgid "Sprzedana energia"
+msgstr "Sprzedana energia"
+
+#: emissions/models.py:243
+msgid "Nazwa wskaźnika"
+msgstr "Nazwa wskaźnika"
+
+#: emissions/models.py:251
+msgid "Wartość wskaźnika"
+msgstr "Wartość wskaźnika"
+
+#: emissions/models.py:252
+msgid "Jednostka wskaźnika"
+msgstr "Jednostka wskaźnika"
+
+#: emissions/models.py:257
+msgid "Wskaźnik emisji"
+msgstr "Wskaźnik emisji"
+
+#: emissions/models.py:258
+msgid "Wskaźniki emisji"
+msgstr "Wskaźniki emisji"
+
+#: emissions/models.py:262
+msgid "Data"
+msgstr "Data"
+
+#: emissions/models.py:264
+msgid "Odbiorcy"
+msgstr "Odbiorcy"
+
+#: emissions/models.py:266
+msgid "Nazwa tabeli"
+msgstr "Nazwa tabeli"
+
+#: emissions/models.py:267
+msgid "ID rekordów"
+msgstr "ID rekordów"
+
+#: emissions/models.py:268
+msgid "Typ szablonu"
+msgstr "Typ szablonu"
+
+#: emissions/models.py:270
+msgid "Zakres"
+msgstr "Zakres"
+
+#: emissions/models.py:275
+msgid "Log email"
+msgstr "Log email"
+
+#: emissions/models.py:276
+msgid "Logi email"
+msgstr "Logi email"
+
+#: emissions/views.py:96 emissions/views.py:432
+#, python-format
+msgid "Zapisano rekord, ale nie wyliczono emisji. Powód: %(error)s"
+msgstr "Zapisano rekord, ale nie wyliczono emisji. Powód: %(error)s"
+
+#: emissions/views.py:101 emissions/views.py:457
+msgid "dodano wpis do"
+msgstr "dodano wpis do"
+
+#: emissions/views.py:101 emissions/views.py:457
+msgid "zaktualizowano wpis w"
+msgstr "zaktualizowano wpis w"
+
+#: emissions/views.py:102 emissions/views.py:458
+#, python-format
+msgid "Pomyślnie %(action)s: %(model)s"
+msgstr "Pomyślnie %(action)s: %(model)s"
+
+#: emissions/views.py:242 emissions/views.py:603
+#, python-format
+msgid "Pomyślnie usunięto wpis z: %(model)s"
+msgstr "Pomyślnie usunięto wpis z: %(model)s"
+
+#: emissions/views.py:452
+msgid "[Wyjaśnienie użytkownika]:"
+msgstr "[Wyjaśnienie użytkownika]:"
+
+#: emissions/views.py:836
+msgid ""
+"Pomyślnie dodano nowy wskaźnik emisji. Możesz teraz przeliczyć brakujące "
+"rekordy!"
+msgstr ""
+"Pomyślnie dodano nowy wskaźnik emisji. Możesz teraz przeliczyć brakujące "
+"rekordy!"
+
+#: emissions/views.py:848
+msgid "Zaktualizowano wskaźnik emisji."
+msgstr "Zaktualizowano wskaźnik emisji."
+
+#: emissions/views.py:858
+msgid "Usunięto wskaźnik emisji z bazy."
+msgstr "Usunięto wskaźnik emisji z bazy."
+
+#: emissions/views.py:912 emissions/views.py:1089 emissions/views.py:1248
+#: emissions/views.py:1408
+msgid "year – rok (liczba całkowita), np. 2024"
+msgstr "year – rok (liczba całkowita), np. 2024"
+
+#: emissions/views.py:913 emissions/views.py:1090 emissions/views.py:1249
+#: emissions/views.py:1409
+msgid "company – dokładna nazwa firmy zapisana w systemie"
+msgstr "company – dokładna nazwa firmy zapisana w systemie"
+
+#: emissions/views.py:914
+msgid "energy_source / energy_type – źródło i typ energii"
+msgstr "energy_source / energy_type – źródło i typ energii"
+
+#: emissions/views.py:915
+msgid "amount – ilość (liczba), unit – jednostka"
+msgstr "amount – ilość (liczba), unit – jednostka"
+
+#: emissions/views.py:941 emissions/views.py:1118 emissions/views.py:1277
+#: emissions/views.py:1437
+#, python-format
+msgid "Błąd wczytywania pliku: %(error)s"
+msgstr "Błąd wczytywania pliku: %(error)s"
+
+#: emissions/views.py:947
+msgid "Niepoprawna struktura pliku."
+msgstr "Niepoprawna struktura pliku."
+
+#: emissions/views.py:960 emissions/views.py:1135 emissions/views.py:1294
+#: emissions/views.py:1454
+msgid "Brak nazwy firmy"
+msgstr "Brak nazwy firmy"
+
+#: emissions/views.py:962 emissions/views.py:1137 emissions/views.py:1296
+#: emissions/views.py:1456
+#, python-format
+msgid "Firma \"%(company)s\" nie znaleziona"
+msgstr "Firma \"%(company)s\" nie znaleziona"
+
+#: emissions/views.py:966 emissions/views.py:1140 emissions/views.py:1299
+#: emissions/views.py:1459
+msgid "Brak roku"
+msgstr "Brak roku"
+
+#: emissions/views.py:969 emissions/views.py:1142 emissions/views.py:1301
+#: emissions/views.py:1461
+msgid "Brak ilości"
+msgstr "Brak ilości"
+
+#: emissions/views.py:974 emissions/views.py:1147 emissions/views.py:1306
+#: emissions/views.py:1466
+msgid "Nieprawidłowa ilość"
+msgstr "Nieprawidłowa ilość"
+
+#: emissions/views.py:1010 emissions/views.py:1173 emissions/views.py:1332
+#: emissions/views.py:1492
+#, python-format
+msgid "Firma \"%(company)s\" nie znaleziona!"
+msgstr "Firma \"%(company)s\" nie znaleziona!"
+
+#: emissions/views.py:1026 emissions/views.py:1186 emissions/views.py:1345
+#: emissions/views.py:1505
+#, python-format
+msgid "Rekord dodany, ale emisja nie obliczona: %(error)s"
+msgstr "Rekord dodany, ale emisja nie obliczona: %(error)s"
+
+#: emissions/views.py:1032 emissions/views.py:1191 emissions/views.py:1350
+#: emissions/views.py:1510
+#, python-format
+msgid ""
+"Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów."
+msgstr ""
+"Zaimportowano %(imported)s rekordów. Pominięto %(duplicates)s duplikatów."
+
+#: emissions/views.py:1091 emissions/views.py:1250 emissions/views.py:1410
+msgid "energy_type – typ energii, amount/unit – ilość i jednostka"
+msgstr "energy_type – typ energii, amount/unit – ilość i jednostka"
+
+#: emissions/views.py:1092
+msgid "trader – dostawca/pośrednik energii"
+msgstr "trader – dostawca/pośrednik energii"
+
+#: emissions/views.py:1124 emissions/views.py:1283 emissions/views.py:1443
+#, python-format
+msgid "Niepoprawna struktura pliku. Oczekiwane kolumny: %(headers)s"
+msgstr "Niepoprawna struktura pliku. Oczekiwane kolumny: %(headers)s"
+
+#: emissions/views.py:1251
+msgid "installation – instalacja/źródło produkcji"
+msgstr "installation – instalacja/źródło produkcji"
+
+#: emissions/views.py:1411
+msgid "customer – odbiorca/klient"
+msgstr "customer – odbiorca/klient"
+
+#: templates/home.html:4
+msgid "Panel startowy"
+msgstr "Panel startowy"
+
+#: templates/home.html:9
+msgid "Witaj"
+msgstr "Witaj"
+
+#: templates/home.html:11
+msgid "ESG Dashboard: Podsumowanie i przegląd Twoich zadań"
+msgstr "ESG Dashboard: Podsumowanie i przegląd Twoich zadań"
+
+#: templates/home.html:16
+msgid "Cele Redukcyjne"
+msgstr "Cele Redukcyjne"
+
+#: templates/home.html:49
+msgid "Emisja (obecna):"
+msgstr "Emisja (obecna):"
+
+#: templates/home.html:54
+msgid "Cel"
+msgstr "Cel"
+
+#: templates/home.html:76
+msgid "Skonsolidowane Emisje"
+msgstr "Skonsolidowane Emisje"
+
+#: templates/home.html:102
+msgid "Paliwa, procesy, wycieki"
+msgstr "Paliwa, procesy, wycieki"
+
+#: templates/home.html:135
+msgid "Oczekujące Zadania"
+msgstr "Oczekujące Zadania"
+
+#: templates/home.html:145 workflow/models.py:126
+msgid "Termin"
+msgstr "Termin"
+
+#: templates/home.html:150
+msgid "ZWIŃ/ROZWIŃ LISTĘ"
+msgstr "ZWIŃ/ROZWIŃ LISTĘ"
+
+#: templates/home.html:157
+msgid "Dotyczy spółek"
+msgstr "Dotyczy spółek"
+
+#: templates/home.html:172
+msgid "Szczegóły dla"
+msgstr "Szczegóły dla"
+
+#: templates/home.html:181
+msgid "Szczegóły"
+msgstr "Szczegóły"
+
+#: templates/home.html:189
+msgid "Edytuj"
+msgstr "Edytuj"
+
+#: templates/home.html:197
+msgid "Brak odrzuconych rekordów w tej kategorii."
+msgstr "Brak odrzuconych rekordów w tej kategorii."
+
+#: templates/home.html:207
+msgid "Wszystko gotowe!"
+msgstr "Wszystko gotowe!"
+
+#: templates/home.html:208
+msgid "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania."
+msgstr "Nie masz obecnie żadnych odrzuconych rekordów ani zadań do wykonania."
+
+#: templates/home.html:214
+msgid "Ulubione Akcje"
+msgstr "Ulubione Akcje"
+
+#: templates/home.html:223
+msgid "Brak ulubionych akcji."
+msgstr "Brak ulubionych akcji."
+
+#: templates/home.html:347
+msgid "Ścieżka redukcji"
+msgstr "Ścieżka redukcji"
+
+#: templates/home.html:400
+msgid "Suma emisji"
+msgstr "Suma emisji"
+
+#: templates/home.html:402
+msgid "Oczekiwany cel"
+msgstr "Oczekiwany cel"
+
+#: templates/home.html:484
+msgid "POKAŻ LISTĘ"
+msgstr "POKAŻ LISTĘ"
+
+#: templates/home.html:484
+msgid "ZWIŃ LISTĘ"
+msgstr "ZWIŃ LISTĘ"
+
+#: theme/templates/base.html:57 theme/templates/base.html:59
+msgid "Panel Administratora"
+msgstr "Panel Administratora"
+
+#: theme/templates/base.html:112
+msgid "Wyloguj"
+msgstr "Wyloguj"
+
+#: theme/templates/base.html:129 theme/templates/base.html:193
+msgid "Raporty"
+msgstr "Raporty"
+
+#: theme/templates/base.html:134 theme/templates/base.html:194
+msgid "Przedsiębiorstwo"
+msgstr "Przedsiębiorstwo"
+
+#: theme/templates/base.html:139 theme/templates/base.html:195
+msgid "Wskaźniki Emisji"
+msgstr "Wskaźniki Emisji"
+
+#: theme/templates/base.html:144 theme/templates/base.html:196
+msgid "Przeliczniki"
+msgstr "Przeliczniki"
+
+#: theme/templates/base.html:149 theme/templates/base.html:197
+msgid "Cele i symulacje"
+msgstr "Cele i symulacje"
+
+#: theme/templates/base.html:159 theme/templates/base.html:199
+msgid "Komunikacja e-mail"
+msgstr "Komunikacja e-mail"
+
+#: theme/templates/base.html:165
+msgid "Narzędzia Administratora"
+msgstr "Narzędzia Administratora"
+
+#: theme/templates/base.html:188
+msgid "Wszelkie prawa zastrzeżone."
+msgstr "Wszelkie prawa zastrzeżone."
+
+#: theme/templates/base.html:192
+msgid "Nawigacja"
+msgstr "Nawigacja"
+
+#: theme/templates/base.html:203
+msgid "Więcej"
+msgstr "Więcej"
+
+#: what_if/forms.py:15
+msgid "Wybierz cel korporacyjny"
+msgstr "Wybierz cel korporacyjny"
+
+#: what_if/forms.py:24
+msgid "-- Wybierz cel z listy --"
+msgstr "-- Wybierz cel z listy --"
+
+#: what_if/forms.py:39
+msgid "-- Cała organizacja (Wszystkie spółki) --"
+msgstr "-- Cała organizacja (Wszystkie spółki) --"
+
+#: what_if/forms.py:40
+msgid "Spółka do symulacji"
+msgstr "Spółka do symulacji"
+
+#: what_if/forms.py:45
+msgid "Co zastępujemy? (Obecne źródło)"
+msgstr "Co zastępujemy? (Obecne źródło)"
+
+#: what_if/forms.py:46
+msgid "Wybierz paliwo/energię, z której rezygnujesz."
+msgstr "Wybierz paliwo/energię, z której rezygnujesz."
+
+#: what_if/forms.py:53
+msgid "Ilość redukowana"
+msgstr "Ilość redukowana"
+
+#: what_if/forms.py:54
+msgid "Ilość zużycia, którą usuwasz z bilansu."
+msgstr "Ilość zużycia, którą usuwasz z bilansu."
+
+#: what_if/forms.py:59
+msgid "Czym zastępujemy? (Nowe źródło)"
+msgstr "Czym zastępujemy? (Nowe źródło)"
+
+#: what_if/forms.py:60
+msgid "Wybierz nowe paliwo/energię zastępczą."
+msgstr "Wybierz nowe paliwo/energię zastępczą."
+
+#: what_if/forms.py:67
+msgid "Ilość dodawana"
+msgstr "Ilość dodawana"
+
+#: what_if/forms.py:68
+msgid "Ilość nowego zużycia (pamiętaj o odpowiedniej jednostce wskaźnika!)."
+msgstr "Ilość nowego zużycia (pamiętaj o odpowiedniej jednostce wskaźnika!)."
+
+#: what_if/models.py:12
+msgid "Zakres 2 (Emisje pośrednie energetyczne)"
+msgstr "Zakres 2 (Emisje pośrednie energetyczne)"
+
+#: what_if/models.py:13
+msgid "Zakres 1 + Zakres 2"
+msgstr "Zakres 1 + Zakres 2"
+
+#: what_if/models.py:21
+msgid "Dedykowana spółka (zostaw puste = cel globalny)"
+msgstr "Dedykowana spółka (zostaw puste = cel globalny)"
+
+#: what_if/models.py:22
+msgid "Jeśli wybierzesz spółkę, cel będzie widoczny tylko dla niej."
+msgstr "Jeśli wybierzesz spółkę, cel będzie widoczny tylko dla niej."
+
+#: what_if/models.py:24
+msgid "Nazwa celu"
+msgstr "Nazwa celu"
+
+#: what_if/models.py:25
+msgid "Rok bazowy"
+msgstr "Rok bazowy"
+
+#: what_if/models.py:26
+msgid "Rok docelowy"
+msgstr "Rok docelowy"
+
+#: what_if/models.py:28
+msgid "Docelowa redukcja (%)"
+msgstr "Docelowa redukcja (%)"
+
+#: what_if/models.py:34
+msgid "Zakres (Scope)"
+msgstr "Zakres (Scope)"
+
+#: what_if/models.py:39
+msgid "Cel redukcji (Globalny)"
+msgstr "Cel redukcji (Globalny)"
+
+#: what_if/models.py:40
+msgid "Cele redukcji (Globalne)"
+msgstr "Cele redukcji (Globalne)"
+
+#: what_if/models.py:43
+msgid "GLOBALNY"
+msgstr "GLOBALNY"
+
+#: what_if/models.py:60
+msgid "Przypisany cel"
+msgstr "Przypisany cel"
+
+#: what_if/models.py:65
+msgid "Przypisanie celu"
+msgstr "Przypisanie celu"
+
+#: what_if/models.py:66
+msgid "Przypisania celów"
+msgstr "Przypisania celów"
+
+#: what_if/views.py:108
+msgid "Wybierz najpierw spółkę z listy celów."
+msgstr "Wybierz najpierw spółkę z listy celów."
+
+#: what_if/views.py:138
+msgid "Ten cel został już przypisany do wybranej spółki."
+msgstr "Ten cel został już przypisany do wybranej spółki."
+
+#: what_if/views.py:145
+msgid "przypisano"
+msgstr "przypisano"
+
+#: what_if/views.py:145
+msgid "zaktualizowano przypisanie"
+msgstr "zaktualizowano przypisanie"
+
+#: what_if/views.py:147
+#, python-format
+msgid "Pomyślnie %(action)s cel redukcyjny: %(goal)s dla %(company)s"
+msgstr "Pomyślnie %(action)s cel redukcyjny: %(goal)s dla %(company)s"
+
+#: what_if/views.py:176
+msgid "Pomyślnie usunięto cel redukcyjny."
+msgstr "Pomyślnie usunięto cel redukcyjny."
+
+#: what_if/views.py:240
+msgid "Zakres 2 (Emisje pośrednie)"
+msgstr "Zakres 2 (Emisje pośrednie)"
+
+#: what_if/views.py:374
+msgid "Pomyślnie utworzono nowy cel redukcyjny."
+msgstr "Pomyślnie utworzono nowy cel redukcyjny."
+
+#: what_if/views.py:385
+msgid "Cel redukcyjny został zaktualizowany."
+msgstr "Cel redukcyjny został zaktualizowany."
+
+#: what_if/views.py:394
+msgid "Cel redukcyjny został pomyślnie usunięty."
+msgstr "Cel redukcyjny został pomyślnie usunięty."
+
+#: workflow/mixins.py:31
+#, python-format
+msgid ""
+"Brak uprawnień. Spółka %(company)s nie została przypisana do okresu "
+"raportowego %(year)s. Najpierw otwórz dla niej raport."
+msgstr ""
+"Brak uprawnień. Spółka %(company)s nie została przypisana do okresu "
+"raportowego %(year)s. Najpierw otwórz dla niej raport."
+
+#: workflow/mixins.py:40
+#, python-format
+msgid ""
+"Edycja jest zablokowana. Raport dla %(company)s za rok %(year)s został "
+"przekazany do weryfikacji lub jest już zatwierdzony."
+msgstr ""
+"Edycja jest zablokowana. Raport dla %(company)s za rok %(year)s został "
+"przekazany do weryfikacji lub jest już zatwierdzony."
+
+#: workflow/mixins.py:46
+#, python-format
+msgid "W systemie brak zdefiniowanego okresu raportowego dla roku %(year)s."
+msgstr "W systemie brak zdefiniowanego okresu raportowego dla roku %(year)s."
+
+#: workflow/models.py:12
+msgid "Rok raportowy"
+msgstr "Rok raportowy"
+
+#: workflow/models.py:13
+msgid "Aktywny"
+msgstr "Aktywny"
+
+#: workflow/models.py:14
+msgid "Ostateczny termin"
+msgstr "Ostateczny termin"
+
+#: workflow/models.py:18
+msgid "Okres raportowy"
+msgstr "Okres raportowy"
+
+#: workflow/models.py:19
+msgid "Okresy raportowe"
+msgstr "Okresy raportowe"
+
+#: workflow/models.py:28
+msgid "Otwarte do wprowadzania"
+msgstr "Otwarte do wprowadzania"
+
+#: workflow/models.py:29
+msgid "W weryfikacji przez Admina (zablokowane dla usera)"
+msgstr "W weryfikacji przez Admina (zablokowane dla usera)"
+
+#: workflow/models.py:30
+msgid "Zwrócone do poprawy (odblokowane)"
+msgstr "Zwrócone do poprawy (odblokowane)"
+
+#: workflow/models.py:31
+msgid "Zatwierdzone (całkowita blokada)"
+msgstr "Zatwierdzone (całkowita blokada)"
+
+#: workflow/models.py:33
+msgid "Okres"
+msgstr "Okres"
+
+#: workflow/models.py:42
+msgid "Koperta raportowa spółki"
+msgstr "Koperta raportowa spółki"
+
+#: workflow/models.py:43
+msgid "Koperty raportowe spółek"
+msgstr "Koperty raportowe spółek"
+
+#: workflow/models.py:51
+msgid "Roboczy"
+msgstr "Roboczy"
+
+#: workflow/models.py:52
+msgid "Oczekuje na akceptację"
+msgstr "Oczekuje na akceptację"
+
+#: workflow/models.py:53
+msgid "Zaakceptowany"
+msgstr "Zaakceptowany"
+
+#: workflow/models.py:54
+msgid "Odrzucony"
+msgstr "Odrzucony"
+
+#: workflow/models.py:61
+msgid "Status workflow"
+msgstr "Status workflow"
+
+#: workflow/models.py:100
+msgid "Treść"
+msgstr "Treść"
+
+#: workflow/models.py:102
+msgid "Rozwiązany"
+msgstr "Rozwiązany"
+
+#: workflow/models.py:105
+msgid "Komentarz do rekordu"
+msgstr "Komentarz do rekordu"
+
+#: workflow/models.py:106
+msgid "Komentarze do rekordów"
+msgstr "Komentarze do rekordów"
+
+#: workflow/models.py:116
+msgid "Wprowadzenie danych"
+msgstr "Wprowadzenie danych"
+
+#: workflow/models.py:117
+msgid "Poprawa odrzuconych rekordów"
+msgstr "Poprawa odrzuconych rekordów"
+
+#: workflow/models.py:118
+msgid "Wniosek o odblokowanie"
+msgstr "Wniosek o odblokowanie"
+
+#: workflow/models.py:119
+msgid "Zadanie Ad-Hoc"
+msgstr "Zadanie Ad-Hoc"
+
+#: workflow/models.py:122
+msgid "Przypisany do"
+msgstr "Przypisany do"
+
+#: workflow/models.py:123
+msgid "Typ zadania"
+msgstr "Typ zadania"
+
+#: workflow/models.py:124
+msgid "Tytuł"
+msgstr "Tytuł"
+
+#: workflow/models.py:125
+msgid "Opis"
+msgstr "Opis"
+
+#: workflow/models.py:127
+msgid "Ukończone"
+msgstr "Ukończone"
+
+#: workflow/models.py:130
+msgid "Zadanie"
+msgstr "Zadanie"
+
+#: workflow/models.py:131
+msgid "Zadania"
+msgstr "Zadania"
+
+#: workflow/services.py:46
+msgid "Odrzucenie rekordu wymaga podania powodu (uwagi)."
+msgstr "Odrzucenie rekordu wymaga podania powodu (uwagi)."
+
+#: workflow/services.py:67
+#, python-format
+msgid "Wymagana poprawa danych emisyjnych - Okres %(year)s"
+msgstr "Wymagana poprawa danych emisyjnych - Okres %(year)s"
+
+#: workflow/services.py:68
+msgid ""
+"Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami "
+"podświetlonymi na czerwono w poszczególnych widokach."
+msgstr ""
+"Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami "
+"podświetlonymi na czerwono w poszczególnych widokach."
+
+#: workflow/services.py:109
+msgid ""
+"Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie "
+"PENDING."
+msgstr ""
+"Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie "
+"PENDING."
+
+#: workflow/services.py:126
+msgid "Uwaga nie może być pusta."
+msgstr "Uwaga nie może być pusta."
+
+#: workflow/services.py:136
+#, python-format
+msgid "Wymagane wyjaśnienie: %(type)s dla spółki %(company)s"
+msgstr "Wymagane wyjaśnienie: %(type)s dla spółki %(company)s"
+
+#: workflow/services.py:145
+msgid "Administrator dodał uwagi do rekordu w celu ponownej weryfikacji."
+msgstr "Administrator dodał uwagi do rekordu w celu ponownej weryfikacji."
+
+#: workflow/services.py:172
+msgid "Raport jest już zatwierdzony."
+msgstr "Raport jest już zatwierdzony."
+
+#: workflow/services.py:210
+#, python-format
+msgid "Uruchomiono proces zbierania danych za okres %(year)s"
+msgstr "Uruchomiono proces zbierania danych za okres %(year)s"
+
+#: workflow/services.py:226
+#, python-format
+msgid ""
+"Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za "
+"rok %(year)s do wskazanego terminu."
+msgstr ""
+"Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za "
+"rok %(year)s do wskazanego terminu."
+
+#: workflow/services.py:258
+#, python-format
+msgid "Weryfikacja rekordu: %(type)s | %(company)s"
+msgstr "Weryfikacja rekordu: %(type)s | %(company)s"
+
+#: workflow/services.py:265
+#, python-format
+msgid ""
+"Użytkownik zmienił status rekordu (ID: %(pk)s) na Oczekujący. Wymagana "
+"weryfikacja poprawności danych."
+msgstr ""
+"Użytkownik zmienił status rekordu (ID: %(pk)s) na Oczekujący. Wymagana "
+"weryfikacja poprawności danych."
+
+#: workflow/views.py:56
+#, python-format
+msgid "Utworzono okres %(year)s i wygenerowano zadania dla spółek."
+msgstr "Utworzono okres %(year)s i wygenerowano zadania dla spółek."
+
+#: workflow/views.py:59
+#, python-format
+msgid "Utworzono pusty okres %(year)s."
+msgstr "Utworzono pusty okres %(year)s."
+
+#: workflow/views.py:182
+msgid "Model nie istnieje"
+msgstr "Model nie istnieje"
+
+#: workflow/views.py:200
+msgid "Nieprawidłowa akcja"
+msgstr "Nieprawidłowa akcja"
+
+#: workflow/views.py:228
+msgid "Nieznany model danych."
+msgstr "Nieznany model danych."
+
+#: workflow/views.py:240
+msgid "Uwaga została wysłana do użytkownika."
+msgstr "Uwaga została wysłana do użytkownika."
+
+#: workflow/views.py:247
+msgid "Wystąpił błąd krytyczny serwera."
+msgstr "Wystąpił błąd krytyczny serwera."
+
+#: workflow/views.py:258
+msgid "Raport już zatwierdzony"
+msgstr "Raport już zatwierdzony"

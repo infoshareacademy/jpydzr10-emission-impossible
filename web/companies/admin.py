@@ -1,5 +1,9 @@
 from django.contrib import admin
-from companies.models import CompaniesGroup, Countries, Companies
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA ADMINA
+)
+
+from companies.models import Companies, CompaniesGroup, Countries
 
 
 @admin.register(CompaniesGroup)

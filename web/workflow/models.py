@@ -3,37 +3,44 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA MODELI
+)
 
 
 class ReportingPeriod(models.Model):
-    year = models.PositiveIntegerField(unique=True)
-    is_active = models.BooleanField(default=False)
-    deadline = models.DateField()
+    year = models.PositiveIntegerField(unique=True, verbose_name=_("Rok raportowy"))
+    is_active = models.BooleanField(default=False, verbose_name=_("Aktywny"))
+    deadline = models.DateField(verbose_name=_("Ostateczny termin"))
 
     class Meta:
         db_table = "workflow_reporting_period"
+        verbose_name = _("Okres raportowy")
+        verbose_name_plural = _("Okresy raportowe")
 
     def __str__(self):
-        status = " (Aktywny)" if self.is_active else ""
-        return f"Okres raportowy: {self.year}{status}"
+        status = f" ({_('Aktywny')})" if self.is_active else ""
+        return f"{_('Okres raportowy')}: {self.year}{status}"
 
 
 class CompanyReportEnvelope(models.Model):
     class Status(models.TextChoices):
-        OPEN = "OPEN", "Otwarte do wprowadzania"
-        IN_REVIEW = "IN_REVIEW", "W weryfikacji przez Admina (zablokowane dla usera)"
-        RETURNED = "RETURNED", "Zwrócone do poprawy (odblokowane)"
-        APPROVED = "APPROVED", "Zatwierdzone (całkowita blokada)"
+        OPEN = "OPEN", _("Otwarte do wprowadzania")
+        IN_REVIEW = "IN_REVIEW", _("W weryfikacji przez Admina (zablokowane dla usera)")
+        RETURNED = "RETURNED", _("Zwrócone do poprawy (odblokowane)")
+        APPROVED = "APPROVED", _("Zatwierdzone (całkowita blokada)")
 
-    period = models.ForeignKey(ReportingPeriod, on_delete=models.CASCADE)
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    period = models.ForeignKey(ReportingPeriod, on_delete=models.CASCADE, verbose_name=_("Okres"))
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, verbose_name=_("Firma"))
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.OPEN
+        max_length=20, choices=Status.choices, default=Status.OPEN, verbose_name=_("Status")
     )
 
     class Meta:
         db_table = "workflow_company_envelope"
         unique_together = ("period", "company")
+        verbose_name = _("Koperta raportowa spółki")
+        verbose_name_plural = _("Koperty raportowe spółek")
 
     def __str__(self):
         return f"{self.company} | {self.period.year} - {self.get_status_display()}"
@@ -41,16 +48,17 @@ class CompanyReportEnvelope(models.Model):
 
 class WorkflowStatusMixin(models.Model):
     class RecordStatus(models.TextChoices):
-        DRAFT = "DRAFT", "Roboczy"
-        PENDING = "PENDING", "Oczekuje na akceptację"
-        APPROVED = "APPROVED", "Zaakceptowany"
-        REJECTED = "REJECTED", "Odrzucony"
+        DRAFT = "DRAFT", _("Roboczy")
+        PENDING = "PENDING", _("Oczekuje na akceptację")
+        APPROVED = "APPROVED", _("Zaakceptowany")
+        REJECTED = "REJECTED", _("Odrzucony")
 
     workflow_status = models.CharField(
         max_length=20,
         choices=RecordStatus.choices,
         default=RecordStatus.DRAFT,
         db_index=True,
+        verbose_name=_("Status workflow"),
     )
 
     class Meta:
@@ -83,35 +91,45 @@ class WorkflowStatusMixin(models.Model):
 
         self._initial_workflow_status = self.workflow_status
 
+
 class RecordComment(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_("Autor"))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
-    text = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_resolved = models.BooleanField(default=False)
+    text = models.TextField(verbose_name=_("Treść"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Data utworzenia"))
+    is_resolved = models.BooleanField(default=False, verbose_name=_("Rozwiązany"))
 
-def __str__(self):
-    truncated_text = f"{self.text[:30]}..." if len(self.text) > 30 else self.text
-    resolved_mark = " [Rozwiązany]" if self.is_resolved else ""
-    return f"{self.author} ({self.created_at.strftime('%Y-%m-%d')}): {truncated_text}{resolved_mark}"
+    class Meta:
+        verbose_name = _("Komentarz do rekordu")
+        verbose_name_plural = _("Komentarze do rekordów")
+
+    def __str__(self):
+        truncated_text = f"{self.text[:30]}..." if len(self.text) > 30 else self.text
+        resolved_mark = f" [{_('Rozwiązany')}]" if self.is_resolved else ""
+        return f"{self.author} ({self.created_at.strftime('%Y-%m-%d')}): {truncated_text}{resolved_mark}"
+
 
 class Task(models.Model):
     class TaskType(models.TextChoices):
-        DATA_ENTRY = "DATA_ENTRY", "Wprowadzenie danych"
-        CORRECTION = "CORRECTION", "Poprawa odrzuconych rekordów"
-        UNLOCK_REQ = "UNLOCK_REQ", "Wniosek o odblokowanie"
-        CUSTOM = "CUSTOM", "Zadanie Ad-Hoc"
+        DATA_ENTRY = "DATA_ENTRY", _("Wprowadzenie danych")
+        CORRECTION = "CORRECTION", _("Poprawa odrzuconych rekordów")
+        UNLOCK_REQ = "UNLOCK_REQ", _("Wniosek o odblokowanie")
+        CUSTOM = "CUSTOM", _("Zadanie Ad-Hoc")
 
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
-    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-    task_type = models.CharField(max_length=20, choices=TaskType.choices)
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    deadline = models.DateField(null=True, blank=True)
-    is_completed = models.BooleanField(default=False)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, verbose_name=_("Firma"))
+    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, verbose_name=_("Przypisany do"))
+    task_type = models.CharField(max_length=20, choices=TaskType.choices, verbose_name=_("Typ zadania"))
+    title = models.CharField(max_length=255, verbose_name=_("Tytuł"))
+    description = models.TextField(blank=True, verbose_name=_("Opis"))
+    deadline = models.DateField(null=True, blank=True, verbose_name=_("Termin"))
+    is_completed = models.BooleanField(default=False, verbose_name=_("Ukończone"))
+
+    class Meta:
+        verbose_name = _("Zadanie")
+        verbose_name_plural = _("Zadania")
 
     def __str__(self):
-        status_icon = "✅" if self.is_completed else "⏳"
+        status_icon = "✓" if self.is_completed else "⏳"
         return f"{status_icon} {self.title} | {self.company}"

@@ -20,7 +20,7 @@ class EmissionCalculatorService:
 
     @staticmethod
     def calculate_scope_1(company: Companies, year: int) -> Scope1Summary:
-        # Zabezpieczenie przed błędem z poprzednich rozmów - używamy poprawnego workflow_status
+        # Zabezpieczenie przed błędem z poprzednich rozmów – używamy poprawnego workflow_status
         base_filters = {
             "company": company,
             "year": year,

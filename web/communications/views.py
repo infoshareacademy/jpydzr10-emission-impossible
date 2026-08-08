@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext as _  # <--- DODANY IMPORT TŁUMACZEŃ
 from django.views.generic import CreateView, DetailView, ListView, View
 
 from .forms import MessageReplyForm, ThreadCreateForm
@@ -99,7 +100,7 @@ class ThreadDetailView(LoginRequiredMixin, DetailView):
 
         if self.object.status == "closed":
             messages.error(
-                request, "Nie można dodawać wiadomości do zamkniętego wątku."
+                request, _("Nie można dodawać wiadomości do zamkniętego wątku.")
             )
             return redirect("communications:thread_detail", pk=self.object.pk)
 
@@ -111,7 +112,7 @@ class ThreadDetailView(LoginRequiredMixin, DetailView):
             msg.save()
             send_thread_notification(request, self.object, msg, is_new=False)
 
-            messages.success(request, "Odpowiedź została wysłana.")
+            messages.success(request, _("Odpowiedź została wysłana."))
             return redirect("communications:thread_detail", pk=self.object.pk)
 
         return self.render_to_response(self.get_context_data(reply_form=form))
@@ -139,7 +140,7 @@ class ThreadCreateView(LoginRequiredMixin, CreateView):
 
         send_thread_notification(self.request, thread, first_msg, is_new=True)
 
-        messages.success(self.request, "Zgłoszenie zostało pomyślnie utworzone.")
+        messages.success(self.request, _("Zgłoszenie zostało pomyślnie utworzone."))
         return redirect("communications:thread_detail", pk=thread.pk)
 
 
@@ -154,8 +155,8 @@ class ThreadCloseView(LoginRequiredMixin, View):
         ):
             thread.status = "closed"
             thread.save()
-            messages.success(request, "Wątek został pomyślnie zamknięty.")
+            messages.success(request, _("Wątek został pomyślnie zamknięty."))
         else:
-            messages.error(request, "Nie masz uprawnień do zamknięcia tego wątku.")
+            messages.error(request, _("Nie masz uprawnień do zamknięcia tego wątku."))
 
         return redirect("communications:thread_detail", pk=pk)

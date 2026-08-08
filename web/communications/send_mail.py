@@ -2,6 +2,7 @@ from accounts.models import CustomUser
 from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
+from django.utils.translation import gettext as _  # <--- KLUCZOWY IMPORT DLA TŁUMACZEŃ
 
 
 def send_thread_notification(request, thread, message, is_new=False):
@@ -28,20 +29,21 @@ def send_thread_notification(request, thread, message, is_new=False):
         reverse("communications:thread_detail", args=[thread.id])
     )
 
-    akcja = "Nowe zgłoszenie" if is_new else "Nowa odpowiedź"
+    akcja = _("Nowe zgłoszenie") if is_new else _("Nowa odpowiedź")
     subject = f"[Emission Impossible] {akcja}: {thread.subject} - {thread.company.name}"
 
     body = (
-        f"Szanowni Państwo,\n\n"
-        f"Użytkownik {message.sender.username} dodał nową wiadomość w wątku dotyczącym spółki {thread.company.name}.\n\n"
-        f"Kategoria: {thread.get_category_display()}\n"
-        f"Treść:\n"
+        f"{_('Szanowni Państwo')},\n\n"
+        f"{_('Użytkownik')} {message.sender.username} {_('dodał nową wiadomość w wątku dotyczącym spółki')} {thread.company.name}.\n\n"
+        f"{_('Kategoria')}: {thread.get_category_display()}\n"
+        f"{_('Treść')}:\n"
         f"----------------------------------------\n"
         f"{message.content}\n"
         f"----------------------------------------\n\n"
-        f"Aby odpowiedzieć lub zamknąć zgłoszenie, przejdź do aplikacji:\n"
+        f"{_('Aby odpowiedzieć lub zamknąć zgłoszenie, przejdź do aplikacji')}:\n"
         f"{thread_url}\n\n"
-        f"Z poważaniem,\nSystem Emission Impossible"
+        f"{_('Z poważaniem')},\n"
+        f"{_('System Emission Impossible')}"
     )
 
     send_mail(

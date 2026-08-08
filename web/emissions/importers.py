@@ -1,17 +1,17 @@
 """
-Scope 1 — Importery danych z pliku XLSX.
+Scope 1 – Importery danych z pliku XLSX.
 
 Architektura:
-  BaseScope1Importer  ← logika wspólna (parsowanie, walidacja, sesja, zapis)
-      ├── StationaryCombustionImporter
-      ├── MobileCombustionImporter
-      ├── ProcessEmissionImporter
-      └── FugitiveEmissionImporter
+  BaseScope1Importer – logika wspólna (parsowanie, walidacja, sesja, zapis)
+     ├── StationaryCombustionImporter
+     ├── MobileCombustionImporter
+     ├── ProcessEmissionImporter
+     └── FugitiveEmissionImporter
 
 Każdy importer:
-  1. parse(file)              → weryfikuje nagłówki, parsuje wiersze
-  2. to_session_payload()     → serializuje prawidłowe wiersze do JSON (sesja)
-  3. save_from_payload(data)  → atomowy zapis do bazy (rollback przy błędzie)
+  1. parse(file)             – weryfikuje nagłówki, parsuje wiersze
+  2. to_session_payload()      – serializuje prawidłowe wiersze do JSON (sesja)
+  3. save_from_payload(data)  – atomowy zapis do bazy (rollback przy błędzie)
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Optional
 
 import openpyxl
+from django.utils.translation import gettext as _  # <--- KLUCZOWY IMPORT DLA TŁUMACZEŃ
 
 # ---------------------------------------------------------------------------
 # Reprezentacja pojedynczego wiersza importu
@@ -63,7 +64,7 @@ class BaseScope1Importer:
         self.rows: list[ImportRow] = []
         self.parse_errors: list[str] = []
 
-    # ── Parsowanie pliku ────────────────────────────────────────────────────
+    # -- Parsowanie pliku ----------------------------------------------------
 
     def parse(self, file_obj) -> bool:
         """
@@ -74,7 +75,7 @@ class BaseScope1Importer:
         try:
             wb = openpyxl.load_workbook(file_obj, read_only=True, data_only=True)
         except Exception as exc:
-            self.parse_errors.append(f"Nie można odczytać pliku XLSX: {exc}")
+            self.parse_errors.append(f"{_('Nie można odczytać pliku XLSX')}: {exc}")
             return False
 
         ws = wb.active
@@ -84,7 +85,7 @@ class BaseScope1Importer:
         try:
             raw_header = next(rows_iter)
         except StopIteration:
-            self.parse_errors.append("Plik jest całkowicie pusty.")
+            self.parse_errors.append(_("Plik jest całkowicie pusty."))
             return False
 
         actual_headers = [
@@ -94,9 +95,9 @@ class BaseScope1Importer:
 
         if actual_headers[: len(expected)] != expected:
             self.parse_errors.append(
-                f"Nieprawidłowe nagłówki kolumn.\n"
-                f"Oczekiwano:  {self.EXPECTED_HEADERS}\n"
-                f"Otrzymano:   {actual_headers[: len(expected)]}"
+                f"{_('Nieprawidłowe nagłówki kolumn.')}\n"
+                f"{_('Oczekiwano')}:  {self.EXPECTED_HEADERS}\n"
+                f"{_('Otrzymano')}:    {actual_headers[: len(expected)]}"
             )
             return False
 
@@ -105,15 +106,15 @@ class BaseScope1Importer:
 
         if not data_rows:
             self.parse_errors.append(
-                "Plik nie zawiera żadnych danych (poza wierszem nagłówkowym)."
+                _("Plik nie zawiera żadnych danych (poza wierszem nagłówkowym).")
             )
             return False
 
         if len(data_rows) > self.MAX_ROWS:
             self.parse_errors.append(
-                f"Plik zawiera zbyt wiele wierszy ({len(data_rows):,}). "
-                f"Maksymalna dozwolona liczba: {self.MAX_ROWS:,}. "
-                f"Podziel dane na mniejsze pliki."
+                f"{_('Plik zawiera zbyt wiele wierszy')} ({len(data_rows):,}). "
+                f"{_('Maksymalna dozwolona liczba')}: {self.MAX_ROWS:,}. "
+                f"{_('Podziel dane na mniejsze pliki')}."
             )
             return False
 
@@ -129,7 +130,7 @@ class BaseScope1Importer:
         """Implementacja w podklasie."""
         raise NotImplementedError
 
-    # ── Właściwości ─────────────────────────────────────────────────────────
+    # -- Właściwości ---------------------------------------------------------
 
     @property
     def valid_rows(self) -> list[ImportRow]:
@@ -139,7 +140,7 @@ class BaseScope1Importer:
     def invalid_rows(self) -> list[ImportRow]:
         return [r for r in self.rows if not r.is_valid]
 
-    # ── Serializacja do sesji ───────────────────────────────────────────────
+    # -- Serializacja do sesji -----------------------------------------------
 
     def to_session_payload(self) -> list[dict]:
         """
@@ -163,12 +164,12 @@ class BaseScope1Importer:
                 result[k] = v
         return result
 
-    # ── Atomowy zapis ───────────────────────────────────────────────────────
+    # -- Atomowy zapis -------------------------------------------------------
 
     def save_from_payload(self, payload: list[dict]) -> int:
         """
         Atomowo zapisuje wszystkie wiersze z sesji do bazy danych.
-        Przy błędzie dowolnego wiersza — rollback całej transakcji.
+        Przy błędzie dowolnego wiersza – rollback całej transakcji.
         Zwraca liczbę zapisanych rekordów.
         """
         from calculator.calculation import calculate_record_emissions
@@ -187,7 +188,7 @@ class BaseScope1Importer:
                     instance.updated_by = self.user
                     instance.status = RecordStatus.DRAFT
 
-                    # Próba obliczenia emisji — nie blokuje importu przy braku wskaźnika
+                    # Próba obliczenia emisji – nie blokuje importu przy braku wskaźnika
                     try:
                         calculate_record_emissions(instance)
                     except Exception:
@@ -198,7 +199,7 @@ class BaseScope1Importer:
 
                 except Exception as exc:
                     raise RuntimeError(
-                        f"Błąd zapisu wiersza #{row_num}: {exc}"
+                        f"{_('Błąd zapisu wiersza')} #{row_num}: {exc}"
                     ) from exc
 
         return count
@@ -207,46 +208,46 @@ class BaseScope1Importer:
         """Tworzy (niezapisany) obiekt modelu z danych sesji. Implementacja w podklasie."""
         raise NotImplementedError
 
-    # ── Walidatory pól ──────────────────────────────────────────────────────
+    # -- Walidatory pól ------------------------------------------------------
 
     def _v_year(self, value, row: ImportRow) -> Optional[int]:
         """Waliduje rok (int, zakres 2010–2035)."""
         try:
             year = int(value)
         except (TypeError, ValueError):
-            row.add_error(f"Rok '{value}' nie jest poprawną liczbą całkowitą.")
+            row.add_error(_("Rok '%(value)s' nie jest poprawną liczbą całkowitą.") % {"value": value})
             return None
         if not (2010 <= year <= 2035):
-            row.add_error(f"Rok {year} jest poza dozwolonym zakresem (2010–2035).")
+            row.add_error(_("Rok %(year)s jest poza dozwolonym zakresem (2010–2035).") % {"year": year})
             return None
         return year
 
     def _v_amount(self, value, row: ImportRow) -> Optional[Decimal]:
         """Waliduje ilość (Decimal > 0). Akceptuje przecinek lub kropkę dziesiętną."""
         if value is None:
-            row.add_error("Brak wartości ilości.")
+            row.add_error(_("Brak wartości ilości."))
             return None
         try:
             normalized = str(value).replace(",", ".").strip()
             amount = Decimal(normalized)
         except (InvalidOperation, TypeError, AttributeError):
-            row.add_error(f"Nieprawidłowa wartość ilości: '{value}'.")
+            row.add_error(_("Nieprawidłowa wartość ilości: '%(value)s'.") % {"value": value})
             return None
         if amount <= 0:
-            row.add_error(f"Ilość musi być większa od zera (podano: {value}).")
+            row.add_error(_("Ilość musi być większa od zera (podano: %(value)s).") % {"value": value})
             return None
         return amount
 
     def _v_unit(self, value, row: ImportRow, allowed: list[str]) -> Optional[str]:
         """Waliduje jednostkę miary względem listy dozwolonych wartości."""
         if not value:
-            row.add_error(f"Brak jednostki. Dozwolone: {', '.join(allowed)}.")
+            row.add_error(_("Brak jednostki. Dozwolone: %(allowed)s.") % {"allowed": ', '.join(allowed)})
             return None
         v = str(value).strip()
         if v not in allowed:
             row.add_error(
-                f"Jednostka '{v}' jest niedozwolona. "
-                f"Dozwolone wartości: {', '.join(allowed)}."
+                _("Jednostka '%(v)s' jest niedozwolona. Dozwolone wartości: %(allowed)s.")
+                % {"v": v, "allowed": ', '.join(allowed)}
             )
             return None
         return v
@@ -263,12 +264,13 @@ class BaseScope1Importer:
         text = str(value).strip() if value is not None else ""
         if not text:
             if required:
-                row.add_error(f"Pole '{label}' jest wymagane.")
+                row.add_error(_("Pole '%(label)s' jest wymagane.") % {"label": label})
                 return None
             return ""
         if len(text) > max_len:
             row.add_error(
-                f"Pole '{label}' jest za długie ({len(text)} znaków, max: {max_len})."
+                _("Pole '%(label)s' jest za długie (%(len)d znaków, max: %(max_len)d).")
+                % {"label": label, "len": len(text), "max_len": max_len}
             )
             return None
         return text
@@ -278,7 +280,7 @@ class BaseScope1Importer:
         from calculator.models import FuelType
 
         if not value:
-            row.add_error("Brak nazwy paliwa.")
+            row.add_error(_("Brak nazwy paliwa."))
             return None
 
         name = str(value).strip()
@@ -288,20 +290,20 @@ class BaseScope1Importer:
         if qs.exists():
             return qs.first()
 
-        # Fallback — szukamy po symbolu
+        # Fallback – szukamy po symbolu
         qs = FuelType.objects.filter(symbol__iexact=name)
         if qs.exists():
             return qs.first()
 
         row.add_error(
-            f"Nieznane paliwo: '{name}'. "
-            f"Sprawdź dostępne paliwa w słowniku (Paliwa → lista symboli/nazw)."
+            _("Nieznane paliwo: '%(name)s'. Sprawdź dostępne paliwa w słowniku.")
+            % {"name": name}
         )
         return None
 
 
 # ---------------------------------------------------------------------------
-# Importer — Spalanie stacjonarne
+# Importer – Spalanie stacjonarne
 # ---------------------------------------------------------------------------
 
 
@@ -317,9 +319,9 @@ class StationaryCombustionImporter(BaseScope1Importer):
         "Faktura 01/2023",
     ]
     INSTRUCTIONS = [
-        "Rok: 2010–2035",
-        "Paliwo: nazwa z bazy (np. Gaz ziemny, Węgiel kamienny, Olej napędowy (ON))",
-        f"Jednostka: {', '.join(ALLOWED_UNITS)}",
+        _("Rok: 2010–2035"),
+        _("Paliwo: nazwa z bazy (np. Gaz ziemny, Węgiel kamienny, Olej napędowy (ON))"),
+        f"{_('Jednostka')}: {', '.join(ALLOWED_UNITS)}",
     ]
 
     def _parse_row(self, row_num: int, cells: tuple) -> ImportRow:
@@ -329,10 +331,10 @@ class StationaryCombustionImporter(BaseScope1Importer):
         ir.data = {
             "year": self._v_year(rok, ir),
             "fuel": self._v_fuel(paliwo, ir),
-            "installation": self._v_text(instalacja, "instalacja", ir),
+            "installation": self._v_text(instalacja, _("instalacja"), ir),
             "amount": self._v_amount(ilosc, ir),
             "unit": self._v_unit(jednostka, ir, self.ALLOWED_UNITS),
-            "source": self._v_text(zrodlo, "zrodlo", ir, required=False),
+            "source": self._v_text(zrodlo, _("źródło"), ir, required=False),
         }
         return ir
 
@@ -350,7 +352,7 @@ class StationaryCombustionImporter(BaseScope1Importer):
 
 
 # ---------------------------------------------------------------------------
-# Importer — Spalanie mobilne
+# Importer – Spalanie mobilne
 # ---------------------------------------------------------------------------
 
 
@@ -366,10 +368,10 @@ class MobileCombustionImporter(BaseScope1Importer):
         "Raport floty Q1 2023",
     ]
     INSTRUCTIONS = [
-        "Rok: 2010–2035",
-        "Pojazd: dowolny opis identyfikujący pojazd/flotę",
-        "Paliwo: nazwa z bazy (np. Olej napędowy (ON), Benzyna (Pb95), LPG)",
-        f"Jednostka: {', '.join(ALLOWED_UNITS)}",
+        _("Rok: 2010–2035"),
+        _("Pojazd: dowolny opis identyfikujący pojazd/flotę"),
+        _("Paliwo: nazwa z bazy (np. Olej napędowy (ON), Benzyna (Pb95), LPG)"),
+        f"{_('Jednostka')}: {', '.join(ALLOWED_UNITS)}",
     ]
 
     def _parse_row(self, row_num: int, cells: tuple) -> ImportRow:
@@ -378,11 +380,11 @@ class MobileCombustionImporter(BaseScope1Importer):
         ir = ImportRow(row_num=row_num, raw=raw, data={})
         ir.data = {
             "year": self._v_year(rok, ir),
-            "vehicle": self._v_text(pojazd, "pojazd", ir),
+            "vehicle": self._v_text(pojazd, _("pojazd"), ir),
             "fuel": self._v_fuel(paliwo, ir),
             "amount": self._v_amount(ilosc, ir),
             "unit": self._v_unit(jednostka, ir, self.ALLOWED_UNITS),
-            "source": self._v_text(zrodlo, "zrodlo", ir, required=False),
+            "source": self._v_text(zrodlo, _("źródło"), ir, required=False),
         }
         return ir
 
@@ -400,7 +402,7 @@ class MobileCombustionImporter(BaseScope1Importer):
 
 
 # ---------------------------------------------------------------------------
-# Importer — Emisje procesowe
+# Importer – Emisje procesowe
 # ---------------------------------------------------------------------------
 
 
@@ -416,10 +418,10 @@ class ProcessEmissionImporter(BaseScope1Importer):
         "Raport technologiczny 2023",
     ]
     INSTRUCTIONS = [
-        "Rok: 2010–2035",
-        "Proces: nazwa procesu technologicznego",
-        "Produkt: nazwa produktu/substratu emitującego GHG",
-        f"Jednostka: {', '.join(ALLOWED_UNITS)}",
+        _("Rok: 2010–2035"),
+        _("Proces: nazwa procesu technologicznego"),
+        _("Produkt: nazwa produktu/substratu emitującego GHG"),
+        f"{_('Jednostka')}: {', '.join(ALLOWED_UNITS)}",
     ]
 
     def _parse_row(self, row_num: int, cells: tuple) -> ImportRow:
@@ -428,11 +430,11 @@ class ProcessEmissionImporter(BaseScope1Importer):
         ir = ImportRow(row_num=row_num, raw=raw, data={})
         ir.data = {
             "year": self._v_year(rok, ir),
-            "process": self._v_text(proces, "proces", ir),
-            "product": self._v_text(produkt, "produkt", ir),
+            "process": self._v_text(proces, _("proces"), ir),
+            "product": self._v_text(produkt, _("produkt"), ir),
             "amount": self._v_amount(ilosc, ir),
             "unit": self._v_unit(jednostka, ir, self.ALLOWED_UNITS),
-            "source": self._v_text(zrodlo, "zrodlo", ir, required=False),
+            "source": self._v_text(zrodlo, _("źródło"), ir, required=False),
         }
         return ir
 
@@ -450,7 +452,7 @@ class ProcessEmissionImporter(BaseScope1Importer):
 
 
 # ---------------------------------------------------------------------------
-# Importer — Emisje niezorganizowane (fugitive)
+# Importer – Emisje niezorganizowane (fugitive)
 # ---------------------------------------------------------------------------
 
 
@@ -466,10 +468,10 @@ class FugitiveEmissionImporter(BaseScope1Importer):
         "Karta Urządzenia 2023",
     ]
     INSTRUCTIONS = [
-        "Rok: 2010–2035",
-        "Instalacja: opis urządzenia/instalacji (klimatyzator, chłodnia itp.)",
-        "Czynnik: nazwa czynnika chłodniczego/gazu (np. R410A, R134a, SF6)",
-        f"Jednostka: {', '.join(ALLOWED_UNITS)}",
+        _("Rok: 2010–2035"),
+        _("Instalacja: opis urządzenia/instalacji (klimatyzator, chłodnia itp.)"),
+        _("Czynnik: nazwa czynnika chłodniczego/gazu (np. R410A, R134a, SF6)"),
+        f"{_('Jednostka')}: {', '.join(ALLOWED_UNITS)}",
     ]
 
     def _parse_row(self, row_num: int, cells: tuple) -> ImportRow:
@@ -478,11 +480,11 @@ class FugitiveEmissionImporter(BaseScope1Importer):
         ir = ImportRow(row_num=row_num, raw=raw, data={})
         ir.data = {
             "year": self._v_year(rok, ir),
-            "installation": self._v_text(instalacja, "instalacja", ir),
-            "product": self._v_text(czynnik, "czynnik", ir),
+            "installation": self._v_text(instalacja, _("instalacja"), ir),
+            "product": self._v_text(czynnik, _("czynnik"), ir),
             "amount": self._v_amount(ilosc, ir),
             "unit": self._v_unit(jednostka, ir, self.ALLOWED_UNITS),
-            "source": self._v_text(zrodlo, "zrodlo", ir, required=False),
+            "source": self._v_text(zrodlo, _("źródło"), ir, required=False),
         }
         return ir
 

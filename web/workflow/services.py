@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from workflow.models import ReportingPeriod, WorkflowStatusMixin
 
@@ -42,7 +43,7 @@ def review_single_record(
         record.save(update_fields=["workflow_status"])
     else:
         if not reason:
-            raise ValueError("Odrzucenie rekordu wymaga podania powodu (uwagi).")
+            raise ValueError(_("Odrzucenie rekordu wymaga podania powodu (uwagi)."))
 
         record.workflow_status = WorkflowStatusMixin.RecordStatus.REJECTED
         record.save(update_fields=["workflow_status"])
@@ -63,8 +64,8 @@ def return_report_to_user(envelope: CompanyReportEnvelope) -> Task:
     task = Task.objects.create(
         company=envelope.company,
         task_type=Task.TaskType.CORRECTION,
-        title=f"Wymagana poprawa danych emisyjnych - Okres {envelope.period.year}",
-        description="Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami podświetlonymi na czerwono w poszczególnych widokach.",
+        title=_("Wymagana poprawa danych emisyjnych - Okres %(year)s") % {"year": envelope.period.year},
+        description=_("Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami podświetlonymi na czerwono w poszczególnych widokach."),
     )
 
     permitted_users = UserCompanyPermission.objects.filter(
@@ -105,7 +106,7 @@ def finalize_envelope_review(envelope: CompanyReportEnvelope) -> str:
 
     if has_pending:
         raise ValueError(
-            "Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie PENDING."
+            _("Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie PENDING.")
         )
 
     if has_rejected:
@@ -122,7 +123,7 @@ def request_record_clarification(
     record: WorkflowStatusMixin, admin_user, message: str, deadline: str = None
 ) -> Task:
     if not message.strip():
-        raise ValueError("Uwaga nie może być pusta.")
+        raise ValueError(_("Uwaga nie może być pusta."))
 
     record.workflow_status = WorkflowStatusMixin.RecordStatus.REJECTED
     record.save(update_fields=["workflow_status"])
@@ -132,7 +133,8 @@ def request_record_clarification(
     )
 
     task_title = (
-        f"Wymagane wyjaśnienie: {ctype.name.title()} dla spółki {record.company.name}"
+        _("Wymagane wyjaśnienie: %(type)s dla spółki %(company)s")
+        % {"type": ctype.name.title(), "company": record.company.name}
     )
     task, created = Task.objects.get_or_create(
         company=record.company,
@@ -140,7 +142,7 @@ def request_record_clarification(
         is_completed=False,
         defaults={
             "title": task_title,
-            "description": "Administrator dodał uwagi do rekordu w celu ponownej weryfikacji.",
+            "description": _("Administrator dodał uwagi do rekordu w celu ponownej weryfikacji."),
             "deadline": deadline or None,
         },
     )
@@ -167,7 +169,7 @@ def bulk_approve_company_records(envelope: CompanyReportEnvelope) -> int:
     Zwraca liczbę zaktualizowanych rekordów.
     """
     if envelope.status == CompanyReportEnvelope.Status.APPROVED:
-        raise ValueError("Raport jest już zatwierdzony.")
+        raise ValueError(_("Raport jest już zatwierdzony."))
 
     count = 0
     for model in apps.get_models():
@@ -205,7 +207,7 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
     envelopes_to_create = []
     tasks_to_create = []
 
-    task_title = f"Uruchomiono proces zbierania danych za okres {period.year}"
+    task_title = _("Uruchomiono proces zbierania danych za okres %(year)s") % {"year": period.year}
 
     for company in companies:
         if company.id not in existing_envelopes:
@@ -221,7 +223,7 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
                     company=company,
                     task_type=Task.TaskType.DATA_ENTRY,
                     title=task_title,
-                    description=f"Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za rok {period.year} do wskazanego terminu.",
+                    description=_("Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za rok %(year)s do wskazanego terminu.") % {"year": period.year},
                     deadline=period.deadline,
                     is_completed=False,
                 )
@@ -253,15 +255,15 @@ def create_admin_task_for_pending_record(record: WorkflowStatusMixin) -> Task:
     """
     ctype = ContentType.objects.get_for_model(record)
 
-    task_title = f"Weryfikacja rekordu: {ctype.name.title()} | {record.company.name}"
+    task_title = _("Weryfikacja rekordu: %(type)s | %(company)s") % {"type": ctype.name.title(), "company": record.company.name}
 
     task = Task.objects.create(
         company=record.company,
         task_type=Task.TaskType.CUSTOM,
         title=task_title,
         description=(
-            f"Użytkownik zmienił status rekordu (ID: {record.pk}) na Oczekujący. "
-            f"Wymagana weryfikacja poprawności danych."
+            _("Użytkownik zmienił status rekordu (ID: %(pk)s) na Oczekujący. Wymagana weryfikacja poprawności danych.")
+            % {"pk": record.pk}
         ),
         is_completed=False,
     )

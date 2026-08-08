@@ -2,6 +2,7 @@ import re
 
 from companies.models import Companies
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 
 from .models import CompanyReportEnvelope, ReportingPeriod
 
@@ -27,8 +28,8 @@ class ReportLockMixin:
 
                 if not envelope:
                     raise PermissionDenied(
-                        f"Brak uprawnień. Spółka {company.name} nie została przypisana "
-                        f"do okresu raportowego {target_year}. Najpierw otwórz dla niej raport."
+                        _("Brak uprawnień. Spółka %(company)s nie została przypisana do okresu raportowego %(year)s. Najpierw otwórz dla niej raport.")
+                        % {"company": company.name, "year": target_year}
                     )
 
                 if envelope.status in [
@@ -36,13 +37,14 @@ class ReportLockMixin:
                     CompanyReportEnvelope.Status.APPROVED,
                 ]:
                     raise PermissionDenied(
-                        f"Edycja jest zablokowana. Raport dla {company.name} za rok {target_year} "
-                        "został przekazany do weryfikacji lub jest już zatwierdzony."
+                        _("Edycja jest zablokowana. Raport dla %(company)s za rok %(year)s został przekazany do weryfikacji lub jest już zatwierdzony.")
+                        % {"company": company.name, "year": target_year}
                     )
 
             else:
                 raise PermissionDenied(
-                    f"W systemie brak zdefiniowanego okresu raportowego dla roku {target_year}."
+                    _("W systemie brak zdefiniowanego okresu raportowego dla roku %(year)s.")
+                    % {"year": target_year}
                 )
 
         return super().dispatch(request, *args, **kwargs)

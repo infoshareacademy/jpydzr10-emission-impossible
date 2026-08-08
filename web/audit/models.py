@@ -1,4 +1,7 @@
 from django.db import models
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA MODELI
+)
 
 
 class AuditLog(models.Model):
@@ -12,8 +15,8 @@ class AuditLog(models.Model):
 
     class Meta:
         db_table = "audit_log"
-        verbose_name = "Log zmian"
-        verbose_name_plural = "Logi zmian"
+        verbose_name = _("Log zmian")
+        verbose_name_plural = _("Logi zmian")
         indexes = [
             models.Index(fields=["table_name", "record_id"]),
         ]

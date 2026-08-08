@@ -1,12 +1,16 @@
 from decimal import Decimal
-from django.core.exceptions import ValidationError
-from emissions.models import EmissionFactor
-from calculator.models import FuelSpec as DbFuelSpec
 
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _  # <--- KLUCZOWY IMPORT DLA TŁUMACZEŃ
+from emissions.models import EmissionFactor
+
+from calculator.models import FuelSpec as DbFuelSpec
+from calculator.units import (
+    FuelSpec as DataclassFuelSpec,
+)
 from calculator.units import (
     convert_via_fuel,
     parse_factor_unit,
-    FuelSpec as DataclassFuelSpec,
 )
 
 
@@ -31,7 +35,7 @@ def calculate_record_emissions(instance) -> None:
 
     lookup_field = lookup_mapping.get(model_name)
     if not lookup_field:
-        raise ValueError(f"Nieobsługiwany model dla kalkulatora: {model_name}")
+        raise ValueError(_("Nieobsługiwany model dla kalkulatora: %(model)s") % {"model": model_name})
 
     # Pobieramy wartość (np. "Węgiel kamienny", "Energia elektryczna")
     lookup_value = getattr(instance, lookup_field, None)
@@ -94,7 +98,10 @@ def calculate_record_emissions(instance) -> None:
                 normalized_amount = float(instance.amount) * raw_multiplier
             except Exception as e:
                 raise ValidationError(
-                    f"Błąd konwersji jednostek dla '{lookup_value}': {str(e)}"
+                    _("Błąd konwersji jednostek dla '%(lookup)s': %(error)s") % {
+                        "lookup": lookup_value,
+                        "error": str(e)
+                    }
                 )
 
         # 5. Właściwe wyliczenie i konwersja licznika na tony CO2e
@@ -104,7 +111,7 @@ def calculate_record_emissions(instance) -> None:
         final_emission_tco2e = convert(raw_emission, num_unit, "tCO2e")
         calculated_emission = Decimal(str(final_emission_tco2e))
 
-    # 6. Zapis wyników do instancji (Ślad audytowy)
+    # 6. Zapis wyników do instancji (ślad audytowy)
     instance.calculated_emission_tco2eq = calculated_emission
     instance.applied_factor_value = factor_value
     instance.applied_factor_unit = factor_unit

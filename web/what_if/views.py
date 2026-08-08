@@ -10,6 +10,7 @@ from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _  # <--- DODANY IMPORT TŁUMACZEŃ
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -104,7 +105,7 @@ class ReductionTargetMixin(LoginRequiredMixin):
     def get_active_company(self):
         company_id = self.request.session.get("active_company_id")
         if not company_id:
-            messages.error(self.request, "Wybierz najpierw spółkę z listy celów.")
+            messages.error(self.request, _("Wybierz najpierw spółkę z listy celów."))
             return None
 
         user = self.request.user
@@ -133,17 +134,22 @@ class ReductionTargetMixin(LoginRequiredMixin):
             .exclude(pk=instance.pk)
             .exists()
         ):
-            form.add_error("goal", "Ten cel został już przypisany do wybranej spółki.")
+            form.add_error(
+                "goal", _("Ten cel został już przypisany do wybranej spółki.")
+            )
             return self.form_invalid(form)
 
         is_new = instance.pk is None
         instance.save()
 
-        action_text = "przypisano" if is_new else "zaktualizowano przypisanie"
-        messages.success(
-            self.request,
-            f"Pomyślnie {action_text} cel redukcyjny: {instance.goal.name} dla {self.company.name}",
-        )
+        action_text = _("przypisano") if is_new else _("zaktualizowano przypisanie")
+
+        msg = _("Pomyślnie %(action)s cel redukcyjny: %(goal)s dla %(company)s") % {
+            "action": action_text,
+            "goal": instance.goal.name,
+            "company": self.company.name,
+        }
+        messages.success(self.request, msg)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -167,7 +173,7 @@ class ReductionTargetDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("what_if:reduction-target-list")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Pomyślnie usunięto cel redukcyjny.")
+        messages.success(self.request, _("Pomyślnie usunięto cel redukcyjny."))
         return super().delete(request, *args, **kwargs)
 
 
@@ -222,7 +228,8 @@ class SimulationDashboardView(LoginRequiredMixin, FormView):
             )["total"] or Decimal("0.0")
 
             actual_emissions["scope_1"] = mob_sum + stat_sum + proc_sum + fug_sum
-            actual_emissions["sources"]["Zakres 1 (Emisje bezpośrednie)"] = (
+            # Dodano funkcję tłumaczącą _() dla kluczy będących tekstem w interfejsie
+            actual_emissions["sources"][_("Zakres 1 (Emisje bezpośrednie)")] = (
                 actual_emissions["scope_1"]
             )
 
@@ -230,7 +237,7 @@ class SimulationDashboardView(LoginRequiredMixin, FormView):
                 total=Sum("emission_tco2eq")
             )["total"] or Decimal("0.0")
             actual_emissions["scope_2"] = e_sum
-            actual_emissions["sources"]["Zakres 2 (Emisje pośrednie)"] = (
+            actual_emissions["sources"][_("Zakres 2 (Emisje pośrednie)")] = (
                 actual_emissions["scope_2"]
             )
 
@@ -340,25 +347,33 @@ class ReductionTargetDetailView(LoginRequiredMixin, DetailView):
 
         return context
 
+
 class AdminRequiredMixin(UserPassesTestMixin):
     """Zabezpieczenie: tylko admin/superuser ma dostęp do globalnych celów."""
+
     def test_func(self):
-        return self.request.user.is_superuser or getattr(self.request.user, 'role', '') == 'admin'
+        return (
+            self.request.user.is_superuser
+            or getattr(self.request.user, "role", "") == "admin"
+        )
+
 
 class ReductionGoalListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = ReductionGoal
     template_name = "what_if/goal_list.html"
     context_object_name = "goals"
 
+
 class ReductionGoalCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = ReductionGoal
     template_name = "what_if/goal_form.html"
-    fields = ['company', 'name', 'base_year', 'target_year', 'reduction_pct', 'scope']
-    success_url = reverse_lazy('what_if:goal_list')
+    fields = ["company", "name", "base_year", "target_year", "reduction_pct", "scope"]
+    success_url = reverse_lazy("what_if:goal_list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie utworzono nowy cel redukcyjny.")
+        messages.success(self.request, _("Pomyślnie utworzono nowy cel redukcyjny."))
         return super().form_valid(form)
+
 
 class ReductionGoalUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
     model = ReductionGoal
@@ -367,7 +382,7 @@ class ReductionGoalUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView
     success_url = reverse_lazy("what_if:goal_list")
 
     def form_valid(self, form):
-        messages.success(self.request, "Cel redukcyjny został zaktualizowany.")
+        messages.success(self.request, _("Cel redukcyjny został zaktualizowany."))
         return super().form_valid(form)
 
 
@@ -376,5 +391,5 @@ class ReductionGoalDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView
     success_url = reverse_lazy("what_if:goal_list")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Cel redukcyjny został pomyślnie usunięty.")
+        messages.success(self.request, _("Cel redukcyjny został pomyślnie usunięty."))
         return super().delete(request, *args, **kwargs)

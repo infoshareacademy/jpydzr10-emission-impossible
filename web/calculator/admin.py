@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA ADMINA
+)
 
 from .models import FuelSpec, FuelType, Supplier
 
@@ -38,14 +41,14 @@ class FuelSpecAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Informacje podstawowe",
+            _("Informacje podstawowe"),
             {
                 "fields": ("fuel_type", "supplier", "is_default"),
-                "description": "Wybierz typ paliwa i dostawcę. Pozostaw dostawcę puste dla specyfikacji domyślnej.",
+                "description": _("Wybierz typ paliwa i dostawcę. Pozostaw dostawcę puste dla specyfikacji domyślnej."),
             },
         ),
         (
-            "Parametry fizykochemiczne",
+            _("Parametry fizykochemiczne"),
             {
                 "fields": (
                     "density_kg_per_m3",

@@ -1,4 +1,7 @@
 from django import forms
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA FORMULARZY
+)
 
 from .models import Message, Thread
 
@@ -11,7 +14,7 @@ class ThreadCreateForm(forms.ModelForm):
                 "class": "w-full bg-[rgba(255,255,255,0.06)] border border-border-subtle rounded-xl text-text-main p-3 focus:outline-none focus:border-accent font-mono text-sm",
             }
         ),
-        label="Treść wiadomości",
+        label=_("Treść wiadomości"),
     )
 
     class Meta:
@@ -58,7 +61,7 @@ class MessageReplyForm(forms.ModelForm):
             "content": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "placeholder": "Napisz odpowiedź...",
+                    "placeholder": _("Napisz odpowiedź..."),
                     "class": "w-full bg-[rgba(255,255,255,0.06)] border border-border-subtle rounded-xl text-text-main p-3 focus:outline-none focus:border-accent font-mono text-sm",
                 }
             ),

@@ -1,9 +1,9 @@
-# web/ai_services/SLM_conf.py
 import logging
 
 import ollama
 from companies.models import Companies
 from django.db.models import Sum
+from django.utils.translation import gettext as _  # <--- KLUCZOWY IMPORT DLA TŁUMACZEŃ
 from emissions.models import (
     EnergyConsumption,
     EnergyProduced,
@@ -36,21 +36,21 @@ class BielikESGService:
             base_filter["year"] = year
 
         scope_labels = {
-            "Z1": "Zakres 1 (Emisje bezpośrednie)",
-            "Z2": "Zakres 2 (Emisje pośrednie wynikające z energii)",
-            "ALL": "Pełny Ślad Węglowy (Carbon Footprint - Wszystkie zakresy)",
+            "Z1": _("Zakres 1 (Emisje bezpośrednie)"),
+            "Z2": _("Zakres 2 (Emisje pośrednie wynikające z energii)"),
+            "ALL": _("Pełny Ślad Węglowy (Carbon Footprint - Wszystkie zakresy)"),
         }
 
         context_lines = [
-            f"Raport emisyjny dla spółki: {company.name}",
-            f"Analizowany obszar merytoryczny: {scope_labels.get(scope_type, 'Nieznany')}",
-            f"Rok: {year if year else 'Wszystkie lata dostępne'}\n",
+            f"{_('Raport emisyjny dla spółki')}: {company.name}",
+            f"{_('Analizowany obszar merytoryczny')}: {scope_labels.get(scope_type, _('Nieznany'))}",
+            f"{_('Rok')}: {year if year else _('Wszystkie lata dostępne')}\n",
         ]
 
         has_data = False
 
         if scope_type in ["Z1", "ALL"]:
-            context_lines.append("=== DANE DLA ZAKRESU 1 ===")
+            context_lines.append(f"=== {_('DANE DLA ZAKRESU 1')} ===")
 
             stat = (
                 StationaryCombustion.objects.filter(**base_filter)
@@ -61,7 +61,7 @@ class BielikESGService:
                 has_data = True
             for item in stat:
                 context_lines.append(
-                    f"- Spalanie stacjonarne (Paliwo: {item['fuel__name']}): {item['total'] or 0:.2f} tCO2eq"
+                    f"- {_('Spalanie stacjonarne')} ({_('Paliwo')}: {item['fuel__name']}): {item['total'] or 0:.2f} tCO2eq"
                 )
 
             mob = (
@@ -73,7 +73,7 @@ class BielikESGService:
                 has_data = True
             for item in mob:
                 context_lines.append(
-                    f"- Spalanie mobilne (Flota, Paliwo: {item['fuel__name']}): {item['total'] or 0:.2f} tCO2eq"
+                    f"- {_('Spalanie mobilne')} ({_('Flota, Paliwo')}: {item['fuel__name']}): {item['total'] or 0:.2f} tCO2eq"
                 )
 
             proc = ProcessEmission.objects.filter(**base_filter).aggregate(
@@ -85,16 +85,16 @@ class BielikESGService:
             if proc["total"] or fug["total"]:
                 has_data = True
             context_lines.append(
-                f"- Emisje procesowe ogółem: {proc['total'] or 0:.2f} tCO2eq"
+                f"- {_('Emisje procesowe ogółem')}: {proc['total'] or 0:.2f} tCO2eq"
             )
             context_lines.append(
-                f"- Emisje niezorganizowane (wycieki/chłodnictwo): {fug['total'] or 0:.2f} tCO2eq"
+                f"- {_('Emisje niezorganizowane (wycieki/chłodnictwo)')}: {fug['total'] or 0:.2f} tCO2eq"
             )
 
         if scope_type in ["Z2", "ALL"]:
             if scope_type == "ALL":
                 context_lines.append("\n")
-            context_lines.append("=== DANE DLA ZAKRESU 2 ===")
+            context_lines.append(f"=== {_('DANE DLA ZAKRESU 2')} ===")
 
             e_cons = (
                 EnergyConsumption.objects.filter(**base_filter)
@@ -105,7 +105,7 @@ class BielikESGService:
                 has_data = True
             for item in e_cons:
                 context_lines.append(
-                    f"- Zużycie energii ({item['energy_type']}): {item['total'] or 0:.2f} tCO2eq"
+                    f"- {_('Zużycie energii')} ({item['energy_type']}): {item['total'] or 0:.2f} tCO2eq"
                 )
 
             e_purc = (
@@ -117,15 +117,18 @@ class BielikESGService:
                 has_data = True
             for item in e_purc:
                 context_lines.append(
-                    f"- Zakupiona energia od dystrybutorów ({item['energy_type']}): {item['total'] or 0:.2f} tCO2eq"
+                    f"- {_('Zakupiona energia od dystrybutorów')} ({item['energy_type']}): {item['total'] or 0:.2f} tCO2eq"
                 )
 
         if not has_data:
+            year_str = f" {_('i roku')} {year}" if year else ""
+            unknown_label = str(_('Nieznany'))
+            scope_label_val = scope_labels.get(scope_type, unknown_label)
             return (
-                f"Brak zatwierdzonych danych emisyjnych dla spółki {company.name} "
-                f"w wybranym zakresie ({scope_labels.get(scope_type, 'Nieznany')}) "
-                f"{'i roku ' + str(year) if year else ''}. "
-                f"Upewnij się że dane mają status APPROVED lub VERIFIED."
+                f"{_('Brak zatwierdzonych danych emisyjnych dla spółki')} {company.name} "
+                f"{_('w wybranym zakresie')} ({scope_label_val}) "
+                f"{year_str}. "
+                f"{_('Upewnij się że dane mają status APPROVED lub VERIFIED.')}"
             )
 
         return "\n".join(context_lines)
@@ -143,7 +146,7 @@ class BielikESGService:
             lang = "pl"
 
         language_instruction = (
-            "Odpowiadaj TYLKO po polsku."
+            "Odpowiadaj TYLКО po polsku."
             if lang == "pl"
             else "Respond ONLY in English."
         )
@@ -197,4 +200,4 @@ class BielikESGService:
             return response["message"]["content"]
         except Exception as e:
             logger.error(f"Błąd Ollama: {e}")
-            return "Wystąpił błąd komunikacji. Silnik AI (Bielik) jest niedostępny lub przeciążony."
+            return str(_("Wystąpił błąd komunikacji. Silnik AI (Bielik) jest niedostępny lub przeciążony."))

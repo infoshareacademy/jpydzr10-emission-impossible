@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Thread, Message
+from django.utils.translation import (
+    gettext_lazy as _,  # <--- KLUCZOWY IMPORT DLA ADMINA
+)
+
+from .models import Message, Thread
 
 
 @admin.register(Thread)

@@ -1,6 +1,7 @@
 from companies.models import Companies
 from django import forms
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from emissions.models import EmissionFactor
 
 from .models import ReductionGoal, ReductionTarget
@@ -11,7 +12,7 @@ class ReductionTargetForm(forms.ModelForm):
         model = ReductionTarget
         fields = ["goal"]
         labels = {
-            "goal": "Wybierz cel korporacyjny"
+            "goal": _("Wybierz cel korporacyjny")
         }
         widgets = {
             "goal": forms.Select(attrs={"class": "form-control"}),
@@ -20,7 +21,7 @@ class ReductionTargetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop("company", None)
         super().__init__(*args, **kwargs)
-        self.fields["goal"].empty_label = "-- Wybierz cel z listy --"
+        self.fields["goal"].empty_label = _("-- Wybierz cel z listy --")
 
         if company:
             qs = ReductionGoal.objects.filter(
@@ -35,36 +36,36 @@ class SimulationForm(forms.Form):
     company = forms.ModelChoiceField(
         queryset=Companies.objects.none(),
         required=False,
-        empty_label="-- Cała organizacja (Wszystkie spółki) --",
-        label="Spółka do symulacji",
+        empty_label=_("-- Cała organizacja (Wszystkie spółki) --"),
+        label=_("Spółka do symulacji"),
     )
     current_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,
-        label="Co zastępujemy? (Obecne źródło)",
-        help_text="Wybierz paliwo/energię, z której rezygnujesz.",
+        label=_("Co zastępujemy? (Obecne źródło)"),
+        help_text=_("Wybierz paliwo/energię, z której rezygnujesz."),
     )
     reduced_amount = forms.DecimalField(
         max_digits=12,
         decimal_places=3,
         required=True,
         min_value=0,
-        label="Ilość redukowana",
-        help_text="Ilość zużycia, którą usuwasz z bilansu.",
+        label=_("Ilość redukowana"),
+        help_text=_("Ilość zużycia, którą usuwasz z bilansu."),
     )
     new_factor = forms.ModelChoiceField(
         queryset=EmissionFactor.objects.all(),
         required=True,
-        label="Czym zastępujemy? (Nowe źródło)",
-        help_text="Wybierz nowe paliwo/energię zastępczą.",
+        label=_("Czym zastępujemy? (Nowe źródło)"),
+        help_text=_("Wybierz nowe paliwo/energię zastępczą."),
     )
     added_amount = forms.DecimalField(
         max_digits=12,
         decimal_places=3,
         required=True,
         min_value=0,
-        label="Ilość dodawana",
-        help_text="Ilość nowego zużycia (pamiętaj o odpowiedniej jednostce wskaźnika!).",
+        label=_("Ilość dodawana"),
+        help_text=_("Ilość nowego zużycia (pamiętaj o odpowiedniej jednostce wskaźnika!)."),
     )
 
     def __init__(self, *args, **kwargs):
