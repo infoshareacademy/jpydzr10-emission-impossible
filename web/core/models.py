@@ -44,3 +44,22 @@ class UserPageView(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.view_name} ({self.visit_count})"
+
+
+class UserCarbonFootprint(models.Model):
+  user = models.OneToOneField(
+      settings.AUTH_USER_MODEL,
+      on_delete=models.CASCADE,
+      related_name='carbon_stats',
+  )
+  total_emissions_kg = models.FloatField(
+      default=0.0
+  )
+  total_requests = models.PositiveIntegerField(default=0)
+  last_updated = models.DateTimeField(auto_now=True)
+
+  def __str__(self):
+    return (
+        f'{self.user.username}: {self.total_emissions_kg:.6f} kg CO2eq'
+        f' ({self.total_requests} zapytań)'
+    )

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Profil Użytkownika — Emission Impossible{% endblock %}
+{% block title %}Profil Użytkownika – Emission Impossible{% endblock %}
 
 {% block content %}
   <div class="max-w-4xl mx-auto space-y-8">
@@ -13,11 +13,13 @@
         {% endfor %}
       </div>
     {% endif %}
+
     <div class="flex items-center gap-3 mb-1">
       <div style="width:4px; height:32px; background:#c8f535; border-radius:999px;"></div>
       <h1 class="font-heading font-bold text-4xl text-text-main tracking-wide">Profil Użytkownika</h1>
     </div>
     <p class="font-mono text-sm text-text-muted mt-3">Przegląd danych i uprawnień systemowych.</p>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="rounded-2xl border border-border-subtle p-6 flex flex-col justify-between"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
@@ -69,6 +71,7 @@
           </a>
         </div>
       </div>
+
       <div class="rounded-2xl border border-border-subtle p-6"
            style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
         <div class="flex items-center gap-2 mb-6 pb-4 border-b border-border-subtle">
@@ -79,7 +82,7 @@
           <div class="mb-4 p-3 rounded-xl font-mono text-xs flex items-start gap-2"
                style="background:rgba(200,245,53,0.06); border:1px solid rgba(200,245,53,0.2); color:#c8f535;">
             <span class="material-symbols-outlined text-sm mt-0.5" style="font-variation-settings:'FILL' 1;">gavel</span>
-            <div><span class="font-bold">TRYB GLOBALNY:</span> Administrator — pełny dostęp do wszystkich spółek.</div>
+            <div><span class="font-bold">TRYB GLOBALNY:</span> Administrator – pełny dostęp do wszystkich spółek.</div>
           </div>
           {% if all_companies %}
             <div class="space-y-3 max-h-72 overflow-y-auto pr-2">
@@ -123,6 +126,50 @@
         {% endif %}
       </div>
     </div>
+
+    <div class="rounded-2xl border border-border-subtle p-6"
+         style="background:rgba(17,23,32,0.6); backdrop-filter:blur(8px);">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-border-subtle">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-accent">eco</span>
+          <h2 class="font-mono text-lg text-text-main tracking-widest uppercase">Ślad węglowy aplikacji</h2>
+        </div>
+        <span class="font-mono text-xs px-2.5 py-1 rounded-full" style="background:rgba(200,245,53,0.1); color:#c8f535; border:1px solid rgba(200,245,53,0.3);">Live Tracker</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono">
+        <div class="p-4 rounded-xl border border-border-subtle flex flex-col justify-between" style="background:rgba(255,255,255,0.03);">
+          <span class="text-text-muted text-xs uppercase tracking-wider mb-1">Całkowita emisja CO₂eq</span>
+          <div>
+            <span class="text-3xl font-bold text-accent">
+              {% if user.carbon_stats %}
+                {{ user.carbon_stats.total_emissions_kg|floatformat:4 }}
+              {% else %}
+                0.0000
+              {% endif %}
+            </span>
+            <span class="text-sm font-normal text-text-muted">kg</span>
+          </div>
+          <span class="text-[11px] text-text-muted mt-2">Szacowany ślad węglowy wygenerowany podczas żądań HTTP.</span>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border-subtle flex flex-col justify-between" style="background:rgba(255,255,255,0.03);">
+          <span class="text-text-muted text-xs uppercase tracking-wider mb-1">Liczba zapytań</span>
+          <div>
+            <span class="text-3xl font-bold text-text-main">
+              {% if user.carbon_stats %}
+                {{ user.carbon_stats.total_requests }}
+              {% else %}
+                0
+              {% endif %}
+            </span>
+            <span class="text-sm font-normal text-text-muted">aktywności</span>
+          </div>
+          <span class="text-[11px] text-text-muted mt-2">Liczba przetworzonych interakcji użytkownika z systemem.</span>
+        </div>
+      </div>
+    </div>
+
     <div class="rounded-2xl border border-red-900/50 p-6" style="background:rgba(42,10,10,0.2);">
       <div class="flex items-center gap-2 mb-4 pb-4 border-b border-red-900/50">
         <span class="material-symbols-outlined text-red-500">warning</span>

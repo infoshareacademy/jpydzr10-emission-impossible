@@ -1,46 +1,47 @@
+import base64
+import io
+import time
+
+import pyotp
+import qrcode
 from companies.models import Companies
 from core.mixins import PageViewTrackerMixin
+from core.models import UserCarbonFootprint
 from django.contrib import messages
-from django.contrib.auth import get_user_model, logout, login
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView, TemplateView, UpdateView, View
-from .forms import DeleteAccountForm, UserProfileForm
-from .models import UserCompanyPermission
-import io
-import pyotp
-import qrcode
-import base64
-import time
 from django.utils import timezone
-from .models import TOTPDevice
+from django.views.generic import FormView, TemplateView, UpdateView, View
+
+from .forms import DeleteAccountForm, UserProfileForm
+from .models import TOTPDevice, UserCompanyPermission
 
 
 class ProfileView(PageViewTrackerMixin, LoginRequiredMixin, TemplateView):
-    template_name = "accounts/profile.html"
-    tracked_view_name = "Profil"
+  template_name = 'accounts/profile.html'
+  tracked_view_name = 'Profil'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    user = self.request.user
 
-        # Sprawdzamy czy użytkownik posiada rolę administratora
-        if user.role == "admin":
-            context["is_admin_user"] = True
-            # Admin widzi absolutnie wszystkie spółki w systemie
-            context["all_companies"] = Companies.objects.all()
-        else:
-            context["is_admin_user"] = False
-            # Zwykły użytkownik widzi tylko te, do których ma jawne uprawnienie
-            context["permissions"] = UserCompanyPermission.objects.filter(
-                user=user
-            ).select_related("company")
+    UserCarbonFootprint.objects.get_or_create(user=user)
 
-        return context
+    if user.role == 'admin':
+      context['is_admin_user'] = True
+      context['all_companies'] = Companies.objects.all()
+    else:
+      context['is_admin_user'] = False
+      context['permissions'] = UserCompanyPermission.objects.filter(
+          user=user
+      ).select_related('company')
+
+    return context
 
 
 class DeleteAccountView(LoginRequiredMixin, FormView):
