@@ -52,4 +52,5 @@ jobs:
           echo "DB_PASSWORD=emission_pass" >> .env
           echo "DB_HOST=localhost" >> .env
           echo "DB_PORT=5432" >> .env
+          echo "FIELD_ENCRYPTION_KEY=django-insecure-dummy-encryption-key-for-ci==" >> .env
           uv run python manage.py test
