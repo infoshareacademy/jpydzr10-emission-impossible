@@ -231,6 +231,10 @@ class Scope2ListMixin(ListView):
 class Scope2DeleteMixin(DeleteView):
     """Wspólna logika dla usuwania rekordów z Zakresu 2."""
 
+    def get_template_names(self):
+        model_name_snake = re.sub(r"(?<!^)(?=[A-Z])", "_", self.model.__name__).lower()
+        return [f"emissions/{model_name_snake}_confirm_delete.html"]
+
     def delete(self, request, *args, **kwargs):
         model_verbose = self.model._meta.verbose_name
         messages.success(self.request, f"Pomyślnie usunięto wpis z: {model_verbose}")
@@ -1055,15 +1059,49 @@ class EnergyPurchasedTemplateDownloadView(View):
 
 
 class EnergyPurchasedImportView(FormView):
-    """Widok importu danych zakupionej energii."""
-
     template_name = "emissions/energy_purchased_import.html"
     form_class = EnergyPurchasedImportForm
-    success_url = reverse_lazy("energy_purchased_list")
+    success_url = reverse_lazy("emissions:energy_purchased_list")
+
+    EXPECTED_HEADERS = ["year", "company", "energy_type", "amount", "unit", "trader", "source"]
+
+    def get_company(self):
+        return self.request.user.companies.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_verbose_name"] = "Zakupiona energia"
+        context["company"] = self.get_company()
+        context["list_url"] = reverse_lazy("emissions:energy_purchased_list")
+        context["import_url"] = reverse_lazy("emissions:energy_purchased_import")
+        context["template_url"] = reverse_lazy("emissions:energy_purchased_template")
+        context["importer_headers"] = self.EXPECTED_HEADERS
+        context["instructions"] = [
+            "year — rok (liczba całkowita), np. 2024",
+            "company — dokładna nazwa firmy zapisana w systemie",
+            "energy_type — typ energii, amount/unit — ilość i jednostka",
+            "trader — dostawca/pośrednik energii",
+        ]
+        context["max_size_mb"] = 5
+        context["max_rows"] = 1000
+        context.setdefault("step", "upload")
+        return context
+
+    def get(self, request, *args, **kwargs):
+        request.session.pop("import_data_purchased", None)
+        return self.render_to_response(self.get_context_data(form=self.get_form()))
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action")
+        if action == "cancel":
+            request.session.pop("import_data_purchased", None)
+            return redirect(self.success_url)
+        if action == "confirm":
+            return self.confirm_import(request)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         file = form.cleaned_data["file"]
-
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
@@ -1072,62 +1110,72 @@ class EnergyPurchasedImportView(FormView):
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "trader",
-            "source",
-        ]
-
-        if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+        if headers != self.EXPECTED_HEADERS:
+            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
             return self.form_invalid(form)
 
-        records_count = ws.max_row - 1
+        preview_rows, raw_rows = [], []
+        valid_count = invalid_count = 0
+
+        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            year, company_name, energy_type, amount, unit, trader, source = row
+            errors = []
+            if not company_name:
+                errors.append("Brak nazwy firmy")
+            elif not Companies.objects.filter(name=company_name).exists():
+                errors.append(f'Firma "{company_name}" nie znaleziona')
+            if not year:
+                errors.append("Brak roku")
+            if amount in (None, ""):
+                errors.append("Brak ilości")
+            else:
+                try:
+                    float(amount)
+                except (TypeError, ValueError):
+                    errors.append("Nieprawidłowa ilość")
+
+            is_valid = not errors
+            if is_valid:
+                valid_count += 1
+                raw_rows.append(row)
+            else:
+                invalid_count += 1
+            preview_rows.append({"row_num": i, "values": row, "is_valid": is_valid, "errors": errors})
+
+        self.request.session["import_data_purchased"] = raw_rows
+
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
-
-        if "confirm" in self.request.POST:
-            imported = 0
-            duplicates = 0
-
-            for row in ws.iter_rows(min_row=2, values_only=True):
-                year, company, energy_type, amount, unit, trader, source = row
-
-                exists = EnergyPurchased.objects.filter(
-                    year=year, company=company, energy_type=energy_type
-                ).exists()
-
-                if exists:
-                    duplicates += 1
-                    continue
-
-                EnergyPurchased.objects.create(
-                    year=year,
-                    company=company,
-                    energy_type=energy_type,
-                    amount=amount,
-                    unit=unit,
-                    trader=trader,
-                    source=source,
-                )
-                imported += 1
-
-            messages.success(
-                self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
-            )
-            return redirect(self.success_url)
-
+        context.update({
+            "step": "preview", "headers": self.EXPECTED_HEADERS, "preview_rows": preview_rows,
+            "total_count": len(preview_rows), "valid_count": valid_count, "invalid_count": invalid_count,
+        })
         return self.render_to_response(context)
 
+    def confirm_import(self, request):
+        imported = duplicates = 0
+        for row in request.session.get("import_data_purchased", []):
+            year, company_name, energy_type, amount, unit, trader, source = row
+            try:
+                company = Companies.objects.get(name=company_name)
+            except Companies.DoesNotExist:
+                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                continue
+            if EnergyPurchased.objects.filter(year=year, company=company, energy_type=energy_type).exists():
+                duplicates += 1
+                continue
+            record = EnergyPurchased(
+                year=year, company=company, energy_type=energy_type,
+                amount=amount, unit=unit, trader=trader, source=source,
+            )
+            try:
+                calculate_record_emissions(record)
+            except ValidationError as e:
+                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+            record.save()
+            imported += 1
+        request.session.pop("import_data_purchased", None)
+        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        return redirect(self.success_url)
 
 # ===== ENERGY PRODUCED IMPORT =====
 
@@ -1162,15 +1210,49 @@ class EnergyProducedTemplateDownloadView(View):
 
 
 class EnergyProducedImportView(FormView):
-    """Widok importu danych wyprodukowanej energii."""
-
     template_name = "emissions/energy_produced_import.html"
     form_class = EnergyProducedImportForm
-    success_url = reverse_lazy("energy_produced_list")
+    success_url = reverse_lazy("emissions:energy_produced_list")
+
+    EXPECTED_HEADERS = ["year", "company", "energy_type", "amount", "unit", "installation", "source"]
+
+    def get_company(self):
+        return self.request.user.companies.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_verbose_name"] = "Wyprodukowana energia"
+        context["company"] = self.get_company()
+        context["list_url"] = reverse_lazy("emissions:energy_produced_list")
+        context["import_url"] = reverse_lazy("emissions:energy_produced_import")
+        context["template_url"] = reverse_lazy("emissions:energy_produced_template")
+        context["importer_headers"] = self.EXPECTED_HEADERS
+        context["instructions"] = [
+            "year — rok (liczba całkowita), np. 2024",
+            "company — dokładna nazwa firmy zapisana w systemie",
+            "energy_type — typ energii, amount/unit — ilość i jednostka",
+            "installation — instalacja/źródło produkcji",
+        ]
+        context["max_size_mb"] = 5
+        context["max_rows"] = 1000
+        context.setdefault("step", "upload")
+        return context
+
+    def get(self, request, *args, **kwargs):
+        request.session.pop("import_data_produced", None)
+        return self.render_to_response(self.get_context_data(form=self.get_form()))
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action")
+        if action == "cancel":
+            request.session.pop("import_data_produced", None)
+            return redirect(self.success_url)
+        if action == "confirm":
+            return self.confirm_import(request)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         file = form.cleaned_data["file"]
-
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
@@ -1179,61 +1261,72 @@ class EnergyProducedImportView(FormView):
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "installation",
-            "source",
-        ]
-
-        if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+        if headers != self.EXPECTED_HEADERS:
+            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
             return self.form_invalid(form)
 
-        records_count = ws.max_row - 1
+        preview_rows, raw_rows = [], []
+        valid_count = invalid_count = 0
+
+        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            year, company_name, energy_type, amount, unit, installation, source = row
+            errors = []
+            if not company_name:
+                errors.append("Brak nazwy firmy")
+            elif not Companies.objects.filter(name=company_name).exists():
+                errors.append(f'Firma "{company_name}" nie znaleziona')
+            if not year:
+                errors.append("Brak roku")
+            if amount in (None, ""):
+                errors.append("Brak ilości")
+            else:
+                try:
+                    float(amount)
+                except (TypeError, ValueError):
+                    errors.append("Nieprawidłowa ilość")
+
+            is_valid = not errors
+            if is_valid:
+                valid_count += 1
+                raw_rows.append(row)
+            else:
+                invalid_count += 1
+            preview_rows.append({"row_num": i, "values": row, "is_valid": is_valid, "errors": errors})
+
+        self.request.session["import_data_produced"] = raw_rows
+
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
-
-        if "confirm" in self.request.POST:
-            imported = 0
-            duplicates = 0
-
-            for row in ws.iter_rows(min_row=2, values_only=True):
-                year, company, energy_type, amount, unit, installation, source = row
-
-                exists = EnergyProduced.objects.filter(
-                    year=year, company=company, energy_type=energy_type
-                ).exists()
-
-                if exists:
-                    duplicates += 1
-                    continue
-
-                EnergyProduced.objects.create(
-                    year=year,
-                    company=company,
-                    energy_type=energy_type,
-                    amount=amount,
-                    unit=unit,
-                    installation=installation,
-                    source=source,
-                )
-                imported += 1
-
-            messages.success(
-                self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
-            )
-            return redirect(self.success_url)
-
+        context.update({
+            "step": "preview", "headers": self.EXPECTED_HEADERS, "preview_rows": preview_rows,
+            "total_count": len(preview_rows), "valid_count": valid_count, "invalid_count": invalid_count,
+        })
         return self.render_to_response(context)
+
+    def confirm_import(self, request):
+        imported = duplicates = 0
+        for row in request.session.get("import_data_produced", []):
+            year, company_name, energy_type, amount, unit, installation, source = row
+            try:
+                company = Companies.objects.get(name=company_name)
+            except Companies.DoesNotExist:
+                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                continue
+            if EnergyProduced.objects.filter(year=year, company=company, energy_type=energy_type).exists():
+                duplicates += 1
+                continue
+            record = EnergyProduced(
+                year=year, company=company, energy_type=energy_type,
+                amount=amount, unit=unit, installation=installation, source=source,
+            )
+            try:
+                calculate_record_emissions(record)
+            except ValidationError as e:
+                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+            record.save()
+            imported += 1
+        request.session.pop("import_data_produced", None)
+        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        return redirect(self.success_url)
 
 
 # ===== ENERGY SOLD IMPORT =====
@@ -1269,15 +1362,49 @@ class EnergySoldTemplateDownloadView(View):
 
 
 class EnergySoldImportView(FormView):
-    """Widok importu danych sprzedanej energii."""
-
     template_name = "emissions/energy_sold_import.html"
     form_class = EnergySoldImportForm
-    success_url = reverse_lazy("energy_sold_list")
+    success_url = reverse_lazy("emissions:energy_sold_list")
+
+    EXPECTED_HEADERS = ["year", "company", "energy_type", "amount", "unit", "customer", "source"]
+
+    def get_company(self):
+        return self.request.user.companies.first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_verbose_name"] = "Sprzedana energia"
+        context["company"] = self.get_company()
+        context["list_url"] = reverse_lazy("emissions:energy_sold_list")
+        context["import_url"] = reverse_lazy("emissions:energy_sold_import")
+        context["template_url"] = reverse_lazy("emissions:energy_sold_template")
+        context["importer_headers"] = self.EXPECTED_HEADERS
+        context["instructions"] = [
+            "year — rok (liczba całkowita), np. 2024",
+            "company — dokładna nazwa firmy zapisana w systemie",
+            "energy_type — typ energii, amount/unit — ilość i jednostka",
+            "customer — odbiorca/klient",
+        ]
+        context["max_size_mb"] = 5
+        context["max_rows"] = 1000
+        context.setdefault("step", "upload")
+        return context
+
+    def get(self, request, *args, **kwargs):
+        request.session.pop("import_data_sold", None)
+        return self.render_to_response(self.get_context_data(form=self.get_form()))
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action")
+        if action == "cancel":
+            request.session.pop("import_data_sold", None)
+            return redirect(self.success_url)
+        if action == "confirm":
+            return self.confirm_import(request)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         file = form.cleaned_data["file"]
-
         try:
             wb = openpyxl.load_workbook(file)
             ws = wb.active
@@ -1286,58 +1413,69 @@ class EnergySoldImportView(FormView):
             return self.form_invalid(form)
 
         headers = [cell.value for cell in ws[1]]
-        expected_headers = [
-            "year",
-            "company",
-            "energy_type",
-            "amount",
-            "unit",
-            "customer",
-            "source",
-        ]
-
-        if headers != expected_headers:
-            messages.error(
-                self.request,
-                f"Niepoprawna struktura pliku. Oczekiwane kolumny: {expected_headers}",
-            )
+        if headers != self.EXPECTED_HEADERS:
+            messages.error(self.request, f"Niepoprawna struktura pliku. Oczekiwane kolumny: {self.EXPECTED_HEADERS}")
             return self.form_invalid(form)
 
-        records_count = ws.max_row - 1
+        preview_rows, raw_rows = [], []
+        valid_count = invalid_count = 0
+
+        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            year, company_name, energy_type, amount, unit, customer, source = row
+            errors = []
+            if not company_name:
+                errors.append("Brak nazwy firmy")
+            elif not Companies.objects.filter(name=company_name).exists():
+                errors.append(f'Firma "{company_name}" nie znaleziona')
+            if not year:
+                errors.append("Brak roku")
+            if amount in (None, ""):
+                errors.append("Brak ilości")
+            else:
+                try:
+                    float(amount)
+                except (TypeError, ValueError):
+                    errors.append("Nieprawidłowa ilość")
+
+            is_valid = not errors
+            if is_valid:
+                valid_count += 1
+                raw_rows.append(row)
+            else:
+                invalid_count += 1
+            preview_rows.append({"row_num": i, "values": row, "is_valid": is_valid, "errors": errors})
+
+        self.request.session["import_data_sold"] = raw_rows
+
         context = self.get_context_data(form=form)
-        context["records_count"] = records_count
-        context["confirm"] = True
-
-        if "confirm" in self.request.POST:
-            imported = 0
-            duplicates = 0
-
-            for row in ws.iter_rows(min_row=2, values_only=True):
-                year, company, energy_type, amount, unit, customer, source = row
-
-                exists = EnergySold.objects.filter(
-                    year=year, company=company, energy_type=energy_type
-                ).exists()
-
-                if exists:
-                    duplicates += 1
-                    continue
-
-                EnergySold.objects.create(
-                    year=year,
-                    company=company,
-                    energy_type=energy_type,
-                    amount=amount,
-                    unit=unit,
-                    customer=customer,
-                    source=source,
-                )
-                imported += 1
-
-            messages.success(
-                self.request,
-                f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.",
-            )
-            return redirect(self.success_url)
-
+        context.update({
+            "step": "preview", "headers": self.EXPECTED_HEADERS, "preview_rows": preview_rows,
+            "total_count": len(preview_rows), "valid_count": valid_count, "invalid_count": invalid_count,
+        })
         return self.render_to_response(context)
+
+    def confirm_import(self, request):
+        imported = duplicates = 0
+        for row in request.session.get("import_data_sold", []):
+            year, company_name, energy_type, amount, unit, customer, source = row
+            try:
+                company = Companies.objects.get(name=company_name)
+            except Companies.DoesNotExist:
+                messages.warning(request, f'Firma "{company_name}" nie znaleziona!')
+                continue
+            if EnergySold.objects.filter(year=year, company=company, energy_type=energy_type).exists():
+                duplicates += 1
+                continue
+            record = EnergySold(
+                year=year, company=company, energy_type=energy_type,
+                amount=amount, unit=unit, customer=customer, source=source,
+            )
+            try:
+                calculate_record_emissions(record)
+            except ValidationError as e:
+                messages.warning(request, f"Rekord dodany, ale emisja nie obliczona: {e}")
+            record.save()
+            imported += 1
+        request.session.pop("import_data_sold", None)
+        messages.success(request, f"Zaimportowano {imported} rekordów. Pominięto {duplicates} duplikatów.")
+        return redirect(self.success_url)

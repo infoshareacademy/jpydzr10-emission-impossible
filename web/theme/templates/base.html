@@ -187,7 +187,6 @@ select {
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">mail</span>
             <span class="font-mono text-sm text-text-muted group-hover:text-text-main transition-colors text-center">Komunikacja e-mail</span>
           </a>
-
           {% if user.is_superuser or user.role == 'admin' %}
           <a href="{% url 'workflow:admin_list' %}" class="dropdown-card flex flex-col items-center gap-3 p-5 rounded-lg border border-border-subtle hover:border-accent transition-colors group">
             <span class="material-symbols-outlined text-text-muted group-hover:text-accent transition-colors" style="font-size:42px; font-variation-settings:'FILL' 1;">fact_check</span>
@@ -198,6 +197,19 @@ select {
         </div>
       </div>
     </nav>
+    {% if messages %}
+      <div class="max-w-7xl mx-auto px-6 pt-4 space-y-2">
+        {% for message in messages %}
+          <div class="p-4 rounded-xl text-sm font-mono font-bold border
+              {% if message.tags == 'error' %}bg-red-500/10 border-red-500/30 text-red-400
+              {% elif message.tags == 'warning' %}bg-yellow-500/10 border-yellow-500/30 text-yellow-400
+              {% else %}bg-accent/10 border-accent/30 text-accent{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
 <div id="dynamic-view">
    <main class="max-w-7xl mx-auto px-6 py-10" style="min-height: calc(100vh - 64px - 200px);">
       {% block content %}{% endblock %}
@@ -234,15 +246,6 @@ select {
           <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false" class="relative">
             <a href="{% url 'emissions:energy_consumption_list' %}"
                class="font-mono text-sm text-text-muted hover:text-text-main transition-colors">Dane Emisyjne</a>
-            <div x-show="show" x-cloak
-                 class="mt-1 ml-3 flex flex-col gap-1 border-l-2 border-border-subtle pl-2">
-              <a href="{% url 'emissions:energy_purchased_list' %}"
-                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Zakupiona energia</a>
-              <a href="{% url 'emissions:energy_produced_list' %}"
-                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Wyprodukowana energia</a>
-              <a href="{% url 'emissions:energy_sold_list' %}"
-                 class="font-mono text-xs text-text-muted hover:text-text-main transition-colors">Sprzedana energia</a>
-            </div>
           </div>
           {% endif %}
         </div>
