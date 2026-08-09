@@ -120,7 +120,7 @@ select {
         </button>
 
         <!-- Language switcher -->
-        <form action="{% url 'set_language' %}" method="post" class="inline-block m-0 p-0">
+        <form action="{% url 'set_language' %}" method="post" class="inline-block m-0 p-0" hx-boost="false">
           {% csrf_token %}
           <input name="next" type="hidden" value="{{ request.path }}"/>
           {% get_current_language as CURRENT_LANGUAGE %}
@@ -139,7 +139,7 @@ select {
           {% endif %}
         </form>
         {% if user.is_authenticated %}
-        <form method="post" action="{% url 'accounts:logout' %}" class="inline-block m-0 p-0">
+        <form method="post" action="{% url 'accounts:logout' %}" class="inline-block m-0 p-0" hx-boost="false">
           {% csrf_token %}
           <button type="submit"
             class="flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-mono text-sm font-bold uppercase tracking-wider transition-all group"

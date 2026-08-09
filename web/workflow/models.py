@@ -112,12 +112,20 @@ class RecordComment(models.Model):
 
 
 class Task(models.Model):
+    
     class TaskType(models.TextChoices):
         DATA_ENTRY = "DATA_ENTRY", _("Wprowadzenie danych")
         CORRECTION = "CORRECTION", _("Poprawa odrzuconych rekordów")
         UNLOCK_REQ = "UNLOCK_REQ", _("Wniosek o odblokowanie")
         CUSTOM = "CUSTOM", _("Zadanie Ad-Hoc")
 
+    ACTION_CHOICES = (
+        ("status_pending", "Status zmieniony na oczekujący"),
+        ("data_collection", "Zbieranie danych"),
+        ("clarification", "Wymagane wyjaśnienie"),
+        ("report_returned", "Raport zwrócony"),
+    )
+    
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, verbose_name=_("Firma"))
     assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, verbose_name=_("Przypisany do"))
     task_type = models.CharField(max_length=20, choices=TaskType.choices, verbose_name=_("Typ zadania"))
@@ -125,11 +133,63 @@ class Task(models.Model):
     description = models.TextField(blank=True, verbose_name=_("Opis"))
     deadline = models.DateField(null=True, blank=True, verbose_name=_("Termin"))
     is_completed = models.BooleanField(default=False, verbose_name=_("Ukończone"))
-
+    action_type = models.CharField(max_length=50, choices=ACTION_CHOICES, null=True, blank=True)
+    target_record_id = models.IntegerField(null=True, blank=True)
+    
     class Meta:
         verbose_name = _("Zadanie")
         verbose_name_plural = _("Zadania")
 
+    @property
+    def dynamic_title(self):
+        """Generuje tytuł w aktywnym języku, zależnie od akcji systemu."""
+        if self.action_type == "status_pending":
+            return _("Weryfikacja rekordu | %(company)s") % {
+                "company": self.company.name
+            }
+
+        elif self.action_type == "data_collection":
+            return _("Uruchomiono proces zbierania danych za okres %(year)s") % {
+                "year": self.target_record_id
+            }
+
+        elif self.action_type == "clarification":
+            return _("Wymagane wyjaśnienie dla spółki %(company)s") % {
+                "company": self.company.name
+            }
+
+        elif self.action_type == "report_returned":
+            return _("Wymagana poprawa danych emisyjnych za okres %(year)s") % {
+                "year": self.target_record_id
+            }
+
+        return self.title or _("Zadanie bez tytułu")
+
+    @property
+    def dynamic_description(self):
+        """Generuje opis w aktywnym języku, zależnie od akcji systemu."""
+        if self.action_type == "status_pending":
+            return _(
+                "Użytkownik zmienił status rekordu (ID: %(id)s) na Oczekujący. Wymagana weryfikacja poprawności danych."
+            ) % {"id": self.target_record_id or "?"}
+
+        elif self.action_type == "data_collection":
+            return _(
+                "Proces zbierania danych został zainicjowany. Uzupełnij wymagane informacje."
+            )
+
+        elif self.action_type == "clarification":
+            return _(
+                "Administrator zażądał wyjaśnienia do rekordu (ID: %(id)s). Prosimy o weryfikację."
+            ) % {"id": self.target_record_id or "?"}
+
+        elif self.action_type == "report_returned":
+            return _(
+                "Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami podświetlonymi na czerwono w poszczególnych widokach."
+            )
+
+        return self.description or ""
+    
     def __str__(self):
         status_icon = "✓" if self.is_completed else "⏳"
         return f"{status_icon} {self.title} | {self.company}"

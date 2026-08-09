@@ -1,15 +1,65 @@
 {% extends "base.html" %}
-{% block title %}Weryfikacja dwuetapowa{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Weryfikacja dwuetapowa" %} | Emission Impossible{% endblock %}
+
 {% block content %}
-  <div class="mb-8">
-    <h1 class="font-heading font-bold text-3xl text-text-main">Weryfikacja dwuetapowa</h1>
-    <p class="font-mono text-sm text-text-muted mt-2">Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej.</p>
-  </div>
-  <form method="post" class="flex flex-col gap-4 max-w-sm">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="px-6 py-3 bg-accent text-black font-mono font-bold rounded-xl hover:opacity-90 transition">
-      Weryfikuj
-    </button>
-  </form>
+    <style>
+    /* Stylowanie domyślnych pól formularza Django pod ciemny motyw */
+        .django-form-dark p {
+            margin-bottom: 1rem;
+        }
+        .django-form-dark label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #9ca3af; /* text-text-muted */
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.875rem;
+        }
+        .django-form-dark input {
+            width: 100%;
+            background-color: #111720;
+            border: 1px solid #2a3f4a; /* border-border-subtle */
+            color: #f8fafc; /* text-text-main */
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .django-form-dark input:focus {
+            border-color: #c8f535; /* accent */
+        }
+        .django-form-dark .helptext, .django-form-dark .errorlist {
+            font-size: 0.75rem;
+            color: #f87171;
+            margin-top: 0.25rem;
+        }
+    </style>
+
+    <div class="flex items-center justify-center min-h-[70vh] px-4">
+        <div class="w-full max-w-md bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+
+            <div class="mb-8 text-center">
+                <span class="material-symbols-outlined text-5xl text-[#5bc4be] mb-3">lock</span>
+                <h1 class="font-heading font-bold text-3xl text-text-main">{% trans "Weryfikacja 2FA" %}</h1>
+                <p class="font-mono text-sm text-text-muted mt-3">
+                    {% trans "Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej." %}
+                </p>
+            </div>
+
+            <form method="post" class="flex flex-col gap-6">
+                {% csrf_token %}
+                <div class="django-form-dark">
+                    {{ form.as_p }}
+                </div>
+
+                <button type="submit"
+                        class="w-full px-6 py-3.5 bg-[#c8f535] text-[#1a4a52] font-mono font-bold rounded-xl hover:bg-[#b5e02b] shadow-lg transition-colors flex justify-center items-center gap-2 uppercase tracking-widest mt-2">
+                    <span class="material-symbols-outlined text-xl">verified</span>
+                    {% trans "Weryfikuj" %}
+                </button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

@@ -166,11 +166,11 @@ class HomeView(LoginRequiredMixin,TemplateView):
 
             grouped_tasks = {}
             for task in tasks_qs:
-                key = task.title
+                key = task.dynamic_title
                 if key not in grouped_tasks:
                     grouped_tasks[key] = {
-                        "title": task.title,
-                        "description": task.description,
+                        "title": task.dynamic_title,
+                        "description": task.dynamic_description,
                         "deadline": task.deadline,
                         "tasks": [],
                     }

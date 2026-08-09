@@ -1,14 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Konfiguracja 2FA{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Konfiguracja 2FA" %} | Emission Impossible{% endblock %}
+
 {% block content %}
-  <div class="mb-8">
-    <h1 class="font-heading font-bold text-3xl text-text-main">Konfiguracja 2FA</h1>
-    <p class="font-mono text-sm text-text-muted mt-2">Zeskanuj kod QR w aplikacji Google Authenticator lub Microsoft Authenticator.</p>
-  </div>
-  <div class="flex flex-col items-center gap-6">
-    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR kod 2FA" class="rounded-xl" style="width:250px;height:250px;"/>
-    <a href="{% url 'accounts:2fa-verify' %}" class="px-6 py-3 bg-accent text-black font-mono font-bold rounded-xl hover:opacity-90 transition">
-      Mam już kod — weryfikuj
-    </a>
-  </div>
+    <div class="flex items-center justify-center min-h-[70vh] px-4">
+        <div class="w-full max-w-lg bg-[#13383e]/20 border border-[#1a4a52] rounded-2xl p-8 shadow-2xl backdrop-blur-sm text-center">
+
+            <div class="mb-8">
+                <span class="material-symbols-outlined text-5xl text-[#5bc4be] mb-3">qr_code_scanner</span>
+                <h1 class="font-heading font-bold text-3xl text-text-main">{% trans "Konfiguracja 2FA" %}</h1>
+                <p class="font-mono text-sm text-text-muted mt-3">
+                    {% trans "Zeskanuj poniższy kod QR w aplikacji takiej jak Google Authenticator lub Microsoft Authenticator." %}
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center gap-8">
+            <!-- Tło pod QR musi być jasne, by skanery działały poprawnie -->
+                <div class="p-4 bg-white rounded-2xl shadow-inner inline-block border-4 border-[#1a4a52]">
+                    <img src="data:image/png;base64,{{ qr_base64 }}"
+                         alt="{% trans 'QR kod 2FA' %}"
+                         class="rounded-lg"
+                         style="width: 200px; height: 200px; object-fit: contain;"/>
+                </div>
+
+                <a href="{% url 'accounts:2fa-verify' %}"
+                   class="w-full max-w-sm px-6 py-3.5 bg-[#c8f535] text-[#1a4a52] font-mono font-bold rounded-xl hover:bg-[#b5e02b] shadow-lg transition-colors flex justify-center items-center gap-2 uppercase tracking-widest">
+                    {% trans "Mam już kod – weryfikuj" %}
+                    <span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

@@ -61,11 +61,14 @@ def return_report_to_user(envelope: CompanyReportEnvelope) -> Task:
     """
     envelope.status = CompanyReportEnvelope.Status.RETURNED
     envelope.save(update_fields=["status"])
+
+    # ZMIANA: Usunięto title i description, używamy akcji "report_returned"
+    # Upewnij się, że dodasz obsługę "report_returned" w swoim pliku models.py
     task = Task.objects.create(
         company=envelope.company,
         task_type=Task.TaskType.CORRECTION,
-        title=_("Wymagana poprawa danych emisyjnych - Okres %(year)s") % {"year": envelope.period.year},
-        description=_("Administrator odrzucił część wprowadzonych danych. Zapoznaj się z uwagami podświetlonymi na czerwono w poszczególnych widokach."),
+        action_type="report_returned",
+        target_record_id=envelope.period.year,  # Przemycamy rok okresu raportowego
     )
 
     permitted_users = UserCompanyPermission.objects.filter(
@@ -106,7 +109,9 @@ def finalize_envelope_review(envelope: CompanyReportEnvelope) -> str:
 
     if has_pending:
         raise ValueError(
-            _("Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie PENDING.")
+            _(
+                "Nie można sfinalizować weryfikacji, dopóki istnieją rekordy o statusie PENDING."
+            )
         )
 
     if has_rejected:
@@ -132,17 +137,15 @@ def request_record_clarification(
         author=admin_user, content_type=ctype, object_id=record.pk, text=message
     )
 
-    task_title = (
-        _("Wymagane wyjaśnienie: %(type)s dla spółki %(company)s")
-        % {"type": ctype.name.title(), "company": record.company.name}
-    )
+    # ZMIANA: W get_or_create filtrujemy po action_type i target_record_id, aby
+    # przypadkiem nie wyciągnąć innego zadania poprawy.
     task, created = Task.objects.get_or_create(
         company=record.company,
         task_type=Task.TaskType.CORRECTION,
+        action_type="clarification",
+        target_record_id=record.pk,
         is_completed=False,
         defaults={
-            "title": task_title,
-            "description": _("Administrator dodał uwagi do rekordu w celu ponownej weryfikacji."),
             "deadline": deadline or None,
         },
     )
@@ -207,8 +210,6 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
     envelopes_to_create = []
     tasks_to_create = []
 
-    task_title = _("Uruchomiono proces zbierania danych za okres %(year)s") % {"year": period.year}
-
     for company in companies:
         if company.id not in existing_envelopes:
             envelopes_to_create.append(
@@ -218,12 +219,14 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
                     status=CompanyReportEnvelope.Status.OPEN,
                 )
             )
+
+            # ZMIANA: Usunięto tekst na sztywno, dodano action_type i target_record_id
             tasks_to_create.append(
                 Task(
                     company=company,
                     task_type=Task.TaskType.DATA_ENTRY,
-                    title=task_title,
-                    description=_("Rozpoczęto nowy okres raportowy. Proszę o uzupełnienie danych emisyjnych za rok %(year)s do wskazanego terminu.") % {"year": period.year},
+                    action_type="data_collection",
+                    target_record_id=period.year,  # Przemycamy rok dla modelu
                     deadline=period.deadline,
                     is_completed=False,
                 )
@@ -233,9 +236,11 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
 
     CompanyReportEnvelope.objects.bulk_create(envelopes_to_create)
     created_tasks = Task.objects.bulk_create(tasks_to_create)
+
     company_users_qs = UserCompanyPermission.objects.filter(
         company__in=companies
     ).values_list("company_id", "user_id")
+
     company_to_users = {}
     for cid, uid in company_users_qs:
         company_to_users.setdefault(cid, []).append(uid)
@@ -247,24 +252,19 @@ def generate_envelopes_and_tasks_for_period(period: ReportingPeriod) -> int:
 
     return len(envelopes_to_create)
 
+
 @transaction.atomic
 def create_admin_task_for_pending_record(record: WorkflowStatusMixin) -> Task:
     """
     Tworzy zadanie (Task) dla administratorów weryfikujących rekord.
     Wywoływane automatycznie przy zmianie statusu rekordu na PENDING.
     """
-    ctype = ContentType.objects.get_for_model(record)
-
-    task_title = _("Weryfikacja rekordu: %(type)s | %(company)s") % {"type": ctype.name.title(), "company": record.company.name}
-
+    # ZMIANA: Usunięto generowanie tłumaczeń, opieramy się całkowicie o akcję
     task = Task.objects.create(
         company=record.company,
         task_type=Task.TaskType.CUSTOM,
-        title=task_title,
-        description=(
-            _("Użytkownik zmienił status rekordu (ID: %(pk)s) na Oczekujący. Wymagana weryfikacja poprawności danych.")
-            % {"pk": record.pk}
-        ),
+        action_type="status_pending",
+        target_record_id=record.pk,
         is_completed=False,
     )
 
